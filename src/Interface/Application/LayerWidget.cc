@@ -815,6 +815,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->display_min_value_state_ );
           QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
             data_layer->adjust_display_min_max_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.pick_color_checkbox_,
+            data_layer->pick_color_state_ );
           QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
             data_layer->adjust_display_min_max_state_, true );
           QtUtils::QtBridge::Show( this->private_->ui_.contrast_, 
@@ -879,6 +881,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->display_min_value_state_ );
           QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
             data_layer->adjust_display_min_max_state_ );
+          QtUtils::QtBridge::Connect( this->private_->ui_.pick_color_checkbox_,
+            data_layer->pick_color_state_ );
           QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
             data_layer->adjust_display_min_max_state_, true );
           QtUtils::QtBridge::Show( this->private_->ui_.contrast_, 
@@ -909,6 +913,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         // Hide the buttons that are not needed for this widget
         this->private_->ui_.bright_contrast_->hide();
         this->private_->ui_.datainfo_widget_->hide();
+        this->private_->ui_.pick_color_checkbox_->hide();
         
         this->connect( this->private_->color_widget_, SIGNAL( color_index_changed( int ) ), 
           this, SLOT( set_mask_background_color( int ) ) );
