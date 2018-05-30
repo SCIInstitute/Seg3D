@@ -229,7 +229,7 @@ void LargeVolumeLayer::initialize_states()
   this->display_max_value_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
   this->add_state( "adjust_minmax", this->adjust_display_min_max_state_, false );
-  this->add_state("pick_color_bool", this->pick_color_state_, false);
+  this->add_state("pick_color", this->pick_color_state_, false);
 
   this->add_state( "data_type", this->data_type_state_, "unknown" );
   this->add_state( "min", this->min_value_state_, std::numeric_limits< double >::quiet_NaN() );

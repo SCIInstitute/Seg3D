@@ -54,6 +54,7 @@ public:
   void set_data_color(float r, float g, float b);
   void set_opacity( float opacity );
   void set_scale_bias( float scale, float bias );
+  void set_pick_color(bool pick_color);
   void set_pixel_size( float width, float height );
   void set_border_width( int width );
   void set_lighting( bool enabled );
@@ -81,6 +82,7 @@ private:
   int enable_fog_loc_;
   int fog_range_loc_;
   int texture_clamp_loc_;
+  int pick_color_loc_;
 };
 
 } // end namespace Seg3D
