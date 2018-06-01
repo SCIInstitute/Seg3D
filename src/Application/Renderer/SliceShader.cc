@@ -37,7 +37,12 @@ namespace Seg3D
 {
 
 SliceShader::SliceShader() :
-  ShaderBase()
+    ShaderBase(), slice_tex_loc_(0), pattern_tex_loc_(0),
+    mask_mode_loc_(0), volume_type_loc_(0), mask_color_loc_(0),
+    data_color_loc_(0), opacity_loc_(0), scale_bias_loc_(0),
+    border_width_loc_(0), pixel_size_loc_(0), enable_lighting_loc_(0),
+    enable_fog_loc_(0), fog_range_loc_(0), texture_clamp_loc_(0),
+    pick_color_loc_(0)
 {
 }
 
@@ -77,6 +82,7 @@ bool SliceShader::post_initialize()
   this->opacity_loc_ = this->get_uniform_location( "opacity" );
   this->mask_mode_loc_ = this->get_uniform_location( "mask_mode" );
   this->scale_bias_loc_ = this->get_uniform_location( "scale_bias" );
+  this->pick_color_loc_ = this->get_uniform_location("pick_color");
   this->pixel_size_loc_ = this->get_uniform_location( "pixel_size" );
   this->border_width_loc_ = this->get_uniform_location( "border_width" );
   this->volume_type_loc_ = this->get_uniform_location( "volume_type" );
@@ -114,6 +120,11 @@ void SliceShader::set_mask_mode( int mask_mode )
 void SliceShader::set_scale_bias( float scale, float bias )
 {
   glUniform2f( this->scale_bias_loc_, scale, bias );
+}
+
+void SliceShader::set_pick_color(bool pick_color)
+{
+	glUniform1i(this->pick_color_loc_, pick_color );
 }
 
 void SliceShader::set_pixel_size( float width, float height )

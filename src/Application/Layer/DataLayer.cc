@@ -90,7 +90,7 @@ void DataLayer::initialize_states()
 	this->display_max_value_state_->set_session_priority(Core::StateBase::DO_NOT_LOAD_E);
 
 	this->add_state("adjust_minmax", this->adjust_display_min_max_state_, false);
-  this->add_state("pick_color_bool", this->pick_color_state_, false);
+    this->add_state("pick_color", this->pick_color_state_, false);
 
 	// == Is this volume rendered through the volume renderer ==
 	this->add_state("volume_rendered", volume_rendered_state_, false);
