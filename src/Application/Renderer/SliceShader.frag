@@ -31,7 +31,7 @@ vec4 shade_data_slice()
   float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
   value = value * scale_bias[0] + scale_bias[1];
   if ( pick_color == false )
- {
+  {
 	data_color = vec3(1.0);
   } 
   vec4 color = vec4( value*data_color, opacity );
