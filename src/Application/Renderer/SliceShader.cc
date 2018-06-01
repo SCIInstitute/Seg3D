@@ -37,7 +37,12 @@ namespace Seg3D
 {
 
 SliceShader::SliceShader() :
-  ShaderBase()
+    ShaderBase(), slice_tex_loc_(0), pattern_tex_loc_(0),
+    mask_mode_loc_(0), volume_type_loc_(0), mask_color_loc_(0),
+    data_color_loc_(0), opacity_loc_(0), scale_bias_loc_(0),
+    border_width_loc_(0), pixel_size_loc_(0), enable_lighting_loc_(0),
+    enable_fog_loc_(0), fog_range_loc_(0), texture_clamp_loc_(0),
+    pick_color_loc_(0)
 {
 }
 
