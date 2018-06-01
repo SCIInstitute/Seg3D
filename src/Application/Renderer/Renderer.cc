@@ -531,17 +531,10 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
       this->set_scale_bias( data_layer_item->data_min_, data_layer_item->data_max_,
         data_layer_item->display_min_, data_layer_item->display_max_ );
 	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
-      bool pick_color = data_layer_item->pick_color_;
-      if (pick_color)
-      {
-        this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
-          static_cast< float >(color.g() / 255), static_cast< float >(color.b() / 255));
-      }
-      else
-      {
-        this->slice_shader_->set_data_color(1.0,1.0,1.0);
-      }
-	  
+	  this->slice_shader_->set_pick_color(data_layer_item->pick_color_);
+	  this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
+	    static_cast< float >(color.g() / 255), static_cast< float >(color.b() / 255));
+
       this->slice_shader_->set_texture_clamp( 0.0f, 1.0f, 0.0f, 1.0f );
       this->map_slice_texture( volume_slice->get_texture(),
         static_cast<int>( volume_slice->nx() ), static_cast<int>( volume_slice->ny() ),
@@ -585,16 +578,10 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
       this->set_scale_bias(data_layer_item->data_min_, data_layer_item->data_max_,
         data_layer_item->display_min_, data_layer_item->display_max_);
 	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
-      bool pick_color = data_layer_item->pick_color_;
-      if (pick_color)
-      {
-        this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
-            static_cast< float >(color.g() / 255), static_cast< float >(color.b() / 255));
-      }
-      else
-      {
-        this->slice_shader_->set_data_color(1.0,1.0,1.0);
-      }
+	  this->slice_shader_->set_pick_color(data_layer_item->pick_color_);
+	  this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
+	   static_cast< float >(color.g() / 255), static_cast< float >(color.b() / 255));
+
       const std::vector<Core::LargeVolumeBrickSliceHandle>& tiles = data_layer_item->tiles_;
       double left, right, bottom, top;
       int width, height;

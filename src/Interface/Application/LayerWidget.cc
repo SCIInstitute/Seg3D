@@ -815,7 +815,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->display_min_value_state_ );
           QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
             data_layer->adjust_display_min_max_state_ );
-          QtUtils::QtBridge::Connect( this->private_->ui_.pick_color_checkbox_,
+           QtUtils::QtBridge::Connect( this->private_->ui_.pick_color_checkbox_,
             data_layer->pick_color_state_ );
           QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
             data_layer->adjust_display_min_max_state_, true );
@@ -825,10 +825,10 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->adjust_display_min_max_state_ );
           QtUtils::QtBridge::Show( this->private_->ui_.display_min_, 
             data_layer->adjust_display_min_max_state_ );
-      
-		  QtUtils::QtBridge::Connect(this->private_->color_widget_,
-			  data_layer->color_state_,
-			  PreferencesManager::Instance()->color_states_);
+		 QtUtils::QtBridge::Connect(this->private_->color_widget_,
+				data_layer->color_state_,
+				PreferencesManager::Instance()->color_states_);
+		 QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->pick_color_state_);
 
 		  this->set_mask_background_color(data_layer->color_state_->get());
 
