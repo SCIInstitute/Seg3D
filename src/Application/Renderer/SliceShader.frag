@@ -29,7 +29,7 @@ uniform bool enable_fog;
 vec4 shade_data_slice()
 {
   float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
-  value = value * scale_bias[0] + scale_bias[1];
+  value = min(value * scale_bias[0] + scale_bias[1], 1);
   vec4 color;
   if ( pick_color )
   {
