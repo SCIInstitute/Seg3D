@@ -752,7 +752,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget_21" native="true">
+             <widget class="QWidget" name="colormap_bar_" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
