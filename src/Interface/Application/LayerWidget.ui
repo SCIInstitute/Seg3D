@@ -785,7 +785,10 @@
                <item>
                 <widget class="QLabel" name="label_6">
                  <property name="text">
-                  <string>ColorMap:</string>
+                  <string>Colormap:</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
                  </property>
                 </widget>
                </item>
