@@ -62,7 +62,6 @@ public:
 // counter for generating new colors for each new data layer
 size_t data_ColorCount = 0;
 boost::mutex data_ColorCountMutex;
-
 void DataLayer::initialize_states()
 {
 	// NOTE: This function allows setting of state variables outside of application thread
@@ -77,6 +76,11 @@ void DataLayer::initialize_states()
 
 		data_ColorCount++;
 	}
+
+	// == Colormap ==
+	this->add_state("colormap", this->colormap_state_, PreferencesManager::Instance()->
+		default_colormap_state_->export_to_string(), PreferencesManager::Instance()->
+		default_colormap_state_->export_list_to_string());
 
 	// == The brightness of the layer ==
 	this->add_state("brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1);

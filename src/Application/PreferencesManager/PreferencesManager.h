@@ -103,6 +103,7 @@ public:
   Core::StateOptionHandle default_mask_fill_state_;
   Core::StateOptionHandle default_mask_border_state_;
   std::vector< Core::StateColorHandle > color_states_;
+  Core::StateOptionHandle default_colormap_state_;
 
   //Interface Controls Preferences
   Core::StateBoolHandle reverse_slice_navigation_state_;

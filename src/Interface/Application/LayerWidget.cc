@@ -831,6 +831,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 		 QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->pick_color_state_);
 		 QtUtils::QtBridge::Enable(this->private_->ui_.colormap_selection_combo_, 
 			   data_layer->pick_color_state_);
+		 QtUtils::QtBridge::Connect(this->private_->ui_.colormap_selection_combo_,
+			 data_layer->colormap_state_);
 
 		  this->set_mask_background_color(data_layer->color_state_->get());
 
@@ -899,6 +901,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 		  QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->pick_color_state_);
 		  QtUtils::QtBridge::Enable(this->private_->ui_.colormap_selection_combo_,
 			  data_layer->pick_color_state_);
+		  QtUtils::QtBridge::Connect(this->private_->ui_.colormap_selection_combo_,
+			  data_layer->colormap_state_);
       
           connect( this->private_->ui_.reset_brightness_contrast_button_, 
             SIGNAL( clicked() ), this, SLOT( set_brightness_contrast_to_default() ) );
@@ -917,7 +921,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
         // Hide the buttons that are not needed for this widget
         this->private_->ui_.bright_contrast_->hide();
         this->private_->ui_.datainfo_widget_->hide();
-        //this->private_->ui_.pick_color_checkbox_->hide();
 		this->private_->ui_.colormap_bar_->hide();
         
         this->connect( this->private_->color_widget_, SIGNAL( color_index_changed( int ) ), 
