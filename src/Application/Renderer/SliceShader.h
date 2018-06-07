@@ -49,6 +49,7 @@ public:
   void set_slice_texture( int tex_unit );
   void set_pattern_texture( int tex_unit );
   void set_mask_mode( int mask_mode );
+  void set_colormap_mode(int colormap_mode);
   void set_volume_type( int volume_type );
   void set_mask_color( float r, float g, float b );
   void set_data_color(float r, float g, float b);
@@ -71,6 +72,7 @@ private:
   int slice_tex_loc_;
   int pattern_tex_loc_;
   int mask_mode_loc_;
+  int colormap_mode_loc_;
   int volume_type_loc_;
   int mask_color_loc_;
   int data_color_loc_;

@@ -357,6 +357,10 @@ void ViewerPrivate::insert_layer( LayerHandle layer )
 	  this->layer_connection_map_.insert(std::make_pair(layer->get_layer_id(),
 		  data_layer->pick_color_state_->state_changed_signal_.connect(
 		  boost::bind(&ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E))));
+
+	  this->layer_connection_map_.insert(std::make_pair(layer->get_layer_id(),
+		  data_layer->colormap_state_->state_changed_signal_.connect(
+		  boost::bind(&ViewerPrivate::layer_state_changed, this, ViewModeType::ALL_E))));
     }
     break;
   case Core::VolumeType::MASK_E:
