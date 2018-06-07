@@ -208,8 +208,8 @@ void PreferencesManager::initialize_states()
   this->add_state( "default_layer_opacity", this->default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
   this->add_state( "default_mask_fill", this->default_mask_fill_state_, "striped", "none|striped|solid" );
   this->add_state( "default_mask_border", this->default_mask_border_state_, "thick", "none|thin|thick" );
-  this->add_state( "default_colormap", this->default_colormap_state_, "none",
-	  "none|Rainbow|Blackbody|Load Colormap..." );
+  this->add_state("default_colormap", this->default_colormap_state_, "none",
+	  "none|Rainbow|Blackbody" ); //|Load Colormap..."); - add later
     
   this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
