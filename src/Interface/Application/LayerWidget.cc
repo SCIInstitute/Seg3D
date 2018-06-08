@@ -815,8 +815,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->display_min_value_state_ );
           QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
             data_layer->adjust_display_min_max_state_ );
-           QtUtils::QtBridge::Connect( this->private_->ui_.pick_color_checkbox_,
-            data_layer->pick_color_state_ );
           QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
             data_layer->adjust_display_min_max_state_, true );
           QtUtils::QtBridge::Show( this->private_->ui_.contrast_, 
@@ -828,9 +826,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 		 QtUtils::QtBridge::Connect(this->private_->color_widget_,
 				data_layer->color_state_,
 				PreferencesManager::Instance()->color_states_);
-		 QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->pick_color_state_);
-		 QtUtils::QtBridge::Enable(this->private_->ui_.colormap_selection_combo_, 
-			   data_layer->pick_color_state_);
+		 QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->colormap_state_, 1);
 		 QtUtils::QtBridge::Connect(this->private_->ui_.colormap_selection_combo_,
 			 data_layer->colormap_state_);
 
@@ -885,8 +881,8 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
             data_layer->display_min_value_state_ );
           QtUtils::QtBridge::Connect( this->private_->ui_.adjust_minmax_checkbox_,
             data_layer->adjust_display_min_max_state_ );
-          QtUtils::QtBridge::Connect( this->private_->ui_.pick_color_checkbox_,
-            data_layer->pick_color_state_ );
+		  QtUtils::QtBridge::Connect(this->private_->ui_.colormap_selection_combo_,
+			  data_layer->colormap_state_);
           QtUtils::QtBridge::Show( this->private_->ui_.brightness_, 
             data_layer->adjust_display_min_max_state_, true );
           QtUtils::QtBridge::Show( this->private_->ui_.contrast_, 
@@ -898,11 +894,7 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 		  QtUtils::QtBridge::Connect(this->private_->color_widget_,
 			  data_layer->color_state_,
 			  PreferencesManager::Instance()->color_states_);
-		  QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->pick_color_state_);
-		  QtUtils::QtBridge::Enable(this->private_->ui_.colormap_selection_combo_,
-			  data_layer->pick_color_state_);
-		  QtUtils::QtBridge::Connect(this->private_->ui_.colormap_selection_combo_,
-			  data_layer->colormap_state_);
+		  //QtUtils::QtBridge::Enable(this->private_->color_widget_, data_layer->colormap_state_);
       
           connect( this->private_->ui_.reset_brightness_contrast_button_, 
             SIGNAL( clicked() ), this, SLOT( set_brightness_contrast_to_default() ) );

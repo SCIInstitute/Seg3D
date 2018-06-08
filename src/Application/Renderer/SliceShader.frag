@@ -21,7 +21,6 @@ uniform int colormap_mode;
 
 uniform vec3 mask_color;  // color of mask
 uniform vec3 data_color; // color of data layer
-uniform bool pick_color; //whether or not color is turned on for data layers
 uniform float opacity;
 uniform vec2 scale_bias;
 uniform int border_width; // width of the mask border
@@ -37,11 +36,11 @@ vec4 shade_data_slice()
   value = min(value * scale_bias[0] + scale_bias[1], 1.0);
   vec4 color;
 
-  if ( pick_color && colormap_mode == 0)
+  if (colormap_mode == 1)
   {
     color = vec4( value*data_color, opacity );
   }
-  else if ( pick_color && colormap_mode == 1)
+  else if (colormap_mode == 2)
   {
     if (value < 0.25)
 	{
@@ -60,7 +59,7 @@ vec4 shade_data_slice()
       color = vec4(1.0, 2.0 - 2.0*value, 0.0, opacity);
 	}
   }
-  else if ( pick_color && colormap_mode == 2)
+  else if (colormap_mode == 3)
   {
     if (value < 0.333333)
 	{

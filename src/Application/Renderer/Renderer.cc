@@ -530,9 +530,8 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         dynamic_cast<DataLayerSceneItem*>( layer_item.get() );
       this->set_scale_bias( data_layer_item->data_min_, data_layer_item->data_max_,
         data_layer_item->display_min_, data_layer_item->display_max_ );
-	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
-	  this->slice_shader_->set_pick_color(data_layer_item->pick_color_);
 	  this->slice_shader_->set_colormap_mode(data_layer_item->colormap_);
+	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
 	  this->slice_shader_->set_data_color(static_cast<float>(color.r() / 255),
 	    static_cast<float>(color.g() / 255), static_cast<float>(color.b() / 255));
 
@@ -578,8 +577,8 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         dynamic_cast< LargeVolumeLayerSceneItem* >(layer_item.get());
       this->set_scale_bias(data_layer_item->data_min_, data_layer_item->data_max_,
         data_layer_item->display_min_, data_layer_item->display_max_);
+	  this->slice_shader_->set_colormap_mode(data_layer_item->colormap_);
 	  Core::Color color = PreferencesManager::Instance()->get_color(data_layer_item->color_);
-	  this->slice_shader_->set_pick_color(data_layer_item->pick_color_);
 	  this->slice_shader_->set_data_color(static_cast< float >(color.r() / 255),
 	   static_cast< float >(color.g() / 255), static_cast< float >(color.b() / 255));
 

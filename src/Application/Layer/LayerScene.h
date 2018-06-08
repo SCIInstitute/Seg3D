@@ -77,7 +77,6 @@ public:
   double display_min_;
   double display_max_;
   bool volume_rendered_;
-  bool pick_color_;
   int colormap_;
 };
 
@@ -98,7 +97,6 @@ public:
   double data_max_;
   double display_min_;
   double display_max_;
-  bool pick_color_;
   int colormap_;
   std::vector<Core::LargeVolumeBrickSliceHandle> tiles_;
 };
