@@ -14,9 +14,13 @@ uniform int mask_mode;
 // 2: mask volume
 uniform int volume_type; 
 
+//Colormap
+//0: Single hue
+//1: Rainbow
+uniform int colormap_mode;
+
 uniform vec3 mask_color;  // color of mask
 uniform vec3 data_color; // color of data layer
-uniform bool pick_color; //whether or not color is turned on for data layers
 uniform float opacity;
 uniform vec2 scale_bias;
 uniform int border_width; // width of the mask border
@@ -29,11 +33,46 @@ uniform bool enable_fog;
 vec4 shade_data_slice()
 {
   float value = texture2D( slice_tex, gl_TexCoord[0].st ).r;
-  value = value * scale_bias[0] + scale_bias[1];
+  value = min(value * scale_bias[0] + scale_bias[1], 1.0);
   vec4 color;
-  if ( pick_color )
+
+  if (colormap_mode == 1)
   {
     color = vec4( value*data_color, opacity );
+  }
+  else if (colormap_mode == 2)
+  {
+    if (value < 0.25)
+	{
+      color = vec4(0.0, value*3.0, 1.0 - value, opacity );
+	}
+    else if (0.25 <= value && value < 0.5)
+	{
+      color = vec4(0.0, value + 0.5, 1.5 - value*3.0, opacity);
+	}
+    else if (0.5 <= value && value < 0.75)
+	{
+      color = vec4(4.0*value - 2.0, 2.0 - 2.0*value, 0.0, opacity);
+	}
+    else
+	{
+      color = vec4(1.0, 2.0 - 2.0*value, 0.0, opacity);
+	}
+  }
+  else if (colormap_mode == 3)
+  {
+    if (value < 0.333333)
+	{
+      color = vec4(value * 3.0, 0.0, 0.0, opacity);
+	}
+    else if (value < 0.6666666)
+	{
+      color = vec4(1.0, (value - 0.333333) * 3.0, 0.0, opacity);
+	}
+    else
+	{
+      color = vec4(1.0, 1.0, (value - 0.6666666) * 3.0, opacity);
+	}
   }
   else
   {

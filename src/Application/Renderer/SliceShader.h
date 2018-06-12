@@ -49,12 +49,12 @@ public:
   void set_slice_texture( int tex_unit );
   void set_pattern_texture( int tex_unit );
   void set_mask_mode( int mask_mode );
+  void set_colormap_mode(int colormap_mode);
   void set_volume_type( int volume_type );
   void set_mask_color( float r, float g, float b );
   void set_data_color(float r, float g, float b);
   void set_opacity( float opacity );
   void set_scale_bias( float scale, float bias );
-  void set_pick_color(bool pick_color);
   void set_pixel_size( float width, float height );
   void set_border_width( int width );
   void set_lighting( bool enabled );
@@ -71,6 +71,7 @@ private:
   int slice_tex_loc_;
   int pattern_tex_loc_;
   int mask_mode_loc_;
+  int colormap_mode_loc_;
   int volume_type_loc_;
   int mask_color_loc_;
   int data_color_loc_;
@@ -82,7 +83,6 @@ private:
   int enable_fog_loc_;
   int fog_range_loc_;
   int texture_clamp_loc_;
-  int pick_color_loc_;
 };
 
 } // end namespace Seg3D

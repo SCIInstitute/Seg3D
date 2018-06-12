@@ -116,7 +116,8 @@ public:
   Core::StateRangedDoubleHandle display_max_value_state_;
 
   Core::StateBoolHandle adjust_display_min_max_state_;
-  Core::StateBoolHandle pick_color_state_;
+
+  Core::StateOptionHandle colormap_state_;
 
   /// State describing whether volume is volume rendered
   Core::StateBoolHandle volume_rendered_state_;
