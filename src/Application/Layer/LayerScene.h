@@ -71,11 +71,13 @@ public:
   }
 
 public:
+  int color_;
   double data_min_;
   double data_max_;
   double display_min_;
   double display_max_;
   bool volume_rendered_;
+  int colormap_;
 };
 
 class LargeVolumeLayerSceneItem : public LayerSceneItem
@@ -90,10 +92,12 @@ public:
   }
 
 public:
+  int color_;
   double data_min_;
   double data_max_;
   double display_min_;
   double display_max_;
+  int colormap_;
   std::vector<Core::LargeVolumeBrickSliceHandle> tiles_;
 };
 

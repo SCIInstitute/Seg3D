@@ -195,6 +195,9 @@ public:
   static Core::ConnectionHandle Connect( QtTransferFunctionCurve* tf_curve, 
     Core::TransferFunctionFeatureHandle& feature );
 
+  static Core::ConnectionHandle Connect(QPlainTextEdit* plain_text,
+	 Core::StateDoubleVectorHandle& state_vector,int dim1,int dim2);
+
   /// Enable / Disable a button from state engine
   static Core::ConnectionHandle Enable( QAction* qaction, Core::StateBoolHandle& state, 
     bool opposite_logic = false );
@@ -208,6 +211,9 @@ public:
 
   static Core::ConnectionHandle Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
     boost::function< bool () > condition );
+
+  static Core::ConnectionHandle Enable(QWidget* qwidget, Core::StateOptionHandle state,
+	  int trueState);
 
   /// Connect the visibility of the QWidget to a StateBool
   static Core::ConnectionHandle Show( QWidget* qwidget, Core::StateBoolHandle& state, 

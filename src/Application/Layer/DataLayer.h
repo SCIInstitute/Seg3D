@@ -102,6 +102,9 @@ public:
   // -- state variables --
 public:
 
+  /// Which color to use for displaying the mask
+  Core::StateIntHandle color_state_;
+
   /// State describing contrast
   Core::StateRangedDoubleHandle contrast_state_;
 
@@ -113,6 +116,8 @@ public:
   Core::StateRangedDoubleHandle display_max_value_state_;
 
   Core::StateBoolHandle adjust_display_min_max_state_;
+
+  Core::StateOptionHandle colormap_state_;
 
   /// State describing whether volume is volume rendered
   Core::StateBoolHandle volume_rendered_state_;
@@ -133,6 +138,17 @@ protected:
   /// CLEAN_UP:
   /// this function cleans up the data volume for when you are deleting the data layer and reloading
   virtual void clean_up();
+
+  // -- color functions --
+public:
+
+	/// GETCOLORCOUNT:
+	/// Get the current count from which the next color is derived
+	static size_t GetColorCount();
+
+	/// SETCOLORCOUNT:
+	/// Set the color count to a specific number
+	static void SetColorCount(size_t count);
 
 private:
   void initialize_states();

@@ -77,6 +77,9 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   std::vector< double > identity_matrix( 6, 0 );
   this->add_state( "transformation_matrix", this->transform_matrix_state_, identity_matrix );
 
+  std::vector< double > zero_matrix(16, 0);
+  this->add_state("complete_transformation_matrix", this->complete_transform_matrix_state_, zero_matrix);
+
   this->add_connection( LayerManager::Instance()->layers_changed_signal_.connect(
     boost::bind( &PointSetFilter::handle_layers_changed, this ) ) );
 
@@ -90,7 +93,6 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
 
   this->add_connection( this->transform_matrix_state_->state_changed_signal_.connect(
     boost::bind( &PointSetFilter::handle_transform_changed, this ) ) );
-
 }
   
 PointSetFilter::~PointSetFilter()
@@ -235,7 +237,8 @@ void PointSetFilter::registration( Core::ActionContextHandle context )
     this->target_layer_state_->get(),
     this->mask_state_->get(),
     this->iterations_state_->get(),
-    this->transform_matrix_state_->get_stateid()
+    this->transform_matrix_state_->get_stateid(),
+	this->complete_transform_matrix_state_->get_stateid()
     );  
 
 }

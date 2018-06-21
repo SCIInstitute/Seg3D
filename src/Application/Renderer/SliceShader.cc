@@ -37,7 +37,12 @@ namespace Seg3D
 {
 
 SliceShader::SliceShader() :
-  ShaderBase()
+    ShaderBase(), slice_tex_loc_(0), pattern_tex_loc_(0),
+    mask_mode_loc_(0), colormap_mode_loc_(0), volume_type_loc_(0),
+	mask_color_loc_(0), data_color_loc_(0), opacity_loc_(0),
+	scale_bias_loc_(0), border_width_loc_(0), pixel_size_loc_(0), 
+	enable_lighting_loc_(0), enable_fog_loc_(0), fog_range_loc_(0), 
+	texture_clamp_loc_(0)
 {
 }
 
@@ -76,11 +81,13 @@ bool SliceShader::post_initialize()
   this->pattern_tex_loc_ = this->get_uniform_location( "pattern_tex" );
   this->opacity_loc_ = this->get_uniform_location( "opacity" );
   this->mask_mode_loc_ = this->get_uniform_location( "mask_mode" );
+  this->colormap_mode_loc_ = this->get_uniform_location("colormap_mode");
   this->scale_bias_loc_ = this->get_uniform_location( "scale_bias" );
   this->pixel_size_loc_ = this->get_uniform_location( "pixel_size" );
   this->border_width_loc_ = this->get_uniform_location( "border_width" );
   this->volume_type_loc_ = this->get_uniform_location( "volume_type" );
   this->mask_color_loc_ = this->get_uniform_location( "mask_color" );
+  this->data_color_loc_ = this->get_uniform_location("data_color");
   this->enable_lighting_loc_ = this->get_uniform_location( "enable_lighting" );
   this->enable_fog_loc_ = this->get_uniform_location( "enable_fog" );
   this->fog_range_loc_ = this->get_uniform_location( "fog_range" );
@@ -110,6 +117,11 @@ void SliceShader::set_mask_mode( int mask_mode )
   glUniform1i( this->mask_mode_loc_, mask_mode );
 }
 
+void SliceShader::set_colormap_mode(int colormap_mode)
+{
+	glUniform1i(this->colormap_mode_loc_, colormap_mode);
+}
+
 void SliceShader::set_scale_bias( float scale, float bias )
 {
   glUniform2f( this->scale_bias_loc_, scale, bias );
@@ -133,6 +145,11 @@ void SliceShader::set_volume_type( int volume_type )
 void SliceShader::set_mask_color( float r, float g, float b )
 {
   glUniform3f( this->mask_color_loc_, r, g, b );
+}
+
+void SliceShader::set_data_color(float r, float g, float b)
+{
+	glUniform3f(this->data_color_loc_, r, g, b );
 }
 
 void SliceShader::set_lighting( bool enabled )

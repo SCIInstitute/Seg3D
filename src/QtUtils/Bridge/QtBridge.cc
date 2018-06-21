@@ -65,6 +65,8 @@
 #include <QtUtils/Bridge/detail/QtTransferFunctionSceneConnector.h>
 #include <QtUtils/Bridge/detail/QtTransferFunctionCurveConnector.h>
 #include <QtUtils/Bridge/detail/QtGroupBoxConnector.h>
+#include <QtUtils/Bridge/detail/QtTextMatrixConnector.h>
+
 
 namespace QtUtils
 {
@@ -238,6 +240,13 @@ Core::ConnectionHandle QtBridge::Connect( QListWidget* qlistwidget, Core::StateL
     new QtListWidgetConnector( qlistwidget, state ) ) );
 }
 
+Core::ConnectionHandle QtBridge::Connect(QPlainTextEdit* plain_text,
+	Core::StateDoubleVectorHandle& state_vector, int dim1, int dim2)
+{
+	return Core::ConnectionHandle(new QtConnection(
+		new QtTextMatrixConnector(plain_text,state_vector,dim1,dim2)));
+}
+
 Core::ConnectionHandle QtBridge::Connect( QListWidget* qwidget, Core::StateStringVectorHandle& state )
 {
   return Core::ConnectionHandle( new QtConnection(
@@ -310,6 +319,13 @@ Core::ConnectionHandle QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& 
 {
   return Core::ConnectionHandle( new QtConnection(
     new QtShowConnector( qwidget, state, opposite_logic ) ) );
+}
+
+Core::ConnectionHandle QtBridge::Enable(QWidget* qwidget, Core::StateOptionHandle state,
+	int trueState)
+{
+	return Core::ConnectionHandle(new QtConnection(
+		new QtEnableConnector(qwidget, state, [state, trueState]() { return state->index() == trueState; })));
 }
 
 Core::ConnectionHandle QtBridge::Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )

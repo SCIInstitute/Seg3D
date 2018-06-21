@@ -50,10 +50,15 @@ static void PythonCLIPrint( std::string output )
   std::cout.flush();
 }
 
+static void PythonCLIPrintError( std::string output )
+{
+  std::cerr << output;
+}
+
 PythonCLI::PythonCLI()
 {
   this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect(
-    boost::bind( &PythonCLIPrint, _1 ) ) );
+    boost::bind( &PythonCLIPrintError, _1 ) ) );
   this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect(
     boost::bind( &PythonCLIPrint, _1 ) ) );
 }
