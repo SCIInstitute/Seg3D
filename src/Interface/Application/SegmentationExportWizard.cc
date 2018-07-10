@@ -345,32 +345,14 @@ bool SegmentationSelectionPage::validatePage()
   }
   else
   {
-    filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-      current_folder.string().c_str(), QFileDialog::ShowDirsOnly | 
-                QFileDialog::DontResolveSymlinks );
+    QString filename;
+    QFileDialog *dialog new QFileDialog( this, tr( "Choose Directory for Export..." ) );
+    dialog->setAcceptMode(QFileDialog::AcceptOpen);
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    dialog->setOption(QFileDialog::ShowDirsOnly);
+    dialog->setOption(QFileDialog::DontResolveSymlinks);
       
-    if( !QFileInfo( filename ).exists() )
-    {
-      this->private_->warning_message_->setText( QString::fromUtf8( 
-        "This location does not exist, please choose a valid location." ) );
-      this->private_->warning_message_->show();
-      return false;
-    }
-    try
-    {
-      boost::filesystem::create_directory( boost::filesystem::path( filename.toStdString() ) 
-        / "delete_me" );
-    }
-    catch( ... ) // if the create fails then we are not in a writable directory
-    {
-      this->private_->warning_message_->setText( QString::fromUtf8( 
-        "This location is not writable, please choose a valid location." ) );
-      this->private_->warning_message_->show();
-      return false;
-    }
-    // if we've made it here then we need to remove the folder we created
-    boost::filesystem::remove( boost::filesystem::path( filename.toStdString() ) 
-      / "delete_me" );
+    dialog->open( this, SLOT( set_filename( const QString& ) ) );
   }
   
   QDir file_path = QDir( filename );
@@ -384,6 +366,32 @@ bool SegmentationSelectionPage::validatePage()
   this->private_->file_name_ = filename.toStdString();
 
   return true;
+}
+    
+void SegmentationSelectionPage( const QString& name)
+{
+    if( !QFileInfo( filename ).exists() )
+    {
+        this->private_->warning_message_->setText( QString::fromUtf8(
+            "This location does not exist, please choose a valid location." ) );
+        this->private_->warning_message_->show();
+        return false;
+    }
+    try
+    {
+        boost::filesystem::create_directory( boost::filesystem::path( filename.toStdString() )
+          / "delete_me" );
+    }
+    catch( ... ) // if the create fails then we are not in a writable directory
+    {
+        this->private_->warning_message_->setText( QString::fromUtf8(
+          "This location is not writable, please choose a valid location." ) );
+        this->private_->warning_message_->show();
+        return false;
+    }
+    // if we've made it here then we need to remove the folder we created
+    boost::filesystem::remove( boost::filesystem::path( filename.toStdString() ) 
+      / "delete_me" );
 }
 
 SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent )

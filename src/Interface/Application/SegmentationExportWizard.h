@@ -80,6 +80,7 @@ protected:
   
 private Q_SLOTS:
   void change_type_text( int index );
+  void set_name(const QString& name);
   
 private:
   SegmentationPrivateHandle private_;
