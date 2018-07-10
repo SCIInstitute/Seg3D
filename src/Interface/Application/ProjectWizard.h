@@ -38,6 +38,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QDebug>
 
 #endif
 
@@ -95,6 +96,7 @@ private:
 
 private Q_SLOTS:
     void set_path();
+    void set_name(const QString& name);
 };
 
 class SummaryPage : public QWizardPage
