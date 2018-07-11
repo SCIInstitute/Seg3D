@@ -302,7 +302,7 @@ void SegmentationSelectionPage::initializePage()
   //Export path intialize
   std::string file_type = this->private_->export_selector_->currentText().toStdString();
     
-  this->private_->filename_name_lineEdit_->setText(QString::fromStdString( "/Untitled" + file_type ) );
+  this->private_->filename_name_lineEdit_->setText(QString::fromStdString( "Untitled" + file_type ) );
   
   this->private_->filename_path_lineEdit_->setText( QString::fromStdString(
     ProjectManager::Instance()->get_current_project_folder().string() ) );
@@ -399,14 +399,6 @@ bool SegmentationSelectionPage::validatePage()
   //Error checks for segmentation export
   QString filename = this->private_->filename_path_lineEdit_->text();
     
-  if( this->private_->single_file_radio_button_->isChecked() )
-  {
-    std::string temp_path = filename.toStdString();
-    size_t index = temp_path.find_last_of("/");
-    temp_path.erase(index, temp_path.length() );
-    filename = QString::fromStdString( temp_path );
-  }
-    
   if( !QFileInfo( filename ).exists() )
   {
     this->private_->warning_message_->setText( QString::fromUtf8(
@@ -436,10 +428,10 @@ bool SegmentationSelectionPage::validatePage()
       return false;
     }
     
-    if( this->private_->single_file_radio_button_->isChecked() ){
-      this->private_->file_name_ = filename.toStdString() + this->private_->single_file_user_input_name_
-        + this->private_->export_selector_->currentText().toStdString();
-      std::cout << this->private_->file_name_ << std::endl;
+    if( this->private_->single_file_radio_button_->isChecked() )
+    {
+      this->private_->file_name_ = filename.toStdString()
+        + "/" + this->private_->filename_name_lineEdit_->text().toStdString();
     }
     else
     {
@@ -471,45 +463,36 @@ void SegmentationSelectionPage::set_filename( const QString& name )
         
     if( export_directory_.exists() )
     {
-      if( this->private_->single_file_radio_button_->isChecked() )
-      {
-        this->private_->filename_path_lineEdit_->setText( export_directory_.canonicalPath()
-          + QString::fromStdString( this->private_->single_file_user_input_name_ )
-          + this->private_->export_selector_->currentText() );
-      }
-      else
-      {
-        this->private_->filename_path_lineEdit_->setText( export_directory_.canonicalPath() );
-      }
-      
+      this->private_->filename_path_lineEdit_
+        ->setText( export_directory_.canonicalPath() );
     }
   }
 }
 
 void SegmentationSelectionPage::radio_button_change_path()
 {
-  auto path_name = this->private_->filename_path_lineEdit_->text();
+    //grey out name path and don't include it in the name
+    
+  auto file_name = this->private_->filename_name_lineEdit_->text();
   auto file_type = this->private_->export_selector_->currentText();
-        
-  QFileInfo info(path_name);
+    
+  QFileInfo info(file_name);
   if ( this->private_->single_file_radio_button_->isChecked() )
   {
-    QString filename = info.baseName();
-    QString path = info.path();
-    if (info.isDir())
-    {
-      //filename = this->private->single_file_user_input_name_;
-      filename = "Untitled";
-      path = path_name;
-    }
-    path_name = QDir(path).filePath(filename + file_type);
+      this->private_->filename_name_lineEdit_->setReadOnly(false);
+      
+      QString name = info.baseName();
+      this->private_->filename_name_lineEdit_->setText(name + file_type);
   }
   else
   {
-    if (!info.isDir())
-    path_name = info.path();
+    this->private_->filename_name_lineEdit_->setReadOnly(true);
+      
+//    QPalette *palette = new QPalette();
+//    palette->setColor(QPalette::Base,Qt::gray);
+//    palette->setColor(QPalette::Text,Qt::darkGray);
+//    this->private_->filename_name_lineEdit_->setPalette(*palette);
   }
-    this->private_->filename_path_lineEdit_->setText( path_name );
 }
     
 SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent )

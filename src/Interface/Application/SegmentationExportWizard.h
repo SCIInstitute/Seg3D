@@ -83,7 +83,6 @@ private Q_SLOTS:
   void set_export_path();
   void set_filename( const QString& name );
   void radio_button_change_path();
-  //void update_path_filetye();
   
 private:
   SegmentationPrivateHandle private_;
