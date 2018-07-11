@@ -494,6 +494,8 @@ void SegmentationSelectionPage::radio_button_change_path()
   }
   else
   {
+    this->private_->filename_name_lineEdit_->setReadOnly(true);
+
     QString style_sheet = QString("QLineEdit[readOnly=\"true\"] {"
                                   " text-align: left;"
                                   " color: rgb(" "128,128,128" ") ;"
