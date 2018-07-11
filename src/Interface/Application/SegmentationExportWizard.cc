@@ -478,17 +478,32 @@ void SegmentationSelectionPage::radio_button_change_path()
   {
       this->private_->filename_name_lineEdit_->setReadOnly(false);
       
+      QString style_sheet = QString("QLineEdit[readOnly=\"false\"] {"
+                                    " text-align: left;"
+                                    " color: rgb(" "255,255,255" ") ;"
+                                    " background-color: rgb( " "43, 43, 46" ") ;"
+                                    " selection-color: rgb( " "0, 0, 0" ") ; "
+                                    " border-radius: 3px;"
+                                    " padding: 0px;"
+                                    " margin: 0px;}");
+      
+      this->setStyleSheet(style_sheet);
+      
       QString name = info.baseName();
       this->private_->filename_name_lineEdit_->setText(name + file_type);
   }
   else
   {
-    this->private_->filename_name_lineEdit_->setReadOnly(true);
+    QString style_sheet = QString("QLineEdit[readOnly=\"true\"] {"
+                                  " text-align: left;"
+                                  " color: rgb(" "128,128,128" ") ;"
+                                  " background-color: rgb( " "43, 43, 46" ") ;"
+                                  " selection-color: rgb( " "0, 0, 0" ") ; "
+                                  " border-radius: 3px;"
+                                  " padding: 0px;"
+                                  " margin: 0px;}");
       
-//    QPalette *palette = new QPalette();
-//    palette->setColor(QPalette::Base,Qt::gray);
-//    palette->setColor(QPalette::Text,Qt::darkGray);
-//    this->private_->filename_name_lineEdit_->setPalette(*palette);
+    this->setStyleSheet(style_sheet);
   }
 }
     
