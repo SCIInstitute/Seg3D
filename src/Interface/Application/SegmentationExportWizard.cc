@@ -375,6 +375,14 @@ bool SegmentationSelectionPage::validatePage()
   //Error checks for segmentation export
   QString filename = this->private_->filename_path_lineEdit_->text();
     
+  if( this->private_->single_file_radio_button_->isChecked() )
+  {
+    std::string temp_path = filename.toStdString();
+    size_t index = temp_path.find_last_of("/");
+    temp_path.erase(index, temp_path.length() );
+    filename = QString::fromStdString( temp_path );
+  }
+    
   if( !QFileInfo( filename ).exists() )
   {
     this->private_->warning_message_->setText( QString::fromUtf8(
@@ -404,18 +412,18 @@ bool SegmentationSelectionPage::validatePage()
       return false;
     }
     
-    this->private_->file_name_ = filename.toStdString();
+    if( this->private_->single_file_radio_button_->isChecked() ){
+      this->private_->file_name_ = filename.toStdString() + this->private_->single_file_user_input_name_
+        + this->private_->export_selector_->currentText().toStdString();
+      std::cout << this->private_->file_name_ << std::endl;
+    }
+    else
+    {
+      this->private_->file_name_ = filename.toStdString();
+    }
     
     return true;
 }
-
-//void SegmentationSelectionPage::update_path_filetype()
-//{
-//  if( this->private_->single_file_radio_button_->isChecked() )
-//  {
-//    this->filename_path_lineEdit_->;
-//  }
-//}
 
 void SegmentationSelectionPage::set_export_path()
 {
@@ -439,7 +447,7 @@ void SegmentationSelectionPage::set_filename( const QString& name )
         
     if( export_directory_.exists() )
     {
-      if(this->private_->single_file_radio_button_->isChecked())
+      if( this->private_->single_file_radio_button_->isChecked() )
       {
         this->private_->filename_path_lineEdit_->setText( export_directory_.canonicalPath()
           + QString::fromStdString( this->private_->single_file_user_input_name_ )
@@ -459,7 +467,7 @@ void SegmentationSelectionPage::radio_button_change_path()
   std::string path_name = this->private_->filename_path_lineEdit_->text().toStdString();
   std::string file_type = this->private_->export_selector_->currentText().toStdString();
   
-  if(!file_type.empty())
+  if( path_name.find(file_type) != std::string::npos )
   {
     size_t index1 = path_name.find_last_of("/");
     std::string temp_name = path_name.substr( index1 );
