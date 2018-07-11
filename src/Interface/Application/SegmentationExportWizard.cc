@@ -459,7 +459,7 @@ void SegmentationSelectionPage::radio_button_change_path()
   std::string path_name = this->private_->filename_path_lineEdit_->text().toStdString();
   std::string file_type = this->private_->export_selector_->currentText().toStdString();
   
-  if(path_name.find( file_type ) != std::string::npos)
+  if(!file_type.empty())
   {
     size_t index1 = path_name.find_last_of("/");
     std::string temp_name = path_name.substr( index1 );
@@ -474,14 +474,6 @@ void SegmentationSelectionPage::radio_button_change_path()
   {
     path_name = path_name + this->private_->single_file_user_input_name_ + file_type;
   }
-//  else
-//  {
-//    if(path_name.find( file_type ) != std::string::npos)
-//    {
-//      size_t index = path_name.find_last_of("/");
-//      path_name.erase( index, path_name.length() );
-//    }
-//  }
     
   this->private_->filename_path_lineEdit_->setText( QString::fromStdString( path_name ) );
 }
