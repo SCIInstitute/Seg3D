@@ -83,8 +83,7 @@ public:
   QLabel *warning_message_;
 
   std::string file_name_;
-  std::string single_file_user_input_name_;
-  
+    
   QWidget *single_or_multiple_files_widget_;
   QHBoxLayout *horizontalLayout_1;
   QWidget *single_file_widget_;
@@ -278,8 +277,8 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   //Main layout
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->warning_message_ );
-  this->private_->selection_main_layout_->addWidget( this->private_->name_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->path_widget_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->name_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
   this->private_->single_file_radio_button_->setChecked( true );
@@ -471,8 +470,6 @@ void SegmentationSelectionPage::set_filename( const QString& name )
 
 void SegmentationSelectionPage::radio_button_change_path()
 {
-    //grey out name path and don't include it in the name
-    
   auto file_name = this->private_->filename_name_lineEdit_->text();
   auto file_type = this->private_->export_selector_->currentText();
     
