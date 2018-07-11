@@ -95,9 +95,13 @@ public:
   QRadioButton *individual_files_radio_button_;
   QButtonGroup *radio_button_group_;
   QLabel *filename_path_label_;
+  QLabel *filename_name_label_;
   QPushButton *choose_filename_loc_button_;
   QWidget *path_widget_;
+  QWidget *name_widget_;
   QHBoxLayout *path_layout_;
+  QHBoxLayout *name_layout_;
+  QLineEdit *filename_name_lineEdit_;
   QLineEdit *filename_path_lineEdit_;
   
   //SegmentationSummaryPage
@@ -204,6 +208,21 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   connect( this->private_->single_file_radio_button_, SIGNAL( clicked() ), SLOT(radio_button_change_path() ) );
   connect( this->private_->individual_files_radio_button_, SIGNAL( clicked() ), SLOT(radio_button_change_path() ) );
 
+  //Segmentation Name
+  this->private_->name_widget_ = new QWidget( this );
+  this->private_->name_widget_->setMinimumSize( QSize( 0, 40) );
+  this->private_->name_widget_->setMaximumSize( QSize( 16777215, 40 ) );
+  this->private_->name_layout_ = new QHBoxLayout( this->private_->name_widget_ );
+  this->private_->name_layout_->setSpacing( 6 );
+  this->private_->name_layout_->setContentsMargins( 4, 4, 4, 4 );
+    
+  this->private_->filename_name_label_ = new QLabel( QString::fromUtf8( "Segmentation Name: " ),
+                                                      this->private_->name_widget_ );
+  this->private_->name_layout_->addWidget( this->private_->filename_name_label_ );
+    
+  this->private_->filename_name_lineEdit_ = new QLineEdit();
+  this->private_->name_layout_->addWidget( this->private_->filename_name_lineEdit_ );
+    
   //Segmentation Path
   this->private_->path_widget_ = new QWidget( this );
   this->private_->path_widget_->setMinimumSize( QSize( 0, 40) );
@@ -259,6 +278,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   //Main layout
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->warning_message_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->name_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->path_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
@@ -280,10 +300,14 @@ void SegmentationSelectionPage::change_type_text( int index )
 void SegmentationSelectionPage::initializePage()
 {
   //Export path intialize
-  this->private_->single_file_user_input_name_ = "/Untitled";
   std::string file_type = this->private_->export_selector_->currentText().toStdString();
+    
+  this->private_->filename_name_lineEdit_->setText(QString::fromStdString( "/Untitled" + file_type ) );
   
-  this->private_->filename_path_lineEdit_->setText( QString::fromStdString(ProjectManager::Instance()->get_current_project_folder().string()+ this->private_->single_file_user_input_name_ + file_type ) );
+  this->private_->filename_path_lineEdit_->setText( QString::fromStdString(
+    ProjectManager::Instance()->get_current_project_folder().string() ) );
+    
+  this->registerField( "projectName", this->private_->filename_name_lineEdit_ );
   this->registerField( "projectPath", this->private_->filename_path_lineEdit_ );
     
   //Mask initialize
@@ -464,26 +488,28 @@ void SegmentationSelectionPage::set_filename( const QString& name )
 
 void SegmentationSelectionPage::radio_button_change_path()
 {
-  std::string path_name = this->private_->filename_path_lineEdit_->text().toStdString();
-  std::string file_type = this->private_->export_selector_->currentText().toStdString();
-  
-  if( path_name.find(file_type) != std::string::npos )
-  {
-    size_t index1 = path_name.find_last_of("/");
-    std::string temp_name = path_name.substr( index1 );
-    path_name.erase(index1 ,path_name.length() );
-      
-    size_t index2 = temp_name.find_last_of(".");
-    temp_name.erase(index2, temp_name.length() );
-    this->private_->single_file_user_input_name_ = temp_name;
-  }
-
+  auto path_name = this->private_->filename_path_lineEdit_->text();
+  auto file_type = this->private_->export_selector_->currentText();
+        
+  QFileInfo info(path_name);
   if ( this->private_->single_file_radio_button_->isChecked() )
   {
-    path_name = path_name + this->private_->single_file_user_input_name_ + file_type;
+    QString filename = info.baseName();
+    QString path = info.path();
+    if (info.isDir())
+    {
+      //filename = this->private->single_file_user_input_name_;
+      filename = "Untitled";
+      path = path_name;
+    }
+    path_name = QDir(path).filePath(filename + file_type);
   }
-    
-  this->private_->filename_path_lineEdit_->setText( QString::fromStdString( path_name ) );
+  else
+  {
+    if (!info.isDir())
+    path_name = info.path();
+  }
+    this->private_->filename_path_lineEdit_->setText( path_name );
 }
     
 SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent )
