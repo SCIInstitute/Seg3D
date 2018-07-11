@@ -246,9 +246,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->export_selector_->addItem( QString::fromUtf8( ".dcm" ) );
   this->private_->export_selector_->setCurrentIndex( 0 );
   this->private_->export_selector_->setEnabled( true );
-  connect(ui->deviceBox, SIGNAL(currentIndexChanged(int)),
-    [this]( int idx ) { radio_button_change_path( ); } );
-  //connect( this->private_->export_selector_, SIGNAL( currentIndexChanged() ), SLOT( radio_button_change_path() ) );
+  connect( this->private_->export_selector_, SIGNAL( currentIndexChanged(int) ), SLOT( radio_button_change_path() ) );
   this->private_->bitmap_layout_->addWidget( this->private_->export_selector_ );
   
   //Warning message
@@ -458,33 +456,32 @@ void SegmentationSelectionPage::set_filename( const QString& name )
 
 void SegmentationSelectionPage::radio_button_change_path()
 {
-  std::cout << "MADE IT" << std::endl;
   std::string path_name = this->private_->filename_path_lineEdit_->text().toStdString();
   std::string file_type = this->private_->export_selector_->currentText().toStdString();
   
   if(path_name.find( file_type ) != std::string::npos)
   {
-    std::string temp_name = path_name.substr( path_name.find_last_of("/") );
-    size_t index = temp_name.find_last_of(".");
-    temp_name.erase(index, temp_name.length() );
-    
+    size_t index1 = path_name.find_last_of("/");
+    std::string temp_name = path_name.substr( index1 );
+    path_name.erase(index1 ,path_name.length() );
+      
+    size_t index2 = temp_name.find_last_of(".");
+    temp_name.erase(index2, temp_name.length() );
     this->private_->single_file_user_input_name_ = temp_name;
   }
 
-  if ( this->private_->single_file_radio_button_->isChecked() && (path_name.find(file_type) == std::string::npos) )
+  if ( this->private_->single_file_radio_button_->isChecked() )
   {
-    std::string file_type = this->private_->export_selector_->currentText().toStdString();
-    path_name = this->private_->filename_path_lineEdit_->text().toStdString() +
-      this->private_->single_file_user_input_name_ + file_type;
+    path_name = path_name + this->private_->single_file_user_input_name_ + file_type;
   }
-  else
-  {
-    if(path_name.find( file_type ) != std::string::npos)
-    {
-      size_t index = path_name.find_last_of("/");
-      path_name.erase( index, path_name.length() );
-    }
-  }
+//  else
+//  {
+//    if(path_name.find( file_type ) != std::string::npos)
+//    {
+//      size_t index = path_name.find_last_of("/");
+//      path_name.erase( index, path_name.length() );
+//    }
+//  }
     
   this->private_->filename_path_lineEdit_->setText( QString::fromStdString( path_name ) );
 }
