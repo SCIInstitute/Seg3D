@@ -50,31 +50,19 @@ typedef boost::shared_ptr< SegmentationPrivate > SegmentationPrivateHandle;
 class SegmentationExportWizard : public QWizard
 {
 Q_OBJECT
-    
-Q_SIGNALS:
-  void finished();
-  void canceled();
 
 public:
   SegmentationExportWizard( QWidget *parent = 0 );
     virtual ~SegmentationExportWizard();
- 
-private Q_SLOTS:
-  void set_delete_path( QString );
     
 private:
-  void accept();
-  void reject();
+    void accept();
   SegmentationPrivateHandle private_;
-  std::string path_to_delete_;
 };
 
 class SegmentationSelectionPage : public QWizardPage
 {
 Q_OBJECT
-
-Q_SIGNALS:
-  void need_to_set_delete_path( QString );;
 
 public:
   SegmentationSelectionPage( SegmentationPrivateHandle private_handle, QWidget *parent = 0 );
