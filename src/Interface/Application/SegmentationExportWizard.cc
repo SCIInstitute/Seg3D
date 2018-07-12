@@ -83,7 +83,7 @@ public:
   QLabel *warning_message_;
 
   std::string file_name_;
-  
+    
   QWidget *single_or_multiple_files_widget_;
   QHBoxLayout *horizontalLayout_1;
   QWidget *single_file_widget_;
@@ -93,8 +93,18 @@ public:
   QHBoxLayout *horizontalLayout_5;
   QRadioButton *individual_files_radio_button_;
   QButtonGroup *radio_button_group_;
+  QLabel *filename_path_label_;
+  QLabel *filename_name_label_;
+  QPushButton *choose_filename_loc_button_;
+  QWidget *path_widget_;
+  QWidget *name_widget_;
+  QHBoxLayout *path_layout_;
+  QHBoxLayout *name_layout_;
+  QLineEdit *filename_name_lineEdit_;
+  QLineEdit *filename_path_lineEdit_;
   
   //SegmentationSummaryPage
+
   QLabel *description_;
   QVBoxLayout *summary_main_layout_;
   QScrollArea *mask_scroll_area_;
@@ -102,9 +112,7 @@ public:
   QVBoxLayout *masks_layout_;
   
 };
-  
-
-SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
+  SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
     QWizard( parent ),
   private_( new SegmentationPrivate )
 {
@@ -136,6 +144,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->selection_main_layout_->setContentsMargins(6, 6, 26, 6);
   this->private_->selection_main_layout_->setObjectName( QString::fromUtf8( "selection_main_layout_" ) );
 
+  //Mask tree
   this->private_->group_with_masks_tree_ = new QTreeWidget( this );
   this->private_->group_with_masks_tree_->setObjectName( QString::fromUtf8( "group_with_masks_tree_" ) );
   this->private_->group_with_masks_tree_->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -148,6 +157,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
 
   this->private_->selection_main_layout_->addWidget( this->private_->group_with_masks_tree_ );
   
+  //Single file or multiple file radio buttons
   this->private_->single_or_multiple_files_widget_ = new QWidget( this );
   this->private_->single_or_multiple_files_widget_->setObjectName( 
     QString::fromUtf8( "single_or_multiple_files_widget_" ) );
@@ -170,7 +180,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->single_file_radio_button_ = new QRadioButton( this->private_->single_file_widget_ );
   this->private_->single_file_radio_button_->setObjectName( 
     QString::fromUtf8( "single_file_radio_button_" ) );
-  this->private_->single_file_radio_button_->setText( QString::fromUtf8( "Save masks as a single file" ) );
+  this->private_->single_file_radio_button_->setText( QString::fromUtf8( "Save segmentation as a single file" ) );
   this->private_->single_file_radio_button_->setChecked( true );
   this->private_->radio_button_group_->addButton( this->private_->single_file_radio_button_, 0 );
 
@@ -188,12 +198,51 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->individual_files_radio_button_->setObjectName( 
     QString::fromUtf8( "individual_files_radio_button_" ) );
   this->private_->individual_files_radio_button_->setText( 
-    QString::fromUtf8( "Save masks as individual files" ) );
+    QString::fromUtf8( "Save segmentation as individual files" ) );
   this->private_->radio_button_group_->addButton( this->private_->individual_files_radio_button_, 1 );
 
   this->private_->horizontalLayout_5->addWidget( this->private_->individual_files_radio_button_ );
   this->private_->horizontalLayout_1->addWidget( this->private_->multiple_files_widget_ );
-  
+    
+  connect( this->private_->single_file_radio_button_, SIGNAL( clicked() ), SLOT(radio_button_change_path() ) );
+  connect( this->private_->individual_files_radio_button_, SIGNAL( clicked() ), SLOT(radio_button_change_path() ) );
+
+  //Segmentation Name
+  this->private_->name_widget_ = new QWidget( this );
+  this->private_->name_widget_->setMinimumSize( QSize( 0, 40) );
+  this->private_->name_widget_->setMaximumSize( QSize( 16777215, 40 ) );
+  this->private_->name_layout_ = new QHBoxLayout( this->private_->name_widget_ );
+  this->private_->name_layout_->setSpacing( 6 );
+  this->private_->name_layout_->setContentsMargins( 4, 4, 4, 4 );
+    
+  this->private_->filename_name_label_ = new QLabel( QString::fromUtf8( "Segmentation Name: " ),
+                                                      this->private_->name_widget_ );
+  this->private_->name_layout_->addWidget( this->private_->filename_name_label_ );
+    
+  this->private_->filename_name_lineEdit_ = new QLineEdit();
+  this->private_->name_layout_->addWidget( this->private_->filename_name_lineEdit_ );
+    
+  //Segmentation Path
+  this->private_->path_widget_ = new QWidget( this );
+  this->private_->path_widget_->setMinimumSize( QSize( 0, 40) );
+  this->private_->path_widget_->setMaximumSize( QSize( 16777215, 40 ) );
+  this->private_->path_layout_ = new QHBoxLayout( this->private_->path_widget_ );
+  this->private_->path_layout_->setSpacing( 6 );
+  this->private_->path_layout_->setContentsMargins( 4, 4, 4, 4 );
+
+  this->private_->filename_path_label_ = new QLabel( QString::fromUtf8( "Segmentation Path: " ),
+                                        this->private_->path_widget_ );
+  this->private_->path_layout_->addWidget( this->private_->filename_path_label_ );
+    
+  this->private_->filename_path_lineEdit_ = new QLineEdit();
+  this->private_->path_layout_->addWidget( this->private_->filename_path_lineEdit_ );
+    
+  this->private_->choose_filename_loc_button_ = new QPushButton( "Browse..." );
+  connect( this->private_->choose_filename_loc_button_, SIGNAL( clicked() ), SLOT( set_export_path() ) );
+  this->private_->choose_filename_loc_button_->setFocusPolicy( Qt::NoFocus );
+  this->private_->path_layout_->addWidget( this->private_->choose_filename_loc_button_ );
+    
+  //Export Segmentation
   this->private_->bitmap_widget_ = new QWidget( this );
   this->private_->bitmap_widget_->setMinimumSize( QSize( 0, 30) );
   this->private_->bitmap_widget_->setMaximumSize( QSize( 16777215, 30 ) );
@@ -201,7 +250,7 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->bitmap_layout_->setSpacing( 6 );
   this->private_->bitmap_layout_->setContentsMargins( 4, 4, 4, 4 );
   
-  this->private_->export_label_ = new QLabel( QString::fromUtf8( "Export masks as: " ), 
+  this->private_->export_label_ = new QLabel( QString::fromUtf8( "Export segmentation as: " ),
     this->private_->bitmap_widget_ );
   this->private_->bitmap_layout_->addWidget( this->private_->export_label_ );
   
@@ -215,19 +264,21 @@ SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle 
   this->private_->export_selector_->addItem( QString::fromUtf8( ".dcm" ) );
   this->private_->export_selector_->setCurrentIndex( 0 );
   this->private_->export_selector_->setEnabled( true );
+  connect( this->private_->export_selector_, SIGNAL( currentIndexChanged(int) ), SLOT( radio_button_change_path() ) );
   this->private_->bitmap_layout_->addWidget( this->private_->export_selector_ );
   
-  // connect( this->private_->export_selector_, SIGNAL( currentIndexChanged( int ) ), this,
-  //  SLOT( change_type_text( int ) ) );
-  
+  //Warning message
   this->private_->warning_message_ = new QLabel( QString::fromUtf8( "This location does not exist, please choose a valid location." ) );
   this->private_->warning_message_->setObjectName( QString::fromUtf8( "message_" ) );
   this->private_->warning_message_->setWordWrap( true );
   this->private_->warning_message_->setStyleSheet( StyleSheet::MAIN_STYLE_C );
   this->private_->warning_message_->hide();
   
+  //Main layout
   this->private_->selection_main_layout_->addWidget( this->private_->single_or_multiple_files_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->warning_message_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->path_widget_ );
+  this->private_->selection_main_layout_->addWidget( this->private_->name_widget_ );
   this->private_->selection_main_layout_->addWidget( this->private_->bitmap_widget_ );
 
   this->private_->single_file_radio_button_->setChecked( true );
@@ -237,18 +288,30 @@ void SegmentationSelectionPage::change_type_text( int index )
 {
   if( index == 0 ) 
   {
-    this->private_->export_label_->setText( QString::fromUtf8( "Export masks as: " ) );
+    this->private_->export_label_->setText( QString::fromUtf8( "Export segmentation as: " ) );
   }
   else
   {
-    this->private_->export_label_->setText( QString::fromUtf8( "Export masks as a series of: " ) );
+    this->private_->export_label_->setText( QString::fromUtf8( "Export segmentation as a series of: " ) );
   }
 }
   
 void SegmentationSelectionPage::initializePage()
 {
-  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+  //Export path intialize
+  std::string file_type = this->private_->export_selector_->currentText().toStdString();
+    
+  this->private_->filename_name_lineEdit_->setText(QString::fromStdString( "Untitled" + file_type ) );
   
+  this->private_->filename_path_lineEdit_->setText( QString::fromStdString(
+    ProjectManager::Instance()->get_current_project_folder().string() ) );
+    
+  this->registerField( "projectName", this->private_->filename_name_lineEdit_ );
+  this->registerField( "projectPath", this->private_->filename_path_lineEdit_ );
+    
+  //Mask initialize
+  Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+
   std::vector< LayerGroupHandle > groups;
   LayerManager::Instance()->get_groups( groups );
 
@@ -313,6 +376,7 @@ void SegmentationSelectionPage::initializePage()
 
 bool SegmentationSelectionPage::validatePage()
 {
+  //Masks
   this->private_->warning_message_->hide();
   this->private_->masks_.clear();
   for ( int i = 0; i < this->private_->group_with_masks_tree_->topLevelItemCount(); ++i )
@@ -331,61 +395,138 @@ bool SegmentationSelectionPage::validatePage()
     }
   }
   
-  QString filename;
-  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
-  
-  if ( this->private_->single_file_radio_button_->isChecked() )
-  {
-        std::string file_type = this->private_->export_selector_->currentText().toStdString();
-        std::string file_selector = Core::StringToUpper( file_type.substr( 1 ) ) + 
-             " File (*"  + file_type + ")";
+  //Error checks for segmentation export
+  QString filename = this->private_->filename_path_lineEdit_->text();
+  boost::filesystem::path full_path =
+  boost::filesystem::path( filename.toStdString() ) /
+  boost::filesystem::path( this->private_->filename_name_lineEdit_->text().toStdString() );
     
-    filename = QFileDialog::getSaveFileName( this, "Export Segmentation As... ",
-      current_folder.string().c_str(), QString::fromStdString( file_selector ) );
-  }
-  else
+  if( boost::filesystem::exists( full_path ) )
   {
-    filename = QFileDialog::getExistingDirectory( this, tr( "Choose Directory for Export..." ),
-      current_folder.string().c_str(), QFileDialog::ShowDirsOnly | 
-                QFileDialog::DontResolveSymlinks );
-      
-    if( !QFileInfo( filename ).exists() )
+    int ret = QMessageBox::warning( this,
+      "A project with this name already exists!",
+      "A project with this name already exists!\n"
+      "Please rename the file or delete the existing file.\n",
+      QMessageBox::Ok);
+        
+    if( ret == QMessageBox::Ok )
     {
-      this->private_->warning_message_->setText( QString::fromUtf8( 
-        "This location does not exist, please choose a valid location." ) );
-      this->private_->warning_message_->show();
       return false;
     }
-    try
-    {
-      boost::filesystem::create_directory( boost::filesystem::path( filename.toStdString() ) 
-        / "delete_me" );
-    }
-    catch( ... ) // if the create fails then we are not in a writable directory
-    {
-      this->private_->warning_message_->setText( QString::fromUtf8( 
-        "This location is not writable, please choose a valid location." ) );
+  }
+
+    
+  if( !QFileInfo( filename ).exists() )
+  {
+    this->private_->warning_message_->setText( QString::fromUtf8(
+      "This location does not exist, please choose a valid location." ) );
+    this->private_->warning_message_->show();
+    return false;
+  }
+    
+  try
+  {
+    boost::filesystem::create_directory( boost::filesystem::path( filename.toStdString() )
+      / "delete_me" );
+  }
+  catch( ... ) // if the create fails then we are not in a writable directory
+  {
+    this->private_->warning_message_->setText( QString::fromUtf8(
+      "This location is not writable, please choose a valid location." ) );
       this->private_->warning_message_->show();
       return false;
     }
     // if we've made it here then we need to remove the folder we created
-    boost::filesystem::remove( boost::filesystem::path( filename.toStdString() ) 
+    boost::filesystem::remove( boost::filesystem::path( filename.toStdString() )
       / "delete_me" );
-  }
-  
-  QDir file_path = QDir( filename );
-  
-  if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
-  {
-    return false;
-  }
-
-  
-  this->private_->file_name_ = filename.toStdString();
-
-  return true;
+    
+    if( !boost::filesystem::exists( boost::filesystem::path( filename.toStdString() ).parent_path() ) )
+    {
+      return false;
+    }
+    
+    if( this->private_->single_file_radio_button_->isChecked() )
+    {
+      this->private_->file_name_ = filename.toStdString()
+        + "/" + this->private_->filename_name_lineEdit_->text().toStdString();
+    }
+    else
+    {
+      this->private_->file_name_ = filename.toStdString();
+    }
+    
+    return true;
 }
 
+void SegmentationSelectionPage::set_export_path()
+{
+  QString filename;
+  boost::filesystem::path current_folder = ProjectManager::Instance()->get_current_file_folder();
+    
+  QFileDialog *dialog = new QFileDialog( this, tr( "Choose Directory for Export..." ) );
+  dialog->setAcceptMode(QFileDialog::AcceptOpen);
+  dialog->setFileMode(QFileDialog::DirectoryOnly);
+  dialog->setOption(QFileDialog::ShowDirsOnly);
+  dialog->setOption(QFileDialog::DontResolveSymlinks);
+    
+  dialog->open( this, SLOT( set_filename( const QString& ) ) );
+}
+    
+void SegmentationSelectionPage::set_filename( const QString& name )
+{
+  if(!name.isEmpty())
+  {
+    QDir export_directory_ = QDir(name);
+        
+    if( export_directory_.exists() )
+    {
+      this->private_->filename_path_lineEdit_
+        ->setText( export_directory_.canonicalPath() );
+    }
+  }
+}
+
+void SegmentationSelectionPage::radio_button_change_path()
+{
+  auto file_name = this->private_->filename_name_lineEdit_->text();
+  auto file_type = this->private_->export_selector_->currentText();
+    
+  QFileInfo info(file_name);
+  if ( this->private_->single_file_radio_button_->isChecked() )
+  {
+      this->private_->filename_name_lineEdit_->setReadOnly(false);
+      
+      QString style_sheet = QString("QLineEdit[readOnly=\"false\"] {"
+                                    " text-align: left;"
+                                    " color: rgb(" "255,255,255" ") ;"
+                                    " background-color: rgb( " "43, 43, 46" ") ;"
+                                    " selection-color: rgb( " "0, 0, 0" ") ; "
+                                    " border-radius: 3px;"
+                                    " padding: 0px;"
+                                    " margin: 0px;}");
+      
+      this->setStyleSheet(style_sheet);
+      
+      QString name = info.baseName();
+      this->private_->filename_name_lineEdit_->setText(name + file_type);
+  }
+  else
+  {
+    this->private_->filename_name_lineEdit_->setReadOnly(true);
+
+    QString style_sheet = QString("QLineEdit[readOnly=\"true\"] {"
+                                  " text-align: left;"
+                                  " color: rgb(" "128,128,128" ") ;"
+                                  " background-color: rgb( " "43, 43, 46" ") ;"
+                                  " selection-color: rgb( " "0, 0, 0" ") ; "
+                                  " border-radius: 3px;"
+                                  " padding: 0px;"
+                                  " margin: 0px;}");
+      
+    this->setStyleSheet(style_sheet);
+  }
+}
+    
 SegmentationSummaryPage::SegmentationSummaryPage( SegmentationPrivateHandle private_handle, QWidget *parent )
     : QWizardPage( parent )
 {

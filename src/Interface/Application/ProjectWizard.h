@@ -80,9 +80,6 @@ public:
 protected:
     void initializePage();
     
-  /// VALIDATEPAGE:
-  /// function that is called right after the next button is clicked and used to process
-  /// the entered data so it can be passed to the next page
   virtual bool validatePage();
 
 private:
