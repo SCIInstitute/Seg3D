@@ -114,7 +114,8 @@ public:
 };
   SegmentationExportWizard::SegmentationExportWizard( QWidget *parent ) :
     QWizard( parent ),
-  private_( new SegmentationPrivate )
+    private_( new SegmentationPrivate ),
+    path_to_delete_( "" )
 {
   this->setMinimumSize( 660, 400 );
   this->addPage( new SegmentationSelectionPage( private_, this ) );
@@ -122,16 +123,50 @@ public:
   this->setWizardStyle( QWizard::MacStyle );
   this->setPixmap( QWizard::BackgroundPixmap, QPixmap( QString::fromUtf8( 
     ":/Images/Symbol.png" ) ) );
+    
+  connect( this->page( 0 ), SIGNAL( need_to_set_delete_path( QString ) ), this,
+     SLOT( set_delete_path( QString ) ) );
+    
   this->setWindowTitle( tr( "Segmentation Export Wizard" ) );
 }
 
 SegmentationExportWizard::~SegmentationExportWizard()
 {
 }
+    
+void SegmentationExportWizard::set_delete_path( QString path )
+{
+  this->path_to_delete_ = path.toStdString();
+}
 
 void SegmentationExportWizard::accept()
 {
-    QDialog::accept();
+  if( this->path_to_delete_ != "" )
+  {
+  try
+    {
+      boost::filesystem::remove_all( boost::filesystem::path( this->path_to_delete_ ) );
+    }
+    catch( boost::filesystem::filesystem_error& )
+    {
+      CORE_LOG_ERROR( "Couldn't remove directory '" + this->path_to_delete_ + "'." );
+      this->reject();
+      return;
+    }
+  }
+    
+//  ActionNewProject::Dispatch( Core::Interface::GetWidgetActionContext(),
+//    field( "exportPath" ).toString().toStdString(),
+//    field( "exportName" ).toString().toStdString() );
+  QDialog::accept();
+    
+  Q_EMIT this->finished();
+}
+
+void SegmentationExportWizard::reject()
+{
+  QDialog::reject();
+  Q_EMIT this->canceled();
 }
 
 SegmentationSelectionPage::SegmentationSelectionPage( SegmentationPrivateHandle private_handle, QWidget *parent )
@@ -306,8 +341,8 @@ void SegmentationSelectionPage::initializePage()
   this->private_->filename_path_lineEdit_->setText( QString::fromStdString(
     ProjectManager::Instance()->get_current_project_folder().string() ) );
     
-  this->registerField( "projectName", this->private_->filename_name_lineEdit_ );
-  this->registerField( "projectPath", this->private_->filename_path_lineEdit_ );
+  this->registerField( "exportName", this->private_->filename_name_lineEdit_ );
+  this->registerField( "exportPath", this->private_->filename_path_lineEdit_ );
     
   //Mask initialize
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -397,6 +432,28 @@ bool SegmentationSelectionPage::validatePage()
   
   //Error checks for segmentation export
   QString filename = this->private_->filename_path_lineEdit_->text();
+  boost::filesystem::path full_path =
+  boost::filesystem::path( filename.toStdString() ) /
+  boost::filesystem::path( this->private_->filename_name_lineEdit_->text().toStdString() );
+    
+  if( boost::filesystem::exists( full_path ) )
+  {
+    int ret = QMessageBox::warning( this,
+                                    "A project with this name already exists!",
+                                    "A project with this name already exists!\n"
+                                    "If you proceed the old project will be deleted and replaced.\n"
+                                    "Are you sure you would like to continue?",
+                                    QMessageBox::Yes | QMessageBox::No );
+        
+    if( ret != QMessageBox::Yes )
+    {
+      return false;
+    }
+        
+    Q_EMIT need_to_set_delete_path( QString::fromStdString( full_path.string() ) );
+        
+    return true;
+  }
     
   if( !QFileInfo( filename ).exists() )
   {
