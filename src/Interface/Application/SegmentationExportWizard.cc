@@ -397,6 +397,24 @@ bool SegmentationSelectionPage::validatePage()
   
   //Error checks for segmentation export
   QString filename = this->private_->filename_path_lineEdit_->text();
+  boost::filesystem::path full_path =
+  boost::filesystem::path( filename.toStdString() ) /
+  boost::filesystem::path( this->private_->filename_name_lineEdit_->text().toStdString() );
+    
+  if( boost::filesystem::exists( full_path ) )
+  {
+    int ret = QMessageBox::warning( this,
+      "A project with this name already exists!",
+      "A project with this name already exists!\n"
+      "Please rename the file or delete the existing file.\n",
+      QMessageBox::Ok);
+        
+    if( ret == QMessageBox::Ok )
+    {
+      return false;
+    }
+  }
+
     
   if( !QFileInfo( filename ).exists() )
   {
