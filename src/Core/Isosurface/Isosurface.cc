@@ -2148,6 +2148,16 @@ bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename 
                                                   );
   return result;
 }
+    
+bool Isosurface::export_obj_isosurface( const boost::filesystem::path& filename )
+{
+  lock_type lock( this->get_mutex() );
+  bool result = IsosurfaceExporter::ExportOBJ( filename,
+                                               this->private_->points_,
+                                               this->private_->faces_
+                                             );
+  return result;
+}
 
 bool Isosurface::export_stl_ascii_isosurface( const boost::filesystem::path& filename,
                                               const std::string& name )

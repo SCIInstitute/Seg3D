@@ -159,6 +159,8 @@ bool IsosurfaceExporter::ExportVTKASCII( const boost::filesystem::path& filename
   return true;
 }
 
+//OBJ format: https://en.wikipedia.org/wiki/Wavefront_.obj_file
+
 // ASCII STL format: https://en.wikipedia.org/wiki/STL_(file_format)
 bool IsosurfaceExporter::ExportSTLASCII( const boost::filesystem::path& filename,
                                          const std::string& name,
