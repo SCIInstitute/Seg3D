@@ -166,6 +166,11 @@ bool IsosurfaceExporter::ExportOBJ( const boost::filesystem::path& filename,
                                   )
 {
   std::ofstream obj_file( filename.string().c_str() );
+
+  if( points.size() == 0 )
+  {
+    return false;
+  }
     
   if (! obj_file.is_open() )
   {
@@ -181,11 +186,12 @@ bool IsosurfaceExporter::ExportOBJ( const boost::filesystem::path& filename,
   }
    
   //Print faces
-  for( size_t i = 0; i < faces.size(); i++ )
+  for( size_t i = 0; i + 2 < faces.size(); i += 3 )
   {
     // OBJ face indices are 1-based.  Seriously.
-    obj_file << "f " << faces[i]+1 << " " << faces[i+1]+1 << " "
-    << faces[i+2]+1 << std::endl;
+    obj_file << "f " << faces[ i ] + 1 << " "
+                     << faces[ i+1 ] + 1 << " "
+                     << faces[ i+2 ] + 1 << std::endl;
   }
     
   obj_file.close();
