@@ -160,6 +160,44 @@ bool IsosurfaceExporter::ExportVTKASCII( const boost::filesystem::path& filename
 }
 
 //OBJ format: https://en.wikipedia.org/wiki/Wavefront_.obj_file
+static bool ExportOBJ( const boost::filesystem::path& filename,
+                       const PointFVector& points,
+                       const UIntVector& faces
+                     )
+{
+  std::ofstream obj_file( filename.string().c_str() );
+    
+  if (! obj_file.is_open() )
+  {
+    return false;
+  }
+    
+  for( size_t i = 0; i + 2 < faces.size(); i += 3 )
+  {
+    //Get faces
+    size_t vertex_index1 = faces[ i ];
+    size_t vertex_index2 = faces[ i + 1 ];
+    size_t vertex_index3 = faces[ i + 2 ];
+      
+    // Get vertices of face
+    PointF p1 = points[ vertex_index1 ];
+    PointF p2 = points[ vertex_index2 ];
+    PointF p3 = points[ vertex_index3 ];
+
+    //Print points
+    obj_file << "v " << p1 << " " << p2 << " " << p3 << "\n";
+    
+    //Print faces
+    // OBJ face indices are 1-based.  Seriously.
+    obj_file << "f " << faces[i]+1 << " " << faces[i+1]+1 << " "
+    << faces[i+2]+1 << "\n";
+  }
+    
+  obj_file.close();
+    
+  return true;
+    
+}
 
 // ASCII STL format: https://en.wikipedia.org/wiki/STL_(file_format)
 bool IsosurfaceExporter::ExportSTLASCII( const boost::filesystem::path& filename,

@@ -49,6 +49,7 @@ class IsosurfaceExporter
                               const PointFVector& points,
                               const UIntVector& faces
                             );
+    
   static bool ExportVTKASCII( const boost::filesystem::path& filename,
                               const PointFVector& points,
                               const UIntVector& faces
