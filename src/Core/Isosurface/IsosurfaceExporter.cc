@@ -186,11 +186,14 @@ static bool ExportOBJ( const boost::filesystem::path& filename,
 
     //Print points
     obj_file << "v " << p1 << " " << p2 << " " << p3 << "\n";
+  }
     
+  for( size_t i = 0; i + 2 < faces.size(); i += 3 )
+  {
     //Print faces
     // OBJ face indices are 1-based.  Seriously.
     obj_file << "f " << faces[i]+1 << " " << faces[i+1]+1 << " "
-    << faces[i+2]+1 << "\n";
+    << faces[i]+1 << "\n";
   }
     
   obj_file.close();
