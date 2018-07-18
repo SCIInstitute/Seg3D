@@ -50,7 +50,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Left mouse sets the lower threshold, right mouse sets the upper</string>
+         <string/>
         </property>
         <layout class="QHBoxLayout" name="histogramLayout">
          <property name="spacing">
@@ -209,11 +209,11 @@
                </property>
                <item>
                 <widget class="QComboBox" name="log_histogram_combo_">
-                 <property name="sizeAdjustPolicy">
-                  <enum>QComboBox::AdjustToContents</enum>
-                 </property>
                  <property name="currentIndex">
                   <number>0</number>
+                 </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QComboBox::AdjustToContents</enum>
                  </property>
                  <item>
                   <property name="text">
