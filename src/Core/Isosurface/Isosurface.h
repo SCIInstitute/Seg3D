@@ -153,6 +153,10 @@ public:
   // EXPORT_VTK_ISOSURFACE:
   /// Writes out an isosurface in ASCII VTK mesh format
   bool export_vtk_isosurface( const boost::filesystem::path& filename );
+    
+  // EXPORT_OBJ_ISOSURFACE:
+  /// Writes out an isosurface in OBJ file format
+  bool export_obj_isosurface( const boost::filesystem::path& filename );
 
   // EXPORT_STL_ASCII_ISOSURFACE:
   /// Writes out an isosurface in ASCII STL file format
