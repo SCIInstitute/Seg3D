@@ -357,13 +357,14 @@ public:
 typedef boost::shared_ptr< VertexBufferBatch > VertexBufferBatchHandle;
 
 #if defined (_WIN32) || defined(__APPLE__)
-const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl)" );
+const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;OBJ (*.obj);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl)" );
 #else
-const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl *)" );
+const std::string Isosurface::EXPORT_FORMATS_C( "VTK (*.vtk);;OBJ (*.obj);;ASCII (*.fac *.pts *.val);;ASCII STL (*.stl);;Binary STL (*.stl *)" );
 #endif
 
 // Binary STL handled as special case in LayerIOFunctions::ExportIsosurface
-const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK (*.vtk)", ".vtk" }, { "ASCII (*.fac *.pts *.val)", ".fac" }, { "ASCII STL (*.stl)", ".stl" } };
+    const FilterMap Isosurface::EXPORT_FORMATS_MAP_C = { { "VTK (*.vtk)", ".vtk" }, {"OBJ (*.obj)", ".obj"},
+        { "ASCII (*.fac *.pts *.val)", ".fac" }, { "ASCII STL (*.stl)", ".stl" } };
 
 class IsosurfacePrivate 
 {
@@ -2145,6 +2146,16 @@ bool Isosurface::export_vtk_isosurface( const boost::filesystem::path& filename 
                                                     this->private_->points_,
                                                     this->private_->faces_
                                                   );
+  return result;
+}
+    
+bool Isosurface::export_obj_isosurface( const boost::filesystem::path& filename )
+{
+  lock_type lock( this->get_mutex() );
+  bool result = IsosurfaceExporter::ExportOBJ( filename,
+                                               this->private_->points_,
+                                               this->private_->faces_
+                                             );
   return result;
 }
 
