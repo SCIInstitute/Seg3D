@@ -3,7 +3,7 @@
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
@@ -95,4 +95,4 @@ TARGET_LINK_LIBRARIES(QtUtils_Utils
   ${SCI_BOOST_LIBRARY}
 )
 
-qt5_use_modules(QtUtils_Utils OpenGL)
+target_link_libraries(QtUtils_Utils Qt5::OpenGL)
