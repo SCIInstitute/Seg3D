@@ -83,6 +83,7 @@ bool ActionExportIsosurface::validate( Core::ActionContextHandle& context )
           (extension == ".pts") ||
           (extension == ".val") ||
           (extension == ".stl") ||
+          (extension == ".obj") ||
           (extension == ".vtk") ) )
   {
     std::ostringstream error;
@@ -130,6 +131,10 @@ bool ActionExportIsosurface::run( Core::ActionContextHandle& context, Core::Acti
     {
       mask_layer->get_isosurface()->export_stl_ascii_isosurface( filename_and_path, this->name_ );
     }
+  }
+  else if(extension == ".obj")
+  {
+    mask_layer->get_isosurface()->export_obj_isosurface( filename_and_path );
   }
   else
   {

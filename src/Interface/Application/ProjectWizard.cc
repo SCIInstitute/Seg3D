@@ -105,7 +105,7 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
     this->setSubTitle( "Specify basic information about the project which you "
                    "want to create." );
 
-    this->project_name_label_ = new QLabel( "Project name:" );
+    this->project_name_label_ = new QLabel( "Project Name:" );
 
 
   QString default_name_count;
@@ -124,11 +124,11 @@ ProjectInfoPage::ProjectInfoPage( QWidget *parent )
   }
   
     this->project_path_label_ = new QLabel( "Project Path:" );
-    this->project_path_lineedit_ = new QLineEdit;
+    this->project_path_lineedit_ = new QLineEdit();
     
     this->project_path_change_button_ = new QPushButton( "Choose Alternative Location" );
     connect( this->project_path_change_button_, SIGNAL( clicked() ), this, SLOT( set_path() ) );
-  this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
+    this->project_path_change_button_->setFocusPolicy( Qt::NoFocus );
 
     this->registerField( "projectName", this->project_name_lineedit_ );
     
@@ -161,29 +161,31 @@ void ProjectInfoPage::initializePage()
 
 void ProjectInfoPage::set_path()
 {
-        //QDir converts the empty QString "" to the current directory
-        this->warning_message_->hide();
-
-
-    QString path_name = QFileDialog::getExistingDirectory ( this,
-                tr( "Choose Save Directory..." ), this->project_path_lineedit_->text(),
-                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
-
-    // getExistingString generates an empty string if canceled or closed.
-    //  If either happens, this will exit without changing anything.
-    if(path_name == "")
-    {
-        return;
-    }
-    QDir project_directory_ = QDir(path_name);
-
-        if( project_directory_.exists() )
-    {
-        this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
-            this->most_recent_path_ = &project_directory_;
+    //QDir converts the empty QString "" to the current directory
+    this->warning_message_->hide();
+    
+    QString path_name;
+    QFileDialog *dialog = new QFileDialog( this, tr( "Choose Save Directory..." ));
+    dialog->setAcceptMode(QFileDialog::AcceptOpen);
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    dialog->setOption(QFileDialog::ShowDirsOnly);
+    dialog->setOption(QFileDialog::DontResolveSymlinks);
+    
+    dialog->open( this, SLOT( set_name( const QString& ) ) );
 }
-
-        registerField( "projectPath", this->project_path_lineedit_ );
+    
+void ProjectInfoPage::set_name(const QString& name)
+{
+  if(!name.isEmpty())
+  {
+    QDir project_directory_ = QDir(name);
+        
+    if( project_directory_.exists() )
+    {
+      this->project_path_lineedit_->setText( project_directory_.canonicalPath() );
+      this->most_recent_path_ = &project_directory_;
+    }
+  }
 }
 
 bool ProjectInfoPage::validatePage()
