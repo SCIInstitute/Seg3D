@@ -32,6 +32,7 @@
 
 // Qt includes
 #include <QFileDialog>
+#include <QButtonGroup>
 
 // Qt Gui Includes
 #include <QtUtils/Bridge/QtBridge.h>

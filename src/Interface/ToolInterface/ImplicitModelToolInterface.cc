@@ -35,6 +35,7 @@
 
 // QtGui includes
 #include "ui_ImplicitModelToolInterface.h"
+#include <QButtonGroup>
 
 //Application Includes
 #include <Application/Tools/ImplicitModelTool.h>
