@@ -31,8 +31,9 @@
 ###########################################
 
 SET(PHILIPS_MAIN_SRCS
-  philips_main.cc
-  ../Seg3DGui.cc
+  philips_lib.cc
+  ../../Seg3DGui.cc
+  ../../Seg3DBase.cc
 )
 
 ###########################################
@@ -42,10 +43,9 @@ SET(PHILIPS_MAIN_SRCS
 #SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
 #ADD_DEFINITIONS(-DAPPLICATION_NAME=${APPLICATION_NAME})
 
-ADD_EXECUTABLE(philips ${PHILIPS_MAIN_SRCS})
+ADD_LIBRARY(philips_lib SHARED ${PHILIPS_MAIN_SRCS})
 
-TARGET_LINK_LIBRARIES(philips
-  philips_lib
+TARGET_LINK_LIBRARIES(philips_lib
   ${SCI_BOOST_LIBRARY}
   ${SCI_GLEW_LIBRARY}
   Core_Utils
@@ -88,20 +88,11 @@ TARGET_LINK_LIBRARIES(philips
   ${Qt5Widgets_LIBRARIES}
 )
 
-IF(WIN32)
-  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} ${Qt5Core_QTMAIN_LIBRARIES} )
-  SET_TARGET_PROPERTIES(${APPLICATION_NAME}
-    PROPERTIES
-    LINK_FLAGS "/INCREMENTAL:NO")
-ENDIF()
-
 IF(APPLE)
-  SET_TARGET_PROPERTIES(philips
+  SET_TARGET_PROPERTIES(philips_lib
     PROPERTIES
     LINK_FLAGS "-framework CoreGraphics"
   )
 ENDIF()
 
-REGISTERED_TARGET_LINK_LIBRARIES(philips)
-
-ADD_SUBDIRECTORY(Lib)
+REGISTERED_TARGET_LINK_LIBRARIES(philips_lib)
