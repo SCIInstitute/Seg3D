@@ -271,3 +271,5 @@ ELSE()
 #    ENDIF()
   ENDIF()
 ENDIF()
+
+ADD_SUBDIRECTORY(Philips)
