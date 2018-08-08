@@ -11,10 +11,9 @@ void Seg3DLibrary::setupSeg3DQApp(Seg3DGui& app)
   const char* cmdline[] = {""};
   int argc = 0;
 
-  //TODO:
-  //QtUtils::QtApplication::setExternalInstance(qApp());
-
   Core::Application::Instance()->parse_command_line_parameters( argc, const_cast<char**>(cmdline) );
+
+  QtUtils::QtApplication::Instance()->setExternalInstance(qApp);
 
   QtUtils::QtApplication::Instance()->setup( argc, const_cast<char**>(cmdline));
 

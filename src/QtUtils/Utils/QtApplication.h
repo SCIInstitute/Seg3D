@@ -81,6 +81,8 @@ public:
   /// This effectively will start the program.
   bool exec();
 
+  void setExternalInstance(QApplication* app);
+
   // -- accessors --
 public:
   /// QT_APPLICATION:
