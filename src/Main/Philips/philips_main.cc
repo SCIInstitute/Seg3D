@@ -1,11 +1,6 @@
 #include <qapplication.h>
 #include <qpushbutton.h>
-
-#include <Main/Seg3DGui.h>
-
 #include "Lib/philips_lib.h"
-
-using namespace Seg3D;
 
 void showSeg3DWidget()
 {
@@ -14,8 +9,8 @@ void showSeg3DWidget()
 
 int main(int argc, char *argv[])
 {
-  Seg3DGui app;
-  Seg3DLibrary::setupSeg3DQApp(app);
+  QApplication app(argc, argv);
+  auto Context = Seg3DLibrary::makeContext(&app);
 
   // dummy application code
   QPushButton runSeg3DasWidget("Click to run Seg3D as a widget");
@@ -24,5 +19,5 @@ int main(int argc, char *argv[])
   runSeg3DasWidget.show();
   // end dummy application
 
-  return Seg3DLibrary::runSeg3DQAppEventLoop();
+  return app.exec();
 }

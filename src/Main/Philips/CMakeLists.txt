@@ -32,7 +32,6 @@
 
 SET(PHILIPS_MAIN_SRCS
   philips_main.cc
-  ../Seg3DGui.cc
 )
 
 ###########################################
@@ -70,21 +69,6 @@ TARGET_LINK_LIBRARIES(philips
   Core_Action
   Core_Interface
   Core_State
-  Application_Project
-  Application_ProjectManager
-  Application_Renderer
-  Application_Tool
-  Application_ToolManager
-  Application_Tools
-  Application_LayerIO
-  ${SCI_ZLIB_LIBRARY}
-  ${SCI_PNG_LIBRARY}
-  ${SCI_TEEM_LIBRARY}
-  ${ImplicitFunction_LIBRARY}
-  ${RESOURCES_LIBRARY}
-  ${Qt5Core_LIBRARIES}
-  ${Qt5Gui_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES}
 )
 
 IF(APPLE)

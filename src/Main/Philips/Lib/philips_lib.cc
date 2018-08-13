@@ -6,18 +6,44 @@
 
 using namespace Seg3D;
 
-void Seg3DLibrary::setupSeg3DQApp(Seg3DGui& app)
+class Seg3DLibrary::ContextImpl
+{
+public:
+	Seg3DGui gui;
+};
+
+void setupSeg3DQApp(Seg3DGui& gui, QApplication* app)
 {
   const char* cmdline[] = {""};
   int argc = 0;
 
   Core::Application::Instance()->parse_command_line_parameters( argc, const_cast<char**>(cmdline) );
 
-  QtUtils::QtApplication::Instance()->setExternalInstance(qApp);
+  QtUtils::QtApplication::Instance()->setExternalInstance(app);
 
   QtUtils::QtApplication::Instance()->setup( argc, const_cast<char**>(cmdline));
 
-  app.initialize();
+  gui.initialize();
+}
+
+Seg3DLibrary::Context::Context(QApplication* app) : impl_(new ContextImpl)
+{
+	setupSeg3DQApp(impl_->gui, app);
+}
+
+Seg3DLibrary::Context::~Context()
+{
+  if (impl_)
+  {
+    impl_->gui.close();
+	delete impl_;
+	impl_ = nullptr;
+  }
+}
+
+Seg3DLibrary::Context* Seg3DLibrary::makeContext(QApplication* app)
+{
+  return new Context(app);
 }
 
 QWidget* Seg3DLibrary::makeSeg3DWidget()
