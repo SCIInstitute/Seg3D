@@ -40,9 +40,6 @@ SET(PHILIPS_MAIN_SRCS
 # Build the Seg3D executable
 ###########################################
 
-#SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
-#ADD_DEFINITIONS(-DAPPLICATION_NAME=${APPLICATION_NAME})
-
 ADD_LIBRARY(philips_lib ${PHILIPS_MAIN_SRCS})
 
 TARGET_LINK_LIBRARIES(philips_lib
@@ -59,7 +56,6 @@ TARGET_LINK_LIBRARIES(philips_lib
   Core_Log
   Application_Tools
   Application_Filters
-  Application_Socket
   QtUtils_Utils
   QtUtils_Widgets
   QtUtils_Bridge
@@ -87,12 +83,5 @@ TARGET_LINK_LIBRARIES(philips_lib
   ${Qt5Gui_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
 )
-
-IF(APPLE)
-  SET_TARGET_PROPERTIES(philips_lib
-    PROPERTIES
-    LINK_FLAGS "-framework CoreGraphics"
-  )
-ENDIF()
 
 REGISTERED_TARGET_LINK_LIBRARIES(philips_lib)
