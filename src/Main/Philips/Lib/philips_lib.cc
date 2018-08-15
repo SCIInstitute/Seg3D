@@ -41,17 +41,12 @@ Seg3DLibrary::Context::~Context()
   }
 }
 
-Seg3DLibrary::Context* Seg3DLibrary::makeContext(QApplication* app)
+std::unique_ptr<Seg3DLibrary::Context> Seg3DLibrary::Context::makeContext(QApplication* app)
 {
-  return new Context(app);
+	return std::unique_ptr<Seg3DLibrary::Context>(new Context(app));
 }
 
 QWidget* Seg3DLibrary::makeSeg3DWidget()
 {
   return new ApplicationInterface();
-}
-
-int Seg3DLibrary::runSeg3DQAppEventLoop()
-{
-  return QtUtils::QtApplication::Instance()->exec();
 }

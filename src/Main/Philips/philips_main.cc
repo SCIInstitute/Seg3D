@@ -10,7 +10,7 @@ void showSeg3DWidget()
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);
-  auto Context = Seg3DLibrary::makeContext(&app);
+  auto Context = Seg3DLibrary::Context::makeContext(&app);
 
   // dummy application code
   QPushButton runSeg3DasWidget("Click to run Seg3D as a widget");
