@@ -31,7 +31,7 @@
 ###########################################
 
 SET(SEG3DLIB_MAIN_SRCS
-  Seg3D_example_main.cc
+  Seg3DLib_example_main.cc
 )
 
 ###########################################
