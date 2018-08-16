@@ -1,4 +1,4 @@
-#include "philips_lib.h"
+#include "Seg3D_lib.h"
 #include <Interface/Application/ApplicationInterface.h>
 #include <Core/Application/Application.h>
 #include <QtUtils/Utils/QtApplication.h>

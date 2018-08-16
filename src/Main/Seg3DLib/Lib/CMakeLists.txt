@@ -30,22 +30,58 @@
 # Set Seg3D main sources
 ###########################################
 
-SET(PHILIPS_MAIN_SRCS
-  philips_main.cc
+SET(SEG3DLIB_MAIN_SRCS
+  Seg3D_lib.cc
+  ../../Seg3DGui.cc
+  ../../Seg3DBase.cc
 )
 
 ###########################################
 # Build the Seg3D executable
 ###########################################
 
-ADD_EXECUTABLE(philips ${PHILIPS_MAIN_SRCS})
+ADD_LIBRARY(Seg3D_lib ${SEG3DLIB_MAIN_SRCS})
 
-MESSAGE("${CLASS_REGISTRATION_LIBRARY_LIST}")
-
-TARGET_LINK_LIBRARIES(philips
-  philips_lib
+TARGET_LINK_LIBRARIES(Seg3D_lib
+  ${SCI_BOOST_LIBRARY}
+  ${SCI_GLEW_LIBRARY}
+  Core_Utils
+  Core_DataBlock
+  Core_EventHandler
+  Core_Graphics
+  Core_Volume
+  Core_Application
+  Core_Interface
+  Core_Action
+  Core_Log
+  Application_Tools
+  Application_Filters
+  QtUtils_Utils
+  QtUtils_Widgets
+  QtUtils_Bridge
+  Interface_Application
+  Interface_ToolInterface
+  Core_Utils
+  Core_EventHandler
+  Core_Action
+  Core_Interface
+  Core_State
+  Application_Project
+  Application_ProjectManager
+  Application_Renderer
+  Application_Tool
+  Application_ToolManager
+  Application_Tools
+  Application_LayerIO
+  ${SCI_ZLIB_LIBRARY}
+  ${SCI_PNG_LIBRARY}
+  ${SCI_TEEM_LIBRARY}
+  ${ImplicitFunction_LIBRARY}
+  ${RESOURCES_LIBRARY}
+  ${Qt5Core_QTMAIN_LIBRARIES}
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Gui_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
 )
 
-#REGISTERED_TARGET_LINK_LIBRARIES(philips)
-
-ADD_SUBDIRECTORY(Lib)
+REGISTERED_TARGET_LINK_LIBRARIES(Seg3D_lib)

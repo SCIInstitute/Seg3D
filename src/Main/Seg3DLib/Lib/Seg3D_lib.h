@@ -1,5 +1,5 @@
-#ifndef PHILIPS_LIB_H__
-#define PHILIPS_LIB_H__
+#ifndef SEG3D_LIB_H__
+#define SEG3D_LIB_H__
 
 #include <memory>
 
