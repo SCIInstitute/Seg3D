@@ -31,6 +31,7 @@
 
 // Qt includes
 #include <QMessageBox>
+#include <QButtonGroup>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QMimeData>
 

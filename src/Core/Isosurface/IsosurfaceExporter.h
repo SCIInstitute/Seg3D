@@ -45,6 +45,11 @@ class IsosurfaceExporter
                             const FloatVector& values
                           );
 
+  static bool ExportOBJ( const boost::filesystem::path& filename,
+                              const PointFVector& points,
+                              const UIntVector& faces
+                            );
+    
   static bool ExportVTKASCII( const boost::filesystem::path& filename,
                               const PointFVector& points,
                               const UIntVector& faces

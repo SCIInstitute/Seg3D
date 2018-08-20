@@ -212,6 +212,9 @@ public:
   static Core::ConnectionHandle Enable( QWidget* qwidget, std::vector< Core::StateBaseHandle >& states,
     boost::function< bool () > condition );
 
+  static Core::ConnectionHandle Enable(QWidget* qwidget, Core::StateOptionHandle state,
+	  int trueState);
+
   /// Connect the visibility of the QWidget to a StateBool
   static Core::ConnectionHandle Show( QWidget* qwidget, Core::StateBoolHandle& state, 
     bool opposite_logic = false );

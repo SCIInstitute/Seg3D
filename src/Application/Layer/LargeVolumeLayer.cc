@@ -210,12 +210,31 @@ LargeVolumeLayer::~LargeVolumeLayer()
   this->disconnect_all();
 }
 
+// counter for generating new colors for each new data layer
+size_t lv_ColorCount = 0;
+boost::mutex lv_ColorCountMutex;
+
 void LargeVolumeLayer::initialize_states()
 {
   // NOTE: This function allows setting of state variables outside of application thread
   this->set_initializing( true ); 
 
   this->add_state( "dir_name", this->dir_name_state_, "" );
+
+  // == Color of the layer ==
+
+  {
+	  boost::mutex::scoped_lock lock(lv_ColorCountMutex);
+	  this->private_->layer_->add_state("color", this->private_->layer_->color_state_,
+		  static_cast<int>(lv_ColorCount % PreferencesManager::Instance()->color_states_.size()));
+
+	 lv_ColorCount++;
+  }
+
+  // == Colormap ==
+  this->add_state("colormap", this->colormap_state_, PreferencesManager::Instance()->
+	  default_colormap_state_->export_to_string(), PreferencesManager::Instance()->
+	  default_colormap_state_->export_list_to_string());
      
   // == The brightness of the layer ==
   this->add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );

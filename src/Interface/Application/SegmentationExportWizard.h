@@ -80,6 +80,9 @@ protected:
   
 private Q_SLOTS:
   void change_type_text( int index );
+  void set_export_path();
+  void set_filename( const QString& name );
+  void radio_button_change_path();
   
 private:
   SegmentationPrivateHandle private_;

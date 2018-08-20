@@ -3,7 +3,7 @@
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
@@ -90,6 +90,6 @@ CORE_ADD_LIBRARY(Resources_QtResources
 TARGET_LINK_LIBRARIES(Resources_QtResources
 )
 
-qt5_use_modules(Resources_QtResources Core)
+target_link_libraries(Resources_QtResources Qt5::Core)
 
 SET(RESOURCES_LIBRARY Resources_QtResources CACHE INTERNAL "Resources library." FORCE)
