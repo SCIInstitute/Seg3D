@@ -288,10 +288,12 @@ void Menu::create_file_menu( QMenuBar* menubar )
   qmenu->addSeparator();
 
   // == Quit ==
+#ifndef BUILD_STANDALONE_LIBRARY
   qaction = qmenu->addAction( tr( "Quit" ) );
   qaction->setShortcut( tr( "Ctrl+Q" ) );
   qaction->setToolTip( tr( "Quit application." ) );
   connect( qaction, SIGNAL( triggered() ), this->parent(), SLOT( close() ) );
+#endif
 }
 
 void Menu::create_edit_menu( QMenuBar* menubar )
