@@ -44,15 +44,16 @@ namespace Core
 
 CORE_SINGLETON_IMPLEMENTATION( PythonCLI );
 
-static void PythonCLIPrint( std::string output )
+static void PythonCLIPrintOutput( std::string output )
 {
   std::cout << output;
   std::cout.flush();
 }
 
-static void PythonCLIPrintError( std::string output )
+static void PythonCLIPrintError( std::string error )
 {
-  std::cerr << output;
+  std::cerr << error;
+  std::cerr.flush();
 }
 
 PythonCLI::PythonCLI()
@@ -60,7 +61,7 @@ PythonCLI::PythonCLI()
   this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->error_signal_.connect(
     boost::bind( &PythonCLIPrintError, _1 ) ) );
   this->connection_handler.add_connection( Core::PythonInterpreter::Instance()->output_signal_.connect(
-    boost::bind( &PythonCLIPrint, _1 ) ) );
+    boost::bind( &PythonCLIPrintOutput, _1 ) ) );
 }
 
 PythonCLI::~PythonCLI()
