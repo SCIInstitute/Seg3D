@@ -111,10 +111,6 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 
 OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
 
-IF(BUILD_STANDALONE_LIBRARY)
-  ADD_DEFINITIONS(-DBUILD_STANDALONE_LIBRARY)
-ENDIF()
-
 ###########################################
 # Travis CI build needs to be as slim as possible
 ###########################################

@@ -144,6 +144,10 @@ ELSE()
   ADD_DEFINITIONS(-DSCI_32BITS)
 ENDIF()
 
+IF(BUILD_STANDALONE_LIBRARY)
+  MESSAGE("Library build successful")
+  ADD_DEFINITIONS(-DBUILD_STANDALONE_LIBRARY)
+ENDIF()
 
 ###########################################
 # Microsoft VC compiler flags

@@ -2,6 +2,7 @@
 #define SEG3D_LIB_H__
 
 #include <memory>
+#include <QString>
 
 class QWidget;
 class QApplication;
@@ -24,6 +25,8 @@ namespace Seg3DLibrary
 	};
 
 	QWidget* makeSeg3DWidget();
-
+  void importDataFile(const QString& data_filename);
+  void importSegFile(const QString& seg_filename);
+  void exportSegFile(const QString& export_path);
 }
 #endif
