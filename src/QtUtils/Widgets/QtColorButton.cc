@@ -75,14 +75,14 @@ void QtColorButton::set_color( Core::Color button_color )
 {
   this->button_color_ = button_color;
   
-  QString style_sheet = QString::fromUtf8( 
-    "background-color: rgb(" ) + QString::number( this->button_color_.r() ) +
-    QString::fromUtf8( ", " ) + QString::number( this->button_color_.g() ) +
-    QString::fromUtf8( ", " ) + QString::number( this->button_color_.b() ) +
-    QString::fromUtf8( ");")  +
-    QString::fromUtf8( " border-radius: 3px; "
-      " border: 1px none rgba(106, 106, 112, 255);"
-      );
+  QString style_sheet = QString(
+	  ":enabled { background-color: rgb(%1, %2, %3); "
+	  "border-radius: 3px; "
+	  " border: 1px none rgba(106, 106, 112, 255); }"
+	  ":disabled { background-color: rgba(%1,%2,%3,127); "
+	  "border-radius: 3px; "
+	  " border: 1px none rgba(106, 106, 112, 255); }"
+	  ).arg(button_color_.r()).arg(button_color_.g()).arg(button_color_.b());
       
   this->setStyleSheet( style_sheet );
   

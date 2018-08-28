@@ -57,6 +57,9 @@ QtCustomDockWidget::QtCustomDockWidget( QWidget *parent ) :
     "}" ) );
   this->private_->overlay_->hide();
 
+#ifdef BUILD_STANDALONE_LIBRARY
+  this->setFeatures(features() & ~DockWidgetFloatable);
+#endif
 }
   
 QtCustomDockWidget::~QtCustomDockWidget()

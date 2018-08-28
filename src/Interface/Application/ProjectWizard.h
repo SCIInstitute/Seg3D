@@ -38,6 +38,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QDebug>
 
 #endif
 
@@ -79,9 +80,6 @@ public:
 protected:
     void initializePage();
     
-  /// VALIDATEPAGE:
-  /// function that is called right after the next button is clicked and used to process
-  /// the entered data so it can be passed to the next page
   virtual bool validatePage();
 
 private:
@@ -95,6 +93,7 @@ private:
 
 private Q_SLOTS:
     void set_path();
+    void set_name(const QString& name);
 };
 
 class SummaryPage : public QWizardPage

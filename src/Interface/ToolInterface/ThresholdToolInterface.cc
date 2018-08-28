@@ -114,6 +114,7 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
 
   
   QtUtils::QtBridge::Enable( this->private_->ui_.histogram_, tool->valid_target_state_ );
+  this->private_->ui_.histogram_->setToolTip("Left mouse sets the lower threshold, right mouse sets the upper");
 
   boost::function< bool () > condition = boost::lambda::bind( &Core::StateLabeledOption::get, 
     tool->target_layer_state_.get() ) != Tool::NONE_OPTION_C;

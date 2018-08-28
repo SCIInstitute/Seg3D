@@ -321,6 +321,13 @@ Core::ConnectionHandle QtBridge::Show( QWidget* qwidget, Core::StateBoolHandle& 
     new QtShowConnector( qwidget, state, opposite_logic ) ) );
 }
 
+Core::ConnectionHandle QtBridge::Enable(QWidget* qwidget, Core::StateOptionHandle state,
+	int trueState)
+{
+	return Core::ConnectionHandle(new QtConnection(
+		new QtEnableConnector(qwidget, state, [state, trueState]() { return state->index() == trueState; })));
+}
+
 Core::ConnectionHandle QtBridge::Show( QtCustomDockWidget* dockwidget, Core::StateBoolHandle& state, bool opposite_logic /*= false */ )
 {
   return Core::ConnectionHandle( new QtConnection(
