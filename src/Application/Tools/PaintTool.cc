@@ -234,6 +234,8 @@ void PaintToolPrivate::initialize()
     this->shader_->disable();
 
     this->initialized_ = true;
+      
+    CORE_LOG_SUCCESS("If brush is not tracking with cursor, activate another window and then reactivate the Seg3D window.");
   }
 }
 

@@ -33,6 +33,7 @@
 // Qt includes
 #include <QDesktopWidget>
 #include <QMessageBox>
+#include <QButtonGroup>
 
 // Core includes
 #include <Core/Utils/Log.h>

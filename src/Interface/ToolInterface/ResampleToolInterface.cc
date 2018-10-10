@@ -37,6 +37,7 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtHistogramWidget.h>
+#include <QButtonGroup>
 
 //Interface Includes
 #include <Interface/ToolInterface/ResampleToolInterface.h>

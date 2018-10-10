@@ -42,6 +42,7 @@
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Utils/QtPointer.h>
+#include <QButtonGroup>
 
 // Interface includes
 #include <Interface/Application/PreferencesInterface.h>

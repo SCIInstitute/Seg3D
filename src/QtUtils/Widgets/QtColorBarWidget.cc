@@ -35,6 +35,7 @@
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtColorBarWidget.h>
+#include <QButtonGroup>
 
 namespace QtUtils
 {
