@@ -109,6 +109,9 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   this->horiz_splitter_->setOpaqueResize( false );
 
   this->viewer_.resize( 6 );
+  std::vector<bool> dummy(6, false);
+  std::vector<Core::ConnectionHandle> connection;
+
   for ( size_t j = 0; j < 6; j++ )
   {
     // Step 1: Get the viewer class that maintains the state of the viewer
@@ -125,11 +128,35 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     {
       viewer->install_renderer( Core::AbstractRendererHandle( 
         new Core::DummyRenderer ) );
+      dummy[j] = true;
     }
     // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );
-    QtUtils::QtBridge::Show( this->viewer_[ j ], viewer->viewer_visible_state_ );
+    connection.push_back(QtUtils::QtBridge::Show(this->viewer_[j], viewer->viewer_visible_state_));
   }
+
+  //Temporary fix for viewers
+  if (dummy[0] && !dummy[1])
+  {
+    if (Core::RenderResources::Instance()->valid_render_resources())
+    {
+      ViewerHandle viewer = ViewerManager::Instance()->get_viewer(0);
+
+      RendererHandle renderer(new Renderer(0));
+      renderer->initialize();
+      viewer->install_renderer(renderer);
+
+      connection[0]->disconnect();
+      delete this->viewer_[0];
+      this->viewer_[0] = new ViewerWidget(viewer, parent);
+      QtUtils::QtBridge::Show(this->viewer_[0], viewer->viewer_visible_state_);
+    }
+    else
+    {
+      throw "NO VIEWER";
+    }
+  }
+
   
   this->vert_splitter1_->addWidget( this->viewer_[ 0 ] );
   this->vert_splitter1_->addWidget( this->viewer_[ 1 ] );
