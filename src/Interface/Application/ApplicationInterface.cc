@@ -239,7 +239,6 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
     boost::bind( &ApplicationInterface::HandleCriticalErrorMessage, qpointer_type( this ),
                 _1, _2 )));
 
-
   // NOTE: Connect state and reflect the current state (needs to be atomic, hence the lock)
   {
     // NOTE: State Engine is locked so the application thread cannot make
@@ -273,6 +272,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
 
   // add signal connection for OS X file assocation open event
   this->add_connection( QtUtils::QtApplication::Instance()->osx_file_open_event_signal_.connect( boost::bind(&ApplicationInterface::handle_osx_file_open_event, this, _1 ) ) );
+
 }
 
 ApplicationInterface::~ApplicationInterface()
