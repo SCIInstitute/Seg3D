@@ -882,6 +882,7 @@ void Menu::open_project_folder()
 
 void Menu::set_recent_file_list()
 {
+#ifndef BUILD_STANDALONE_LIBRARY
   QAction* qaction = 0;
   this->file_menu_recents_->clear();
   
@@ -896,6 +897,7 @@ void Menu::set_recent_file_list()
     QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
       qpointer_type( this ), recent_projects[ i ].path().string() ) );
   }
+#endif
 }
 
 void Menu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path )
@@ -1010,8 +1012,10 @@ void Menu::mac_open_another_version()
 
 void Menu::SetRecentFileList( qpointer_type qpointer )
 {
+#ifndef BUILD_STANDALONE_LIBRARY
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &Menu::set_recent_file_list, qpointer.data() ) ) );
+#endif
 }
 
 void Menu::ShowHideLargeVolume( qpointer_type qpointer )
