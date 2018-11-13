@@ -27,6 +27,10 @@
  */
 
 #include <GL/glew.h>
+#include <atomic>
+#include <chrono>
+#include <boost/logic/tribool.hpp>
+#include <boost/logic/tribool_io.hpp>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -54,9 +58,13 @@ public:
   // initialize_gl:
   // Initialize GLEW and check required OpenGL version and extensions.
   void initialize_gl();
+
+  //Error checking for GL initialization.
+  void error_check_for_initialize_gl(std::string);
   
   // Query available video memory size.
   void query_video_memory_size();
+  std::atomic<bool> videoDone_{ false };
   
   // A Handle to resource that generated the contexts
   RenderResourcesContextHandle resources_context_;
@@ -75,37 +83,46 @@ public:
   boost::mutex thread_mutex_;
   boost::condition_variable thread_condition_variable_;
 
-  bool gl_capable_;
+  std::atomic<boost::tribool> gl_capable_{boost::indeterminate};
   unsigned long vram_size_;
+
+  bool wait_for_render_resources()
+  {
+    return boost::indeterminate(gl_capable_) || !videoDone_;
+  }
 };
+
+void RenderResourcesPrivate::error_check_for_initialize_gl(std::string error_string)
+{
+  this->gl_capable_ = false;
+  CORE_LOG_ERROR(error_string);
+  return;
+}
   
 void RenderResourcesPrivate::initialize_gl()
-{
-  this->gl_capable_ = true;
-  
+{  
+  //refactor error checks into a function to avoid misuse
   int err = glewInit();
-  if ( err != GLEW_OK )
+  if (err != GLEW_OK)
   {
-    this->gl_capable_ = false;
-    CORE_LOG_ERROR( "glewInit failed with error code " + Core::ExportToString( err ) );
+    error_check_for_initialize_gl( "glewInit failed with error code " + Core::ExportToString(err) );
   }
   
   // Check OpenGL capabilities
   if ( !GLEW_VERSION_2_0 )
   {
-    this->gl_capable_ = false;
-    CORE_LOG_ERROR( "OpenGL 2.0 required but not found." );
+    error_check_for_initialize_gl( "OpenGL 2.0 required but not found." );
   }
   if ( !GLEW_EXT_framebuffer_object )
   {
-    this->gl_capable_ = false;
-    CORE_LOG_ERROR( "GL_EXT_framebuffer_object required but not found." );
+    error_check_for_initialize_gl( "GL_EXT_framebuffer_object required but not found." );;
   }
   if ( !GLEW_ARB_pixel_buffer_object )
   {
-    this->gl_capable_ = false;
-    CORE_LOG_ERROR( "GL_ARB_pixel_buffer_object required but not found." );
+    error_check_for_initialize_gl( "GL_ARB_pixel_buffer_object required but not found." );
   }
+
+  this->gl_capable_ = true;
 }
   
 void RenderResourcesPrivate::query_video_memory_size()
@@ -214,12 +231,14 @@ void RenderResourcesPrivate::query_video_memory_size()
   {
     CORE_LOG_MESSAGE( "Video Memory Size: " + ExportToString( vram_size_MB ) + " MB." );
   }
+
+  videoDone_ = true;
 }
 
 RenderResources::RenderResources() :
   private_( new RenderResourcesPrivate )
 {
-  this->private_->gl_capable_ = false;
+
 }
 
 RenderResources::~RenderResources()
@@ -274,23 +293,34 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
   this->private_->resources_context_ = resources_context;
 
   // Start the event handler thread and then create the GL context
-  std::cout << __FILE__ << "Before locking " << std::endl;
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
-  std::cout << "After locking and before event handler" << std::endl;
   this->start_eventhandler();
-  std::cout << "After event handler and before thread condition" << std::endl;
   this->private_->thread_condition_variable_.wait( lock );
-  std::cout << "After thread condition wait and before initialize event thread" << std::endl;
   this->initialize_on_event_thread();
-  std::cout << "After initialize thread event" << std::endl;
 }
+
+//#define LOG_RENDER_RESOURCE_INIT
 
 bool RenderResources::valid_render_resources()
 {
-  std::cout << "resources context: " << (this->private_->resources_context_ != nullptr) << " "
-    << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << " "
-    << "delete context: " << (this->private_->delete_context_ != nullptr) << " "
-    << "GL capable: " << this->private_->gl_capable_ << std::endl;
+  if (!this->private_->gl_capable_)
+  {
+    return false;
+  }
+
+  while (this->private_->wait_for_render_resources())
+  {
+
+#ifdef LOG_RENDER_RESOURCE_INIT
+    std::cout << "Waiting..." << std::endl;
+    std::cout << std::boolalpha << "resources context: " << (this->private_->resources_context_ != nullptr) << " "
+      << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << " "
+      << "delete context: " << (this->private_->delete_context_ != nullptr) << " "
+      << "GL capable: " << this->private_->gl_capable_ << std::endl;
+#endif
+
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+  }
 
   return ( this->private_->resources_context_ && 
          this->private_->resources_context_->valid_render_resources() && 
