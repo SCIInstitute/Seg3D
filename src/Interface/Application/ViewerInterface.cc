@@ -109,9 +109,8 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   this->horiz_splitter_->setOpaqueResize( false );
 
   this->viewer_.resize( 6 );
-  //std::vector<bool> dummy(6, false);
+  std::vector<bool> dummy(6, false);
   std::vector<Core::ConnectionHandle> connection;
-  int dummyNum = 0;
 
   for ( size_t j = 0; j < 6; j++ )
   {
@@ -129,8 +128,7 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     {
       viewer->install_renderer( Core::AbstractRendererHandle( 
         new Core::DummyRenderer ) );
-      //dummy[j] = true;
-	  dummyNum += 1;
+      dummy[j] = true;
     }
     // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );
@@ -138,7 +136,7 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   }
 
   //Temporary fix for viewers
-  if (dummyNum == 1)
+  if (dummy[0] && !dummy[1])
   {
     if (Core::RenderResources::Instance()->valid_render_resources())
     {
