@@ -115,7 +115,7 @@ void RenderResourcesPrivate::initialize_gl()
   }
   if ( !GLEW_EXT_framebuffer_object )
   {
-    error_check_for_initialize_gl( "GL_EXT_framebuffer_object required but not found." );;
+    error_check_for_initialize_gl( "GL_EXT_framebuffer_object required but not found." );
   }
   if ( !GLEW_ARB_pixel_buffer_object )
   {
