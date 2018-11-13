@@ -274,14 +274,24 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
   this->private_->resources_context_ = resources_context;
 
   // Start the event handler thread and then create the GL context
+  std::cout << __FILE__ << "Before locking " << std::endl;
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
+  std::cout << "After locking and before event handler" << std::endl;
   this->start_eventhandler();
+  std::cout << "After event handler and before thread condition" << std::endl;
   this->private_->thread_condition_variable_.wait( lock );
+  std::cout << "After thread condition wait and before initialize event thread" << std::endl;
   this->initialize_on_event_thread();
+  std::cout << "After initialize thread event" << std::endl;
 }
 
 bool RenderResources::valid_render_resources()
 {
+  std::cout << "resources context: " << (this->private_->resources_context_ != nullptr) << " "
+    << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << " "
+    << "delete context: " << (this->private_->delete_context_ != nullptr) << " "
+    << "GL capable: " << this->private_->gl_capable_ << std::endl;
+
   return ( this->private_->resources_context_ && 
          this->private_->resources_context_->valid_render_resources() && 
          this->private_->delete_context_ &&
