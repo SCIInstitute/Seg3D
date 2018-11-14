@@ -25,11 +25,6 @@
 #  DEALINGS IN THE SOFTWARE.
 
 ###########################################
-# Includes
-###########################################
-include(CMakeDependentOption)
-
-###########################################
 # TODO: build from archive - Git not used
 ###########################################
 
@@ -113,23 +108,8 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 ###########################################
 # Configure Seg3D library build
 ###########################################
-if(!BUILD_STANDALONE_LIBRARY)
-  set(BUILD_TESTING OFF)
-  set(PYTHON_TESTING OFF)
-endif()
 
-cmake_dependent_option(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF "BUILD_WITH_PYTHON;BUILD_TESTING" ON)
-# OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
-
-if(BUILD_STANDALONE_LIBRARY)
-  set(SEG3D_MANUAL ON)
-else()
-  set(SEG3SEG3D_MANUAL OFF)
-endif()
-
-cmake_dependent_option(SEG3D_MANUAL, "Build Seg3D library with only manual tools." ON "BUILD_STANDALONE_LIBRARY" ON)
-
-#OPTION(SEG3D_MANUAL, "Build Seg3D library with only manual tools." OFF)
+OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
 
 ###########################################
 # Travis CI build needs to be as slim as possible
