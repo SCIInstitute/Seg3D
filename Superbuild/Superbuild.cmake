@@ -110,6 +110,16 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 ###########################################
 
 OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
+MESSAGE("Library: " ${BUILD_STANDALONE_LIBRARY} " Python: " ${BUILD_WITH_PYTHON} " Testing: " ${BUILD_TESTING})
+
+if(BUILD_STANDALONE_LIBRARY)
+  set(BUILD_TESTING OFF)
+  set(BUILD_WITH_PYTHON OFF)
+  MESSAGE("Library: " ${BUILD_STANDALONE_LIBRARY} " Python: " ${BUILD_WITH_PYTHON} " Testing: " ${BUILD_TESTING})
+endif()
+
+OPTION(SEG3D_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
+MESSAGE("Manual tools: " ${SEG3D_MANUAL_TOOLS_ONLY})
 
 ###########################################
 # Travis CI build needs to be as slim as possible
@@ -291,6 +301,7 @@ SET(SEG3D_CACHE_ARGS
     "-DSEG3D_SHOW_CONSOLE:BOOL=${SEG3D_SHOW_CONSOLE}"
     "-DBUILD_WITH_PYTHON:BOOL=${BUILD_WITH_PYTHON}"
     "-DBUILD_STANDALONE_LIBRARY:BOOL=${BUILD_STANDALONE_LIBRARY}"
+    "-DSEG3D_MANUAL_TOOLS_ONLY:BOOL=${SEG3D_MANUAL_TOOLS_ONLY}"
     "-DDO_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
     "-DZlib_DIR:PATH=${Zlib_DIR}"
     "-DLibPNG_DIR:PATH=${LibPNG_DIR}"
