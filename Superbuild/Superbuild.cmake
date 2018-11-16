@@ -109,17 +109,21 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 # Configure Seg3D library build
 ###########################################
 
+IF(WIN32)
+
 OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
 MESSAGE("Library: " ${BUILD_STANDALONE_LIBRARY} " Python: " ${BUILD_WITH_PYTHON} " Testing: " ${BUILD_TESTING})
 
-if(BUILD_STANDALONE_LIBRARY)
+IF(BUILD_STANDALONE_LIBRARY)
   set(BUILD_TESTING OFF)
   set(BUILD_WITH_PYTHON OFF)
   MESSAGE("Library: " ${BUILD_STANDALONE_LIBRARY} " Python: " ${BUILD_WITH_PYTHON} " Testing: " ${BUILD_TESTING})
-endif()
+ENDIF()
 
-OPTION(SEG3D_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
-MESSAGE("Manual tools: " ${SEG3D_MANUAL_TOOLS_ONLY})
+ENDIF()
+
+OPTION(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
+MESSAGE("Manual tools: " ${BUILD_MANUAL_TOOLS_ONLY})
 
 ###########################################
 # Travis CI build needs to be as slim as possible

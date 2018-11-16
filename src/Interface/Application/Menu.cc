@@ -103,7 +103,7 @@ Menu::Menu( QMainWindow* parent ) :
     this->update_undo_tag( UndoBuffer::Instance()->get_undo_tag() );
     this->update_redo_tag( UndoBuffer::Instance()->get_redo_tag() );
 
-#ifndef BUILD_STANDALONE_LIBRARY
+#ifndef SEG3D_MANUAL_TOOLS_ONLY
     // Update to the most recent list
     this->set_recent_file_list(); 
 #endif
@@ -170,7 +170,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
   // == New Project ==
   QAction* qaction;
 
-#ifndef BUILD_STANDALONE_LIBRARY
+#ifndef SEG3D_MANUAL_TOOLS_ONLY
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     bool project_creation = InterfaceManager::Instance()->enable_project_creation_state_->get();
@@ -284,7 +284,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
     boost::bind( &LayerIOFunctions::ExportLayer, this->main_window_ ) );
   this->export_active_data_layer_qaction_->setEnabled( false );
   
-#ifndef BUILD_STANDALONE_LIBRARY
+#ifndef SEG3D_MANUAL_TOOLS_ONLY
   qmenu->addSeparator();
     
   // == Recent Projects ==
@@ -882,7 +882,7 @@ void Menu::open_project_folder()
 
 void Menu::set_recent_file_list()
 {
-#ifndef BUILD_STANDALONE_LIBRARY
+#ifndef SEG3D_MANUAL_TOOLS_ONLY
   QAction* qaction = 0;
   this->file_menu_recents_->clear();
   
@@ -1012,7 +1012,7 @@ void Menu::mac_open_another_version()
 
 void Menu::SetRecentFileList( qpointer_type qpointer )
 {
-#ifndef BUILD_STANDALONE_LIBRARY
+#ifndef SEG3D_MANUAL_TOOLS_ONLY
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &Menu::set_recent_file_list, qpointer.data() ) ) );
 #endif
