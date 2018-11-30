@@ -85,3 +85,40 @@ TARGET_LINK_LIBRARIES(Seg3D_lib
 )
 
 REGISTERED_TARGET_LINK_LIBRARIES(Seg3D_lib)
+
+#########################################################
+# Copy External and Seg3D library files to Lib directory
+#########################################################
+
+SET(ALL_LIBS_DEST_DIR ${CMAKE_BINARY_DIR}/Main/Seg3DLib/Lib/All_Libs)
+
+IF(NOT EXISTS ${ALL_LIBS_DEST_DIR})
+  ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${ALL_LIBS_DEST_DIR}
+  )
+  FILE(GLOB_RECURSE LIB_FILES RELATIVE "${SUPERBUILD_LIBS_SOURCE_DIR}"
+      "${SUPERBUILD_LIBS_SOURCE_DIR}/*.lib")
+
+  FOREACH(CURRENT_LIB_FILE ${LIB_FILES})
+
+    SET(LIB_SOURCE_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/${CURRENT_LIB_FILE})
+
+    ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${LIB_SOURCE_FILE} ${ALL_LIBS_DEST_DIR}/
+    )
+
+  ENDFOREACH(CURRENT_LIB_FILE)
+
+ENDIF()
+
+###########################################
+# Make Seg3D and External .lib file
+###########################################
+
+get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
+# MESSAGE("VS PATH: " ${_vs_bin_path})
+
+# ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+# COMMAND ${CMAKE_COMMAND} -E lib.exe /OUT:composite.lib *.lib
+# )
