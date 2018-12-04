@@ -117,8 +117,18 @@ ENDIF()
 ###########################################
 
 get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
-# MESSAGE("VS PATH: " ${_vs_bin_path})
+MESSAGE("vs bin path: " ${_vs_bin_path} )
+STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
-# ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-# COMMAND ${CMAKE_COMMAND} -E lib.exe /OUT:composite.lib *.lib
-# )
+SET(LIB_COMMAND " lib.exe ")
+STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR_CMD ${ALL_LIBS_DEST_DIR})
+SET(ARGUMENTS "/OUT:composite.lib ${ALL_LIBS_DEST_DIR_CMD}\\*.lib" )
+MESSAGE("Command line: " ${LIB_COMMAND} ${ARGUMENTS})
+
+SET(VSINSTALL_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\")
+SET(ENVIRONMENT "VCINSTALL = ${VSINSTALL_PATH};$ENV{VSINSTALL}")
+MESSAGE("Environment: ${ENVIRONMENT}")
+
+ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+COMMAND ${CMAKE_COMMAND} -E env ${ENVIRONMENT} chdir ${_vs_bin_path} ${LIB_COMMAND} ${ARGUMENTS}
+)
