@@ -135,26 +135,28 @@ POST_BUILD
 COMMAND ${CMAKE_COMMAND} -E copy ${ZLIB_FILE} ${ALL_LIBS_DEST_DIR}/
 )
 
+SET(LIB_DIR_REMOVED OFF)
+
 ENDIF()
 
 ###########################################
 # Make Seg3D and External .lib file
 ###########################################
 
-#get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
-#STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
+get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
+STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
-#SET(LIB_TOOL_PATH ${_vs_bin_path}\\lib.exe)
+SET(LIB_TOOL_PATH ${_vs_bin_path}\\lib.exe)
 
-#SET(BATCH_FILE_PATH ${_vs_bin_path}\\..\\..\\..\\..\\..\\..\\..\\Common7\\Tools\\VsDevCmd.bat)
+SET(BATCH_FILE_PATH ${_vs_bin_path}\\..\\..\\..\\..\\..\\..\\..\\Common7\\Tools\\VsDevCmd.bat)
 
-#STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR_CMD ${ALL_LIBS_DEST_DIR})
+STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR_CMD ${ALL_LIBS_DEST_DIR})
 
-#SET(DEPENDENCIES_DEST_DIR ${ALL_LIBS_DEST_DIR_CMD}\\..\\Release)
+SET(DEPENDENCIES_DEST_DIR ${ALL_LIBS_DEST_DIR_CMD}\\..\\Release)
 
-#SET(ARGUMENTS " /OUT:${DEPENDENCIES_DEST_DIR}\\Seg_lib_dependencies.lib ${ALL_LIBS_DEST_DIR_CMD}\\*.lib" )
+SET(ARGUMENTS " /OUT:${DEPENDENCIES_DEST_DIR}\\Seg_lib_dependencies.lib ${ALL_LIBS_DEST_DIR_CMD}\\*.lib" )
 
-#MESSAGE("Command line: " \"${BATCH_FILE_PATH}\" " & " \"${LIB_TOOL_PATH}\" ${ARGUMENTS})
+MESSAGE("Command line: " \"${BATCH_FILE_PATH}\" " & " \"${LIB_TOOL_PATH}\" ${ARGUMENTS})
 
 #ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
 #POST_BUILD
