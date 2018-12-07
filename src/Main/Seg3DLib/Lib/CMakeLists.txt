@@ -91,54 +91,75 @@ REGISTERED_TARGET_LINK_LIBRARIES(Seg3D_lib)
 #########################################################
 
 SET(ALL_LIBS_DEST_DIR ${CMAKE_BINARY_DIR}/Main/Seg3DLib/Lib/All_Libs)
+SET(LIB_DIR_REMOVED OFF)
+MESSAGE("Lib dir state: " ${LIB_DIR_REMOVED})
 
 IF(EXISTS ${ALL_LIBS_DEST_DIR})
   ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${ALL_LIBS_DEST_DIR}
   )
+  SET(LIB_DIR_REMOVED ON)
+  MESSAGE("Lib dir state: " ${LIB_DIR_REMOVED})
+ELSE()
+  SET(LIB_DIR_REMOVED ON)
+  MESSAGE("Lib dir state: " ${LIB_DIR_REMOVED})
 ENDIF()
 
-ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-COMMAND ${CMAKE_COMMAND} -E make_directory ${ALL_LIBS_DEST_DIR}
-)
+IF(${LIB_DIR_REMOVED})
+ ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+ COMMAND ${CMAKE_COMMAND} -E make_directory ${ALL_LIBS_DEST_DIR}
+ )
 
 FILE(GLOB_RECURSE LIB_FILES RELATIVE "${SUPERBUILD_LIBS_SOURCE_DIR}"
-   "${SUPERBUILD_LIBS_SOURCE_DIR}/*.lib")
+    "${SUPERBUILD_LIBS_SOURCE_DIR}/*.lib")
 
 FOREACH(CURRENT_LIB_FILE ${LIB_FILES})
 
-  SET(LIB_SOURCE_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/${CURRENT_LIB_FILE})
-  MESSAGE(STATUS "Current lib file: ${CURRENT_LIB_FILE}")
+SET(LIB_SOURCE_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/${CURRENT_LIB_FILE})
 
- STRING(FIND ${LIB_SOURCE_FILE} "Seg3D_lib.lib" CONTAINS_SEG3D_LIB)
- STRING(FIND ${LIB_SOURCE_FILE} "Zlib_external" CONTAINS_Z_LIB)
+STRING(FIND ${LIB_SOURCE_FILE} "Seg3D_lib" CONTAINS_SEG3D_LIB)
 
-  IF((${CONTAINS_SEG3D_LIB} EQUAL "-1") OR (NOT ${CONTAINS_Z_LIB} EQUAL "-1"))
-    ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${LIB_SOURCE_FILE} ${ALL_LIBS_DEST_DIR}/
-    )
-  ENDIF()
+IF(${CONTAINS_SEG3D_LIB} EQUAL "-1")
+  ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy ${LIB_SOURCE_FILE} ${ALL_LIBS_DEST_DIR}/
+  )
+ENDIF()
 
-  ENDFOREACH(CURRENT_LIB_FILE)
+ENDFOREACH(CURRENT_LIB_FILE)
+
+SET(ZLIB_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/Externals/Build/Zlib_external/Release/z.lib)
+
+ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy ${ZLIB_FILE} ${ALL_LIBS_DEST_DIR}/
+)
+
+ENDIF()
 
 ###########################################
 # Make Seg3D and External .lib file
 ###########################################
 
-get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
-MESSAGE("vs bin path: " ${_vs_bin_path} )
-STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
-SET(BATCH_COMMAND "cmd /k \"\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\VsDevCmd.bat\" & lib.exe\" ")
-#SET(LIB_COMMAND "cmd /c lib.exe ")
-STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR_CMD ${ALL_LIBS_DEST_DIR})
-SET(ARGUMENTS "/OUT:composite.lib ${ALL_LIBS_DEST_DIR_CMD}\\*.lib" )
-MESSAGE("Command line: " ${BATCH_COMMAND} ${ARGUMENTS})
+#get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
+#STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
-#SET(VSINSTALL_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\")
-#SET(ENVIRONMENT "VCINSTALL = ${VSINSTALL_PATH};$ENV{VSINSTALL}")
-#MESSAGE("Environment: ${ENVIRONMENT}")
+#SET(LIB_TOOL_PATH ${_vs_bin_path}\\lib.exe)
 
-ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-COMMAND ${CMAKE_COMMAND} -E chdir ${_vs_bin_path} ${BATCH_COMMAND} ${ARGUMENTS}
-)
+#SET(BATCH_FILE_PATH ${_vs_bin_path}\\..\\..\\..\\..\\..\\..\\..\\Common7\\Tools\\VsDevCmd.bat)
+
+#STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR_CMD ${ALL_LIBS_DEST_DIR})
+
+#SET(DEPENDENCIES_DEST_DIR ${ALL_LIBS_DEST_DIR_CMD}\\..\\Release)
+
+#SET(ARGUMENTS " /OUT:${DEPENDENCIES_DEST_DIR}\\Seg_lib_dependencies.lib ${ALL_LIBS_DEST_DIR_CMD}\\*.lib" )
+
+#MESSAGE("Command line: " \"${BATCH_FILE_PATH}\" " & " \"${LIB_TOOL_PATH}\" ${ARGUMENTS})
+
+#ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+#POST_BUILD
+#COMMAND \"${BATCH_FILE_PATH}\" " & " \"${LIB_TOOL_PATH}\" ${ARGUMENTS}
+#)
+
+#"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" & "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.15.26726\bin\Hostx86\x64\lib.exe"
+#/OUT:C:\Users\Ally\Documents\composite.lib C:\Users\Ally\Desktop\Seg3DLibDependencies2017\*.lib
