@@ -87,81 +87,19 @@ TARGET_LINK_LIBRARIES(Seg3D_lib
 REGISTERED_TARGET_LINK_LIBRARIES(Seg3D_lib)
 
 #########################################################
-# Copy External and Seg3D library files to Lib directory
+# Make Seg3D static lib file
 #########################################################
 
 SET(ALL_LIBS_DEST_DIR ${CMAKE_BINARY_DIR}/Main/Seg3DLib/Lib/All_Libs)
-SET(LIB_DIR_REMOVED OFF)
-MESSAGE("Lib dir state: " ${LIB_DIR_REMOVED})
-
-IF(EXISTS ${ALL_LIBS_DEST_DIR})
-  ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${ALL_LIBS_DEST_DIR}
-  )
-  SET(LIB_DIR_REMOVED ON)
-  MESSAGE("Lib dir state: " ${LIB_DIR_REMOVED})
-ELSE()
-  SET(LIB_DIR_REMOVED ON)
-  MESSAGE("Lib dir state: " ${LIB_DIR_REMOVED})
-ENDIF()
-
-IF(${LIB_DIR_REMOVED})
- ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
- COMMAND ${CMAKE_COMMAND} -E make_directory ${ALL_LIBS_DEST_DIR}
- )
-
-FILE(GLOB_RECURSE LIB_FILES RELATIVE "${SUPERBUILD_LIBS_SOURCE_DIR}"
-    "${SUPERBUILD_LIBS_SOURCE_DIR}/*.lib")
-
-FOREACH(CURRENT_LIB_FILE ${LIB_FILES})
-
-SET(LIB_SOURCE_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/${CURRENT_LIB_FILE})
-
-STRING(FIND ${LIB_SOURCE_FILE} "Seg3D_lib" CONTAINS_SEG3D_LIB)
-
-IF(${CONTAINS_SEG3D_LIB} EQUAL "-1")
-  ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${LIB_SOURCE_FILE} ${ALL_LIBS_DEST_DIR}/
-  )
-ENDIF()
-
-ENDFOREACH(CURRENT_LIB_FILE)
+STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR ${ALL_LIBS_DEST_DIR})
 
 SET(ZLIB_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/Externals/Build/Zlib_external/Release/z.lib)
-
-ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy ${ZLIB_FILE} ${ALL_LIBS_DEST_DIR}/
-)
-
-SET(LIB_DIR_REMOVED OFF)
-
-ENDIF()
-
-###########################################
-# Make Seg3D and External .lib file
-###########################################
+STRING(REGEX REPLACE "/" "\\\\" ZLIB_FILE ${ZLIB_FILE})
 
 get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
 STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
-SET(LIB_TOOL_PATH ${_vs_bin_path}\\lib.exe)
-
-SET(BATCH_FILE_PATH ${_vs_bin_path}\\..\\..\\..\\..\\..\\..\\..\\Common7\\Tools\\VsDevCmd.bat)
-
-STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR_CMD ${ALL_LIBS_DEST_DIR})
-
-SET(DEPENDENCIES_DEST_DIR ${ALL_LIBS_DEST_DIR_CMD}\\..\\Release)
-
-SET(ARGUMENTS " /OUT:${DEPENDENCIES_DEST_DIR}\\Seg_lib_dependencies.lib ${ALL_LIBS_DEST_DIR_CMD}\\*.lib" )
-
-MESSAGE("Command line: " \"${BATCH_FILE_PATH}\" " & " \"${LIB_TOOL_PATH}\" ${ARGUMENTS})
-
-#ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
-#POST_BUILD
-#COMMAND \"${BATCH_FILE_PATH}\" " & " \"${LIB_TOOL_PATH}\" ${ARGUMENTS}
-#)
-
-#"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" & "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.15.26726\bin\Hostx86\x64\lib.exe"
-#/OUT:C:\Users\Ally\Documents\composite.lib C:\Users\Ally\Desktop\Seg3DLibDependencies2017\*.lib
+ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
+POST_BUILD
+#build_full_static_lib.bat.in
+)
