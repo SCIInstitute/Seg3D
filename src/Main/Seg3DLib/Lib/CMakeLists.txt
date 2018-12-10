@@ -99,7 +99,10 @@ STRING(REGEX REPLACE "/" "\\\\" ZLIB_FILE ${ZLIB_FILE})
 get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
 STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/CMake/Scripts/build_full_static_lib.bat.in
+                 ${CMAKE_BINARY_DIR}/build_full_static_lib.bat)
+
 ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
 POST_BUILD
-${SEG3D_SOURCE_DIR}/CMake/Scripts/build_full_static_lib.bat.in
+${CMAKE_BINARY_DIR}/build_full_static_lib.bat
 )
