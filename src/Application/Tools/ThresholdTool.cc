@@ -350,7 +350,8 @@ void ThresholdTool::handle_seed_points_changed()
   Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
   Core::DataBlockHandle data_block = data_volume->get_data_block();
   double min_val = std::numeric_limits< double >::max(); 
-  double max_val = std::numeric_limits< double >::min();
+  double max_val = (-1.0)*std::numeric_limits< double >::max();
+  
   for ( size_t i = 0; i < seed_points.size(); ++i )
   {
     Core::Point pt = data_volume->apply_inverse_grid_transform( seed_points[ i ] );
