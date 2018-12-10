@@ -101,5 +101,5 @@ STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
 ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
 POST_BUILD
-#build_full_static_lib.bat.in
+${SEG3D_SOURCE_DIR}/CMake/Scripts/build_full_static_lib.bat.in
 )
