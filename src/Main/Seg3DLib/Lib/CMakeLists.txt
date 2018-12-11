@@ -100,9 +100,12 @@ get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
 STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
 
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/CMake/Scripts/build_full_static_lib.bat.in
-                 ${CMAKE_BINARY_DIR}/build_full_static_lib.bat)
+    ${CMAKE_BINARY_DIR}/build_full_static_lib.bat)
+
+SET(BATCH_COMMAND ${CMAKE_BINARY_DIR}/build_full_static_lib.bat)
+STRING(REGEX REPLACE "/" "\\\\" BATCH_COMMAND ${BATCH_COMMAND})
 
 ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
 POST_BUILD
-${CMAKE_BINARY_DIR}/build_full_static_lib.bat
+COMMAND cmd //c ${BATCH_COMMAND}
 )
