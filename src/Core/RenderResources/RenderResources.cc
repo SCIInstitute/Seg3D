@@ -60,12 +60,12 @@ public:
   void initialize_gl();
 
   //Error checking for GL initialization.
-  void error_check_for_initialize_gl(std::string);
-  
+  void initialize_gl_log_error(const std::string&);
+
   // Query available video memory size.
   void query_video_memory_size();
   std::atomic<bool> videoDone_{ false };
-  
+
   // A Handle to resource that generated the contexts
   RenderResourcesContextHandle resources_context_;
 
@@ -78,58 +78,60 @@ public:
   // a separate thread using a separate OpenGL context.
   RenderContextHandle delete_context_;
 
-  // Mutex and condition variable to make sure the RenderResources thread has 
+  // Mutex and condition variable to make sure the RenderResources thread has
   // completed initialization before continuing the main thread.
   boost::mutex thread_mutex_;
   boost::condition_variable thread_condition_variable_;
 
-  std::atomic<boost::tribool> gl_capable_{boost::indeterminate};
+  std::atomic<boost::tribool> gl_capable_{ boost::logic::indeterminate };
   unsigned long vram_size_;
 
   bool wait_for_render_resources()
   {
-    return boost::indeterminate(gl_capable_) || !videoDone_;
+    return boost::logic::indeterminate(gl_capable_) || !videoDone_;
   }
+
 };
 
-void RenderResourcesPrivate::error_check_for_initialize_gl(std::string error_string)
+void RenderResourcesPrivate::initialize_gl_log_error(const std::string& error_string)
 {
-  this->gl_capable_ = false;
-  CORE_LOG_ERROR(error_string);
-  return;
+	this->gl_capable_ = false;
+	CORE_LOG_ERROR(error_string);
 }
-  
-void RenderResourcesPrivate::initialize_gl()
-{  
-  //refactor error checks into a function to avoid misuse
-  int err = glewInit();
-  if (err != GLEW_OK)
-  {
-    error_check_for_initialize_gl( "glewInit failed with error code " + Core::ExportToString(err) );
-  }
-  
-  // Check OpenGL capabilities
-  if ( !GLEW_VERSION_2_0 )
-  {
-    error_check_for_initialize_gl( "OpenGL 2.0 required but not found." );
-  }
-  if ( !GLEW_EXT_framebuffer_object )
-  {
-    error_check_for_initialize_gl( "GL_EXT_framebuffer_object required but not found." );
-  }
-  if ( !GLEW_ARB_pixel_buffer_object )
-  {
-    error_check_for_initialize_gl( "GL_ARB_pixel_buffer_object required but not found." );
-  }
 
-  this->gl_capable_ = true;
+void RenderResourcesPrivate::initialize_gl()
+{
+	//refactor error checks into a function to avoid misuse
+	int err = glewInit();
+	if (err != GLEW_OK)
+	{
+		initialize_gl_log_error("glewInit failed with error code " + Core::ExportToString(err));
+	}
+
+	// Check OpenGL capabilities
+	else if (!GLEW_VERSION_2_0)
+	{
+		initialize_gl_log_error("OpenGL 2.0 required but not found.");
+	}
+	else if (!GLEW_EXT_framebuffer_object)
+	{
+		initialize_gl_log_error("GL_EXT_framebuffer_object required but not found.");
+	}
+	else if (!GLEW_ARB_pixel_buffer_object)
+	{
+		initialize_gl_log_error("GL_ARB_pixel_buffer_object required but not found.");
+	}
+	else
+	{
+		this->gl_capable_ = true;
+	}
 }
-  
+
 void RenderResourcesPrivate::query_video_memory_size()
 {
   this->vram_size_ = 0;
   unsigned long vram_size_MB = 0;
-  
+
 #if defined(_WIN32)
   const char HARDWARE_DEVICEMAP_VIDEO_C[] = "HARDWARE\\DEVICEMAP\\VIDEO";
   const char MAX_OBJECT_NUMBER_C[] = "MaxObjectNumber";
@@ -137,28 +139,28 @@ void RenderResourcesPrivate::query_video_memory_size()
   const char HARDWAREINFO_MEMSIZE[] = "HardwareInformation.MemorySize";
 
   HKEY video_devicemap_key;
-  if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, HARDWARE_DEVICEMAP_VIDEO_C, 0, 
+  if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, HARDWARE_DEVICEMAP_VIDEO_C, 0,
     KEY_READ, &video_devicemap_key ) == ERROR_SUCCESS )
   {
     DWORD type = REG_DWORD;
     DWORD max_object_number = 0;
     DWORD buffer_size = sizeof( DWORD );
-    if ( RegQueryValueEx( video_devicemap_key, MAX_OBJECT_NUMBER_C, NULL, &type, 
-      reinterpret_cast< LPBYTE >( &max_object_number ), &buffer_size ) 
+    if ( RegQueryValueEx( video_devicemap_key, MAX_OBJECT_NUMBER_C, NULL, &type,
+      reinterpret_cast< LPBYTE >( &max_object_number ), &buffer_size )
       == ERROR_SUCCESS )
     {
       for ( DWORD i = 0; i <= max_object_number && this->vram_size_ == 0; ++i )
       {
         DWORD type = REG_SZ;
         std::string video_device_name = "\\Device\\Video" + ExportToString( i );
-        if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL, 
+        if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL,
           &type, NULL, &buffer_size ) != ERROR_SUCCESS )
         {
           continue;
         }
 
         std::vector< BYTE > buffer( buffer_size );
-        if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL, 
+        if ( RegQueryValueEx( video_devicemap_key, video_device_name.c_str(), NULL,
           NULL, &buffer[ 0 ], &buffer_size ) != ERROR_SUCCESS )
         {
           continue;
@@ -180,8 +182,8 @@ void RenderResourcesPrivate::query_video_memory_size()
         DWORD vram_size = 0;
         buffer_size = sizeof( DWORD );
         type = REG_BINARY;
-        
-        if ( RegQueryValueEx( video_device_key, HARDWAREINFO_MEMSIZE, NULL, &type, 
+
+        if ( RegQueryValueEx( video_device_key, HARDWAREINFO_MEMSIZE, NULL, &type,
           reinterpret_cast< LPBYTE >( &vram_size ), &buffer_size ) == ERROR_SUCCESS )
         {
           this->vram_size_ = vram_size;
@@ -189,7 +191,7 @@ void RenderResourcesPrivate::query_video_memory_size()
         }
         RegCloseKey( video_device_key );
       } // end for
-      
+
     }
 
     RegCloseKey( video_devicemap_key );
@@ -221,13 +223,13 @@ void RenderResourcesPrivate::query_video_memory_size()
   // TODO: Add support for Linux
 #endif
 
-  if ( this->vram_size_ == 0 ) 
+  if ( this->vram_size_ == 0 )
   {
     CORE_LOG_WARNING( "Failed to query video memory size." );
     CORE_LOG_WARNING( "Assuming system has at least 128 MB of graphics memory." );
     this->vram_size_ = 128 * (1 << 20);
   }
-  else 
+  else
   {
     CORE_LOG_MESSAGE( "Video Memory Size: " + ExportToString( vram_size_MB ) + " MB." );
   }
@@ -271,7 +273,7 @@ RenderContextHandle RenderResources::get_current_context()
 {
   return this->private_->resources_context_->get_current_context();
 }
-  
+
 unsigned long RenderResources::get_vram_size()
 {
   return this->private_->vram_size_;
@@ -289,7 +291,7 @@ void RenderResources::install_resources_context( RenderResourcesContextHandle re
   {
     CORE_THROW_LOGICERROR( "A RenderResourcesContext has already been installed" );
   }
-  
+
   this->private_->resources_context_ = resources_context;
 
   // Start the event handler thread and then create the GL context
@@ -310,22 +312,21 @@ bool RenderResources::valid_render_resources()
 
   while (this->private_->wait_for_render_resources())
   {
-
 #ifdef LOG_RENDER_RESOURCE_INIT
-    std::cout << "Waiting..." << std::endl;
-    std::cout << std::boolalpha << "resources context: " << (this->private_->resources_context_ != nullptr) << " "
-      << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << " "
-      << "delete context: " << (this->private_->delete_context_ != nullptr) << " "
-      << "GL capable: " << this->private_->gl_capable_ << std::endl;
+	  std::cout << "Waiting..." << std::endl;
+	  std::cout << std::boolalpha << "resources context: " << (this->private_->resources_context_ != nullptr) << " "
+		  << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << " "
+		  << "delete context: " << (this->private_->delete_context_ != nullptr) << " "
+		  << "GL capable: " << this->private_->gl_capable_ << std::endl;
 #endif
 
-    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+	  boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
   }
 
-  return ( this->private_->resources_context_ && 
-         this->private_->resources_context_->valid_render_resources() && 
-         this->private_->delete_context_ &&
-         this->private_->gl_capable_ );
+  return (this->private_->resources_context_ &&
+		  this->private_->resources_context_->valid_render_resources() &&
+		  this->private_->delete_context_ &&
+		  this->private_->gl_capable_);
 }
 
 void RenderResources::initialize_on_event_thread()
@@ -346,16 +347,16 @@ void RenderResources::initialize_on_event_thread()
 
 void RenderResources::delete_texture( unsigned int texture_id )
 {
-  // If the calling thread doesn't have a valid OpenGL context, 
+  // If the calling thread doesn't have a valid OpenGL context,
   // repost the delete operation to the default RenderResources thread.
   // Otherwise, delete the object immediately.
   if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    this->post_event( boost::bind( &RenderResources::delete_texture, this, 
+    this->post_event( boost::bind( &RenderResources::delete_texture, this,
       texture_id ) );
-    return;     
+    return;
   }
-  
+
   lock_type lock( RenderResources::GetMutex() );
   if ( glIsTexture( texture_id ) )
   {
@@ -366,16 +367,16 @@ void RenderResources::delete_texture( unsigned int texture_id )
 
 void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
 {
-  // If the calling thread doesn't have a valid OpenGL context, 
+  // If the calling thread doesn't have a valid OpenGL context,
   // repost the delete operation to the default RenderResources thread.
   // Otherwise, delete the object immediately.
   if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    this->post_event( boost::bind( &RenderResources::delete_renderbuffer, this, 
+    this->post_event( boost::bind( &RenderResources::delete_renderbuffer, this,
       renderbuffer_id ) );
-    return;     
+    return;
   }
-  
+
   lock_type lock( RenderResources::GetMutex() );
   glDeleteRenderbuffersEXT( 1, &renderbuffer_id );
   CORE_CHECK_OPENGL_ERROR();
@@ -383,16 +384,16 @@ void RenderResources::delete_renderbuffer( unsigned int renderbuffer_id )
 
 void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
 {
-  // If the calling thread doesn't have a valid OpenGL context, 
+  // If the calling thread doesn't have a valid OpenGL context,
   // repost the delete operation to the default RenderResources thread.
   // Otherwise, delete the object immediately.
   if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    this->post_event( boost::bind( &RenderResources::delete_buffer_object, this, 
+    this->post_event( boost::bind( &RenderResources::delete_buffer_object, this,
       buffer_object_id ) );
-    return;     
+    return;
   }
-  
+
   lock_type lock( RenderResources::GetMutex() );
   glDeleteBuffers( 1, &buffer_object_id );
   CORE_CHECK_OPENGL_ERROR();
@@ -400,16 +401,16 @@ void RenderResources::delete_buffer_object( unsigned int buffer_object_id )
 
 void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object_id )
 {
-  // If the calling thread doesn't have a valid OpenGL context, 
+  // If the calling thread doesn't have a valid OpenGL context,
   // repost the delete operation to the default RenderResources thread.
   // Otherwise, delete the object immediately.
   if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    this->post_event( boost::bind( &RenderResources::delete_framebuffer_object, this, 
+    this->post_event( boost::bind( &RenderResources::delete_framebuffer_object, this,
       framebuffer_object_id ) );
-    return;     
+    return;
   }
-  
+
   lock_type lock( RenderResources::GetMutex() );
   glDeleteFramebuffersEXT( 1, &framebuffer_object_id );
   CORE_CHECK_OPENGL_ERROR();
@@ -417,14 +418,14 @@ void RenderResources::delete_framebuffer_object( unsigned int framebuffer_object
 
 void RenderResources::delete_program( unsigned int program_id )
 {
-  // If the calling thread doesn't have a valid OpenGL context, 
+  // If the calling thread doesn't have a valid OpenGL context,
   // repost the delete operation to the default RenderResources thread.
   // Otherwise, delete the object immediately.
   if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    this->post_event( boost::bind( &RenderResources::delete_program, this, 
+    this->post_event( boost::bind( &RenderResources::delete_program, this,
       program_id ) );
-    return;     
+    return;
   }
 
   lock_type lock( RenderResources::GetMutex() );
@@ -434,14 +435,14 @@ void RenderResources::delete_program( unsigned int program_id )
 
 void RenderResources::delete_shader( unsigned int shader_id )
 {
-  // If the calling thread doesn't have a valid OpenGL context, 
+  // If the calling thread doesn't have a valid OpenGL context,
   // repost the delete operation to the default RenderResources thread.
   // Otherwise, delete the object immediately.
   if ( !this->is_eventhandler_thread() && !this->get_current_context() )
   {
-    this->post_event( boost::bind( &RenderResources::delete_shader, this, 
+    this->post_event( boost::bind( &RenderResources::delete_shader, this,
       shader_id ) );
-    return;     
+    return;
   }
 
   lock_type lock( RenderResources::GetMutex() );
@@ -452,10 +453,9 @@ void RenderResources::delete_shader( unsigned int shader_id )
   CORE_CHECK_OPENGL_ERROR();
 }
 
-RenderResources::mutex_type& RenderResources::GetMutex() 
-{ 
-  return Instance()->get_mutex(); 
+RenderResources::mutex_type& RenderResources::GetMutex()
+{
+  return Instance()->get_mutex();
 }
 
 } // end namespace Core
-
