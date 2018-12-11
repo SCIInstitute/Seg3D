@@ -91,13 +91,21 @@ REGISTERED_TARGET_LINK_LIBRARIES(Seg3D_lib)
 #########################################################
 
 SET(ALL_LIBS_DEST_DIR ${CMAKE_BINARY_DIR}/Main/Seg3DLib/Lib/All_Libs)
+SET(DEPENDENCIES_DEST_DIR ${ALL_LIBS_DEST_DIR}/../Release)
 STRING(REGEX REPLACE "/" "\\\\" ALL_LIBS_DEST_DIR ${ALL_LIBS_DEST_DIR})
+STRING(REGEX REPLACE "/" "\\\\" DEPENDENCIES_DEST_DIR ${DEPENDENCIES_DEST_DIR})
+
+STRING(REGEX REPLACE "/" "\\\\" SUPERBUILD_LIBS_SOURCE_DIR_CMD ${SUPERBUILD_LIBS_SOURCE_DIR})
 
 SET(ZLIB_FILE ${SUPERBUILD_LIBS_SOURCE_DIR}/Externals/Build/Zlib_external/Release/z.lib)
 STRING(REGEX REPLACE "/" "\\\\" ZLIB_FILE ${ZLIB_FILE})
 
 get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
+SET(BATCH_FILE_PATH \"${_vs_bin_path}/../../../../../../../Common7/Tools/VsDevCmd.bat\")
+SET(LIB_TOOL_PATH \"${_vs_bin_path}/lib.exe\")
 STRING(REGEX REPLACE "/" "\\\\" _vs_bin_path ${_vs_bin_path})
+STRING(REGEX REPLACE "/" "\\\\" LIB_TOOL_PATH ${LIB_TOOL_PATH})
+STRING(REGEX REPLACE "/" "\\\\" BATCH_FILE_PATH ${BATCH_FILE_PATH})
 
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/CMake/Scripts/build_full_static_lib.bat.in
     ${CMAKE_BINARY_DIR}/build_full_static_lib.bat)
@@ -107,5 +115,5 @@ STRING(REGEX REPLACE "/" "\\\\" BATCH_COMMAND ${BATCH_COMMAND})
 
 ADD_CUSTOM_COMMAND(TARGET Seg3D_lib
 POST_BUILD
-COMMAND cmd //c ${BATCH_COMMAND}
+COMMAND cmd /c ${BATCH_COMMAND}
 )
