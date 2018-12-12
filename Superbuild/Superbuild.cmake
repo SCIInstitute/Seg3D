@@ -109,7 +109,7 @@ OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 # Configure Seg3D library build
 ###########################################
 
-IF(WIN32)
+IF((WIN32) AND (MSVC_VERSION GREATER 1900))
 
   OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
 
