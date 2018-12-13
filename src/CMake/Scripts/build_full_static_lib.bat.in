@@ -1,0 +1,21 @@
+SET all_libs_dest_dir=@ALL_LIBS_DEST_DIR@
+SET superbuild_dir=@SUPERBUILD_LIBS_SOURCE_DIR_CMD@
+SET zlib_file=@ZLIB_FILE@
+SET vs_bin_path=@_vs_bin_path@
+SET dependencies_dest_dir=@DEPENDENCIES_DEST_DIR@
+SET batch_file_path=@BATCH_FILE_PATH@
+SET lib_tool_path=@LIB_TOOL_PATH@
+
+rmdir /S /Q %all_libs_dest_dir%
+mkdir %all_libs_dest_dir%
+
+cd %superbuild_dir%
+for /r %%A IN (*.lib) DO copy %%A %all_libs_dest_dir%
+copy %zlib_file% %all_libs_dest_dir%
+del %all_libs_dest_dir%\Seg3D_lib.lib
+del %all_libs_dest_dir%\Seg3D_dependencies.lib
+del %all_libs_dest_dir%\Seg3D_lib_complete.lib
+
+del %dependencies_dest_dir%\Seg3D_dependencies.lib
+del %dependencies_dest_dir%\Seg3D_lib_complete.lib
+%batch_file_path% & %lib_tool_path% /OUT:%dependencies_dest_dir%\Seg3D_dependencies.lib %all_libs_dest_dir%\*.lib & %lib_tool_path% /OUT:%dependencies_dest_dir%\Seg3D_lib_complete.lib %dependencies_dest_dir%\*.lib
