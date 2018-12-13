@@ -149,6 +149,13 @@ Core::Log::Instance()->post_message(message,__LINE__,__FILE__)
 #define CORE_LOG_SUCCESS(message)\
   Core::Log::Instance()->post_success(message,__LINE__,__FILE__)
 
+//TODO: remove after upgrade to VS2017 
+#ifndef NDEBUG
+#ifdef BUILD_STANDALONE_LIBRARY
+#error "Only build standalone library in Release mode."
+#endif
+#endif
+
 #ifdef NDEBUG
 #define CORE_LOG_DEBUG(message)
 #else
