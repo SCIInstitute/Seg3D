@@ -95,7 +95,7 @@ ToolFactory::~ToolFactory()
 {
 }
 
-#ifdef SEG3D_MANUAL_TOOLS_ONLY
+#ifdef BUILD_MANUAL_TOOLS_ONLY
 static std::set<std::string> nonManualTools = { "croptool", "resampletool", "thresholdtool", "cannyedgedetectionfilter",
 "confidenceconnectedfilter", "connectedcomponentfilter", "curvatureanisotropicdiffusionfilter",
 "discretegaussianfilter", "distancefilter", "extractdatalayer", "gradientanisotropicdiffusionfilter",
@@ -110,7 +110,7 @@ void ToolFactory::register_tool(ToolBuilderBase* builder, ToolInfoHandle info,
 {
   tool_name = Core::StringToLower(tool_name);
 
-#ifdef SEG3D_MANUAL_TOOLS_ONLY
+#ifdef BUILD_MANUAL_TOOLS_ONLY
  //When building a library, we don't want to include the tools in nonManualTools
     if (nonManualTools.find(tool_name) != nonManualTools.end())
     {
