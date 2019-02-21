@@ -2,7 +2,7 @@
 #
 #  The MIT License
 #
-#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2019 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -24,36 +24,28 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
+SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
-##################################################
-# ADDING TINYXML
-##################################################
+SET(GTEST_CACHE_ARGS
+ "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"
+ "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+ "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON"
+)
 
-MESSAGE(STATUS "Configuring tinyxml")
-ADD_SUBDIRECTORY(tinyxml)
+SET(googletest_GIT_TAG "origin/cibc")
 
+# If CMake ever allows overriding the checkout command or adding flags,
+# git checkout -q will silence message about detached head (harmless).
+ExternalProject_Add(GoogleTest_external
+  GIT_REPOSITORY "https://github.com/CIBC-Internal/googletest.git"
+  GIT_TAG ${googletest_GIT_TAG}
+  PATCH_COMMAND ""
+  INSTALL_DIR ""
+  INSTALL_COMMAND ""
+  CMAKE_CACHE_ARGS ${GTEST_CACHE_ARGS}
+)
 
-##################################################
-# ADDING MATLABIO
-##################################################
+ExternalProject_Get_Property(GoogleTest_external BINARY_DIR)
+SET(GTEST_DIR ${BINARY_DIR} CACHE PATH "")
 
-MESSAGE(STATUS "Configuring MatlabIO")
-ADD_SUBDIRECTORY(MatlabIO)
-
-
-##################################################
-# ADDING MRC2000
-##################################################
-
-MESSAGE(STATUS "Configuring MRC2000")
-ADD_SUBDIRECTORY(MRC2000IO)
-
-
-##################################################
-# ADD GOOGLETEST
-##################################################
-
-IF(BUILD_TESTING)
-  MESSAGE(STATUS "Configuring Google Test")
-  ADD_SUBDIRECTORY(submodules)
-ENDIF()
+MESSAGE(STATUS "GTEST_DIR: ${GTEST_DIR}")

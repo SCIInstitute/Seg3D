@@ -1,8 +1,9 @@
+#
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
 #
-#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2019 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -23,37 +24,27 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
+#
 
+MESSAGE(STATUS "Configuring Submodules")
 
-##################################################
-# ADDING TINYXML
-##################################################
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/../.git")
+# Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if(GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
+    endif()
+endif()
 
-MESSAGE(STATUS "Configuring tinyxml")
-ADD_SUBDIRECTORY(tinyxml)
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/submodules/googletest/CMakeLists.txt")
+    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
 
-
-##################################################
-# ADDING MATLABIO
-##################################################
-
-MESSAGE(STATUS "Configuring MatlabIO")
-ADD_SUBDIRECTORY(MatlabIO)
-
-
-##################################################
-# ADDING MRC2000
-##################################################
-
-MESSAGE(STATUS "Configuring MRC2000")
-ADD_SUBDIRECTORY(MRC2000IO)
-
-
-##################################################
-# ADD GOOGLETEST
-##################################################
-
-IF(BUILD_TESTING)
-  MESSAGE(STATUS "Configuring Google Test")
-  ADD_SUBDIRECTORY(submodules)
-ENDIF()
+ADD_SUBDIRECTORY(googletest)
