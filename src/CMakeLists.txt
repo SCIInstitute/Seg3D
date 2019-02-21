@@ -400,9 +400,8 @@ IF(BUILD_WITH_PYTHON)
 ENDIF()
 
 IF(BUILD_TESTING)
-  INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} ${SCI_GMOCK_INCLUDE}  )
-  #INCLUDE(DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/submodeules/googletest/googletest/include))
-  #INCLUDE(DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/submodeules/googletest/googlemock/include))
+  INCLUDE(DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/submodules/googletest/googletest/include))
+  INCLUDE(DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/submodules/googletest/googlemock/include))
 ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
