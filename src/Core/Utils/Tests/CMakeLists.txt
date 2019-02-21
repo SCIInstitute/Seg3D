@@ -36,5 +36,6 @@ REGISTER_UNIT_TEST(Core_Utils_Tests
 
 TARGET_LINK_LIBRARIES(Core_Utils_Tests
   Core_Utils
-  ${SCI_GTESTMAIN_LIBRARY}
+  gtest_main
+  gtest
 )
