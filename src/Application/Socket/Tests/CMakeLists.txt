@@ -36,5 +36,6 @@ REGISTER_UNIT_TEST(Application_Socket_Tests
 TARGET_LINK_LIBRARIES(Application_Socket_Tests
   Application_Socket
   Testing_Utils
-  ${SCI_GTESTMAIN_LIBRARY}
+  gtest
+  gtest_main
 )

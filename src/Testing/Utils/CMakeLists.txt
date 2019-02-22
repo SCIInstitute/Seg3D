@@ -40,5 +40,6 @@ TARGET_LINK_LIBRARIES(Testing_Utils
   Core_Geometry
   ${SCI_BOOST_LIBRARY}
   ${SCI_ITK_LIBRARY}
-  ${SCI_GMOCKMAIN_LIBRARY}
+ gmock
+ gmock_main
 )

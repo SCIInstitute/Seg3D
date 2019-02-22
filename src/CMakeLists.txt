@@ -418,7 +418,6 @@ INCLUDE(CMake/RegisterClass.cmake)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
 
-
 ###########################################
 # Application layers:
 #  Core - Core functionality
