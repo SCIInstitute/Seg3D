@@ -325,7 +325,6 @@ ENDIF()
 
 ADD_SUBDIRECTORY(ThirdParty)
 
-
 ###########################################
 # Check for "XInitThreads" on X-window
 # systems.

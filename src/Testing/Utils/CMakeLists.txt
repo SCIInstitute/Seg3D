@@ -42,4 +42,6 @@ TARGET_LINK_LIBRARIES(Testing_Utils
   ${SCI_ITK_LIBRARY}
  gmock
  gmock_main
+ gtest
+ gtest_main
 )
