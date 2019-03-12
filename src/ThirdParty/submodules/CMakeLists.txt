@@ -47,4 +47,5 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/submodules/googletest/CMakeLists
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
+SET(gtest_force_shared_crt ON)
 ADD_SUBDIRECTORY(googletest)
