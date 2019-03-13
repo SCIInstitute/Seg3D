@@ -91,7 +91,7 @@ INCLUDE( ExternalProject )
 # Options for console, headless mode
 ###########################################
 
-OPTION(BUILD_TESTING "Build with tests." OFF)
+OPTION(BUILD_TESTING "Build with tests." ON)
 
 OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
 IF(WIN32)
@@ -133,7 +133,7 @@ MARK_AS_ADVANCED(TRAVIS_BUILD)
 IF(TRAVIS_BUILD)
   SET(SEG3D_BUILD_INTERFACE OFF) # TODO: Qt 5.9 packages needed, hopefully temporary
   SET(BUILD_WITH_PYTHON OFF) # TODO: hopefully temporary etc.
-  SET(BUILD_TESTING OFF)
+  SET(BUILD_TESTING ON)
   SET(BUILD_MOSAIC_TOOLS OFF)
   SET(BUILD_LARGE_VOLUME_TOOLS OFF)
   SET(DOWNLOAD_DATA OFF)
