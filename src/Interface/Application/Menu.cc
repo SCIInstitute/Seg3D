@@ -98,13 +98,15 @@ Menu::Menu( QMainWindow* parent ) :
   // will synchronize properly.
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    
+
     // Update the tags in the undo and redo buffers
     this->update_undo_tag( UndoBuffer::Instance()->get_undo_tag() );
     this->update_redo_tag( UndoBuffer::Instance()->get_redo_tag() );
 
+#ifndef BUILD_MANUAL_TOOLS_ONLY
     // Update to the most recent list
     this->set_recent_file_list(); 
+#endif
 
     // Ensure we have the right state
     bool mask_layer_found = false;
@@ -168,6 +170,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
   // == New Project ==
   QAction* qaction;
 
+#ifndef BUILD_MANUAL_TOOLS_ONLY
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     bool project_creation = InterfaceManager::Instance()->enable_project_creation_state_->get();
@@ -223,6 +226,7 @@ void Menu::create_file_menu( QMenuBar* menubar )
 #endif
   
   qmenu->addSeparator();
+#endif
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -279,7 +283,8 @@ void Menu::create_file_menu( QMenuBar* menubar )
   QtUtils::QtBridge::Connect( this->export_active_data_layer_qaction_, 
     boost::bind( &LayerIOFunctions::ExportLayer, this->main_window_ ) );
   this->export_active_data_layer_qaction_->setEnabled( false );
-    
+  
+#ifndef BUILD_MANUAL_TOOLS_ONLY
   qmenu->addSeparator();
     
   // == Recent Projects ==
@@ -288,10 +293,13 @@ void Menu::create_file_menu( QMenuBar* menubar )
   qmenu->addSeparator();
 
   // == Quit ==
+
   qaction = qmenu->addAction( tr( "Quit" ) );
   qaction->setShortcut( tr( "Ctrl+Q" ) );
   qaction->setToolTip( tr( "Quit application." ) );
   connect( qaction, SIGNAL( triggered() ), this->parent(), SLOT( close() ) );
+#endif
+
 }
 
 void Menu::create_edit_menu( QMenuBar* menubar )
@@ -874,6 +882,7 @@ void Menu::open_project_folder()
 
 void Menu::set_recent_file_list()
 {
+#ifndef BUILD_MANUAL_TOOLS_ONLY
   QAction* qaction = 0;
   this->file_menu_recents_->clear();
   
@@ -888,6 +897,7 @@ void Menu::set_recent_file_list()
     QtUtils::QtBridge::Connect( qaction, boost::bind( &Menu::ConfirmRecentFileLoad,
       qpointer_type( this ), recent_projects[ i ].path().string() ) );
   }
+#endif
 }
 
 void Menu::ConfirmRecentFileLoad( qpointer_type qpointer, const std::string& path )
@@ -1002,8 +1012,10 @@ void Menu::mac_open_another_version()
 
 void Menu::SetRecentFileList( qpointer_type qpointer )
 {
+#ifndef BUILD_MANUAL_TOOLS_ONLY
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &Menu::set_recent_file_list, qpointer.data() ) ) );
+#endif
 }
 
 void Menu::ShowHideLargeVolume( qpointer_type qpointer )

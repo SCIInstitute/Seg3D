@@ -105,8 +105,25 @@ ENDIF()
 
 OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
 
-
 ###########################################
+# Configure Seg3D library build
+###########################################
+
+IF((WIN32) AND (MSVC_VERSION GREATER 1900))
+
+  OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
+
+  IF(BUILD_STANDALONE_LIBRARY)
+    SET(BUILD_TESTING OFF)
+    SET(BUILD_WITH_PYTHON OFF)
+    SET(SUPERBUILD_LIBS_SOURCE_DIR ${CMAKE_BINARY_DIR})
+  ENDIF()
+
+ENDIF()
+
+OPTION(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
+
+###########################################ß
 # Travis CI build needs to be as slim as possible
 ###########################################
 
@@ -125,7 +142,6 @@ IF(TRAVIS_BUILD)
 ELSE()
   SET(ENABLED_WARNINGS "-Wall")
 ENDIF()
-
 
 ###########################################
 # Configure Qt
@@ -165,13 +181,11 @@ IF(SEG3D_BUILD_INTERFACE)
 
 ENDIF()
 
-
 ###########################################
 # Configure sample data download
 ###########################################
 
 OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
-
 
 ###########################################
 # *Nix C++ compiler flags
@@ -288,7 +302,10 @@ SET(SEG3D_CACHE_ARGS
     "-DSEG3D_BUILD_INTERFACE:BOOL=${SEG3D_BUILD_INTERFACE}"
     "-DSEG3D_SHOW_CONSOLE:BOOL=${SEG3D_SHOW_CONSOLE}"
     "-DBUILD_WITH_PYTHON:BOOL=${BUILD_WITH_PYTHON}"
+    "-DBUILD_STANDALONE_LIBRARY:BOOL=${BUILD_STANDALONE_LIBRARY}"
+    "-DBUILD_MANUAL_TOOLS_ONLY:BOOL=${BUILD_MANUAL_TOOLS_ONLY}"
     "-DDO_ZLIB_MANGLE:BOOL=${DO_ZLIB_MANGLE}"
+    "-DSUPERBUILD_LIBS_SOURCE_DIR:PATH=${SUPERBUILD_LIBS_SOURCE_DIR}"
     "-DZlib_DIR:PATH=${Zlib_DIR}"
     "-DLibPNG_DIR:PATH=${LibPNG_DIR}"
     "-DSQLite_DIR:PATH=${SQLite_DIR}"

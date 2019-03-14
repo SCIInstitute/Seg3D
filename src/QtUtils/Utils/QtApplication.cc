@@ -130,7 +130,10 @@ bool QtApplication::setup( int& argc, char **argv )
   {
     // Step 1: Main application class
     CORE_LOG_DEBUG( "Creating QApplication" );
-    this->private_->qt_application_ = new OverrideQApplication( argc, argv );
+	//Check if QApplication exists
+	if (!this->private_->qt_application_)
+	  this->private_->qt_application_ = new OverrideQApplication(argc, argv);
+
     this->private_->win32_event_filter_ = new QtWin32ApplicationEventFilter;
 
     // Set the native event filter for QApplication
@@ -167,6 +170,11 @@ bool QtApplication::setup( int& argc, char **argv )
   }
 
   return ( true );
+}
+
+void QtApplication::setExternalInstance(QApplication* app)
+{
+	this->private_->qt_application_ = app;
 }
 
 bool QtApplication::exec()

@@ -95,32 +95,50 @@ ToolFactory::~ToolFactory()
 {
 }
 
-void ToolFactory::register_tool( ToolBuilderBase* builder, ToolInfoHandle info, 
-  std::string tool_name )
-{
-  tool_name = Core::StringToLower( tool_name );
+#ifdef BUILD_MANUAL_TOOLS_ONLY
+static std::set<std::string> nonManualTools = { "croptool", "resampletool", "thresholdtool", "cannyedgedetectionfilter",
+"confidenceconnectedfilter", "connectedcomponentfilter", "curvatureanisotropicdiffusionfilter",
+"discretegaussianfilter", "distancefilter", "extractdatalayer", "gradientanisotropicdiffusionfilter",
+"gradientmagnitudefilter", "histogramequalizationfilter", "intensitycorrectionfilter",
+"maskdatafilter", "medianfilter", "meanfilter", "neighborhoodconnectedfilter",
+"otsuthresholdfilter", "thresholdsegmentationlsfilter", "transformtool", "measurementtool",
+"pointsetfilter", "speedlinetool", "pointsselecttool", "padtool", "implicitmodeltool", "watershedfilter" };
+#endif
 
-  lock_type lock( this->get_mutex() );
+void ToolFactory::register_tool(ToolBuilderBase* builder, ToolInfoHandle info,
+  std::string tool_name)
+{
+  tool_name = Core::StringToLower(tool_name);
+
+#ifdef BUILD_MANUAL_TOOLS_ONLY
+ //When building a library, we don't want to include the tools in nonManualTools
+    if (nonManualTools.find(tool_name) != nonManualTools.end())
+    {
+      return;
+    }
+#endif
+
+  lock_type lock(this->get_mutex());
 
   // Test is tool was registered before.
-  if ( this->private_->tools_.find( tool_name ) != this->private_->tools_.end() )
+  if (this->private_->tools_.find(tool_name) != this->private_->tools_.end())
   {
     // Actions that are registered twice, will cause problems
     // Hence the program will throw an exception.
     // As registration is done on startup, this will cause a
     // faulty program to fail always on startup.
-    CORE_THROW_LOGICERROR( std::string( "Tool '" ) + tool_name + "' is registered twice" );
+    CORE_THROW_LOGICERROR(std::string("Tool '") + tool_name + "' is registered twice");
   }
 
   // Register the action and set its properties 
   ToolEntry entry;
   entry.builder_ = builder;
   entry.info_ = info;
-  this->private_->tools_[ tool_name ] = entry;
+  this->private_->tools_[tool_name] = entry;
 
-  this->private_->tool_menus_.insert( info->get_menu() );
-  
-  CORE_LOG_DEBUG( std::string( "Registering tool : " ) + tool_name );
+  this->private_->tool_menus_.insert(info->get_menu());
+
+  CORE_LOG_DEBUG(std::string("Registering tool : ") + tool_name);
 }
 
 void ToolFactory::register_toolinterface( ToolInterfaceBuilderBase* builder,
