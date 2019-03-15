@@ -325,7 +325,6 @@ ENDIF()
 
 ADD_SUBDIRECTORY(ThirdParty)
 
-
 ###########################################
 # Check for "XInitThreads" on X-window
 # systems.
@@ -400,11 +399,11 @@ IF(BUILD_WITH_PYTHON)
 ENDIF()
 
 IF(BUILD_TESTING)
-  INCLUDE_DIRECTORIES( ${SCI_GTEST_INCLUDE} ${SCI_GMOCK_INCLUDE}  )
+  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/submodules/googletest/googletest/include)
+  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/submodules/googletest/googlemock/include)
 ENDIF()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-
 
 ###########################################
 # Generate a variable for registering all
@@ -417,7 +416,6 @@ INCLUDE(CMake/RegisterClass.cmake)
 ###########################################
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
-
 
 ###########################################
 # Application layers:

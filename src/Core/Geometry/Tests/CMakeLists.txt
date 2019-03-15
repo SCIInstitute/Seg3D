@@ -39,5 +39,6 @@ REGISTER_UNIT_TEST(Core_Geometry_Tests
 TARGET_LINK_LIBRARIES(Core_Geometry_Tests
   Core_Geometry
   Testing_Utils
-  ${SCI_GTESTMAIN_LIBRARY}
+  gtest
+  gtest_main
 )

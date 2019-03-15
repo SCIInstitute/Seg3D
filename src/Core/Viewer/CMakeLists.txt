@@ -48,4 +48,5 @@ TARGET_LINK_LIBRARIES(Core_Viewer
   Core_State
   Core_Utils
   Core_Renderer 
-  ${SCI_BOOST_LIBRARY})
+  ${SCI_BOOST_LIBRARY}
+  )

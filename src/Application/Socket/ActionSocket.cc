@@ -34,16 +34,16 @@
 #include <fstream>
 #include <sstream>
 
+// Core includes
+#include <Core/Utils/ConnectionHandler.h>
+#include <Core/Utils/Log.h>
+#include <Core/Python/PythonInterpreter.h>
+
 // Boost includes
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/ref.hpp>
 #include <boost/system/system_error.hpp>
-
-// Core includes
-#include <Core/Utils/ConnectionHandler.h>
-#include <Core/Utils/Log.h>
-#include <Core/Python/PythonInterpreter.h>
 
 // Application includes
 #include <Application/Socket/ActionSocket.h>
@@ -218,6 +218,7 @@ void ActionSocket::run_action_socket( int portnum )
 
   CORE_LOG_MESSAGE( "Stopped listening on port " + Core::ExportToString( portnum ) );
 }
+
 
 } // end namespace Core
 

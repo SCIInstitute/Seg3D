@@ -40,5 +40,6 @@ TARGET_LINK_LIBRARIES(Core_DataBlock_Tests
   ${SCI_ZLIB_LIBRARY}
   ${SCI_PNG_LIBRARY}
   ${SCI_TEEM_LIBRARY}
-  ${SCI_GTESTMAIN_LIBRARY}
+  gtest
+  gtest_main
 )

@@ -3,7 +3,7 @@
 #
 #  The MIT License
 #
-#  Copyright (c) 2016 Scientific Computing and Imaging Institute,
+#  Copyright (c) 2019 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
 #
@@ -26,18 +26,26 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS
-  ActionAssembleFilterTests.cc
-  ActionFFTFilterTests.cc
-  ActionRefineTranslateFilterTests.cc
-)
+MESSAGE(STATUS "Configuring Submodules")
 
-REGISTER_UNIT_TEST(Application_ImageRegistrationTools_Actions_Tests
-  ${APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS}
-)
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/../.git")
+# Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if(GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
+    endif()
+endif()
 
-TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools_Actions_Tests
-  Application_ImageRegistrationTools
-  gtest
-  gtest_main
-)
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/submodules/googletest/CMakeLists.txt")
+    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+
+SET(gtest_force_shared_crt ON)
+ADD_SUBDIRECTORY(googletest)

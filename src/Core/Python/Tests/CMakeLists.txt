@@ -37,5 +37,6 @@ TARGET_LINK_LIBRARIES(Core_Python_Tests
   Core_Python
   Testing_Utils
   ${SCI_PYTHON_LIBRARY}
-  ${SCI_GTESTMAIN_LIBRARY}
+  gtest
+  gtest_main
 )

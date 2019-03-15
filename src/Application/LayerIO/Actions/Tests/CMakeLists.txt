@@ -36,5 +36,6 @@ REGISTER_UNIT_TEST(Application_LayerIO_Tests
 TARGET_LINK_LIBRARIES(Application_LayerIO_Tests
   Application_LayerIO
   Testing_Utils
-  ${SCI_GTESTMAIN_LIBRARY}
+  gtest
+  gtest_main
 )
