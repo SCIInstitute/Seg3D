@@ -34,12 +34,12 @@
 #include <cstdlib>
 #include <string>
 
+#include <Python.h>
+#include <Core/Python/PythonInterpreter.h>
+
 #include <boost/filesystem.hpp>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
-
-#include <Python.h>
-#include <Core/Python/PythonInterpreter.h>
 
 #include <Application/Socket/ActionSocket.h>
 

@@ -64,9 +64,11 @@ ENDIF()
 # Boost Jam needs to have 64-bit build explicitly configured
 IF(WIN32)
   SET(FORCE_64BIT_BUILD ON)
+  SET(boost_GIT_TAG "origin/v1.67.0")
+ELSE()
+    SET(boost_GIT_TAG "origin/v1.58.0")
 ENDIF()
 
-SET(boost_GIT_TAG "origin/master")
 SET(boost_GIT_URL "https://github.com/CIBC-Internal/boost.git")
 
 IF(TRAVIS_BUILD)
