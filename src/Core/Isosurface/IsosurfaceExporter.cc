@@ -52,9 +52,9 @@ computeFaceNormal(const PointF& p1, const PointF& p2, const PointF& p3)
   VectorF V = p3 - p1;
 
   boost::shared_array<float> normal(new float[3]);
-  normal[0] = U.y() * V.z() - U.z() * V.y();
-  normal[1] = U.z() * V.x() - U.x() * V.z();
-  normal[2] = U.x() * V.y() - U.y() * V.x();
+  normal[0] = (U.y() * V.z()) - (U.z() * V.y());
+  normal[1] = (U.z() * V.x()) - (U.x() * V.z());
+  normal[2] = (U.x() * V.y()) - (U.y() * V.x());
   return normal;
 }
 
