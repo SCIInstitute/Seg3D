@@ -267,7 +267,7 @@ bool IsosurfaceExporter::ExportSTLBinary( const boost::filesystem::path& filenam
   const unsigned short FIELD_LEN = 12;
   const unsigned short ATTRIBUTE_BYTE_COUNT = 2;
 
-  std::ofstream stl_file( filename.string().c_str() );
+  std::ofstream stl_file(filename.string().c_str(), std::ios::binary | std::ios::out);
   if ( ! stl_file.is_open() )
   {
     return false;
