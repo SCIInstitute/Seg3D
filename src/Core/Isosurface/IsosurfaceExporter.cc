@@ -38,7 +38,7 @@
 namespace Core
 {
 
-boost::shared_array<float>
+std::vector<float>
 computeFaceNormal(const PointF& p1, const PointF& p2, const PointF& p3)
 {
   // compute face normal:
@@ -51,11 +51,7 @@ computeFaceNormal(const PointF& p1, const PointF& p2, const PointF& p3)
   VectorF U = p2 - p1;
   VectorF V = p3 - p1;
 
-  boost::shared_array<float> normal(new float[3]);
-  normal[0] = U.y() * V.z() - U.z() * V.y();
-  normal[1] = U.z() * V.x() - U.x() * V.z();
-  normal[2] = U.x() * V.y() - U.y() * V.x();
-  return normal;
+  return{ (U.y() * V.z()) - (U.z() * V.y()),(U.z() * V.x()) - (U.x() * V.z()),(U.x() * V.y()) - (U.y() * V.x()) };
 }
 
 
@@ -230,7 +226,7 @@ bool IsosurfaceExporter::ExportSTLASCII( const boost::filesystem::path& filename
     PointF p2 = points[ vertex_index2 ];
     PointF p3 = points[ vertex_index3 ];
 
-    boost::shared_array<float> normal = computeFaceNormal(p1, p2, p3);
+   auto normal = computeFaceNormal(p1, p2, p3);
 
     stl_file << indent_level1 << "facet normal " << std::fixed <<
                                  normal[0] << delim <<
@@ -271,13 +267,14 @@ bool IsosurfaceExporter::ExportSTLBinary( const boost::filesystem::path& filenam
   const unsigned short FIELD_LEN = 12;
   const unsigned short ATTRIBUTE_BYTE_COUNT = 2;
 
-  std::ofstream stl_file( filename.string().c_str() );
+  std::ofstream stl_file(filename.string().c_str(), std::ios::binary | std::ios::out);
   if ( ! stl_file.is_open() )
   {
     return false;
   }
 
   std::string header("STL header: Seg3D isosurface to STL Binary export");
+  header.resize(STL_HEADER_LENGTH);
   char* headerBuffer = const_cast<char*>(header.c_str());
   stl_file.write(headerBuffer, STL_HEADER_LENGTH);
 
@@ -285,41 +282,32 @@ bool IsosurfaceExporter::ExportSTLBinary( const boost::filesystem::path& filenam
   stl_file.write(reinterpret_cast<char*>(&numTriangles), STL_FIELD_LENGTH);
 
   // 0 is an acceptable value for this field
-  unsigned short byteAttributeCount = 0;
+  const unsigned short byteAttributeCount = 0;
 
-  for ( size_t i = 0; i + 2 < faces.size(); i += 3 )
+  for (size_t i = 0; i + 2 < faces.size(); i += 3)
   {
-    size_t vertex_index1 = faces[ i ];
-    size_t vertex_index2 = faces[ i + 1 ];
-    size_t vertex_index3 = faces[ i + 2 ];
+    size_t vertex_index1 = faces[i];
+    size_t vertex_index2 = faces[i + 1];
+    size_t vertex_index3 = faces[i + 2];
 
     // Get vertices of face
-    PointF p1 = points[ vertex_index1 ];
-    PointF p2 = points[ vertex_index2 ];
-    PointF p3 = points[ vertex_index3 ];
+    if (vertex_index1 >= points.size() || vertex_index2 >= points.size() || vertex_index3 >= points.size())
+    {
+      throw("verticies are out of points bounds");
+    }
 
-    boost::shared_array<float> normal = computeFaceNormal(p1, p2, p3);
-    stl_file.write(reinterpret_cast<char*>(normal.get()), FIELD_LEN);
+    PointF p1 = points[vertex_index1];
+    PointF p2 = points[vertex_index2];
+    PointF p3 = points[vertex_index3];
+   
+    auto normal = computeFaceNormal(p1, p2, p3);
+    stl_file.write(reinterpret_cast<char*>(&normal[0]), FIELD_LEN);
 
-    boost::shared_array<float> vertex1(new float[POINT_LEN]);
-    vertex1[0] = p1.x();
-    vertex1[1] = p1.y();
-    vertex1[2] = p1.z();
-    stl_file.write(reinterpret_cast<char*>(vertex1.get()), FIELD_LEN);
+    stl_file.write(reinterpret_cast<char*>(&p1[0]), FIELD_LEN);
+    stl_file.write(reinterpret_cast<char*>(&p2[0]), FIELD_LEN);
+    stl_file.write(reinterpret_cast<char*>(&p3[0]), FIELD_LEN);
 
-    boost::shared_array<float> vertex2(new float[POINT_LEN]);
-    vertex2[0] = p2.x();
-    vertex2[1] = p2.y();
-    vertex2[2] = p2.z();
-    stl_file.write(reinterpret_cast<char*>(vertex2.get()), FIELD_LEN);
-
-    boost::shared_array<float> vertex3(new float[POINT_LEN]);
-    vertex3[0] = p3.x();
-    vertex3[1] = p3.y();
-    vertex3[2] = p3.z();
-    stl_file.write(reinterpret_cast<char*>(vertex3.get()), FIELD_LEN);
-
-    stl_file.write(reinterpret_cast<char*>(&byteAttributeCount), ATTRIBUTE_BYTE_COUNT);
+    stl_file.write(reinterpret_cast<const char*>(&byteAttributeCount), ATTRIBUTE_BYTE_COUNT);
   }
   stl_file.close();
 
