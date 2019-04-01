@@ -46,7 +46,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Threshold" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+8" )
-  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:ThresholdTool:1" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/ThresholdTool.html" )
   SEG3D_TOOL_HOTKEYS( "M=Toggle visibility of the preview mask.|C=Clear seed points.|Left Mouse Button=Add seed point.|Right Mouse Button=Delete seed point." )
 )
 

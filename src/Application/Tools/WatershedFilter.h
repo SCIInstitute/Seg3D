@@ -41,7 +41,7 @@ SEG3D_TOOL(
   SEG3D_TOOL_MENULABEL( "Watershed" )
   SEG3D_TOOL_MENU( "Advanced Filters" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+SHIFT+W" )
-  SEG3D_TOOL_URL( "" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/Watershed.html" )
   SEG3D_TOOL_VERSION( "1" )
 )
   

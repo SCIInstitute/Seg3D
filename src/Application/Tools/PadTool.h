@@ -46,7 +46,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Pad" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+0" )
-  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:PadTool:1" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/PadTool.html" )
 )
 
   // -- constructor/destructor --
