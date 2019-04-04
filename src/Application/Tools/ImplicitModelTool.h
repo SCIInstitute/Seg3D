@@ -45,7 +45,7 @@ SEG3D_TOOL(
   SEG3D_TOOL_MENULABEL( "Implicit Model" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+r" )
-  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:RBF:1" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/ImplicitModel.html" )
   SEG3D_TOOL_HOTKEYS( "C=Clear seed points.|Left Mouse Button=Add point.|Right Mouse Button=Delete point." )
 )
 

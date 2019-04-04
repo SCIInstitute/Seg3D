@@ -45,7 +45,7 @@ SEG3D_TOOL_NAME( "DistanceFilter", "Compute the distance to the mask" )
 SEG3D_TOOL_MENULABEL( "Distance Map" )
 SEG3D_TOOL_MENU( "Advanced Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+R" )
-SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:DistanceFilter:1" )
+SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/DistanceMap.html" )
 SEG3D_TOOL_VERSION( "1" )
 )
 
