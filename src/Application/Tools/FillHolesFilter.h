@@ -47,7 +47,7 @@ SEG3D_TOOL(
   SEG3D_TOOL_MENULABEL( "Fill Holes" )
   SEG3D_TOOL_MENU( "Mask Filters" )
   SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+F" )
-  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:FillHolesFilter:1" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/FillHoles.html" )
   SEG3D_TOOL_HOTKEYS("C=Clear seed points.|Left Mouse Button=Add seed point.|Right Mouse Button=Delete seed point.")
 )
 

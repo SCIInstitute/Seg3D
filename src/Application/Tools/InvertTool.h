@@ -43,7 +43,7 @@ SEG3D_TOOL
   SEG3D_TOOL_MENULABEL( "Invert" )
   SEG3D_TOOL_MENU( "Tools" )
   SEG3D_TOOL_SHORTCUT_KEY( "Ctrl+ALT+4" )
-  SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:InvertTool:1" )
+  SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/InvertTool.html" )
 )
 
   // -- constructor/destructor --

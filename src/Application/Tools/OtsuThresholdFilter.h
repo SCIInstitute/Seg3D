@@ -44,7 +44,7 @@ SEG3D_TOOL_NAME( "OtsuThresholdFilter",
 SEG3D_TOOL_MENULABEL( "Otsu Threshold" )
 SEG3D_TOOL_MENU( "Data Filters" )
 SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+O" )
-SEG3D_TOOL_URL( "http://scirundocwiki.sci.utah.edu/SCIRunDocs/index.php5/CIBC:Seg3D2:OtsuThresholdFilter:1" )
+SEG3D_TOOL_URL( "http://sciinstitute.github.io/seg3d.pages/Tools/OtsuThreshold.html" )
 )
 
 public:
