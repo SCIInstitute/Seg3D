@@ -458,17 +458,18 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
     new ImageData( temp_handle->get_data_volume()->get_data_block(),
                    temp_handle->get_grid_transform() ) );
 
+  bool success = false;
   if ( this->extension_ == ".dcm" )
   {
     if ( this->pixel_type_ == Core::DataType::FLOAT_E || this->pixel_type_ == Core::DataType::DOUBLE_E ||
          this->pixel_type_ == Core::DataType::ULONGLONG_E || this->pixel_type_ == Core::DataType::LONGLONG_E )
     {
       typename itk::Image< int, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, int >( image_data );
-      return export_dicom_series< int >( file_path, name, new_image_data, temp_handle, this->extension_ );
+      success =  export_dicom_series< int >( file_path, name, new_image_data, temp_handle, this->extension_ );
     }
     else
     {
-      return export_dicom_series< InputPixelType >( file_path, name, image_data->get_image(), temp_handle, this->extension_ );
+      success =  export_dicom_series< InputPixelType >( file_path, name, image_data->get_image(), temp_handle, this->extension_ );
     }
   }
   else if ( this->extension_ == ".tiff" || this->extension_ == ".tif" )
@@ -476,16 +477,16 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
     if ( this->pixel_type_ == Core::DataType::DOUBLE_E)
     {
       typename itk::Image< float, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, float >( image_data );
-      return export_image_series< float >( file_path, name, new_image_data, this->extension_ );
+      success = export_image_series< float >( file_path, name, new_image_data, this->extension_ );
     }
     else if ( this->pixel_type_ == Core::DataType::ULONGLONG_E || this->pixel_type_ == Core::DataType::LONGLONG_E )
     {
       typename itk::Image< int, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, int >( image_data );
-      return export_image_series< int >( file_path, name, new_image_data, this->extension_ );
+      success = export_image_series< int >( file_path, name, new_image_data, this->extension_ );
     }
     else
     {
-      return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+      success = export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
     }
   }
   else if ( this->extension_ == ".png" )
@@ -494,25 +495,25 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
             this->pixel_type_ == Core::DataType::USHORT_E ) )
     {
       typename itk::Image< unsigned short, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, unsigned short >( image_data );
-      return export_image_series< unsigned short >( file_path, name, new_image_data, this->extension_ );
+      success = export_image_series< unsigned short >( file_path, name, new_image_data, this->extension_ );
     }
     else
     {
-      return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+      success = export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
     }
   }
   else if ( this->extension_ == ".nii" || this->extension_ == ".nii.gz" || this->extension_ == ".mha" )
   {
     // supports all
-    return export_volume< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+    success =  export_volume< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
   }
   else if ( ! this->extension_.empty() )
   {
-    return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+    success = export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
   }
 
-  CORE_LOG_SUCCESS( "Data export has been successfully completed." );
-  return true;
+  if (success) CORE_LOG_SUCCESS("Data export has been successfully completed.");
+  return success;
 }
 
 bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::string& file_path, const std::string& name )
