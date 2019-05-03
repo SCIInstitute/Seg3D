@@ -120,6 +120,10 @@ private Q_SLOTS:
   /// ABOUT:
   /// This launches the about dialog
   void about();
+
+  /// REPORT_ISSUE:
+  /// This launches the report issue dialog and will direct to Seg3D's github issue page
+  void report_issue();
   
   /// MAC_OPEN_ANOTHER_VERSION:
   /// This opens another version of Seg3D on the mac.
