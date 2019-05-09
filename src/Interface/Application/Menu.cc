@@ -38,6 +38,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QtCore/QProcess>
+#include <QDesktopServices>
 
 // Core includes
 #include <Core/State/State.h>
@@ -578,6 +579,10 @@ void Menu::create_help_menu( QMenuBar* menubar )
   qaction->setCheckable( true );
   QtUtils::QtBridge::Connect( qaction, 
     InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );
+
+  // == Report Issue ==
+  qaction = qmenu->addAction(tr("&Report issue..."));
+  connect(qaction, SIGNAL(triggered()), this, SLOT(report_issue()));
 }
 
 void Menu::punch_through()
@@ -604,6 +609,15 @@ void Menu::about()
     QString::fromStdString( Core::Application::GetApplicationNameAndVersion() ) +
     QString( "</h3>" ) +
     QString::fromStdString( Core::Application::GetAbout() ) );
+}
+
+void Menu::report_issue()
+{
+  if (QMessageBox::Ok == QMessageBox::information(this->main_window_, "Report Issue",
+    "Click OK to be taken to Seg3D's Github issue reporting page.\n\nFor bug reports, please follow the template.", QMessageBox::Ok | QMessageBox::Cancel))
+  {
+    QDesktopServices::openUrl(QUrl("https://github.com/SCIInstitute/Seg3D/issues/new", QUrl::TolerantMode));
+  }
 }
 
 void Menu::new_project()
