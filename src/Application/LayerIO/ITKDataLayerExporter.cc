@@ -76,23 +76,30 @@ cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
   typedef itk::RescaleIntensityImageFilter< InputImageType, InputImageType > RescaleType;
   typename RescaleType::Pointer rescale = RescaleType::New();
 
-  //static_assert((std::is_unsigned<InputPixelType>::value && std::is_unsigned<OutputPixelType>::value) 
-    //|| (std::is_signed<InputPixelType>::value && std::is_signed<OutputPixelType>::value), "Signed/unsigned mismatch");
+  typedef itk::CastImageFilter< InputImageType, OutputImageType > CastFilterType;
+  typename CastFilterType::Pointer castFilter = CastFilterType::New();
 
   // assumes casting to type with smaller range...
   rescale->SetInput( itk_image );
   rescale->Update();
-
   rescale->SetOutputMinimum( itk::NumericTraits< OutputPixelType >::min() );
-  // TODO: problem for PNG?
   rescale->SetOutputMaximum( itk::NumericTraits< OutputPixelType >::max() );
 
-  typedef itk::CastImageFilter< InputImageType, OutputImageType > CastFilterType;
-  typename CastFilterType::Pointer castFilter = CastFilterType::New();
-  castFilter->SetInput( rescale->GetOutput() );
-  castFilter->Update();
+  auto outputMin = rescale->GetOutputMinimum();
+  auto outputMax = rescale->GetOutputMaximum();
 
-  return castFilter->GetOutput();
+  if (outputMin > outputMax)
+  {
+    CORE_LOG_ERROR("Signed/unsigned mismatch: please convert your data to float using the arithmetic filter.");
+  }
+  else
+  {
+    
+    castFilter->SetInput(rescale->GetOutput());
+    castFilter->Update();
+  }
+
+   return castFilter->GetOutput();
 }
 
 template< class InputPixelType, class OutputPixelType >
@@ -203,6 +210,11 @@ bool export_image_series( const std::string& file_path,
   typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
   typename ImageType::IndexType start = region.GetIndex();
   typename ImageType::SizeType size = region.GetSize();
+ 
+  if (size[1] || size[2] || size[3])
+  {
+    return false;
+  }
 
   unsigned int first_slice = start[ 2 ];
   unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
