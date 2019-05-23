@@ -532,7 +532,6 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
   // Connect the thresholds so that they keep in sync
   this->private_->ui_.display_max_adjuster_->connect_max( this->private_->ui_.display_min_adjuster_ );
   this->private_->ui_.display_min_adjuster_->connect_min( this->private_->ui_.display_max_adjuster_ );
-
   
   QtUtils::QtBridge::Show( this->private_->ui_.advanced_visibility_button_, 
     PreferencesManager::Instance()->advanced_visibility_settings_state_ );
@@ -560,6 +559,30 @@ LayerWidget::LayerWidget( QFrame* parent, LayerHandle layer ) :
 
   this->connect( this->private_->ui_.stop_button_,
     SIGNAL ( pressed() ), this, SLOT( trigger_stop() ) );
+
+  //Make layer info selectable by mouse
+  this->private_->ui_.dimensions_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.dimensions_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.origin_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_5->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.spacing_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_7->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.centering_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_10->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.datatype_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_9->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.isosurface_area_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_4->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.provenance_id_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_13->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.min_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_11->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.max_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_12->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.mask_volume_label_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_3->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.mask_pixel_count_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+  this->private_->ui_.label_8->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
