@@ -211,7 +211,7 @@ bool export_image_series( const std::string& file_path,
   typename ImageType::IndexType start = region.GetIndex();
   typename ImageType::SizeType size = region.GetSize();
  
-  if (size[1] == 0 || size[2] == 0 || size[3] == 0)
+  if (size[0] == 0 || size[1] == 0 || size[2] == 0)
   {
     return false;
   }
