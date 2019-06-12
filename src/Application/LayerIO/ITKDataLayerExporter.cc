@@ -38,6 +38,7 @@
 #include <itkMetaDataObject.h>
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkCastImageFilter.h>
+#include <itkMinimumMaximumImageCalculator.h>
 
 // GDCM includes
 #include <gdcmImageHelper.h>
@@ -75,16 +76,60 @@ cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
   typedef itk::RescaleIntensityImageFilter< InputImageType, InputImageType > RescaleType;
   typename RescaleType::Pointer rescale = RescaleType::New();
 
+  typedef itk::CastImageFilter< InputImageType, OutputImageType > CastFilterType;
+  typename CastFilterType::Pointer castFilter = CastFilterType::New();
+
   // assumes casting to type with smaller range...
   rescale->SetInput( itk_image );
+  rescale->Update();
   rescale->SetOutputMinimum( itk::NumericTraits< OutputPixelType >::min() );
-  // TODO: problem for PNG?
   rescale->SetOutputMaximum( itk::NumericTraits< OutputPixelType >::max() );
+
+  auto outputMin = rescale->GetOutputMinimum();
+  auto outputMax = rescale->GetOutputMaximum();
+
+  if (outputMin > outputMax)
+  {
+    CORE_LOG_ERROR("Signed/unsigned mismatch: please convert your data to float using the arithmetic filter.");
+  }
+  else
+  {
+    
+    castFilter->SetInput(rescale->GetOutput());
+    castFilter->Update();
+  }
+
+   return castFilter->GetOutput();
+}
+
+template< class InputPixelType, class OutputPixelType >
+typename itk::Image< OutputPixelType, DIM_3D >::Pointer
+direct_cast_image(typename Core::ITKImageDataT< InputPixelType >::Handle image_data)
+{
+  typedef itk::Image< InputPixelType, DIM_3D > InputImageType;
+  typedef itk::Image< OutputPixelType, DIM_3D > OutputImageType;
+  typedef typename Core::ITKImageDataT< OutputPixelType > OutputType;
+
+  typename InputImageType::Pointer itk_image = image_data->get_image();
+
+  typedef itk::MinimumMaximumImageCalculator<InputImageType> MinimumMaximumImageCalculatorType;
+  typename MinimumMaximumImageCalculatorType::Pointer MinMaxCalc = MinimumMaximumImageCalculatorType::New();
+  MinMaxCalc->SetImage(itk_image);
+  MinMaxCalc->Compute();
+  auto inputMain = MinMaxCalc->GetMinimum();
+  auto inputMax = MinMaxCalc->GetMaximum();
 
   typedef itk::CastImageFilter< InputImageType, OutputImageType > CastFilterType;
   typename CastFilterType::Pointer castFilter = CastFilterType::New();
-  castFilter->SetInput( rescale->GetOutput() );
+  castFilter->SetInput(itk_image);
   castFilter->Update();
+
+  typedef itk::MinimumMaximumImageCalculator<OutputImageType> MinimumMaximumImageCalculatorCastType;
+  auto MinMaxCalcCast = MinimumMaximumImageCalculatorCastType::New();
+  MinMaxCalcCast->SetImage(castFilter->GetOutput());
+  MinMaxCalcCast->Compute();
+  auto inputMain_1 = MinMaxCalcCast->GetMinimum();
+  auto inputMax_1 = MinMaxCalcCast->GetMaximum();
 
   return castFilter->GetOutput();
 }
@@ -165,6 +210,11 @@ bool export_image_series( const std::string& file_path,
   typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
   typename ImageType::IndexType start = region.GetIndex();
   typename ImageType::SizeType size = region.GetSize();
+ 
+  if (size[0] == 0 || size[1] == 0 || size[2] == 0)
+  {
+    return false;
+  }
 
   unsigned int first_slice = start[ 2 ];
   unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
@@ -458,17 +508,19 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
     new ImageData( temp_handle->get_data_volume()->get_data_block(),
                    temp_handle->get_grid_transform() ) );
 
-  if ( this->extension_ == ".dcm" )
+  bool success = false;
+  if ( this->extension_ == ".dcm" || this->extension_ == ".dicom" || this->extension_ == ".ima")
   {
     if ( this->pixel_type_ == Core::DataType::FLOAT_E || this->pixel_type_ == Core::DataType::DOUBLE_E ||
          this->pixel_type_ == Core::DataType::ULONGLONG_E || this->pixel_type_ == Core::DataType::LONGLONG_E )
     {
+      //investigate unsigned long long to int conversion
       typename itk::Image< int, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, int >( image_data );
-      return export_dicom_series< int >( file_path, name, new_image_data, temp_handle, this->extension_ );
+      success =  export_dicom_series< int >( file_path, name, new_image_data, temp_handle, this->extension_ );
     }
     else
     {
-      return export_dicom_series< InputPixelType >( file_path, name, image_data->get_image(), temp_handle, this->extension_ );
+      success =  export_dicom_series< InputPixelType >( file_path, name, image_data->get_image(), temp_handle, this->extension_ );
     }
   }
   else if ( this->extension_ == ".tiff" || this->extension_ == ".tif" )
@@ -476,16 +528,16 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
     if ( this->pixel_type_ == Core::DataType::DOUBLE_E)
     {
       typename itk::Image< float, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, float >( image_data );
-      return export_image_series< float >( file_path, name, new_image_data, this->extension_ );
+      success = export_image_series< float >( file_path, name, new_image_data, this->extension_ );
     }
     else if ( this->pixel_type_ == Core::DataType::ULONGLONG_E || this->pixel_type_ == Core::DataType::LONGLONG_E )
     {
       typename itk::Image< int, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, int >( image_data );
-      return export_image_series< int >( file_path, name, new_image_data, this->extension_ );
+      success = export_image_series< int >( file_path, name, new_image_data, this->extension_ );
     }
     else
     {
-      return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+      success = export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
     }
   }
   else if ( this->extension_ == ".png" )
@@ -493,26 +545,26 @@ bool ITKDataLayerExporter::export_layer_internal( const std::string& file_path,
     if (! ( this->pixel_type_ == Core::DataType::CHAR_E || this->pixel_type_ == Core::DataType::UCHAR_E ||
             this->pixel_type_ == Core::DataType::USHORT_E ) )
     {
-      typename itk::Image< unsigned short, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, unsigned short >( image_data );
-      return export_image_series< unsigned short >( file_path, name, new_image_data, this->extension_ );
+      typename itk::Image< unsigned short, DIM_3D >::Pointer new_image_data = cast_image< InputPixelType, unsigned short >(image_data);
+      success = export_image_series< unsigned short >( file_path, name, new_image_data, this->extension_ );
     }
     else
     {
-      return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+      success = export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
     }
   }
   else if ( this->extension_ == ".nii" || this->extension_ == ".nii.gz" || this->extension_ == ".mha" )
   {
     // supports all
-    return export_volume< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+    success =  export_volume< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
   }
   else if ( ! this->extension_.empty() )
   {
-    return export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
+    success = export_image_series< InputPixelType >( file_path, name, image_data->get_image(), this->extension_ );
   }
 
-  CORE_LOG_SUCCESS( "Data export has been successfully completed." );
-  return true;
+  if (success) CORE_LOG_SUCCESS("Data export has been successfully completed.");
+  return success;
 }
 
 bool ITKDataLayerExporter::export_layer( const std::string& mode, const std::string& file_path, const std::string& name )
