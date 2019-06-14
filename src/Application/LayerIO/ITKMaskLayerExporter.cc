@@ -327,10 +327,8 @@ bool export_mask_volume( const std::string& file_path,
                          typename itk::Image< PixelType, DIM_3D >::Pointer itk_image )
 {
   boost::filesystem::path path = boost::filesystem::path( file_path );
-
   boost::filesystem::path full_filename( file_name );
-  std::string extension, base;
-  std::tie( extension, base ) = Core::GetFullExtension( full_filename );
+  boost::filesystem::path filename_path = path / full_filename;
 
   typedef itk::Image< PixelType, DIM_3D > ImageType;
   typedef itk::ImageFileWriter< ImageType > WriterType;
@@ -338,7 +336,7 @@ bool export_mask_volume( const std::string& file_path,
   typename WriterType::Pointer writer = WriterType::New();
 
   writer->SetInput( itk_image );
-  writer->SetFileName( full_filename.string() );
+  writer->SetFileName(filename_path.string());
 
   try
   {
@@ -439,6 +437,7 @@ bool ITKMaskLayerExporter::export_layer_internal( const std::string& mode,
       success =  export_mask_volume<InputPixelType>( file_path, ( mask->get_layer_name() + this->extension_ ), image_data->get_image() );
     }
 
+    if (success) CORE_LOG_SUCCESS("Segmentation export has been successfully completed.");
     return success;
   }
   else
@@ -471,10 +470,10 @@ bool ITKMaskLayerExporter::export_layer_internal( const std::string& mode,
       }
     }
 
+    if (success) CORE_LOG_SUCCESS("Segmentation export has been successfully completed.");
     return success;
   }
 
-  CORE_LOG_SUCCESS( "Segmentation export has been successfully completed." );
 
   // If we have successfully gone through all the layers return true
   return true;
