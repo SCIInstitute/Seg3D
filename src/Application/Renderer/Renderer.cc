@@ -102,9 +102,9 @@ static const unsigned int PATTERN_SIZE_C = 4;
 static const unsigned char MAX_PATTERN_VAL_C = 200;
 static const unsigned char MASK_PATTERNS_C[ PATTERN_SIZE_C ][ PATTERN_SIZE_C ] =
 {
-  { MAX_PATTERN_VAL_C, 0, 0, 0 }, 
-  { 0, MAX_PATTERN_VAL_C, 0, 0 }, 
-  { 0, 0, MAX_PATTERN_VAL_C, 0 }, 
+  { MAX_PATTERN_VAL_C, 0, 0, 0 },
+  { 0, MAX_PATTERN_VAL_C, 0, 0 },
+  { 0, 0, MAX_PATTERN_VAL_C, 0 },
   { 0, 0, 0, MAX_PATTERN_VAL_C }
 };
 
@@ -114,14 +114,14 @@ class RendererPrivate
 public:
   void process_slices( LayerSceneHandle& layer_scene, ViewerHandle& viewer );
   void draw_slices_3d( const Core::BBox& bbox, const Core::Transform& mvp_trans,
-    const std::vector< LayerSceneHandle >& layer_scenes, 
+    const std::vector< LayerSceneHandle >& layer_scenes,
     const std::vector< double >& depths,
     const std::vector< std::string >& view_modes );
   void draw_slice( LayerSceneItemHandle layer_item, const Core::Matrix& proj_mat,
     ProxyRectangleHandle rect = ProxyRectangleHandle() );
   void set_scale_bias(double data_min, double data_max, double display_min, double display_max);
   bool render_volume_view( ViewerHandle viewer, const Core::Color bkg_color, Core::StateEngine::lock_type& state_lock );
-  
+
   void map_slice_texture(Core::Texture2DHandle slice_tex, int width, int height,
     double left, double right, double bottom, double top,
     const Core::Matrix& proj_mat,
@@ -165,7 +165,7 @@ void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandl
     bool layer_visible = false;
     if ( layer_item->layer_->is_visible( this->viewer_id_ ) )
     {
-      Core::VolumeSliceHandle volume_slice = 
+      Core::VolumeSliceHandle volume_slice =
         viewer->get_volume_slice( layer_item->layer_id_ );
 
       if ( volume_slice && volume_slice->is_valid() )
@@ -179,7 +179,7 @@ void RendererPrivate::process_slices( LayerSceneHandle& layer_scene, ViewerHandl
         layer_visible = true;
       }
     }
-    
+
     // Release the handle to the layer
     layer_item->layer_.reset();
 
@@ -249,12 +249,12 @@ void RendererPrivate::picking_target_changed( size_t viewer_id )
 }
 
 void RendererPrivate::draw_slices_3d( const Core::BBox& bbox, const Core::Transform& mvp_trans,
-                const std::vector< LayerSceneHandle >& layer_scenes, 
+                const std::vector< LayerSceneHandle >& layer_scenes,
                 const std::vector< double >& depths,
                 const std::vector< std::string >& view_modes )
 {
   size_t num_of_viewers = layer_scenes.size();
-  
+
   // for each visible 2D viewer
   for ( size_t i = 0; i < num_of_viewers; i++ )
   {
@@ -437,7 +437,7 @@ void RendererPrivate::map_slice_texture(Core::Texture2DHandle slice_tex, int wid
   double texel_width = slice_width / (width - 1);
   double texel_height = slice_height / (height - 1);
 
-  // NOTE: Extend the size of the slice by half voxel size in each direction. 
+  // NOTE: Extend the size of the slice by half voxel size in each direction.
   // This is to compensate the difference between node centering and cell centering.
   // The volume data uses node centering, but OpenGL texture uses cell centering.
   left = left - 0.5 * texel_width;
@@ -515,8 +515,8 @@ void RendererPrivate::set_scale_bias(double data_min, double data_max, double di
     static_cast< float >(bias));
 }
 
-void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item, 
-              const Core::Matrix& proj_mat, 
+void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
+              const Core::Matrix& proj_mat,
               ProxyRectangleHandle rect )
 {
   this->slice_shader_->set_volume_type( layer_item->type() );
@@ -544,7 +544,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
     break;
   case Core::VolumeType::MASK_E:
     {
-      MaskLayerSceneItem* mask_layer_item = 
+      MaskLayerSceneItem* mask_layer_item =
         dynamic_cast< MaskLayerSceneItem* >( layer_item.get() );
       if ( rect )
       {
@@ -562,7 +562,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         this->slice_shader_->set_border_width( mask_layer_item->border_ );
       }
       Core::Color color = PreferencesManager::Instance()->get_color( mask_layer_item->color_ );
-      this->slice_shader_->set_mask_color( static_cast< float >( color.r() / 255 ), 
+      this->slice_shader_->set_mask_color( static_cast< float >( color.r() / 255 ),
         static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
       this->slice_shader_->set_texture_clamp( 0.0f, 1.0f, 0.0f, 1.0f );
       this->map_slice_texture( volume_slice->get_texture(),
@@ -599,7 +599,7 @@ void RendererPrivate::draw_slice( LayerSceneItemHandle layer_item,
         volume_slice->project_onto_slice( inner.min(), ileft, ibottom );
         volume_slice->project_onto_slice( inner.max(), iright, itop );
 
-        texture = tile->get_texture( volume_slice->get_slice_type(), 
+        texture = tile->get_texture( volume_slice->get_slice_type(),
           volume_slice->depth(), width, height, Core::ExportToString( this->viewer_id_ ) );
         if (texture)
         {
@@ -859,7 +859,7 @@ void RendererPrivate::enable_rendering( bool enable )
 {
   if ( !this->renderer_->is_renderer_thread() )
   {
-    this->renderer_->post_renderer_event( boost::bind( 
+    this->renderer_->post_renderer_event( boost::bind(
       &RendererPrivate::enable_rendering, this, enable ) );
     return;
   }
@@ -881,7 +881,7 @@ void RendererPrivate::process_isosurfaces( IsosurfaceArray& isosurfaces )
   size_t num_of_layers = layers.size();
   for ( size_t i = 0; i < num_of_layers; ++i )
   {
-    if ( layers[ i ]->get_type() == Core::VolumeType::MASK_E 
+    if ( layers[ i ]->get_type() == Core::VolumeType::MASK_E
       && layers[ i ]->visible_state_[ this->viewer_id_ ]->get() )
     {
       MaskLayer* mask_layer = static_cast< MaskLayer* >( layers[ i ].get() );
@@ -971,6 +971,7 @@ void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
   glPopMatrix();
 
   glPopAttrib();
+  glViewport(0, 0, this->renderer_->width_, this->renderer_->height_);
 }
 
 
@@ -979,8 +980,8 @@ void RendererPrivate::draw_orientation_arrows( const Core::View3D& view_3d )
 //////////////////////////////////////////////////////////////////////////
 
 Renderer::Renderer( size_t viewer_id ) :
-  RendererBase(), 
-  ConnectionHandler(), 
+  RendererBase(),
+  ConnectionHandler(),
   private_( new RendererPrivate )
 {
   this->private_->rendering_enabled_ = true;
@@ -1026,7 +1027,7 @@ void Renderer::post_initialize()
     this->private_->volume_renderers_[ 0 ]->initialize();
     this->private_->volume_renderers_[ 2 ]->initialize();
     this->private_->pattern_texture_.reset( new Core::Texture2D );
-    this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C, 
+    this->private_->pattern_texture_->set_image( PATTERN_SIZE_C, PATTERN_SIZE_C,
       GL_ALPHA, MASK_PATTERNS_C, GL_ALPHA, GL_UNSIGNED_BYTE );
     this->private_->text_texture_.reset( new Core::Texture2D );
     this->private_->orientation_arrows_.reset( new OrientationArrows );
@@ -1054,14 +1055,14 @@ void Renderer::post_initialize()
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
 
   // Redraw without picking
-  this->add_connection( viewer->redraw_scene_signal_.connect( 
+  this->add_connection( viewer->redraw_scene_signal_.connect(
     boost::bind( &Renderer::redraw_scene, this ) ) );
   // Redraw with picking
-  this->add_connection( viewer->redraw_scene_pick_signal_.connect( 
+  this->add_connection( viewer->redraw_scene_pick_signal_.connect(
     boost::bind( &Renderer::redraw_scene, this, _1 ) ) );
-  this->add_connection( viewer->redraw_overlay_signal_.connect( 
+  this->add_connection( viewer->redraw_overlay_signal_.connect(
     boost::bind( &Renderer::redraw_overlay, this ) ) );
-  this->add_connection( viewer->redraw_all_signal_.connect( 
+  this->add_connection( viewer->redraw_all_signal_.connect(
     boost::bind( &Renderer::redraw_all, this ) ) );
 
 
@@ -1073,7 +1074,7 @@ void Renderer::post_initialize()
       this->add_connection( ViewerManager::Instance()->get_viewer( i )->slice_changed_signal_.
         connect( boost::bind( &RendererPrivate::viewer_slice_changed, this->private_, _1 ) ) );
       this->add_connection( ViewerManager::Instance()->get_viewer( i )->view_mode_state_->
-        state_changed_signal_.connect( boost::bind( 
+        state_changed_signal_.connect( boost::bind(
         &RendererPrivate::viewer_mode_changed, this->private_, i ) ) );
     }
   }
@@ -1088,6 +1089,7 @@ void Renderer::post_initialize()
 
 bool Renderer::render_scene()
 {
+  glViewport(0, 0, this->width_, this->height_);
   if ( !this->private_->rendering_enabled_ )
   {
     return false;
@@ -1101,7 +1103,7 @@ bool Renderer::render_scene()
   glClearColor( bkg_color.r(), bkg_color.g(), bkg_color.b(), 0.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString(
     this->private_->viewer_id_ ) + ": starting redraw" );
 
   glMatrixMode( GL_PROJECTION );
@@ -1118,11 +1120,11 @@ bool Renderer::render_scene()
     // Get a snapshot of current layers
     LayerSceneHandle layer_scene = LayerManager::Instance()->
       compose_layer_scene( this->private_->viewer_id_ );
-    
+
     // Copy slices from viewer
     this->private_->process_slices( layer_scene, viewer );
 
-    Core::View2D view2d( static_cast< Core::StateView2D* >( 
+    Core::View2D view2d( static_cast< Core::StateView2D* >(
       viewer->get_active_view_state().get() )->get() );
 
     // We have got everything we want from the state engine, unlock before we do any rendering
@@ -1133,7 +1135,7 @@ bool Renderer::render_scene()
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     double left, right, top, bottom, pixel_size;
-    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
+    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ),
       left, right, bottom, top );
     pixel_size = (right - left) / this->width_;
     Core::Matrix proj_mat;
@@ -1152,9 +1154,9 @@ bool Renderer::render_scene()
       LayerSceneItemHandle lsi = (*layer_scene)[layer_num];
       if (lsi->type() == Core::VolumeType::LARGE_DATA_E)
       {
-        boost::dynamic_pointer_cast<LargeVolumeLayerSceneItem>(lsi)->tiles_ = 
+        boost::dynamic_pointer_cast<LargeVolumeLayerSceneItem>(lsi)->tiles_ =
           boost::dynamic_pointer_cast<Core::LargeVolumeSlice>(lsi->volume_slice_)->
-          load_tiles(left, right, bottom, top, pixel_size, 
+          load_tiles(left, right, bottom, top, pixel_size,
           Core::ExportToString( this->private_->viewer_id_ ));
       }
       this->private_->draw_slice( ( *layer_scene )[ layer_num ], proj_mat );
@@ -1165,7 +1167,7 @@ bool Renderer::render_scene()
     glDisable( GL_BLEND );
   }
 
-  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString(
     this->private_->viewer_id_ ) + ": done redraw" );
 
   return true;
@@ -1173,6 +1175,7 @@ bool Renderer::render_scene()
 
 bool Renderer::render_overlay()
 {
+  glViewport(0, 0, this->width_, this->height_);
   if ( !this->private_->rendering_enabled_ )
   {
     return false;
@@ -1181,32 +1184,32 @@ bool Renderer::render_overlay()
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString(
     this->private_->viewer_id_ ) + ": starting redraw overlay" );
 
   // Enable blending
   glEnable( GL_BLEND );
   // NOTE: The result of the following blend function is that, color channels contains
   // colors modulated by alpha, alpha channel stores the value of "1-alpha"
-  glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA , 
+  glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ,
     GL_ZERO, GL_ONE_MINUS_SRC_ALPHA  );
 
   // Lock the state engine
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( this->private_->viewer_id_ );
-  // NOTE: If the viewer layout changes, viewer attributes could be changed by the interface thread   
-  // underneath us.  Since there is no way to force Qt to lock the viewer before making these   
-  // changes, we grab the width and height up front and check for validity so that we at least  
-  // don't crash later due to a width or height of 0.  The width and height are passed to the 
-  // tools and should be used instead of querying the viewer directly.  
-  int viewer_width = viewer->get_width(); 
-  int viewer_height = viewer->get_height(); 
-  if( viewer_width <= 0 || viewer_height <= 0 )   
-  {   
-    return false; 
-  } 
-  
+  // NOTE: If the viewer layout changes, viewer attributes could be changed by the interface thread
+  // underneath us.  Since there is no way to force Qt to lock the viewer before making these
+  // changes, we grab the width and height up front and check for validity so that we at least
+  // don't crash later due to a width or height of 0.  The width and height are passed to the
+  // tools and should be used instead of querying the viewer directly.
+  int viewer_width = viewer->get_width();
+  int viewer_height = viewer->get_height();
+  if( viewer_width <= 0 || viewer_height <= 0 )
+  {
+    return false;
+  }
+
   bool show_overlay = viewer->overlay_visible_state_->get();
 
   if ( viewer->is_volume_view() )
@@ -1222,7 +1225,7 @@ bool Renderer::render_overlay()
     if ( show_overlay )
     {
       glEnable( GL_DEPTH_TEST );
-      this->private_->draw_orientation_arrows( view3d );  
+      this->private_->draw_orientation_arrows( view3d );
     }
   }
   else
@@ -1235,10 +1238,10 @@ bool Renderer::render_overlay()
     bool show_slice_num = PreferencesManager::Instance()->show_slice_number_state_->get();
     bool zero_based_slice_numbers = PreferencesManager::Instance()->
       zero_based_slice_numbers_state_->get();
-    
+
     int grid_spacing = PreferencesManager::Instance()->grid_size_state_->get();
     Core::Color bkg_color = PreferencesManager::Instance()->get_background_color();
-    Core::View2D view2d( static_cast< Core::StateView2D* > ( 
+    Core::View2D view2d( static_cast< Core::StateView2D* > (
       viewer->get_active_view_state().get() )->get() );
     std::string view_mode = viewer->view_mode_state_->get();
     ViewerInfoList viewers_info[ 3 ];
@@ -1257,7 +1260,7 @@ bool Renderer::render_overlay()
       {
         if ( zero_based_slice_numbers )
         {
-          ss << active_slice->get_slice_number() << " / " << active_slice->number_of_slices();        
+          ss << active_slice->get_slice_number() << " / " << active_slice->number_of_slices();
         }
         else
         {
@@ -1271,7 +1274,7 @@ bool Renderer::render_overlay()
     state_lock.unlock();
 
     double left, right, top, bottom;
-    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ), 
+    view2d.compute_clipping_planes( this->width_ / ( 1.0 * this->height_ ),
       left, right, bottom, top );
     Core::Matrix proj_mat;
     Core::Transform::BuildOrtho2DMatrix( proj_mat, left, right, bottom, top );
@@ -1322,7 +1325,7 @@ bool Renderer::render_overlay()
       glEnd();
       CORE_CHECK_OPENGL_ERROR();
     } // end if ( show_grid )
-    
+
     // Render the positions of slices in other viewers
     if ( show_overlay && show_picking_lines )
     {
@@ -1387,7 +1390,7 @@ bool Renderer::render_overlay()
           color[ 3 ] = 0.5f;
         }
         //color[ 3 ] = viewers_info[ hori_slice_mode ][ i ]->is_picking_target_ ? 0.75f : 0.3f;
-        glColor4fv( color );    
+        glColor4fv( color );
         glBegin( GL_LINES );
         glVertex2i( 0, slice_pos);
         glVertex2i( this->width_, slice_pos );
@@ -1401,8 +1404,8 @@ bool Renderer::render_overlay()
     if ( show_overlay && show_slice_num )
     {
       std::vector< unsigned char > buffer( this->width_ * this->height_, 0 );
-      this->private_->text_renderer_->render_aligned( slice_str, &buffer[ 0 ], 
-        this->width_, this->height_, 14, Core::TextHAlignmentType::RIGHT_E, 
+      this->private_->text_renderer_->render_aligned( slice_str, &buffer[ 0 ],
+        this->width_, this->height_, 14, Core::TextHAlignmentType::RIGHT_E,
         Core::TextVAlignmentType::TOP_E, 5, 5, 5, 5 );
 
       this->private_->text_texture_->enable();
@@ -1429,7 +1432,7 @@ bool Renderer::render_overlay()
 
   glDisable( GL_BLEND );
 
-  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString( 
+  CORE_LOG_DEBUG( std::string("Renderer ") + Core::ExportToString(
     this->private_->viewer_id_ ) + ": done redraw overlay" );
 
   return true;
