@@ -71,6 +71,7 @@ public:
   
   // === LayerManagerWidget Styles === //
     const static QString LAYERMANAGERWIDGET_C;
+    const static QString BACKGROUND_COLOR_STR;
   
   // === LayerWidget Styles === //
     // - LayerWidget - //
