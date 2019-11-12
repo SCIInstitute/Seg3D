@@ -84,7 +84,7 @@ void RendererBasePrivate::redraw_scene( PickPointHandle pick_point )
   // Migrate to the right thread
   if ( !this->renderer_->is_renderer_thread() )
   {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_scene, 
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_scene,
       this, pick_point ) );
     return;
   }
@@ -94,10 +94,10 @@ void RendererBasePrivate::redraw_scene( PickPointHandle pick_point )
     if( !pick_point )
     {
       // signal rendering completed
-      this->renderer_->redraw_completed_signal_( 
+      this->renderer_->redraw_completed_signal_(
         this->textures_[ this->active_scene_texture_ ], false );
 
-      // swap render textures 
+      // swap render textures
       this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1;
     }
   }
@@ -108,7 +108,7 @@ void RendererBasePrivate::redraw_overlay()
   // Migrate to the right thread
   if ( !this->renderer_->is_renderer_thread() )
   {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_overlay, 
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_overlay,
       this) );
     return;
   }
@@ -116,10 +116,10 @@ void RendererBasePrivate::redraw_overlay()
   if ( this->render_overlay() )
   {
     // signal rendering completed
-    this->renderer_->redraw_overlay_completed_signal_( 
+    this->renderer_->redraw_overlay_completed_signal_(
       this->textures_[ this->active_overlay_texture_ ], false );
 
-    // swap render textures 
+    // swap render textures
     this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
   }
 }
@@ -129,7 +129,7 @@ void RendererBasePrivate::redraw_all()
   // Migrate to the right thread
   if ( !this->renderer_->is_renderer_thread() )
   {
-    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_all, 
+    this->renderer_->post_renderer_event( boost::bind( &RendererBasePrivate::redraw_all,
       this) );
     return;
   }
@@ -140,20 +140,20 @@ void RendererBasePrivate::redraw_all()
   if ( render_scene_success )
   {
     // signal scene rendering completed
-    this->renderer_->redraw_completed_signal_( 
+    this->renderer_->redraw_completed_signal_(
       this->textures_[ this->active_scene_texture_ ], render_overlay_success );
-      
-    // swap render textures 
-    this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1; 
+
+    // swap render textures
+    this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1;
   }
 
   if ( render_overlay_success )
   {
     // signal overlay rendering completed
-    this->renderer_->redraw_overlay_completed_signal_( 
-      this->textures_[ this->active_overlay_texture_ ], false );  
-        
-    // swap render textures 
+    this->renderer_->redraw_overlay_completed_signal_(
+      this->textures_[ this->active_overlay_texture_ ], false );
+
+    // swap render textures
     this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
   }
 }
@@ -165,8 +165,8 @@ bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
 #endif
 
-  if ( !this->renderer_->is_active() || 
-    this->renderer_->width_ == 0 || 
+  if ( !this->renderer_->is_active() ||
+    this->renderer_->width_ == 0 ||
     this->renderer_->height_ == 0 )
   {
     return false;
@@ -211,11 +211,11 @@ bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     win_x = static_cast< float >( pick_point->window_x_ );
-    win_y = static_cast< float >( 
+    win_y = static_cast< float >(
       static_cast< float >( viewport[ 3 ] ) - static_cast< float >( pick_point->window_y_ ) );
     // Get the depth value from the last render pass at the pick point
     // FBO is already bound
-    glReadPixels( pick_point->window_x_, static_cast< int >( win_y ), 1, 1, GL_DEPTH_COMPONENT, 
+    glReadPixels( pick_point->window_x_, static_cast< int >( win_y ), 1, 1, GL_DEPTH_COMPONENT,
       GL_FLOAT, &win_z );
 
     // If z isn't on near or far plane
@@ -225,7 +225,7 @@ bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
       gluUnProject( win_x, win_y, win_z, modelview, projection, viewport, &pos_x, &pos_y, &pos_z );
 
       Point world_pick_point( pos_x, pos_y, pos_z );
-      
+
       // Emit signal with picked point
       this->renderer_->volume_pick_point_signal_( world_pick_point );
     }
@@ -237,7 +237,7 @@ bool RendererBasePrivate::render_scene( PickPointHandle pick_point )
       CORE_LOG_DEBUG( "Rendering of the Scene failed" );
       return false;
     }
-  
+
     // Synchronization call for multi threaded rendering
     glFinish();
   }
@@ -265,8 +265,8 @@ bool RendererBasePrivate::render_overlay()
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->context_ ) );
 #endif
 
-  if ( !this->renderer_->is_active() || 
-    this->renderer_->width_ == 0 || 
+  if ( !this->renderer_->is_active() ||
+    this->renderer_->width_ == 0 ||
     this->renderer_->height_ == 0 )
   {
     return false;
@@ -282,7 +282,7 @@ bool RendererBasePrivate::render_overlay()
   }
 
   // lock the active render texture
-  Core::Texture::lock_type texture_lock( 
+  Core::Texture::lock_type texture_lock(
     this->textures_[ this->active_overlay_texture_ ]->get_mutex() );
 
   // bind the framebuffer object
@@ -325,8 +325,8 @@ bool RendererBasePrivate::render_overlay()
 //////////////////////////////////////////////////////////////////////////
 
 RendererBase::RendererBase() :
-  EventHandler(), 
-  width_( 0 ), 
+  EventHandler(),
+  width_( 0 ),
   height_( 0 ),
   private_( new RendererBasePrivate )
 {
@@ -348,7 +348,7 @@ RendererBase::~RendererBase()
 
 void RendererBase::initialize()
 {
-  // NOTE: it is important to postpone the allocation of OpenGL objects to the 
+  // NOTE: it is important to postpone the allocation of OpenGL objects to the
   // rendering thread. If created in a different thread, these objects might not
   // be ready when the rendering thread uses them the first time, which caused
   // the scene to be blank sometimes.
@@ -358,7 +358,7 @@ void RendererBase::initialize()
     this->post_renderer_event( boost::bind( &RendererBase::initialize, this ) );
     return;
   }
-  
+
 #if MULTITHREADED_RENDERING
   CORE_LOG_DEBUG( "Initializing renderer in a separate thread" );
 #else
@@ -429,7 +429,7 @@ void RendererBase::resize( int width, int height )
   {
     return;
   }
-  
+
 #if !MULTITHREADED_RENDERING
   RenderContextBindingHandle context_binding( new RenderContextBinding( this->private_->context_ ) );
 #endif
@@ -489,7 +489,7 @@ void RendererBase::redraw_scene( PickPointHandle pick_point )
   this->set_redraw_needed();
 
   this->private_->redraw_scene( pick_point );
-} 
+}
 
 bool RendererBase::redraw_needed()
 {
@@ -552,5 +552,3 @@ void RendererBase::post_renderer_event( boost::function< void () > event )
 }
 
 } // end namespace Core
-
-
