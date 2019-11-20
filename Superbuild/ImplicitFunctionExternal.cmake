@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
-SET(implicitFunction_GIT_TAG "origin/profile")
+SET(implicitFunction_GIT_TAG "origin/master")
 SET(implicitFunction_DEPENDENCIES "Tetgen_external;Eigen_external")
 
 IF(TRAVIS_BUILD)
