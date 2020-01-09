@@ -44,6 +44,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <ctime>
 
 // Boost includes
 #include <boost/signals2/signal.hpp>
@@ -130,6 +131,9 @@ public:
   
   SCI_BEGIN_RUN()
   {
+    time_t tstart, tend;
+    tstart = time(0);
+
     DataLayerHandle srcDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->srcLayer_);
     DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->dstLayer_);
     GridTransform srcGridTransform = srcDataLayer->get_grid_transform();
@@ -214,6 +218,8 @@ public:
                                                     Core::DataVolumeHandle(new Core::DataVolume( this->actionInternal_->dstLayer_->get_grid_transform(), dstDataBlock ) ),
                                                     true
                                                    );
+      tend = time(0);
+      std::cout << difftime(tend, tstart);
   }
   SCI_END_RUN()
 
