@@ -164,7 +164,7 @@ void ThresholdToolInterface::choose_threshold_color()
 {  
   Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
   // Launch dialog to allow user to select color
-  QColor color = QColorDialog::getColor(QColor(this->r_, this->g_, this->b_), this);
+ // QColor color = QColorDialog::getColor(QColor(this->r_, this->g_, this->b_), this);
 
   //if (color.isValid())
   //{
