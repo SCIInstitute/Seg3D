@@ -37,6 +37,7 @@
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Widgets/QtHistogramWidget.h>
+#include <QColorDialog>
 
 //Interface Includes
 #include <Interface/ToolInterface/ThresholdToolInterface.h>
@@ -98,7 +99,11 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
     tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preview_opacity_slider_, 
     tool->preview_opacity_state_ );
+  //
+  //QtUtils::QtBridge::Connect( this ->private_->ui_.thresholdColorButton, SIGNAL(clicked));
+  //
   QtUtils::QtBridge::Show( this->private_->ui_.preview_opacity_slider_, tool->show_preview_state_ );
+  QtUtils::QtBridge::Show( this->private_->ui_.thresholdColorButton, tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
     &SeedPointsTool::clear, tool, Core::Interface::GetWidgetActionContext() ) );
   QtUtils::QtBridge::Connect( this->private_->ui_.run_button_, boost::bind(
@@ -153,6 +158,24 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
     get_data_block()->get_histogram() );
   
   this->private_->ui_.histogram_->show_threshold_bars();
+}
+
+void ThresholdToolInterface::choose_threshold_color()
+{  
+  Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
+  // Launch dialog to allow user to select color
+  QColor color = QColorDialog::getColor(QColor(this->r_, this->g_, this->b_), this);
+
+  //if (color.isValid())
+  //{
+  //  this->r_ = color.red();
+  //  this->g_ = color.green();
+  //  this->b_ = color.blue();
+
+  //  Q_EMIT color_changed();
+  //}
+
+  //this->set_color();
 }
 
 } // end namespace Seg3D
