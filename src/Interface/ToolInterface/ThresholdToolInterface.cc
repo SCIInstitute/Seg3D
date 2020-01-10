@@ -165,14 +165,16 @@ void ThresholdToolInterface::choose_threshold_color()
 {  
   Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
   //Launch dialog to allow user to select color
-  std::vector<int> threshold_color_(3);
+  Core::Color threshold_color;
   QColor color = QColorDialog::getColor(QColor(196, 159, 255), this);
 
   if (color.isValid())
   {
-    threshold_color_[0] = color.red();
-    threshold_color_[1] = color.green();
-    threshold_color_[2] = color.blue();
+    threshold_color[0] = color.red()/255.0;
+    threshold_color[1] = color.green()/255.0;
+    threshold_color[2] = color.blue()/255.0;
+    //Set state variable to color
+    //tool->threshold_color_state_->set(color);
   }
 }
 

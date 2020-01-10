@@ -301,7 +301,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     this->private_->shader_->enable();
     this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
       static_cast< float >( 1.0 /slice_screen_height ) );
-    this->private_->shader_->set_color( color[0]/255.0, color[1]/255.0, color[2]/255.0 );
+    this->private_->shader_->set_color( color[0], color[1], color[2] );
     this->private_->shader_->set_opacity( static_cast< float >( opacity ) );
     glBegin( GL_QUADS );
     glTexCoord2f( 0.0f, 0.0f );
