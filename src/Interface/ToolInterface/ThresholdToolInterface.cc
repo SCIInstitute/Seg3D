@@ -101,8 +101,10 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
     tool->preview_opacity_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.thresholdColorButton, 
     tool->threshold_color_state_ );
+
   connect(this->private_->ui_.thresholdColorButton, SIGNAL(clicked()),
     this, SLOT(choose_threshold_color()));
+
   QtUtils::QtBridge::Show( this->private_->ui_.preview_opacity_slider_, tool->show_preview_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.thresholdColorButton, tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
@@ -164,6 +166,10 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
 void ThresholdToolInterface::choose_threshold_color()
 {  
   Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
+
+  ToolHandle base_tool_ = tool();
+  ThresholdTool* tool = dynamic_cast<ThresholdTool*> (base_tool_.get());
+
   //Launch dialog to allow user to select color
   Core::Color threshold_color;
   QColor color = QColorDialog::getColor(QColor(196, 159, 255), this);
@@ -174,7 +180,7 @@ void ThresholdToolInterface::choose_threshold_color()
     threshold_color[1] = color.green()/255.0;
     threshold_color[2] = color.blue()/255.0;
     //Set state variable to color
-    //tool->threshold_color_state_->set(color);
+    tool->threshold_color_state_->set(threshold_color);
   }
 }
 
