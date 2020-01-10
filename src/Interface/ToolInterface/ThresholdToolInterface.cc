@@ -99,9 +99,8 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
     tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preview_opacity_slider_, 
     tool->preview_opacity_state_ );
-  //
-  //QtUtils::QtBridge::Connect( this ->private_->ui_.thresholdColorButton, SIGNAL(clicked));
-  //
+  connect(this->private_->ui_.thresholdColorButton, SIGNAL(clicked()),
+    this, SLOT(choose_threshold_color()));
   QtUtils::QtBridge::Show( this->private_->ui_.preview_opacity_slider_, tool->show_preview_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.thresholdColorButton, tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
@@ -163,19 +162,16 @@ void ThresholdToolInterface::refresh_histogram( QString layer_name )
 void ThresholdToolInterface::choose_threshold_color()
 {  
   Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
-  // Launch dialog to allow user to select color
- // QColor color = QColorDialog::getColor(QColor(this->r_, this->g_, this->b_), this);
+  //Launch dialog to allow user to select color
+  std::vector<int> threshold_color_(3);
+  QColor color = QColorDialog::getColor(QColor(196, 159, 255), this);
 
-  //if (color.isValid())
-  //{
-  //  this->r_ = color.red();
-  //  this->g_ = color.green();
-  //  this->b_ = color.blue();
-
-  //  Q_EMIT color_changed();
-  //}
-
-  //this->set_color();
+  if (color.isValid())
+  {
+    threshold_color_[0] = color.red();
+    threshold_color_[1] = color.green();
+    threshold_color_[2] = color.blue();
+  }
 }
 
 } // end namespace Seg3D

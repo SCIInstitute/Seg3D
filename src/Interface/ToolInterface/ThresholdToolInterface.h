@@ -57,7 +57,6 @@ private Q_SLOTS:
 
 private:
     boost::shared_ptr < ThresholdToolInterfacePrivate > private_;
-  
 };
 
 } // end namespace Seg3D
