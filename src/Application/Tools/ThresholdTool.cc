@@ -193,7 +193,7 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
   this->add_state( "lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, .01 );
   this->add_state( "show_preview", this->show_preview_state_, true );
   this->add_state( "preview_opacity", this->preview_opacity_state_, 0.5, 0.0, 1.0, 0.1 );
-  this->add_state( "threshold_color", this->threshold_color_state_, (196, 159, 255));
+  this->add_state( "threshold_color", this->threshold_color_state_, (196.0, 159.0, 255.0));
 
   this->private_->handle_target_layer_changed();
 
@@ -301,7 +301,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     this->private_->shader_->enable();
     this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
       static_cast< float >( 1.0 /slice_screen_height ) );
-    this->private_->shader_->set_color( static_cast< float >( color ) );
+    this->private_->shader_->set_color( static_cast< float >( color[0]/255, color[1]/255, color[2]/255 ) );
     this->private_->shader_->set_opacity( static_cast< float >( opacity ) );
     glBegin( GL_QUADS );
     glTexCoord2f( 0.0f, 0.0f );
