@@ -166,7 +166,6 @@ void ThresholdToolInterface::choose_threshold_color()
   ToolHandle base_tool_ = tool();
   ThresholdTool* tool = dynamic_cast<ThresholdTool*> (base_tool_.get());
 
-  //Launch dialog to allow user to select color
   Core::Color threshold_color;
   QColor color = QColorDialog::getColor(QColor(196, 159, 255), this);
 
@@ -175,7 +174,6 @@ void ThresholdToolInterface::choose_threshold_color()
     threshold_color[0] = color.red()/255.0;
     threshold_color[1] = color.green()/255.0;
     threshold_color[2] = color.blue()/255.;
-    //Set state variable to color
     Core::ActionSet::Dispatch(Core::Interface::GetWidgetActionContext(), tool->threshold_color_state_, threshold_color);
   }
 }
