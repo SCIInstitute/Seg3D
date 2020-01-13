@@ -180,20 +180,20 @@ void ThresholdToolPrivate::handle_threshold_color_changed()
 // Class Threshold
 //////////////////////////////////////////////////////////////////////////
 
-ThresholdTool::ThresholdTool( const std::string& toolid ) :
-  SeedPointsTool( Core::VolumeType::DATA_E, toolid ),
-  private_( new ThresholdToolPrivate )
+ThresholdTool::ThresholdTool(const std::string& toolid) :
+  SeedPointsTool(Core::VolumeType::DATA_E, toolid),
+  private_(new ThresholdToolPrivate)
 {
   this->private_->tool_ = this;
   this->private_->initialized_ = false;
   this->private_->signal_block_count_ = 0;
 
   double inf = std::numeric_limits< double >::infinity();
-  this->add_state( "upper_threshold", this->upper_threshold_state_, inf, -inf, inf, .01 );
-  this->add_state( "lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, .01 );
-  this->add_state( "show_preview", this->show_preview_state_, true );
-  this->add_state( "preview_opacity", this->preview_opacity_state_, 0.5, 0.0, 1.0, 0.1 );
-  this->add_state( "threshold_color", this->threshold_color_state_, (196.0, 159.0, 255.0));
+  this->add_state("upper_threshold", this->upper_threshold_state_, inf, -inf, inf, .01);
+  this->add_state("lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, .01);
+  this->add_state("show_preview", this->show_preview_state_, true);
+  this->add_state("preview_opacity", this->preview_opacity_state_, 0.5, 0.0, 1.0, 0.1);
+  this->add_state("threshold_color", this->threshold_color_state_, Core::Color(0.624f, 0.725f, 1.0f));
 
   this->private_->handle_target_layer_changed();
 

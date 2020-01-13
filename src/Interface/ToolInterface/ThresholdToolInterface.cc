@@ -99,12 +99,8 @@ bool ThresholdToolInterface::build_widget( QFrame* frame )
     tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.preview_opacity_slider_, 
     tool->preview_opacity_state_ );
-  QtUtils::QtBridge::Connect( this->private_->ui_.thresholdColorButton, 
-    tool->threshold_color_state_ );
-
   connect(this->private_->ui_.thresholdColorButton, SIGNAL(clicked()),
     this, SLOT(choose_threshold_color()));
-
   QtUtils::QtBridge::Show( this->private_->ui_.preview_opacity_slider_, tool->show_preview_state_ );
   QtUtils::QtBridge::Show( this->private_->ui_.thresholdColorButton, tool->show_preview_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.clear_seeds_button_, boost::bind(
@@ -178,9 +174,9 @@ void ThresholdToolInterface::choose_threshold_color()
   {
     threshold_color[0] = color.red()/255.0;
     threshold_color[1] = color.green()/255.0;
-    threshold_color[2] = color.blue()/255.0;
+    threshold_color[2] = color.blue()/255.;
     //Set state variable to color
-    tool->threshold_color_state_->set(threshold_color);
+    Core::ActionSet::Dispatch(Core::Interface::GetWidgetActionContext(), tool->threshold_color_state_, threshold_color);
   }
 }
 
