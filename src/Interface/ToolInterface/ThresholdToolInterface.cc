@@ -167,7 +167,7 @@ void ThresholdToolInterface::choose_threshold_color()
   ThresholdTool* tool = dynamic_cast<ThresholdTool*> (base_tool_.get());
 
   Core::Color threshold_color;
-  QColor color = QColorDialog::getColor(QColor(196, 159, 255), this);
+  QColor color = QColorDialog::getColor(QColor(159, 185, 255), this);
 
   if (color.isValid())
   {
