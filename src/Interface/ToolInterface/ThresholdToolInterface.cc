@@ -171,9 +171,9 @@ void ThresholdToolInterface::choose_threshold_color()
 
   if (color.isValid())
   {
-    threshold_color[0] = color.red()/255.0;
-    threshold_color[1] = color.green()/255.0;
-    threshold_color[2] = color.blue()/255.;
+    threshold_color[0] = color.red()/255.0f;
+    threshold_color[1] = color.green()/255.0f;
+    threshold_color[2] = color.blue()/255.0f;
     Core::ActionSet::Dispatch(Core::Interface::GetWidgetActionContext(), tool->threshold_color_state_, threshold_color);
   }
 }
