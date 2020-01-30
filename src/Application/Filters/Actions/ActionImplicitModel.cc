@@ -44,7 +44,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <ctime>
 
 // Boost includes
 #include <boost/signals2/signal.hpp>
@@ -131,9 +130,6 @@ public:
 
   SCI_BEGIN_RUN()
   {
-    time_t tstart, tend;
-    tstart = time(0);
-
     DataLayerHandle srcDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->srcLayer_);
     DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->dstLayer_);
     GridTransform srcGridTransform = srcDataLayer->get_grid_transform();
@@ -199,21 +195,17 @@ public:
         return;
       }
 
-      auto rasterData = const_cast<DataStorage*>(modelAlgo.getRasterData());
-      auto blockPtr = reinterpret_cast<double*>(dstDataBlock->get_data());
-      std::copy(rasterData->beginRawPtr(), rasterData->beginRawPtr() + rasterData->totalSize(), blockPtr);
-
-      // const auto rasterData = modelAlgo.getRasterData();
-      // for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
-      // {
-      //   for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
-      //   {
-      //     for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
-      //     {
-      //       dstDataBlock->set_data_at( i, j, k, rasterData->get(i, j, k)  );
-      //     }
-      //   }
-      // }
+      const auto rasterData = modelAlgo.getRasterData();
+      for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
+      {
+        for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
+        {
+          for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
+          {
+            dstDataBlock->set_data_at( i, j, k, rasterData->get(i, j, k)  );
+          }
+        }
+      }
 
       dstDataBlock->update_histogram();
 
@@ -223,8 +215,6 @@ public:
                                                     Core::DataVolumeHandle(new Core::DataVolume( this->actionInternal_->dstLayer_->get_grid_transform(), dstDataBlock ) ),
                                                     true
                                                    );
-      tend = time(0);
-      std::cout << difftime(tend, tstart);
   }
   SCI_END_RUN()
 
