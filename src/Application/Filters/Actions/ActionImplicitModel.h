@@ -56,7 +56,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "normal_offset", "Normal vector offset parameter." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "convex_hull_2D", "true", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "invert_seed_order", "false", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Implicit model function kernel (thin plate spline, gaussian, multiquadratic)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Implicit model function kernel (thin plate spline, gaussian, multiquadratic, or inverse multiquadratic)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
   CORE_ACTION_CHANGES_PROJECT_DATA()

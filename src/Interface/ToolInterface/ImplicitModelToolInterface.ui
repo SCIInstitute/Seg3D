@@ -304,7 +304,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="suggestedScaling_checkBox">
+       <widget class="QCheckBox" name="suggestedKernelWidth_checkBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
@@ -312,7 +312,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Suggested Scaling</string>
+         <string>Suggested kernel width</string>
         </property>
        </widget>
       </item>

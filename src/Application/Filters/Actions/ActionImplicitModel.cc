@@ -180,6 +180,10 @@ public:
     {
       kernel = MultiQuadratic;
     }
+    else if (this->actionInternal_->kernel_ == "inverse_multiquadratic" || "inverse multiquadratic")
+    {
+      kernel = InverseMultiQuadratic;
+    }
 
       RBFInterface modelAlgo( modelPointData, modelOrigin, modelGridSize, modelGridSpacing,
                             this->actionInternal_->normalOffset_, axisData,
@@ -265,10 +269,13 @@ bool ActionImplicitModel::validate( ActionContextHandle& context )
 
   if ( (this->private_->kernel_ != "thin_plate" ) &&
        (this->private_->kernel_ != "thin plate spline" ) &&
-       (this->private_->kernel_ != "gaussian") &&
-       (this->private_->kernel_ != "multiquadratic") )
+       (this->private_->kernel_ != "gaussian" ) &&
+       (this->private_->kernel_ != "multiquadratic" ) &&
+       (this->private_->kernel_ != "inverse multiquadratic" ) &&
+       (this->private_->kernel_ != "inverse_multiquadratic" ) );
+
   {
-    context->report_error("Kernel must be thin plate spline, gaussian, multiquadratic.");
+    context->report_error("Kernel must be thin plate spline, gaussian, multiquadratic, or inverse multiquadratic.");
     return false;
   }
 

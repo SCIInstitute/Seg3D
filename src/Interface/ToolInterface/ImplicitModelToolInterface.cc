@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -55,7 +55,7 @@ namespace Seg3D
 class ImplicitModelToolInterfacePrivate
 {
 public:
-	Ui::ImplicitModelToolInterface ui_;	
+	Ui::ImplicitModelToolInterface ui_;
 };
 
 // constructor
@@ -77,11 +77,11 @@ bool ImplicitModelToolInterface::build_widget( QFrame* frame )
 
 	//Step 2 - get a pointer to the tool
 	ImplicitModelTool* tool = dynamic_cast< ImplicitModelTool* > ( this->tool().get() );
-	    
+
 	//Step 3 - connect the gui to the tool through the QtBridge
 	QtUtils::QtBridge::Connect( this->private_->ui_.targetLayer_, tool->target_layer_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.useActiveLayer_, tool->use_active_layer_state_ );
-	
+
 	QtUtils::QtBridge::Connect( this->private_->ui_.normalOffsetRange_, tool->normalOffset_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.kernel_, tool->kernel_state_ );
 
@@ -118,5 +118,5 @@ bool ImplicitModelToolInterface::build_widget( QFrame* frame )
 
 	return true;
 }
-	
+
 } // end namespace Seg3D

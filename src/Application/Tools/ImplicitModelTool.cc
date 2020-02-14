@@ -64,6 +64,7 @@ ImplicitModelTool::ImplicitModelTool( const std::string& toolid ) :
   kernel_types.push_back( "thin plate spline" );
   kernel_types.push_back( "gaussian" );
   kernel_types.push_back( "multiquadratic" );
+  kernel_types.push_back( "inverse multiquadratic" );
   this->add_state( "kernel", this->kernel_state_, kernel_types[0] , kernel_types );
 
   this->add_state( "view_modes", this->view_modes_state_ );
