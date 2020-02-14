@@ -303,6 +303,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="suggestedScaling_checkBox">
+        <property name="text">
+         <string>Suggested Scaling</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
