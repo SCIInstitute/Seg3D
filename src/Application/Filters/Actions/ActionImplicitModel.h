@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -56,7 +56,7 @@ CORE_ACTION(
   CORE_ACTION_ARGUMENT( "normal_offset", "Normal vector offset parameter." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "convex_hull_2D", "true", "" )
   CORE_ACTION_OPTIONAL_ARGUMENT( "invert_seed_order", "false", "" )
-  CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Implicit model function kernel (thin_plate or gaussian or multi_quadratic)." )
+  CORE_ACTION_OPTIONAL_ARGUMENT( "kernel", "thin_plate", "Implicit model function kernel (thin plate spline, gaussian, multiquadratic)." )
   CORE_ACTION_OPTIONAL_ARGUMENT( "sandbox", "-1", "The sandbox in which to run the action." )
   CORE_ACTION_ARGUMENT_IS_NONPERSISTENT( "sandbox" )
   CORE_ACTION_CHANGES_PROJECT_DATA()
@@ -65,13 +65,13 @@ CORE_ACTION(
 
 public:
   ActionImplicitModel();
-  
+
   // VALIDATE:
   // Each action needs to be validated just before it is posted. This way we
   // enforce that every action that hits the main post_action signal will be
   // a valid action to execute.
   virtual bool validate( Core::ActionContextHandle& context ) override;
-  
+
   // RUN:
   // Each action needs to have this piece implemented. It spells out how the
   // action is run. It returns whether the action was successful or not.

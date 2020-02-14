@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -127,7 +127,7 @@ public:
 
   ImplicitModelAlgo();
   virtual ~ImplicitModelAlgo();
-  
+
   SCI_BEGIN_RUN()
   {
     DataLayerHandle srcDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->actionInternal_->srcLayer_);
@@ -176,7 +176,7 @@ public:
     {
       kernel = Gaussian;
     }
-    else if (this->actionInternal_->kernel_ == "multi_quadratic")
+    else if (this->actionInternal_->kernel_ == "multiquadratic")
     {
       kernel = MultiQuadratic;
     }
@@ -223,14 +223,14 @@ public:
   {
     return "ImplicitModel Tool";
   }
-  
+
   // GET_LAYER_PREFIX:
   // This function returns the name of the filter. The latter is prepended to the new layer name,
   // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "ImplicitModel";	
-  }	
+    return "ImplicitModel";
+  }
 };
 
 ImplicitModelAlgo::ImplicitModelAlgo()
@@ -263,11 +263,12 @@ bool ActionImplicitModel::validate( ActionContextHandle& context )
     return false;
   }
 
-  if ( (this->private_->kernel_ != "thin_plate") &&
+  if ( (this->private_->kernel_ != "thin_plate" ) &&
+       (this->private_->kernel_ != "thin plate spline" ) &&
        (this->private_->kernel_ != "gaussian") &&
-       (this->private_->kernel_ != "multi_quadratic") )
+       (this->private_->kernel_ != "multiquadratic") )
   {
-    context->report_error("Kernel must be thin_plate or gaussian or multi_quadratic.");
+    context->report_error("Kernel must be thin plate spline, gaussian, multiquadratic.");
     return false;
   }
 

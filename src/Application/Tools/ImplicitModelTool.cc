@@ -60,8 +60,12 @@ ImplicitModelTool::ImplicitModelTool( const std::string& toolid ) :
   // TODO: slider max should be up to 20% of source data range.
   // See threshold tool for good implementation example.
   this->add_state( "normal_offset", this->normalOffset_state_, 2.0, 0.0, 20.0, 0.1 );
-  this->add_state( "kernel", this->kernel_state_, "thin_plate",
-                   "thin_plate|gaussian|multi_quadratic" );
+  std::vector< std::string > kernel_types;
+  kernel_types.push_back( "thin plate spline" );
+  kernel_types.push_back( "gaussian" );
+  kernel_types.push_back( "multiquadratic" );
+  this->add_state( "kernel", this->kernel_state_, kernel_types[0] , kernel_types );
+
   this->add_state( "view_modes", this->view_modes_state_ );
   this->add_state( "compute_2D_convex_hull", this->compute_2D_convex_hull_state_, false );
   this->add_state( "invert_seed_order", this->invert_seed_order_state_, false );
