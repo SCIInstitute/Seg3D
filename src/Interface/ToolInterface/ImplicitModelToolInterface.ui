@@ -303,13 +303,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="suggestedScaling_checkBox">
-        <property name="text">
-         <string>Suggested Scaling</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -343,6 +336,13 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="QCheckBox" name="suggestedScaling_checkBox">
+        <property name="text">
+         <string>Suggested Scaling</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="clearSeedsButton_">
         <property name="minimumSize">
