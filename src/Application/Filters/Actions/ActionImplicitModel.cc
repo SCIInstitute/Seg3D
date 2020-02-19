@@ -199,7 +199,7 @@ public:
         return;
       }
 
-      const DataStorage rasterData = modelAlgo.getRasterData();
+      auto DataStorage rasterData = modelAlgo.getRasterData();
       for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
       {
         for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
