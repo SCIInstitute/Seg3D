@@ -199,14 +199,14 @@ public:
         return;
       }
 
-      auto DataStorage rasterData = modelAlgo.getRasterData();
+      const DataStorage* rasterData = modelAlgo.getRasterData();
       for (size_t i = 0; i < dstDataBlock->get_nx(); ++i)
       {
         for (size_t j = 0; j < dstDataBlock->get_ny(); ++j)
         {
           for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
           {
-            dstDataBlock->set_data_at( i, j, k, rasterData[i][j][k] );
+            dstDataBlock->set_data_at( i, j, k, rasterData->get(i,j,k) );
           }
         }
       }
