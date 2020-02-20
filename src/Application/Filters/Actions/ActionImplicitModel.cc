@@ -272,12 +272,9 @@ bool ActionImplicitModel::validate( ActionContextHandle& context )
        (this->private_->kernel_ != "gaussian" ) &&
        (this->private_->kernel_ != "multiquadratic" ) &&
        (this->private_->kernel_ != "inverse multiquadratic" ) &&
-       (this->private_->kernel_ != "inverse_multiquadratic" ) );
-
+       (this->private_->kernel_ != "inverse_multiquadratic" ) )
   {
-    std::string temp = "thin plate spline";
-    context->report_error("Compare: " + std::to_string(temp.compare(this->private_->kernel_)));
-    //context->report_error("Kernel must be thin plate spline, gaussian, multiquadratic, or inverse multiquadratic.");
+    context->report_error("Kernel must be thin plate spline, gaussian, multiquadratic, or inverse multiquadratic.");
     return false;
   }
 
