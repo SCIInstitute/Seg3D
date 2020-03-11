@@ -114,7 +114,7 @@ double GridTransform::get_diagonal_length() const
      static_cast<double>( this->nz_ ) ) ).length();
 }
 
-void GridTransform::CheckForRHS(const GridTransform& src_transform)
+GridTransform GridTransform::CheckForRHS(const GridTransform& src_transform)
 {
   //Check if transform is a LHS or a RHS - must have RHS
   //probably make a separate function
@@ -147,7 +147,8 @@ void GridTransform::CheckForRHS(const GridTransform& src_transform)
     double size_y = src_transform.ny_;
     origin = y_transform_neg * size_y + origin;
 
-    //src_transform.mat_ = ;
+    GridTransform updated_src_transform;
+    return updated_src_transform;
   }
 }
 
@@ -155,7 +156,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   std::vector< int >& permutation, GridTransform& dst_transform )
 {
   //Step 1. Check for right-hand system
-  GridTransform::CheckForRHS(src_transform);
+  GridTransform updated_src_transform(GridTransform::CheckForRHS(src_transform));
   
   // Step 2. Align the transformation frame to axes
   Vector axes[ 3 ];
