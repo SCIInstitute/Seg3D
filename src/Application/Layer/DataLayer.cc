@@ -131,7 +131,9 @@ void DataLayerPrivate::update_data_info()
     this->layer_->max_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
     return;
   }
-  
+
+  auto grid_transform_temp = this->layer_->get_grid_transform();
+
   this->layer_->centering_state_->set( 
     this->layer_->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
 

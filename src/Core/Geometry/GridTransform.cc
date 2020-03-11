@@ -30,6 +30,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include <Core/Geometry/GridTransform.h>
+#include <string>
+#include <Core/Utils/Log.h>
 
 namespace Core
 {
@@ -112,10 +114,50 @@ double GridTransform::get_diagonal_length() const
      static_cast<double>( this->nz_ ) ) ).length();
 }
 
+void GridTransform::CheckForRHS(const GridTransform& src_transform)
+{
+  //Check if transform is a LHS or a RHS - must have RHS
+  //probably make a separate function
+  auto src_transform_loc = src_transform.mat_.data();
+  std::vector<double> src_transform_data;
+  for (int i = 0; i < 16; i++)
+  {
+    src_transform_data.push_back(*(src_transform_loc + i));
+  }
+
+  //put into Vector type
+  Vector x_transform(src_transform_data[0], src_transform_data[1], src_transform_data[2]);
+  Vector y_transform(src_transform_data[4], src_transform_data[5], src_transform_data[6]);
+  Vector z_transform(src_transform_data[8], src_transform_data[9], src_transform_data[10]);
+  Vector origin(src_transform_data[12], src_transform_data[13], src_transform_data[14]);
+
+  //normalize
+  x_transform.normalize();
+  y_transform.normalize();
+  z_transform.normalize();
+
+  //cross product to check for RHS - cross product of X and Y and should get Z
+  auto cross_product = Cross(x_transform, y_transform);
+
+  //need tolerance here
+  if (cross_product != z_transform)
+  {
+    //CORE_LOG_WARNING("Image stack was a left-hand system. Converted to right-hand system.");
+    Vector y_transform_neg(-src_transform_data[4], -src_transform_data[5], -src_transform_data[6]);
+    double size_y = src_transform.ny_;
+    origin = y_transform_neg * size_y + origin;
+
+    //src_transform.mat_ = ;
+  }
+}
+
 void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transform, 
   std::vector< int >& permutation, GridTransform& dst_transform )
 {
-  // Step 1. Align the transformation frame to axes
+  //Step 1. Check for right-hand system
+  GridTransform::CheckForRHS(src_transform);
+  
+  // Step 2. Align the transformation frame to axes
   Vector axes[ 3 ];
   std::vector< Vector > canonical_axes( 3 );
   canonical_axes[ 0 ] = X_AXIS;
@@ -157,7 +199,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   // NOTE: The origin should remain the same, as the value is already in world coordinates
   Point dst_origin = src_origin;
 
-  // Step 2. Get the permutation transformation from the source to canonical coordinates
+  // Step 3. Get the permutation transformation from the source to canonical coordinates
   permutation.resize( 3 );
   for ( int i = 0; i < 3; ++i )
   {

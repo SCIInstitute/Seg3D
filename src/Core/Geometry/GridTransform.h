@@ -169,6 +169,8 @@ public:
 
   static void AlignToCanonicalCoordinates( const GridTransform& src_transform,
     std::vector< int >& permutation, GridTransform& dst_transform );
+  
+  static void CheckForRHS(const GridTransform& src_transform);
 };
 
 Point operator*( const GridTransform& gt, const Point& d );

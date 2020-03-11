@@ -257,7 +257,7 @@ bool ITKLayerImporterPrivate::scan_simple_volume()
   // Store the information we just extracted from the file in this private class
   this->data_type_ = this->convert_data_type( type_string );
   this->grid_transform_ = image_data->get_grid_transform();
-  
+
   // Header was read, hence mark it so we will not read it again.
   this->read_header_ = true;
   return true;
