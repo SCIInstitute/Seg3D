@@ -126,9 +126,9 @@ GridTransform GridTransform::CheckForRHS(const GridTransform& src_transform)
   }
 
   //put into Vector type
-  Vector x_transform(src_transform_data[0], src_transform_data[1], src_transform_data[2]);
-  Vector y_transform(src_transform_data[4], src_transform_data[5], src_transform_data[6]);
-  Vector z_transform(src_transform_data[8], src_transform_data[9], src_transform_data[10]);
+  Vector x_transform(src_transform_data[0], src_transform_data[4], src_transform_data[8]);
+  Vector y_transform(src_transform_data[1], src_transform_data[5], src_transform_data[9]);
+  Vector z_transform(src_transform_data[2], src_transform_data[6], src_transform_data[10]);
   Vector origin(src_transform_data[12], src_transform_data[13], src_transform_data[14]);
 
   //normalize
@@ -143,12 +143,22 @@ GridTransform GridTransform::CheckForRHS(const GridTransform& src_transform)
   if (cross_product != z_transform)
   {
     //CORE_LOG_WARNING("Image stack was a left-hand system. Converted to right-hand system.");
-    Vector y_transform_neg(-src_transform_data[4], -src_transform_data[5], -src_transform_data[6]);
-    double size_y = src_transform.ny_;
-    origin = y_transform_neg * size_y + origin;
+    Vector x_input(0, 1, 0);
+    Vector y_input(0, 0, -1);
+    Vector z_input(1, 0, 0);
 
-    GridTransform updated_src_transform;
-    return updated_src_transform;
+    double size_y = src_transform.ny_;
+    //origin = y_transform_neg * size_y + origin;
+    Point origin_pt(origin[0], origin[1], origin[2]);
+
+    Core::Transform updated_transform(origin_pt, x_transform, y_transform, z_transform);
+    GridTransform updated_grid_transform(src_transform.nx_, src_transform.ny_, src_transform.nz_, updated_transform, false);
+
+    return updated_grid_transform;
+  }
+  else
+  {
+    return src_transform;
   }
 }
 
@@ -156,7 +166,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   std::vector< int >& permutation, GridTransform& dst_transform )
 {
   //Step 1. Check for right-hand system
-  GridTransform updated_src_transform(GridTransform::CheckForRHS(src_transform));
+  const GridTransform& updated_src_transform(GridTransform::CheckForRHS(src_transform));
   
   // Step 2. Align the transformation frame to axes
   Vector axes[ 3 ];
@@ -164,9 +174,9 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   canonical_axes[ 0 ] = X_AXIS;
   canonical_axes[ 1 ] = Y_AXIS;
   canonical_axes[ 2 ] = Z_AXIS;
-  axes[ 0 ] = src_transform.project( canonical_axes[ 0 ] );
-  axes[ 1 ] = src_transform.project( canonical_axes[ 1 ] );
-  axes[ 2 ] = src_transform.project( canonical_axes[ 2 ] );
+  axes[ 0 ] = updated_src_transform.project( canonical_axes[ 0 ] );
+  axes[ 1 ] = updated_src_transform.project( canonical_axes[ 1 ] );
+  axes[ 2 ] = updated_src_transform.project( canonical_axes[ 2 ] );
 
   // Find the closest axis to each vector
   
@@ -185,16 +195,17 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
     }
     double length = axes[ i ].length();
     if ( length == 0.0 ) length = 1.0;
-    axes[ i ] = canonical_axes[ index ] * ( Sign( proj_len ) * length );
+    auto sign = Sign(proj_len);
+    axes[ i ] = canonical_axes[ index ] * ( sign * length );
     canonical_axes.erase( canonical_axes.begin() + index );
   }
   
-  Point src_origin = src_transform.project( DEFAULT_ORIGIN );
+  Point src_origin = updated_src_transform.project( DEFAULT_ORIGIN );
   
   std::vector< size_t > src_size( 3 );
-  src_size[ 0 ] = src_transform.get_nx();
-  src_size[ 1 ] = src_transform.get_ny();
-  src_size[ 2 ] = src_transform.get_nz();
+  src_size[ 0 ] = updated_src_transform.get_nx();
+  src_size[ 1 ] = updated_src_transform.get_ny();
+  src_size[ 2 ] = updated_src_transform.get_nz();
   Vector spacing;
   std::vector< size_t > dst_size( 3 );
   // NOTE: The origin should remain the same, as the value is already in world coordinates
@@ -220,7 +231,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   {
     if ( permutation[ i ] < 0 )
     {
-      if ( src_transform.get_originally_node_centered() )
+      if (updated_src_transform.get_originally_node_centered() )
       {
         dst_origin[ i ] = dst_origin[ i ] - 
           static_cast<double> ( dst_size[ i ] ) * spacing[ i ];
@@ -239,7 +250,7 @@ void GridTransform::AlignToCanonicalCoordinates( const GridTransform& src_transf
   dst_transform.set_ny( dst_size[ 1 ] );
   dst_transform.set_nz( dst_size[ 2 ] );
 
-  dst_transform.set_originally_node_centered( src_transform.get_originally_node_centered() );
+  dst_transform.set_originally_node_centered(updated_src_transform.get_originally_node_centered() );
 }
 
 Point operator*( const GridTransform& gt, const Point& d )
