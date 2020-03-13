@@ -344,9 +344,9 @@ Transform ITKImageDataT<T>::get_transform() const
   // Seg3D uses same LPS (Left, Posterior, Superior) 3D basis
   typename image_type::DirectionType direction = itk_image_->GetDirection();
   typename image_type::SpacingType spacing = itk_image_->GetSpacing();
-  Vector direction_x( direction[ 0 ][ 0 ], direction[ 0 ][ 1 ], direction[ 0 ][ 2 ] );
-  Vector direction_y( direction[ 1 ][ 0 ], direction[ 1 ][ 1 ], direction[ 1 ][ 2 ] );
-  Vector direction_z( direction[ 2 ][ 0 ], direction[ 2 ][ 1 ], direction[ 2 ][ 2 ] );
+  Vector direction_x( direction[ 0 ][ 0 ], direction[ 1 ][ 0 ], direction[ 2 ][ 0 ] );
+  Vector direction_y( direction[ 0 ][ 1 ], direction[ 1 ][ 1 ], direction[ 2 ][ 1 ] );
+  Vector direction_z( direction[ 0 ][ 2 ], direction[ 1 ][ 2 ], direction[ 2 ][ 2 ] );
 
   direction_x *= spacing[ 0 ];
   direction_y *= spacing[ 1 ];
