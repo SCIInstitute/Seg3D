@@ -53,10 +53,10 @@ public:
   
 private Q_SLOTS:
   void refresh_histogram( QString layer_name );
+  void choose_threshold_color();
 
 private:
     boost::shared_ptr < ThresholdToolInterfacePrivate > private_;
-  
 };
 
 } // end namespace Seg3D

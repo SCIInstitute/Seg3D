@@ -89,9 +89,11 @@ public:
   /// The opacity of the preview
   Core::StateRangedDoubleHandle preview_opacity_state_;
 
+  ///The color of the preview
+  Core::StateColorHandle threshold_color_state_;
+
 private:
   ThresholdToolPrivateHandle private_;
-
 };
 
 } // end namespace

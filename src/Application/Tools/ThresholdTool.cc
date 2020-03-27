@@ -64,6 +64,7 @@ public:
   void handle_target_layer_changed();
   void handle_preview_visibility_changed( bool visible );
   void handle_preview_opacity_changed();
+  void handle_threshold_color_changed();
 
   void update_viewers();
   void initialize_gl();
@@ -165,24 +166,34 @@ void ThresholdToolPrivate::handle_preview_opacity_changed()
   }
 }
 
+void ThresholdToolPrivate::handle_threshold_color_changed()
+{
+  if (this->tool_->valid_target_state_->get() &&
+    this->tool_->show_preview_state_->get())
+  {
+    this->update_viewers();
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Class Threshold
 //////////////////////////////////////////////////////////////////////////
 
-ThresholdTool::ThresholdTool( const std::string& toolid ) :
-  SeedPointsTool( Core::VolumeType::DATA_E, toolid ),
-  private_( new ThresholdToolPrivate )
+ThresholdTool::ThresholdTool(const std::string& toolid) :
+  SeedPointsTool(Core::VolumeType::DATA_E, toolid),
+  private_(new ThresholdToolPrivate)
 {
   this->private_->tool_ = this;
   this->private_->initialized_ = false;
   this->private_->signal_block_count_ = 0;
 
   double inf = std::numeric_limits< double >::infinity();
-  this->add_state( "upper_threshold", this->upper_threshold_state_, inf, -inf, inf, .01 );
-  this->add_state( "lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, .01 );
-  this->add_state( "show_preview", this->show_preview_state_, true );
-  this->add_state( "preview_opacity", this->preview_opacity_state_, 0.5, 0.0, 1.0, 0.1 );
+  this->add_state("upper_threshold", this->upper_threshold_state_, inf, -inf, inf, .01);
+  this->add_state("lower_threshold", this->lower_threshold_state_, -inf, -inf, inf, .01);
+  this->add_state("show_preview", this->show_preview_state_, true);
+  this->add_state("preview_opacity", this->preview_opacity_state_, 0.5, 0.0, 1.0, 0.1);
+  this->add_state("threshold_color", this->threshold_color_state_, Core::Color(0.624f, 0.725f, 1.0f));
 
   this->private_->handle_target_layer_changed();
 
@@ -197,6 +208,8 @@ ThresholdTool::ThresholdTool( const std::string& toolid ) :
     this->private_, _1 ) ) );
   this->add_connection( this->preview_opacity_state_->state_changed_signal_.connect(
     boost::bind( &ThresholdToolPrivate::handle_preview_opacity_changed, this->private_ ) ) );
+  this->add_connection( this->threshold_color_state_->state_changed_signal_.connect(
+    boost::bind( &ThresholdToolPrivate::handle_threshold_color_changed, this->private_) ) );
 }
 
 ThresholdTool::~ThresholdTool()
@@ -212,6 +225,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   double min_val, max_val;
   bool show_preview;
   double opacity;
+  Core::Color color;
   {
     Core::StateEngine::lock_type se_lock( Core::StateEngine::GetMutex() );
     target_layer_id = this->target_layer_state_->get();
@@ -219,6 +233,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     max_val = this->upper_threshold_state_->get();
     show_preview = this->show_preview_state_->get();
     opacity = this->preview_opacity_state_->get();
+    color = this->threshold_color_state_->get();
   }
 
   if ( target_layer_id == Tool::NONE_OPTION_C )
@@ -286,7 +301,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     this->private_->shader_->enable();
     this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
       static_cast< float >( 1.0 /slice_screen_height ) );
-    this->private_->shader_->set_color( 0.624f, 0.725f, 1.0f ); // INTERFACE_ACCENT_BRIGHT_COLOR
+    this->private_->shader_->set_color( color[0], color[1], color[2] );
     this->private_->shader_->set_opacity( static_cast< float >( opacity ) );
     glBegin( GL_QUADS );
     glTexCoord2f( 0.0f, 0.0f );
