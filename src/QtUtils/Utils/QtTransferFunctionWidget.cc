@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -25,6 +25,10 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+
+ #ifdef __APPLE__
+ #define GL_SILENCE_DEPRECATION
+ #endif
 
 // STL includes
 #include <iostream>
@@ -37,7 +41,7 @@
 
 // Core includes
 #include <Core/Interface/Interface.h>
-#include <Core/RenderResources/RenderResources.h> 
+#include <Core/RenderResources/RenderResources.h>
 
 // QtUtils includes
 #include <QtUtils/Utils/QtTransferFunctionWidget.h>
@@ -64,7 +68,7 @@ public:
 
 typedef QPointer< QtTransferFunctionWidget > QtTransferFunctionWidgetWeakHandle;
 
-QtTransferFunctionWidget::QtTransferFunctionWidget( const QGLFormat& format, QWidget* parent, 
+QtTransferFunctionWidget::QtTransferFunctionWidget( const QGLFormat& format, QWidget* parent,
                  QGLWidget* share, Core::TransferFunctionHandle tf ) :
   QGLWidget( format, parent, share ),
   private_( new QtTransferFunctionWidgetPrivate )
@@ -111,7 +115,7 @@ void QtTransferFunctionWidget::initializeGL()
     this->private_->bkg_tex_->set_wrap_t( GL_REPEAT );
     this->private_->bkg_tex_->set_min_filter( GL_NEAREST );
     this->private_->bkg_tex_->set_mag_filter( GL_NEAREST );
-    this->private_->bkg_tex_->set_image( 2, 2, GL_LUMINANCE, checker, 
+    this->private_->bkg_tex_->set_image( 2, 2, GL_LUMINANCE, checker,
       GL_LUMINANCE, GL_UNSIGNED_BYTE );
     this->private_->bkg_tex_->unbind();
 
@@ -129,7 +133,7 @@ void QtTransferFunctionWidget::paintGL()
   {
     return;
   }
-  
+
   Core::TextureHandle tf_texture = this->private_->transfer_function_->get_diffuse_lut();
 
   if ( !this->private_->bkg_tex_ || !tf_texture )

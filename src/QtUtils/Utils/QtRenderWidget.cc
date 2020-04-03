@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -25,6 +25,10 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
+
+ #ifdef __APPLE__
+ #define GL_SILENCE_DEPRECATION
+ #endif
 
 // STL includes
 #include <iostream>
@@ -81,7 +85,7 @@ void QtRenderWidgetPrivate::exit_size_move()
 // Class QtRenderWidget
 //////////////////////////////////////////////////////////////////////////
 
-QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent, 
+QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent,
                  QGLWidget* share, Core::AbstractViewerHandle viewer ) :
   QGLWidget( format, parent, share ),
   private_( new QtRenderWidgetPrivate )
@@ -146,7 +150,7 @@ void QtRenderWidget::paintGL()
     this->renderText( 5, 20, error_str );
     return;
   }
-  
+
   Core::Texture2DHandle texture = this->private_->viewer_->get_texture();
   Core::Texture2DHandle overlay_texture = this->private_->viewer_->get_overlay_texture();
 
@@ -185,7 +189,7 @@ void QtRenderWidget::paintGL()
 
   // Enable blending to render the overlay texture.
   // NOTE: The overlay texture can NOT be simply rendered using multi-texturing because
-  // its color channels already reflect the effect of transparency, and its alpha channel 
+  // its color channels already reflect the effect of transparency, and its alpha channel
   // actually stores the value of "1-alpha"
   glEnable( GL_BLEND );
   glBlendFunc( GL_ONE, GL_SRC_ALPHA );
@@ -207,7 +211,7 @@ void QtRenderWidget::paintGL()
 void QtRenderWidget::resizeGL( int width, int height )
 {
   if ( width <= 0 || height <= 0 ) return;
-  
+
   glViewport( 0, 0, width, height );
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -227,7 +231,7 @@ void QtRenderWidget::mouseMoveEvent( QMouseEvent * event )
   this->private_->mouse_history_.current_.x_ = event->x();
   this->private_->mouse_history_.current_.y_ = event->y();
 
-  this->private_->viewer_->mouse_move_event( this->private_->mouse_history_, 
+  this->private_->viewer_->mouse_move_event( this->private_->mouse_history_,
     event->button(), event->buttons(), event->modifiers() );
 }
 
@@ -235,11 +239,11 @@ void QtRenderWidget::mousePressEvent( QMouseEvent * event )
 {
   this->activate_signal_();
 
-  this->private_->mouse_history_.current_.x_ = 
+  this->private_->mouse_history_.current_.x_ =
     this->private_->mouse_history_.previous_.x_ = event->x();
-  this->private_->mouse_history_.current_.y_ = 
+  this->private_->mouse_history_.current_.y_ =
     this->private_->mouse_history_.previous_.y_ = event->y();
-  
+
   if ( event->button() == Qt::LeftButton )
   {
     this->private_->mouse_history_.left_start_.x_ = event->x();
@@ -256,7 +260,7 @@ void QtRenderWidget::mousePressEvent( QMouseEvent * event )
     this->private_->mouse_history_.mid_start_.y_ = event->y();
   }
 
-  this->private_->viewer_->mouse_press_event( 
+  this->private_->viewer_->mouse_press_event(
     this->private_->mouse_history_, event->button(), event->buttons(),
       event->modifiers() );
 }
@@ -341,7 +345,7 @@ void QtRenderWidget::mouseReleaseEvent( QMouseEvent * event )
   this->private_->mouse_history_.current_.x_ = event->x();
   this->private_->mouse_history_.current_.y_ = event->y();
 
-  this->private_->viewer_->mouse_release_event( this->private_->mouse_history_, event->button(), 
+  this->private_->viewer_->mouse_release_event( this->private_->mouse_history_, event->button(),
     event->buttons(), event->modifiers() );
 }
 
@@ -353,12 +357,12 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
   if ( event->delta() < 0 )
   {
     delta = -Core::RoundUp( -event->delta() / 120.0 );
-  } 
+  }
   else
   {
     delta = Core::RoundUp( event->delta() / 120.0 );
   }
-  if ( this->private_->viewer_->wheel_event( delta, event->x(), event->y(), 
+  if ( this->private_->viewer_->wheel_event( delta, event->x(), event->y(),
     event->buttons(), event->modifiers() ) )
   {
     event->accept();
@@ -372,11 +376,11 @@ void QtRenderWidget::wheelEvent( QWheelEvent* event )
 void QtRenderWidget::keyPressEvent( QKeyEvent* event )
 {
   this->activate_signal_();
-  
+
   QPoint cursor_pos = this->mapFromGlobal( QCursor::pos() );
   int x = cursor_pos.x();
   int y = cursor_pos.y();
-  
+
   if ( this->private_->viewer_->key_press_event( event->key(), event->modifiers(), x, y ) )
   {
   }
