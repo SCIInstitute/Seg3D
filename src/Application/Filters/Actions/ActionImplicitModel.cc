@@ -206,6 +206,7 @@ public:
           }
         }
       }
+
       dstDataBlock->update_histogram();
 
       // TODO: threshold from 0 to dataset max to get mask layer
