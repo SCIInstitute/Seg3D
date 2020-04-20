@@ -202,7 +202,7 @@ public:
         {
           for (size_t k = 0; k < dstDataBlock->get_nz(); ++k)
           {
-            dstDataBlock->set_data_at( i, j, k, rasterData->get(i, j, k)  );
+            dstDataBlock->set_data_at( i, j, k, rasterData->get(i, j, k) );
           }
         }
       }
