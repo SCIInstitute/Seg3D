@@ -180,7 +180,8 @@ public:
     {
       kernel = MultiQuadratic;
     }
-    else if (this->actionInternal_->kernel_ == "inverse_multiquadratic" || "inverse multiquadratic")
+    else if (this->actionInternal_->kernel_ == "inverse_multiquadratic" || 
+      this->actionInternal_->kernel_ == "inverse multiquadratic")
     {
       kernel = InverseMultiQuadratic;
     }
