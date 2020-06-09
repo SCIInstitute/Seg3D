@@ -3,29 +3,6 @@ name: windows-build
 on: [push, pull_request]
 
 jobs:
-#  windows-build-headless:
-#    runs-on: windows-latest
-
-#    steps:
-
-#    - name: Checkout
-#      uses: actions/checkout@v1
-
-#    - name: Configure
-#      working-directory: bin
-#      shell: cmd
-#      run: |
-#        cmake ..\Superbuild -DCMAKE_BUILD_TYPE=Release -G"Visual Studio 16 2019" -Ax64 -DBUILD_HEADLESS:BOOL=ON -DBUILD_WITH_PYTHON:BOOL=OFF -DBUILD_TESTING:BOOL=ON
-#    - name: Compile
-#      working-directory: bin
-#      shell: cmd
-#      run: cmake --build . --config Release -j 3
-
-#    - name: Test
-#      working-directory: bin/SCIRun
-#      continue-on-error: true
-#      shell: cmd
-#      run: cmake --build . --target RUN_TESTS --config Release
 
   windows-build-gui:
     runs-on: windows-latest
@@ -66,5 +43,3 @@ jobs:
       with:
         name: Seg3DWindowsInstaller
         path: bin/Seg3D/Seg3D2-2.4.4-win64.exe
-
-        path: bin/SCIRun/SCIRun-5.0.beta.X-win64.exe
