@@ -7,7 +7,7 @@ jobs:
   windows-build-gui:
     strategy:
       matrix:
-        qtversions: [5.9.9, 5.12.8, 5.13.2, 5.14.2]
+        qtversion: [5.9.9, 5.12.8, 5.13.2, 5.14.2]
     runs-on: windows-2016
 
     steps:
@@ -18,7 +18,7 @@ jobs:
     - name: Install Qt
       uses: ouuan/install-qt-action@ouuan
       with:
-        version: ${{ qtversions }}
+        version: ${{ matrix.qtversion }}
         target: desktop
         host: windows
         arch: win64_msvc2017_64
