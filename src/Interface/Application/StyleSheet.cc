@@ -69,7 +69,7 @@
 
 namespace Seg3D
 {
-  const QString StyleSheet::BACKGROUND_COLOR_STR = BACKGROUND_COLOR;
+  //const QString StyleSheet::BACKGROUND_COLOR_STR = BACKGROUND_COLOR;
 
   const char* StyleSheet::PALETTE_BACKGROUND_PROPERTY_C = PALETTE_BACKGROUND_PROPERTY;
 
@@ -314,7 +314,7 @@ namespace Seg3D
   "QWidget#tool_dock_ QTabWidget::pane{"
   " background-color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
   " border: 2px solid rgb( " BORDER_COLOR ") ;"
-  "}" 
+  "}"
    "QHeaderView {"
    " background-color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
    " color: rgb( " FONT_COLOR ") ;"
@@ -950,7 +950,7 @@ const QString StyleSheet::STATUSBAR_WARNING_C = QString::fromUtf8(
   " color: rgb(" WARNING_COLOR ");"
   " font: bold;"
   "}" );
-  
+
 const QString StyleSheet::STATUSBAR_MESSAGE_C = QString::fromUtf8(
   "QLabel#status_report_label_{"
   " color: rgb(" MESSAGE_COLOR ");"
@@ -961,9 +961,9 @@ const QString StyleSheet::STATUSBAR_DEBUG_C = QString::fromUtf8(
   " color: " DEBUG_COLOR ";"
   " font: bold;"
   "}" );
-  
+
 // === ToolBoxWidget Styles === //
-const QString StyleSheet::TOOLBOXWIDGET_C = QString( 
+const QString StyleSheet::TOOLBOXWIDGET_C = QString(
   "QWidget#tool_main_ {"
   " background-color: rgb( " BACKGROUND_COLOR ") ;"
   " border-radius: 0px;"
@@ -1023,10 +1023,10 @@ const QString StyleSheet::TOOLBOXWIDGET_C = QString(
   " border-style: none;"
   "}"
  );
-  
+
 // === ToolBoxPageWidget Styles === //
 // - page_background_ - //
-const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C = QString( 
+const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C = QString(
   "QWidget#page_background_ {"
   " background-color: rgb( " ACCENT_COLOR ") ;"
   " border-radius: 3px;"
@@ -1039,7 +1039,7 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_ACTIVE_C = QString(
   " padding-right: 3px; "
   "}"
   );
-const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C = QString( 
+const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C = QString(
   "QWidget#page_background_ {"
   " background-color: rgb( " INACTIVE_COLOR ") ;"
   " border-radius: 3px;"
@@ -1049,9 +1049,9 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_PAGE_BACKGROUND_INACTIVE_C = QString
   " padding-right: 3px; "
   "}"
   );
-  
+
 // - activate_button_ - //
-const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString( 
+const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString(
   "QToolButton#activate_button_{"
   " background-color: rgba(0, 0, 0, 0);"
   " text-align: left;"
@@ -1063,7 +1063,7 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString(
   " font: bold;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#activate_button_:hover{"
   " background-color: rgba(0, 0, 0, 0);"
@@ -1084,8 +1084,8 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_ACTIVE_C = QString(
   " border-style: none;"
   "}"
   );
-  
-const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString( 
+
+const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString(
   "QToolButton#activate_button_{"
   " background-color: rgba(0, 0, 0, 0);"
   " margin-right: 7px;"
@@ -1097,7 +1097,7 @@ const QString StyleSheet::TOOLBOXPAGEWIDGET_ACTIVATE_BUTTON_INACTIVE_C = QString
   " font: normal;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}\n"
   "QToolButton#activate_button_:hover{"
   " background-color: rgba(0, 0, 0, 0);"
@@ -1174,7 +1174,7 @@ const QString StyleSheet::RENDERINGWIDGET_C = QString(
   " background-color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
   "}"
   );
-const QString StyleSheet::RENDERING_CLIPPING_ACTIVE_C = QString( 
+const QString StyleSheet::RENDERING_CLIPPING_ACTIVE_C = QString(
   "QWidget#clipping_header_bkg_ {"
   " background-color:rgb( " ACCENT_COLOR ") ;"
   " border-radius: 3px;"
@@ -1193,7 +1193,7 @@ const QString StyleSheet::RENDERING_CLIPPING_ACTIVE_C = QString(
   " font: bold;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#clipping_open_button_:hover{"
   " color: rgb( " HOVER_COLOR ") ;"
@@ -1223,8 +1223,8 @@ const QString StyleSheet::RENDERING_CLIPPING_ACTIVE_C = QString(
   " background-color: transparent;"
   "}"
   );
-  
-const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString( 
+
+const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString(
   "QWidget#clipping_header_bkg_ {"
   " background-color:  rgb( " INACTIVE_COLOR ") ;"
   " border-radius: 3px;"
@@ -1241,7 +1241,7 @@ const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString(
   " font: normal;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#clipping_open_button_:hover{"
   " color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
@@ -1264,7 +1264,7 @@ const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString(
   " font: normal;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#clipping_spacer_:hover{"
   " color: silver;"
@@ -1280,7 +1280,7 @@ const QString StyleSheet::RENDERING_CLIPPING_INACTIVE_C = QString(
   );
 
 
-const QString StyleSheet::RENDERING_VR_ACTIVE_C = QString( 
+const QString StyleSheet::RENDERING_VR_ACTIVE_C = QString(
   "QWidget#vr_header_bkg_ {"
   " background-color:rgb( " ACCENT_COLOR ") ;"
   " border-radius: 3px;"
@@ -1300,7 +1300,7 @@ const QString StyleSheet::RENDERING_VR_ACTIVE_C = QString(
   " font: bold;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#vr_open_button_:hover{"
   " background-color: transparent;"
@@ -1332,8 +1332,8 @@ const QString StyleSheet::RENDERING_VR_ACTIVE_C = QString(
   " color: rgb( " FONT_COLOR ") ;"
   "}"
   );
-  
-const QString StyleSheet::RENDERING_VR_INACTIVE_C = QString( 
+
+const QString StyleSheet::RENDERING_VR_INACTIVE_C = QString(
   "QWidget#vr_header_bkg_ {"
   " background-color:  rgb( " INACTIVE_COLOR ") ;"
   " border-radius: 3px;"
@@ -1350,7 +1350,7 @@ const QString StyleSheet::RENDERING_VR_INACTIVE_C = QString(
   " font: normal;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#vr_open_button_:hover{"
   " color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
@@ -1382,7 +1382,7 @@ const QString StyleSheet::RENDERING_VR_INACTIVE_C = QString(
   "}"
   );
 
-const QString StyleSheet::RENDERING_FOG_ACTIVE_C = QString( 
+const QString StyleSheet::RENDERING_FOG_ACTIVE_C = QString(
   "QWidget#fog_header_bkg_ {"
   " background-color:rgb( " ACCENT_COLOR ") ;"
   " border-radius: 3px;"
@@ -1402,7 +1402,7 @@ const QString StyleSheet::RENDERING_FOG_ACTIVE_C = QString(
   " font: bold;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#fog_open_button_:hover{"
   " background-color: transparent;"
@@ -1433,8 +1433,8 @@ const QString StyleSheet::RENDERING_FOG_ACTIVE_C = QString(
   " color: rgb( " FONT_COLOR ") ;"
   "}"
   );
-  
-const QString StyleSheet::RENDERING_FOG_INACTIVE_C = QString( 
+
+const QString StyleSheet::RENDERING_FOG_INACTIVE_C = QString(
   "QWidget#fog_header_bkg_ {"
   " background-color:  rgb( " INACTIVE_COLOR ") ;"
   " border-radius: 3px;"
@@ -1451,7 +1451,7 @@ const QString StyleSheet::RENDERING_FOG_INACTIVE_C = QString(
   " font: normal;"
 #ifdef __APPLE__
   "   font-size: 13;"
-#endif  
+#endif
   "}"
   "QToolButton#fog_open_button_:hover{"
   " color: rgb( " PALETTE_BACKGROUND_COLOR ") ;"
@@ -1608,11 +1608,11 @@ const QString StyleSheet::LAYER_WIDGET_LABEL_ACTIVE_IN_USE_C = QString::fromUtf8
   "QLineEdit#label_:!focus{"
   " background-color: rgb( " ACCENT_COLOR ") ;"
   "}");
-  
+
 const QString StyleSheet::LAYER_WIDGET_LABEL_IN_USE_C = QString::fromUtf8(
   "QLineEdit#label_:!focus{"
   " background-color: rgb( " HOVER_COLOR ") ;"
-  "}");      
+  "}");
 // - VISUAL_LOCKED - //
 const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
   "QWidget#base_ {"
@@ -1624,7 +1624,7 @@ const QString StyleSheet::LAYER_WIDGET_BASE_LOCKED_C = QString::fromUtf8(
   " background-color: rgb( " HOVER_COLOR ") ;"
   "}"
 );
-  
+
 const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
   "QLineEdit#label_:!focus{"
   " color: gray;"
@@ -1633,7 +1633,7 @@ const QString StyleSheet::LAYER_WIDGET_LABEL_LOCKED_C = QString::fromUtf8(
 
 
 // === LayerGroupWidget Styles === //
-const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(  
+const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(
   "QWidget#group_header_ {"
   " background-color: rgb( " ACCENT_COLOR ") ;"
   " border: 3px solid rgb( " BORDER_COLOR ") ;"
@@ -1650,7 +1650,7 @@ const QString StyleSheet::GROUP_WIDGET_BACKGROUND_ACTIVE_C = QString::fromUtf8(
   " padding: 0 0 0 0;"
   "}"
     );
-const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(  
+const QString StyleSheet::GROUP_WIDGET_BACKGROUND_INACTIVE_C = QString::fromUtf8(
   "QWidget#group_header_ {"
   " background-color: rgb( " INACTIVE_COLOR ") ;"
   " border: 2px solid rgb( " BORDER_COLOR ") ;"
@@ -1670,7 +1670,7 @@ const QString StyleSheet::LAYER_RESAMPLER_C = QString::fromUtf8(
   "}"
   );
 
-// - PushDragButton - //  
+// - PushDragButton - //
 const QString StyleSheet::LAYER_PUSHDRAGBUTTON_C = QString::fromUtf8(
   "QPushButton#activate_button_{"
   " background-color: rgba(0, 0, 0, 0);"

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -42,7 +42,6 @@
 
 // Qt Includes
 #include <QVBoxLayout>
-#include <QDebug>
 
 // Core includes
 #include <Core/Utils/Log.h>
@@ -128,11 +127,11 @@ public:
 
   // REPORT_SCRIPT_PROGRESS:
   // Update the script progress bar and the current step name.
-  void report_script_progress( SandboxID sandbox, std::string current_step, 
+  void report_script_progress( SandboxID sandbox, std::string current_step,
     size_t steps_done, size_t total_steps );
 
   // MAKE_NEW_GROUP:
-  // function that creates a new group to put layers into. 
+  // function that creates a new group to put layers into.
   LayerGroupWidget* make_new_group( LayerGroupHandle group );
 
 public:
@@ -141,7 +140,7 @@ public:
 
   // Pointer to the LayerManagerWidget
   LayerManagerWidget* parent_;
-  
+
   // Mapping of group name to its underlying widget
   GroupWidgetMap group_map_;
 
@@ -161,7 +160,7 @@ public:
 
   // HANDLELAYERSDELETED:
   // This function is called in response to the LayerManager::layers_deleted_signal_.
-  static void HandleLayersDeleted( qpointer_type qpointer, 
+  static void HandleLayersDeleted( qpointer_type qpointer,
     std::vector< std::string > affected_groups, bool groups_deleted );
 
   // HANDLELAYERSREORDERED:
@@ -194,7 +193,7 @@ public:
 
   // REPORTSCRIPTPROGRESS:
   // Called on LayerManager::script_progress_signal_.
-  static void ReportScriptProgress( qpointer_type qpointer, SandboxID sandbox, 
+  static void ReportScriptProgress( qpointer_type qpointer, SandboxID sandbox,
     std::string current_step, size_t steps_done, size_t total_steps );
 };
 
@@ -234,7 +233,7 @@ void LayerManagerWidgetPrivate::handle_layer_inserted( LayerHandle layer, bool n
   this->parent_->setUpdatesEnabled( true );
 }
 
-void LayerManagerWidgetPrivate::handle_layers_deleted( 
+void LayerManagerWidgetPrivate::handle_layers_deleted(
   std::vector< std::string > affected_groups, bool groups_deleted )
 {
   // Don't update if there is a session loading going on
@@ -242,7 +241,7 @@ void LayerManagerWidgetPrivate::handle_layers_deleted(
 
   // Disable UI updates
   this->parent_->setUpdatesEnabled( false );
-  
+
   // Update group widgets if some groups have been deleted
   if ( groups_deleted )
   {
@@ -302,7 +301,7 @@ void LayerManagerWidgetPrivate::update_group_widgets()
   // in the right order. Create new widgets when necessary.
   for ( size_t i = 0; i < groups.size(); ++i )
   {
-    // Look for an existing widget for the group. If found, remove it from the 
+    // Look for an existing widget for the group. If found, remove it from the
     // temporary map. Otherwise, create a new widget.
     LayerGroupWidget* group_widget;
     std::string group_id = groups[ i ]->get_group_id();
@@ -311,7 +310,7 @@ void LayerManagerWidgetPrivate::update_group_widgets()
     {
       group_widget = it->second;
       tmp_map.erase( it );
-      
+
       // Instantly hide any still visible drop space
       group_widget->instant_hide_drop_space();
     }
@@ -363,16 +362,16 @@ LayerGroupWidget* LayerManagerWidgetPrivate::make_new_group( LayerGroupHandle gr
 {
   LayerGroupWidget* new_group = new LayerGroupWidget( this->parent_, group );
 
-  connect( new_group, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ), 
+  connect( new_group, SIGNAL( prep_layers_for_drag_and_drop_signal_( bool ) ),
     this->parent_, SLOT( prep_layers_for_drag_and_drop( bool ) ) );
 
-  connect( new_group, SIGNAL( prep_groups_for_drag_and_drop_signal_( bool ) ), 
+  connect( new_group, SIGNAL( prep_groups_for_drag_and_drop_signal_( bool ) ),
     this->parent_, SLOT( prep_groups_for_drag_and_drop( bool ) ) );
 
-  connect( new_group, SIGNAL( picked_up_group_size_signal_( int ) ), 
+  connect( new_group, SIGNAL( picked_up_group_size_signal_( int ) ),
     this->parent_, SLOT( notify_picked_up_group_size( int ) ) );
 
-  connect( new_group, SIGNAL( picked_up_layer_size_signal_( int ) ), 
+  connect( new_group, SIGNAL( picked_up_layer_size_signal_( int ) ),
     this->parent_, SLOT( notify_groups_of_picked_up_layer_size( int ) ) );
 
   return new_group;
@@ -410,7 +409,7 @@ void LayerManagerWidgetPrivate::handle_script_end( SandboxID sandbox )
   this->ui_.script_widget_->hide();
 }
 
-void LayerManagerWidgetPrivate::report_script_progress( SandboxID sandbox, 
+void LayerManagerWidgetPrivate::report_script_progress( SandboxID sandbox,
                              std::string current_step, size_t steps_done, size_t total_steps )
 {
   this->ui_.step_name_label_->setText( QString::fromStdString( current_step ) );
@@ -418,31 +417,31 @@ void LayerManagerWidgetPrivate::report_script_progress( SandboxID sandbox,
   this->ui_.progress_bar_->setValue( static_cast< int >( steps_done ) );
 }
 
-void LayerManagerWidgetPrivate::HandleLayerInserted( qpointer_type qpointer, 
+void LayerManagerWidgetPrivate::HandleLayerInserted( qpointer_type qpointer,
                           LayerHandle layer, bool new_group )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &LayerManagerWidgetPrivate::handle_layer_inserted, qpointer.data(), layer, new_group ) ) );
 }
 
-void LayerManagerWidgetPrivate::HandleLayersDeleted( qpointer_type qpointer, 
+void LayerManagerWidgetPrivate::HandleLayersDeleted( qpointer_type qpointer,
   std::vector< std::string > affected_groups, bool groups_deleted )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &LayerManagerWidgetPrivate::handle_layers_deleted, qpointer.data(),
     affected_groups, groups_deleted ) ) );
 }
 
-void LayerManagerWidgetPrivate::HandleLayersReordered( qpointer_type qpointer, 
+void LayerManagerWidgetPrivate::HandleLayersReordered( qpointer_type qpointer,
                             std::string group_id )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &LayerManagerWidgetPrivate::handle_layers_reordered, qpointer.data(), group_id ) ) );
 }
 
 void LayerManagerWidgetPrivate::HandleGroupsReordered( qpointer_type qpointer )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind( 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
     &LayerManagerWidgetPrivate::handle_groups_reordered, qpointer.data() ) ) );
 }
 
@@ -464,7 +463,7 @@ void LayerManagerWidgetPrivate::HandleReset( qpointer_type qpointer )
     &LayerManagerWidgetPrivate::reset, qpointer.data() ) ) );
 }
 
-void LayerManagerWidgetPrivate::HandleScriptBegin( qpointer_type qpointer, 
+void LayerManagerWidgetPrivate::HandleScriptBegin( qpointer_type qpointer,
                           SandboxID sandbox, std::string script_name )
 {
   Core::Interface::PostEvent( QtUtils::CheckQtPointer( qpointer, boost::bind(
@@ -497,8 +496,8 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
 
   // Setup style sheets
   this->setStyleSheet( StyleSheet::LAYERMANAGERWIDGET_C );
-  this->private_->ui_.main_->setStyleSheet("background-color: rgb(" + StyleSheet::BACKGROUND_COLOR_STR + ")");
-  
+  //this->private_->ui_.main_->setStyleSheet("background-color: rgb(" + StyleSheet::BACKGROUND_COLOR_STR + ")");
+
   // Setup the alignment of groups
   this->private_->ui_.group_layout_->setAlignment( Qt::AlignTop );
 
@@ -514,17 +513,17 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
 
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-    this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
+    this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::HandleLayerInserted, qpointer, _1, _2 ) ) );
-    this->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect( 
+    this->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::HandleLayersDeleted, qpointer, _2, _3 ) ) );
     this->add_connection( LayerManager::Instance()->layers_reordered_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::HandleLayersReordered, qpointer, _1 ) ) );
     this->add_connection( LayerManager::Instance()->groups_reordered_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::HandleGroupsReordered, qpointer ) ) );
-    this->add_connection( Core::StateEngine::Instance()->pre_load_states_signal_.connect( 
+    this->add_connection( Core::StateEngine::Instance()->pre_load_states_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::PreLoadStates, qpointer ) ) );
-    this->add_connection( Core::StateEngine::Instance()->post_load_states_signal_.connect( 
+    this->add_connection( Core::StateEngine::Instance()->post_load_states_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::PostLoadStates, qpointer ) ) );
     this->add_connection( Core::Application::Instance()->reset_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::HandleReset, qpointer ) ) );
@@ -536,7 +535,7 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
     this->add_connection( LayerManager::Instance()->script_progress_signal_.connect(
       boost::bind( &LayerManagerWidgetPrivate::ReportScriptProgress, qpointer, _1, _2, _3, _4 ) ) );
   }
-  
+
   // Add any layers that may have been added before the GUI was initialized
   this->private_->update_group_widgets();
 }
@@ -545,18 +544,18 @@ LayerManagerWidget::~LayerManagerWidget()
 {
   this->disconnect_all();
 }
-  
-// Drag and Drop Functions  
+
+// Drag and Drop Functions
 void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
-  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin(); 
+  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin();
     it != this->private_->group_map_.end(); ++it )
   {
     LayerGroupHandle group = LayerManager::Instance()->find_group( ( *it ).first );
     if( group && group->group_widget_expanded_state_->get() )
-    { 
+    {
       ( *it ).second->prep_layers_for_drag_and_drop( move_time );
     }
   }
@@ -564,16 +563,16 @@ void LayerManagerWidget::prep_layers_for_drag_and_drop( bool move_time )
 
 void LayerManagerWidget::prep_groups_for_drag_and_drop( bool move_time )
 {
-  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin(); 
+  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin();
     it != this->private_->group_map_.end(); ++it )
   {
     ( *it ).second->prep_for_animation( move_time );
   }
 }
-  
+
 void LayerManagerWidget::notify_picked_up_group_size( int group_size )
 {
-  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin(); 
+  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin();
     it != this->private_->group_map_.end(); ++it )
   {
     ( *it ).second->set_picked_up_group_size( group_size );
@@ -582,7 +581,7 @@ void LayerManagerWidget::notify_picked_up_group_size( int group_size )
 
 void LayerManagerWidget::notify_groups_of_picked_up_layer_size( int layer_size )
 {
-  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin(); 
+  for( GroupWidgetMap::iterator it = this->private_->group_map_.begin();
     it != this->private_->group_map_.end(); ++it )
   {
     ( *it ).second->notify_picked_up_layer_size( layer_size );
@@ -596,7 +595,7 @@ void LayerManagerWidget::abort_script()
 #endif
   if ( this->private_->script_sandbox_ >= 0 )
   {
-    ActionDeleteSandbox::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    ActionDeleteSandbox::Dispatch( Core::Interface::GetWidgetActionContext(),
       this->private_->script_sandbox_ );
   }
 
