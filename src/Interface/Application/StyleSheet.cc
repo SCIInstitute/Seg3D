@@ -69,8 +69,6 @@
 
 namespace Seg3D
 {
-  //const QString StyleSheet::BACKGROUND_COLOR_STR = BACKGROUND_COLOR;
-
   const char* StyleSheet::PALETTE_BACKGROUND_PROPERTY_C = PALETTE_BACKGROUND_PROPERTY;
 
   const QString StyleSheet::MAIN_STYLE_C = QString::fromUtf8(

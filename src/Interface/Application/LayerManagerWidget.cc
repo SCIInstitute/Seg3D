@@ -496,7 +496,6 @@ LayerManagerWidget::LayerManagerWidget( QWidget* parent ) :
 
   // Setup style sheets
   this->setStyleSheet( StyleSheet::LAYERMANAGERWIDGET_C );
-  //this->private_->ui_.main_->setStyleSheet("background-color: rgb(" + StyleSheet::BACKGROUND_COLOR_STR + ")");
 
   // Setup the alignment of groups
   this->private_->ui_.group_layout_->setAlignment( Qt::AlignTop );
