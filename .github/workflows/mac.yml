@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install Qt
-      uses: ouuan/install-qt-action@ouuan
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.2
         target: desktop
