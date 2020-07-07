@@ -69,7 +69,6 @@ cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
 {
   typedef itk::Image< InputPixelType, DIM_3D > InputImageType;
   typedef itk::Image< OutputPixelType, DIM_3D > OutputImageType;
-  typedef typename Core::ITKImageDataT< OutputPixelType > OutputType;
 
   typename InputImageType::Pointer itk_image = image_data->get_image();
 
@@ -80,10 +79,13 @@ cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
   typename CastFilterType::Pointer castFilter = CastFilterType::New();
 
   // assumes casting to type with smaller range...
+  auto numericMin = itk::NumericTraits< OutputPixelType >::min();
+  auto numericMax = itk::NumericTraits< OutputPixelType >::max();
+
   rescale->SetInput( itk_image );
   rescale->Update();
-  rescale->SetOutputMinimum( itk::NumericTraits< OutputPixelType >::min() );
-  rescale->SetOutputMaximum( itk::NumericTraits< OutputPixelType >::max() );
+  rescale->SetOutputMinimum( numericMin );
+  rescale->SetOutputMaximum( numericMax );
 
   auto outputMin = rescale->GetOutputMinimum();
   auto outputMax = rescale->GetOutputMaximum();
@@ -94,7 +96,7 @@ cast_image( typename Core::ITKImageDataT< InputPixelType >::Handle image_data )
   }
   else
   {
-    
+
     castFilter->SetInput(rescale->GetOutput());
     castFilter->Update();
   }
@@ -108,7 +110,6 @@ direct_cast_image(typename Core::ITKImageDataT< InputPixelType >::Handle image_d
 {
   typedef itk::Image< InputPixelType, DIM_3D > InputImageType;
   typedef itk::Image< OutputPixelType, DIM_3D > OutputImageType;
-  typedef typename Core::ITKImageDataT< OutputPixelType > OutputType;
 
   typename InputImageType::Pointer itk_image = image_data->get_image();
 
@@ -134,7 +135,7 @@ direct_cast_image(typename Core::ITKImageDataT< InputPixelType >::Handle image_d
   return castFilter->GetOutput();
 }
 
-void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator, 
+void set_data_series_names( itk::NumericSeriesFileNames::Pointer& name_series_generator,
                             const std::string& file_path, const std::string& file_name,
                             const size_t size, const std::string& extension )
 {
@@ -210,7 +211,7 @@ bool export_image_series( const std::string& file_path,
   typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
   typename ImageType::IndexType start = region.GetIndex();
   typename ImageType::SizeType size = region.GetSize();
- 
+
   if (size[0] == 0 || size[1] == 0 || size[2] == 0)
   {
     return false;
@@ -277,49 +278,49 @@ bool export_dicom_series( const std::string& file_path,
 {
   typedef itk::GDCMImageIO ImageIOType;
   ImageIOType::Pointer dicom_io = ImageIOType::New();
-  
+
   typedef itk::Image< PixelType, DIM_3D > ImageType;
   typedef itk::Image< PixelType, DIM_2D > OutputImageType;
   typedef itk::ImageSeriesWriter< ImageType, OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
-  
+
   typename ImageType::RegionType region = itk_image->GetLargestPossibleRegion();
   typename ImageType::IndexType start = region.GetIndex();
   typename ImageType::SizeType size = region.GetSize();
-  
+
   unsigned int first_slice = start[ 2 ];
   unsigned int last_slice = start[ 2 ] + size[ 2 ] - 1;
-  
+
   typedef itk::NumericSeriesFileNames NamesGeneratorType;
   NamesGeneratorType::Pointer names_generator = NamesGeneratorType::New();
   set_data_series_names( names_generator, file_path, file_name, size[ 2 ], extension );
-  
+
   names_generator->SetStartIndex( first_slice );
   names_generator->SetEndIndex( last_slice );
   names_generator->SetIncrementIndex( 1 );
-  
+
   ///////////////////////////////////////////////////////////////////////////
-  
+
   // Check whether header file was included
   bool has_header_file = false;
   bool is_dicom = false;
-  
+
   LayerMetaData meta_data = temp_handle->get_meta_data();
   std::vector< std::string > header_files;
   ProjectHandle project = ProjectManager::Instance()->get_current_project();
   InputFilesID inputfiles_id = -1;
-  
+
   if ( PreferencesManager::Instance()->export_dicom_headers_state_->get() )
   {
     if ( meta_data.meta_data_info_ == "dicom_filename" )
     {
       std::vector<std::string> parts = Core::SplitString( meta_data.meta_data_, "|" );
       Core::ImportFromString( parts[ 0 ], header_files );
-      
+
       boost::filesystem::path full_file;
       boost::filesystem::path cached_file;
       if ( parts.size() > 1 ) Core::ImportFromString( parts[ 1 ], inputfiles_id );
-      
+
       has_header_file = true;
       for ( size_t j = 0; j < header_files.size(); j++ )
       {
@@ -334,7 +335,7 @@ bool export_dicom_series( const std::string& file_path,
             header_files[ j ] = full_file.string();
           }
         }
-        
+
         if ( ! boost::filesystem::exists( full_file ) )
         {
           has_header_file = false;
@@ -343,7 +344,7 @@ bool export_dicom_series( const std::string& file_path,
       }
     }
   }
-  
+
   // TODO: this is weird - why is it needed???
   // If validation check, should be at function beginning!
   std::string l_extension = boost::to_lower_copy( extension );
@@ -351,15 +352,15 @@ bool export_dicom_series( const std::string& file_path,
   {
     is_dicom = true;
   }
-  
+
   writer->SetInput( itk_image );
   writer->SetImageIO( dicom_io );
   writer->SetFileNames( names_generator->GetFileNames() );
-  
+
   typedef typename itk::ImageSeriesReader< ImageType > ReaderType;
   typename ReaderType::Pointer reader;
   typename ReaderType::DictionaryArrayType dict_array;
-  
+
   if ( is_dicom )
   {
     size_t dict_size;
@@ -388,22 +389,22 @@ bool export_dicom_series( const std::string& file_path,
     {
       dict_size = names_generator->GetFileNames().size();
     }
-    
+
     std::string uid_prefix = dicom_io->GetUIDPrefix();
     gdcm::UIDGenerator::SetRoot( uid_prefix.c_str() );
     gdcm::UIDGenerator uid;
-    
+
     double min_value = temp_handle->min_value_state_->get();
     double max_value = temp_handle->max_value_state_->get();
     Core::GridTransform grid_transform = temp_handle->get_grid_transform();
-    
+
     std::string series_uid = uid.Generate();
     std::string description = "Data Generated by Seg3D";
     std::string data_center = Core::ExportToString( 0.5 * ( min_value + max_value ) );
     std::string data_width = Core::ExportToString( max_value - min_value );
-    
+
     double z_offset = 0.0;
-    
+
     for ( size_t i = 0; i < dict_size; ++i )
     {
       typename ReaderType::DictionaryRawPointer dict = new typename ReaderType::DictionaryType;
@@ -413,9 +414,9 @@ bool export_dicom_series( const std::string& file_path,
         if (inputDict) copy_dictionary( *inputDict, *dict );
       }
       dict_array.push_back( dict );
-      
+
       std::string sop_uid = uid.Generate();
-      
+
       // [Series Instance UID]
       itk::EncapsulateMetaData<std::string>( *dict, "0020|000e", series_uid );
       // [ Window Center ]
@@ -432,7 +433,7 @@ bool export_dicom_series( const std::string& file_path,
       itk::EncapsulateMetaData<std::string>( *dict, "0028|0102", "" );
       // [Pixel Representation]
       itk::EncapsulateMetaData<std::string>( *dict, "0028|0103", "" );
-      
+
       Core::Point slice_origin = grid_transform.project( Core::Point( 0.0, 0.0, z_offset ) );
       z_offset += 1.0;
       std::ostringstream patient_location;
@@ -440,38 +441,38 @@ bool export_dicom_series( const std::string& file_path,
       Core::ExportToString( slice_origin.y() ) << "\\" <<
       Core::ExportToString( slice_origin.z() );
       itk::EncapsulateMetaData<std::string>( *dict, "0020|0032", patient_location.str() );
-      
+
       double spacing_x = grid_transform.project( Core::Vector( 1.0, 0.0, 0.0 ) ).length();
       double spacing_y = grid_transform.project( Core::Vector( 0.0, 1.0, 0.0 ) ).length();
       double spacing_z = grid_transform.project( Core::Vector( 0.0, 0.0, 1.0 ) ).length();
-      
+
       std::string z_spacing = Core::ExportToString( spacing_z );
       itk::EncapsulateMetaData<std::string>( *dict, "0018|0050", z_spacing );
-      
+
       typedef itk::Array< double > DoubleArrayType;
       DoubleArrayType originArray( 3 );
       DoubleArrayType spacingArray( 3 );
-      
+
       originArray[ 0 ]  = slice_origin.x();
       originArray[ 1 ]  = slice_origin.y();
       originArray[ 2 ]  = slice_origin.z();
       spacingArray[ 0 ] = spacing_x;
       spacingArray[ 1 ] = spacing_y;
       spacingArray[ 2 ] = spacing_z;
-      
+
       itk::EncapsulateMetaData< unsigned int >( *dict, itk::ITK_NumberOfDimensions, 3 );
       itk::EncapsulateMetaData< DoubleArrayType >( *dict, itk::ITK_Origin, originArray );
       itk::EncapsulateMetaData< DoubleArrayType >( *dict, itk::ITK_Spacing, spacingArray );
     }
-    
+
     // now tell the Dicom writer to use the provided UIDs
     dicom_io->KeepOriginalUIDOn();
     writer->SetMetaDataDictionaryArray( &dict_array );
   }
   ////////////////////////////////////////////////////////////////////////////
-  
+
   gdcm::ImageHelper::SetForcePixelSpacing( true );
-  
+
   try
   {
     writer->Update();
@@ -482,7 +483,7 @@ bool export_dicom_series( const std::string& file_path,
     CORE_LOG_ERROR(itk_error);
     return false;
   }
-  
+
   return true;
 }
 
