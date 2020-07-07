@@ -26,9 +26,6 @@
  DEALINGS IN THE SOFTWARE.
  */
 
-// boost includes
-#include <boost/algorithm/string/case_conv.hpp>
-
 // itk includes
 #include <itkImageFileWriter.h>
 #include <itkImageSeriesWriter.h>
@@ -305,6 +302,14 @@ bool export_dicom_series( const std::string& file_path,
   bool has_header_file = false;
   bool is_dicom = false;
 
+  std::string lower_extension = extension;
+  std::transform(lower_extension.begin(), lower_extension.end(), lower_extension.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+  if ( lower_extension == ".dcm" || lower_extension == ".dicom" || lower_extension == ".ima" )
+  {
+    is_dicom = true;
+  }
+
   LayerMetaData meta_data = temp_handle->get_meta_data();
   std::vector< std::string > header_files;
   ProjectHandle project = ProjectManager::Instance()->get_current_project();
@@ -343,14 +348,6 @@ bool export_dicom_series( const std::string& file_path,
         }
       }
     }
-  }
-
-  // TODO: this is weird - why is it needed???
-  // If validation check, should be at function beginning!
-  std::string l_extension = boost::to_lower_copy( extension );
-  if ( l_extension == ".dcm" || l_extension == ".dicom" || l_extension == ".ima" )
-  {
-    is_dicom = true;
   }
 
   writer->SetInput( itk_image );
