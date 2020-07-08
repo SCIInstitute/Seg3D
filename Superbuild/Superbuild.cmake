@@ -44,7 +44,7 @@ ENDIF()
 
 # Hardcode (unfortunately) minumum OS X version for
 # productbuild's Distribution.xml
-SET(OSX_MINIMUM_OS_VERSION "10.10" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
+SET(OSX_MINIMUM_OS_VERSION "10.12" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
 MARK_AS_ADVANCED(OSX_MINIMUM_OS_VERSION)
 
 ###########################################
