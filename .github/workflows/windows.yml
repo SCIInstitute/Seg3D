@@ -7,7 +7,7 @@ jobs:
   windows-build-gui:
     strategy:
       matrix:
-        qtversion: [5.9.9, 5.12.8, 5.14.2]
+        qtversion: [5.12.8, 5.14.2]
     runs-on: windows-2016
 
     steps:
