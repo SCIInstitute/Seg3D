@@ -31,6 +31,7 @@
 #endif
 
 #include <string>
+#include <fstream>
 
 #include <Core/Utils/Log.h>
 
@@ -63,10 +64,16 @@ bool Seg3DGui::run()
 #if defined(__APPLE__)
       if (QtUtils::QtApplication::Instance()->qt_application()->hasPendingEvents())
       {
+        //std::ofstream debugFile;
+        //debugFile.open("/Users/allywarner/Desktop/debugOutput.txt");
+        //debugFile << "This is the start of a debug log.\n";
+        //debugFile << "---------------------------------\n";
         QtUtils::QtApplication::Instance()->qt_application()->processEvents();
         if (this->file_to_view == "") {
             app_interface->activate_splash_screen();
           }
+        //debugFile << this->file_to_view << std::endl;
+        //debugFile.close();
       }
 #else
     app_interface->activate_splash_screen();

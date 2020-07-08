@@ -32,6 +32,7 @@
 
 #include <locale>
 #include <cstdlib>
+#include <fstream>
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -52,6 +53,12 @@ using namespace Seg3D;
 int main( int argc, char **argv )
 {
   putenv("LANG=C");
+
+  std::ofstream debugFile;
+  debugFile.open("/Users/allywarner/Desktop/debugOutput.txt");
+  for(int i = 1; i < argc; ++i)
+    debugFile << "Loading file: " << argv[i] << std::endl;
+  debugFile.close();
 
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
   Seg3DBase* app = NULL;
