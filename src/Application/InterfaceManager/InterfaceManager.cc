@@ -53,24 +53,24 @@ InterfaceManager::~InterfaceManager()
 void InterfaceManager::initialize_states()
 {
   // set up state variables
-  this->add_state( "fullscreen", full_screen_state_, 
+  this->add_state( "fullscreen", full_screen_state_,
     PreferencesManager::Instance()->full_screen_on_startup_state_->get() );
 
-  this->add_state( "project_dockwidget_visibility", this->project_dockwidget_visibility_state_, 
+  this->add_state( "project_dockwidget_visibility", this->project_dockwidget_visibility_state_,
     PreferencesManager::Instance()->show_projectmanager_bar_state_->get() );
-  this->add_state( "toolmanager_dockwidget_visibility", this->toolmanager_dockwidget_visibility_state_, 
+  this->add_state( "toolmanager_dockwidget_visibility", this->toolmanager_dockwidget_visibility_state_,
     PreferencesManager::Instance()->show_tools_bar_state_->get() );
-  this->add_state( "layermanager_dockwidget_visibility", this->layermanager_dockwidget_visibility_state_, 
+  this->add_state( "layermanager_dockwidget_visibility", this->layermanager_dockwidget_visibility_state_,
     PreferencesManager::Instance()->show_layermanager_bar_state_->get() );
-  this->add_state( "rendering_dockwidget_visible", this->rendering_dockwidget_visibility_state_, 
+  this->add_state( "rendering_dockwidget_visible", this->rendering_dockwidget_visibility_state_,
     PreferencesManager::Instance()->show_rendering_bar_state_->get() );
-  this->add_state( "provenance_dockwidget_visibility", this->provenance_dockwidget_visibility_state_, 
+  this->add_state( "provenance_dockwidget_visibility", this->provenance_dockwidget_visibility_state_,
     PreferencesManager::Instance()->show_provenance_bar_state_->get() );
-  
+
   this->add_state( "preferences_manager_visibility", this->preferences_manager_visibility_state_, false );
   this->add_state( "controller_visibility", this->controller_visibility_state_, false );
   this->add_state( "message_window_visibility", this->message_window_visibility_state_, false );
-  this->add_state( "splash_screen_visibility", this->splash_screen_visibility_state_, true );
+  this->add_state( "splash_screen_visibility", this->splash_screen_visibility_state_, false );
   this->add_state( "keyboard_shortcut_visibility", this->keyboard_shortcut_visibility_state_, false );
   this->add_state( "python_console_visibility", this->python_console_visibility_state_, false );
 
