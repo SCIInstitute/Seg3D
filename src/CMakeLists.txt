@@ -101,8 +101,8 @@ INCLUDE(CMake/RegisterUnitTest.cmake)
 ###########################################
 
 SET(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
-SET(SEG3D_MINOR_VERSION 4 CACHE INTERNAL "Minor version number" FORCE)
-SET(SEG3D_PATCH_VERSION 4 CACHE INTERNAL "Patch version number" FORCE)
+SET(SEG3D_MINOR_VERSION 5 CACHE INTERNAL "Minor version number" FORCE)
+SET(SEG3D_PATCH_VERSION 0 CACHE INTERNAL "Patch version number" FORCE)
 
 
 ###########################################
