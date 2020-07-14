@@ -1,0 +1,30 @@
+name: linux-build
+
+on: [push, pull_request]
+
+jobs:
+  linux-build-gui:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Prepare
+      run: sudo apt-get update && sudo apt-get install mesa-common-dev libgl1-mesa-dev mesa-utils-extra libglapi-mesa ninja-build qt5-qmake qtbase5-dev libqt5opengl5-dev libqt5svg5-dev
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.2
+        target: desktop
+        host: linux
+        install-deps: true
+
+    - name: Build
+      run: ./build.sh -DQt5_PATH="${Qt5_Dir}" -j3
+      continue-on-error: true
