@@ -44,7 +44,7 @@ ENDIF()
 
 # Hardcode (unfortunately) minumum OS X version for
 # productbuild's Distribution.xml
-SET(OSX_MINIMUM_OS_VERSION "10.10" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
+SET(OSX_MINIMUM_OS_VERSION "10.12" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
 MARK_AS_ADVANCED(OSX_MINIMUM_OS_VERSION)
 
 ###########################################
@@ -167,8 +167,8 @@ IF(SEG3D_BUILD_INTERFACE)
 
   IF(Qt5Core_FOUND)
     MESSAGE(STATUS "Found Qt version: ${Qt5Core_VERSION}")
-    IF(${Qt5Core_VERSION} VERSION_LESS "5.9")
-      MESSAGE(FATAL_ERROR "Qt 5.9 or greater is required for building the Seg3D GUI")
+    IF(${Qt5Core_VERSION} VERSION_LESS "5.12")
+      MESSAGE(FATAL_ERROR "Qt 5.12 or greater is required for building the Seg3D GUI")
     ENDIF()
   ELSE()
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")

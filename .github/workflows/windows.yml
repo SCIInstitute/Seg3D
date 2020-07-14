@@ -1,0 +1,46 @@
+name: windows-build
+
+on: [push, pull_request]
+
+jobs:
+
+  windows-build-gui:
+    strategy:
+      matrix:
+        qtversion: [5.12.8, 5.14.2]
+    runs-on: windows-2016
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qtversion }}
+        target: desktop
+        host: windows
+        arch: win64_msvc2017_64
+        install-deps: true
+
+    - name: Configure
+      working-directory: bin
+      run: |
+        cmake ..\Superbuild -DCMAKE_BUILD_TYPE=Release -G"Visual Studio 15 2017" -Ax64 -DQt5_PATH:PATH="$env:Qt5_Dir" -DBUILD_WITH_PYTHON:BOOL=OFF
+
+    - name: Compile
+      working-directory: bin
+      shell: cmd
+      run: cmake --build . --config Release -j 3
+
+    - name: Package
+      working-directory: bin/Seg3D
+      shell: cmd
+      run: cmake --build . --config Release --target package
+
+    - name: Upload installer
+      uses: actions/upload-artifact@v1
+      with:
+        name: Seg3DWindowsInstaller_${{ matrix.qtversion }}
+        path: bin/Seg3D/Seg3D2-2.4.4-win64.exe
