@@ -43,4 +43,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: Seg3DWindowsInstaller_${{ matrix.qtversion }}
-        path: bin/Seg3D/Seg3D2-2.4.4-win64.exe
+        path: bin/Seg3D/Seg3D2-2.5.0-win64.exe
