@@ -32,6 +32,7 @@
 
 #include <csignal>
 #include <string>
+#include <fstream>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
@@ -66,6 +67,12 @@ bool Seg3DHeadless::keep_running()
 
 bool Seg3DHeadless::run()
 {
+  std::ofstream debugFile;
+  debugFile.open("/Users/ally_warner/Desktop/debugOutput.txt");
+  debugFile << "This is the start of a debug log in Seg3DHeadless.\n";
+  debugFile << "---------------------------------\n";
+  debugFile.close();
+
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);
   signal(SIGINT, &sighandler);

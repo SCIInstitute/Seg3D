@@ -59,7 +59,7 @@ bool Seg3DGui::run()
 
   std::ofstream debugFile;
   debugFile.open("/Users/ally_warner/Desktop/debugOutput.txt");
-  debugFile << "This is the start of a debug log.\n";
+  debugFile << "This is the start of a debug log in Seg3DGui.\n";
   debugFile << "---------------------------------\n";
 
   bool opened_init_project = app_interface->open_initial_project( this->file_to_view );
