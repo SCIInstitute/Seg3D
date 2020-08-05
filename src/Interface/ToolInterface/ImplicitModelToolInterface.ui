@@ -129,7 +129,7 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <widget class="QCheckBox" name="generate_segmentation_checkbox_">
+     <widget class="QCheckBox" name="generate_segmentation_">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -142,7 +142,7 @@
        <string>Generate Segmentation</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="calculate_distance_map_checkbox_">
+     <widget class="QCheckBox" name="calculate_distance_map_">
       <property name="geometry">
        <rect>
         <x>10</x>
