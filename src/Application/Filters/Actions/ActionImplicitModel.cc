@@ -96,6 +96,7 @@ public:
     notifier_->wait();
     // threshold layer callback
     runThresholdSignal_(layerContext_);
+    //check this checkbox and then permanent delete
   }
 };
 
