@@ -81,6 +81,9 @@ bool ImplicitModelToolInterface::build_widget( QFrame* frame )
 	//Step 3 - connect the gui to the tool through the QtBridge
 	QtUtils::QtBridge::Connect( this->private_->ui_.targetLayer_, tool->target_layer_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.useActiveLayer_, tool->use_active_layer_state_ );
+
+  QtUtils::QtBridge::Connect(this->private_->ui_.generate_segmentation_, tool->generate_segmentation_state_);
+  QtUtils::QtBridge::Connect(this->private_->ui_.calculate_distance_map_, tool->calculate_distance_map_state_);
 	
 	QtUtils::QtBridge::Connect( this->private_->ui_.normalOffsetRange_, tool->normalOffset_state_ );
 	QtUtils::QtBridge::Connect( this->private_->ui_.kernel_, tool->kernel_state_ );

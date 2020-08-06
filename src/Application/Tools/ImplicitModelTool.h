@@ -61,6 +61,8 @@ public:
   Core::StateBoolHandle compute_2D_convex_hull_state_;
   Core::StateBoolHandle invert_seed_order_state_;
   Core::StateLabeledOptionHandle convex_hull_selection_state_;
+  Core::StateBoolHandle generate_segmentation_state_;
+  Core::StateBoolHandle calculate_distance_map_state_;
 
   // TODO: temporary
   Core::StateBoolHandle disabled_widget_state_;

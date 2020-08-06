@@ -51,6 +51,8 @@ class ActionImplicitModel : public Seg3D::LayerAction
 CORE_ACTION(
   CORE_ACTION_TYPE( "ImplicitModel", "Implicit model function action interface" )
   CORE_ACTION_ARGUMENT( "layerid", "The layerid on which this filter needs to be run." )
+  CORE_ACTION_ARGUMENT( "generate_segmentation", "true", "Toggles creating a segmentation (mask layer).")
+  CORE_ACTION_ARGUMENT( "calculate_distance_map", "true", "Toggles calculating a distance map (data layer).")
   CORE_ACTION_ARGUMENT( "vertices", "The 3D points needed to generate the implicit model function." )
   CORE_ACTION_ARGUMENT( "view_modes", "The 2D view where each point was picked (axial or sagittal or coronal)." )
   CORE_ACTION_ARGUMENT( "normal_offset", "Normal vector offset parameter." )
@@ -84,6 +86,7 @@ private:
 
 public:
   static void Dispatch(Core::ActionContextHandle context, const std::string& target,
+                       bool generateSegmentation, bool calculateDistanceMap, 
                        const VertexList& vertices,const ViewModeList& viewModes,
                        double normalOffset, bool compute2DConvexHull,
                        bool invertSeedOrder,const std::string& kernel);

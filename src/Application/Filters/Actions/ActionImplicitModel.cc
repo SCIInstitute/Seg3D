@@ -103,6 +103,8 @@ class ActionImplicitModelPrivate
 {
 public:
   ActionImplicitModelPrivate() :
+    generateSegmentation_(true),
+    calculateDistanceMap_(true),
     normalOffset_(0),
     compute2DConvexHull_(true),
     invertSeedOrder_(false),
@@ -111,6 +113,8 @@ public:
   LayerHandle srcLayer_;
   LayerHandle dstLayer_;
   std::string targetLayerID_;
+  bool generateSegmentation_;
+  bool calculateDistanceMap_;
   VertexList vertices_;
   ViewModeList view_modes_;
   double normalOffset_;
@@ -210,11 +214,10 @@ public:
       dstDataBlock->update_histogram();
 
       // TODO: threshold from 0 to dataset max to get mask layer
-      this->dispatch_insert_data_volume_into_layer(
-                                                    this->actionInternal_->dstLayer_,
-                                                    Core::DataVolumeHandle(new Core::DataVolume( this->actionInternal_->dstLayer_->get_grid_transform(), dstDataBlock ) ),
-                                                    true
-                                                   );
+      this->dispatch_insert_data_volume_into_layer(this->actionInternal_->dstLayer_,
+                                                   Core::DataVolumeHandle(new Core::DataVolume(
+                                                   this->actionInternal_->dstLayer_->get_grid_transform(), 
+                                                   dstDataBlock)), true );
   }
   SCI_END_RUN()
 
@@ -247,6 +250,8 @@ ActionImplicitModel::ActionImplicitModel() :
 
 {
   this->add_layer_id( this->private_->targetLayerID_ );
+  this->add_parameter( this->private_->generateSegmentation_ );
+  this->add_parameter( this->private_->calculateDistanceMap_ );
   this->add_parameter( this->private_->vertices_ );
   this->add_parameter( this->private_->view_modes_ );
   this->add_parameter( this->private_->normalOffset_ );
@@ -336,19 +341,24 @@ bool ActionImplicitModel::run( ActionContextHandle& context, ActionResultHandle&
 
 bool ActionImplicitModel::run_threshold( ActionContextHandle& context )
 {
-  DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>( this->private_->dstLayer_ );
-  double dstMaxValue = dstDataLayer->get_data_volume()->get_data_block()->get_max();
-  ActionThreshold::Dispatch(context,
-                            dstDataLayer->get_layer_id(),
-                            this->private_->thresholdValue_,
-                            dstMaxValue);
+  if (this->private_->generateSegmentation_)
+  {
+    DataLayerHandle dstDataLayer = boost::dynamic_pointer_cast<DataLayer>(this->private_->dstLayer_);
+    double dstMaxValue = dstDataLayer->get_data_volume()->get_data_block()->get_max();
+    ActionThreshold::Dispatch(context,
+      dstDataLayer->get_layer_id(),
+      this->private_->thresholdValue_,
+      dstMaxValue);
 
-  return true;
+    return true;
+  }
 }
 
 void ActionImplicitModel::Dispatch(
                                     ActionContextHandle context,
                                     const std::string& target,
+                                    bool generateSegmentation,
+                                    bool calculateDistanceMap,
                                     const VertexList& vertices,
                                     const ViewModeList& viewModes,
                                     double normalOffset,
@@ -359,6 +369,8 @@ void ActionImplicitModel::Dispatch(
 {
   ActionImplicitModel* action = new ActionImplicitModel;
   action->private_->targetLayerID_ = target;
+  action->private_->generateSegmentation_ = generateSegmentation;
+  action->private_->calculateDistanceMap_ = calculateDistanceMap;
   action->private_->vertices_ = vertices;
   action->private_->view_modes_ = viewModes;
   action->private_->normalOffset_ = normalOffset;

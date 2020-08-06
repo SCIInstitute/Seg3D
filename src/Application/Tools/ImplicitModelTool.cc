@@ -59,6 +59,8 @@ ImplicitModelTool::ImplicitModelTool( const std::string& toolid ) :
 {
   // TODO: slider max should be up to 20% of source data range.
   // See threshold tool for good implementation example.
+  this->add_state( "generate_segmentation", this->generate_segmentation_state_, true );
+  this->add_state( "calculate_distance_map", this->calculate_distance_map_state_, true);
   this->add_state( "normal_offset", this->normalOffset_state_, 2.0, 0.0, 20.0, 0.1 );
   this->add_state( "kernel", this->kernel_state_, "thin_plate",
                    "thin_plate|gaussian|multi_quadratic" );
@@ -185,6 +187,8 @@ void ImplicitModelTool::execute( Core::ActionContextHandle context )
 
   ActionImplicitModel::Dispatch( context,
                                  this->target_layer_state_->get(),
+                                 this->generate_segmentation_state_->get(),
+                                 this->calculate_distance_map_state_->get(),
                                  this->seed_points_state_->get(),
                                  this->view_modes_state_->get(),
                                  this->normalOffset_state_->get(),
