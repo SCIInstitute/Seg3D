@@ -57,16 +57,7 @@ bool Seg3DGui::run()
 {
   ApplicationInterface* app_interface = new ApplicationInterface();
 
-  std::ofstream debugFile;
-  debugFile.open("/Users/ally_warner/Desktop/debugOutput.txt");
-  debugFile << "This is the start of a debug log in Seg3DGui.\n";
-  debugFile << "---------------------------------\n";
-
   bool opened_init_project = app_interface->open_initial_project( this->file_to_view );
-
-  debugFile << "opened_init_project: " << opened_init_project << std::endl;
-  //debugFile << this->file_to_view << std::endl;
-  debugFile.close();
 
   if (!opened_init_project && this->display_splash_screen) {
 //Trying to catch osx file open event when double click on .nrrd file. hasPendingEvents is obsolete at 5.10.
