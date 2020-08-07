@@ -50,9 +50,9 @@ SET(itk_CACHE_ARGS
   "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
   "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
   "-DITK_BUILD_DEFAULT_MODULES:BOOL=OFF"
-  "-DITKV3_COMPATIBILITY:BOOL=OFF"
-  "-DITK_LEGACY_REMOVE:BOOL=ON"
-  "-DITK_FUTURE_LEGACY_REMOVE:BOOL=ON"
+  "-DITKV4_COMPATIBILITY:BOOL=ON"
+  "-DITK_LEGACY_REMOVE:BOOL=OFF"
+  "-DITK_FUTURE_LEGACY_REMOVE:BOOL=OFF"
   "-DModule_ITKRegistrationCommon:BOOL=ON"
   "-DModule_ITKSmoothing:BOOL=ON"
   "-DModule_ITKAnisotropicSmoothing:BOOL=ON"
@@ -88,7 +88,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/itk-4.13.1")
+SET(itk_GIT_TAG "origin/itk5.1.0")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -103,6 +103,6 @@ ExternalProject_Add(ITK_external
 
 # hardcoded, since we need this before ITK's configure step
 ExternalProject_Get_Property(ITK_external INSTALL_DIR)
-SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-4.13" CACHE PATH "")
+SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.1" CACHE PATH "")
 
 MESSAGE(STATUS "ITK_DIR=${ITK_DIR}")
