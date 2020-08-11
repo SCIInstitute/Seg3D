@@ -335,7 +335,7 @@ void ViewerWidget::resizeEvent( QResizeEvent * event )
   // 300px
   if( !this->private_->initialized_size_ )
   {
-    this->private_->minimum_toolbar_width_ = 300;
+    this->private_->minimum_toolbar_width_ = 400;
   }
 
   else
