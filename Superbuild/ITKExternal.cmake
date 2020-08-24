@@ -50,7 +50,7 @@ SET(itk_CACHE_ARGS
   "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
   "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
   "-DITK_BUILD_DEFAULT_MODULES:BOOL=OFF"
-  "-DITKV3_COMPATIBILITY:BOOL=ON"
+  "-DITKV3_COMPATIBILITY:BOOL=OFF"
   "-DModule_ITKRegistrationCommon:BOOL=ON"
   "-DModule_ITKSmoothing:BOOL=ON"
   "-DModule_ITKAnisotropicSmoothing:BOOL=ON"
@@ -86,7 +86,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/itk-5.1.0")
+SET(itk_GIT_TAG "origin/itk5.1.0")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
