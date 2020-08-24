@@ -37,7 +37,6 @@
 #include <itkLSMImageIO.h>
 #include <itkGDCMImageIO.h>
 #include <itkGDCMSeriesFileNames.h>
-#include <itkAnalyzeImageIO.h>
 #include <itkNiftiImageIO.h>
 #include <itkMetaImageIO.h>
 #include <itkImageSeriesReader.h>
@@ -54,6 +53,7 @@
 
 // Application includes
 #include <Application/LayerIO/ITKLayerImporter.h>
+#include <Application/LayerIO/ITKSeriesLayerImporter.h>
 
 #ifdef _WIN32
 #define snprintf _snprintf
@@ -86,10 +86,6 @@ public:
   // READ_DATA
   // Read the data from the file
   bool read_data();
-  
-  // CONVERT_DATA_TYPE:
-  // Copy the data type we get from itk and convert to a Seg3D enum type
-  Core::DataType convert_data_type( std::string& type );
 
   // SCAN_SIMPLE_VOLUME:
   // Scan the data file
@@ -164,48 +160,6 @@ public:
   }
 };
 
-Core::DataType ITKLayerImporterPrivate::convert_data_type( std::string& type )
-{
-  // Convert ITK types into our enum
-  if ( type == "unsigned_char" )
-  {
-    return Core::DataType::UCHAR_E;
-  }
-  else if ( type == "char" )
-  {
-    return Core::DataType::CHAR_E;
-  }
-  else if ( type == "unsigned_short" )
-  {
-    return Core::DataType::USHORT_E;
-  }
-  else if ( type == "short" )
-  {
-    return Core::DataType::SHORT_E;
-  }
-  else if ( type == "unsigned_int" )
-  {
-    return Core::DataType::UINT_E;
-  }
-  else if ( type == "int" )
-  {
-    return Core::DataType::INT_E;
-  }
-  else if ( type == "float" )
-  {
-    return Core::DataType::FLOAT_E;
-  }
-  else if ( type == "double" )
-  {
-    return Core::DataType::DOUBLE_E;
-  }
-  else
-  {
-    // NOTE: Defaults to float if not known
-    return Core::DataType::FLOAT_E;
-  }
-}
-
 template< class ItkImporterType >
 bool ITKLayerImporterPrivate::scan_simple_volume()
 {
@@ -237,9 +191,6 @@ bool ITKLayerImporterPrivate::scan_simple_volume()
     this->importer_->set_error( "ITK crashed while reading file." );
     return false;
   }
-
-  // Grab the information on the data type from the ITK image
-  std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
   
   // Grab the image from the output so we can read its transform
   Core::ITKUCharImageDataHandle image_data;
@@ -255,7 +206,7 @@ bool ITKLayerImporterPrivate::scan_simple_volume()
   }
 
   // Store the information we just extracted from the file in this private class
-  this->data_type_ = this->convert_data_type( type_string );
+  this->data_type_ = convert_data_type(IO->GetComponentType());
   this->grid_transform_ = image_data->get_grid_transform();
   
   // Header was read, hence mark it so we will not read it again.
@@ -298,6 +249,8 @@ bool ITKLayerImporterPrivate::read_header()
   else if ( detect_analyze( extension ) ) 
   {
     this->file_type_ = "Analyze";
+    //Check if scan_simple_volume needs more settings for analyze?
+    //See function SetLegacyAnalyze75Mode - https://itk.org/Doxygen/html/classitk_1_1NiftiImageIO.html
     return this->scan_simple_volume< itk::NiftiImageIO >();
   } 
   else if ( detect_nifti( extension ) ) 

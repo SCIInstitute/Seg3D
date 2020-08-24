@@ -77,10 +77,6 @@ public:
   // READ_DATA
   // Read the data from the file
   bool read_data();
-  
-  // CONVERT_DATA_TYPE:
-  // Copy the data type we get from itk and convert to a Seg3D enum type
-  Core::DataType convert_data_type( std::string& type );
 
   // SCAN_SIMPLE_SERIES:
   // Scan the data file
@@ -117,39 +113,38 @@ public:
   bool read_data_;
 };
 
-
-Core::DataType ITKSeriesLayerImporterPrivate::convert_data_type( std::string& type )
+Core::DataType Seg3D::convert_data_type(itk::CommonEnums::IOComponent type )
 {
   // Convert ITK types into our enum
-  if ( type == "unsigned_char" )
+  if ( type == itk::CommonEnums::IOComponent::UCHAR)
   {
     return Core::DataType::UCHAR_E;
   }
-  else if ( type == "char" )
+  else if ( type == itk::CommonEnums::IOComponent::CHAR )
   {
     return Core::DataType::CHAR_E;
   }
-  else if ( type == "unsigned_short" )
+  else if ( type == itk::CommonEnums::IOComponent::USHORT )
   {
     return Core::DataType::USHORT_E;
   }
-  else if ( type == "short" )
+  else if ( type == itk::CommonEnums::IOComponent::SHORT )
   {
     return Core::DataType::SHORT_E;
   }
-  else if ( type == "unsigned_int" )
+  else if ( type == itk::CommonEnums::IOComponent::UINT)
   {
     return Core::DataType::UINT_E;
   }
-  else if ( type == "int" )
+  else if ( type == itk::CommonEnums::IOComponent::INT)
   {
     return Core::DataType::INT_E;
   }
-  else if ( type == "float" )
+  else if ( type == itk::CommonEnums::IOComponent::FLOAT)
   {
     return Core::DataType::FLOAT_E;
   }
-  else if ( type == "double" )
+  else if ( type == itk::CommonEnums::IOComponent::DOUBLE)
   {
     return Core::DataType::DOUBLE_E;
   }
@@ -235,9 +230,6 @@ bool ITKSeriesLayerImporterPrivate::scan_simple_series()
     this->importer_->set_error( "ITK reader failed." );
     return false;
   }
-
-  // Grab the information on the data type from the ITK image
-  std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
   
   // Grab the image from the output so we can read its transform
   Core::ITKUCharImage2DDataHandle image_data;
@@ -253,7 +245,7 @@ bool ITKSeriesLayerImporterPrivate::scan_simple_series()
   } 
   
   // Store the information we just extracted from the file in this private class
-  this->data_type_ = this->convert_data_type( type_string );
+  this->data_type_ = convert_data_type(IO->GetComponentType());
   this->grid_transform_ = image_data->get_grid_transform();
 
   this->read_header_ = true;
