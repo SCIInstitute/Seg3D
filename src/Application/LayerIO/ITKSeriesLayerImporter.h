@@ -45,6 +45,9 @@
 
 namespace Seg3D
 {
+  // CONVERT_DATA_TYPE:
+  // Copy the data type we get from itk and convert to a Seg3D enum type
+  Core::DataType convert_data_type(itk::CommonEnums::IOComponent type);
 
 // Forward declaration for internals of this class
 class ITKSeriesLayerImporterPrivate;
