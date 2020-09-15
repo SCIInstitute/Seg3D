@@ -551,4 +551,52 @@ void RendererBase::post_renderer_event( boost::function< void () > event )
 #endif
 }
 
+DebugRenderer::DebugRenderer(size_t i) : index_(i)
+{
+  file_.open("/Users/dan/Dev/Seg3D/bin/debugRender.log");
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::initialize()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::resize( int width, int height )
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::redraw_scene()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::redraw_overlay()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::redraw_all()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::activate()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+void DebugRenderer::deactivate()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+}
+
+bool DebugRenderer::is_active()
+{
+  file_ << __FUNCTION__ << "[index: " << index_ << "]" << std::endl;
+  return true;
+}
+
+
 } // end namespace Core

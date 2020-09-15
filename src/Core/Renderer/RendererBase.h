@@ -36,6 +36,7 @@
 #include <Core/EventHandler/EventHandler.h>
 #include <Core/Renderer/AbstractRenderer.h>
 #include <Core/Renderer/PickPoint.h>
+#include <fstream>
 
 namespace Core
 {
@@ -55,7 +56,7 @@ public:
   virtual ~RendererBase();
 
 public:
-  
+
   // INITIALIZE:
   /// Initialize the renderer.
   virtual void initialize();
@@ -80,7 +81,7 @@ public:
   virtual void redraw_all();
 
   // VOLUME_PICK_POINT_SIGNAL_:
-  /// Triggered when user "picks" in volume view.   
+  /// Triggered when user "picks" in volume view.
   typedef boost::signals2::signal< void( Point world_pick_point ) >
     volume_pick_point_signal_type;
   volume_pick_point_signal_type volume_pick_point_signal_;
@@ -159,6 +160,23 @@ protected:
 
 private:
   RendererBasePrivateHandle private_;
+};
+
+class DebugRenderer : public AbstractRenderer
+{
+public:
+    explicit DebugRenderer(size_t i);
+    virtual void initialize() override;
+    virtual void resize( int width, int height ) override;
+    virtual void redraw_scene() override;
+    virtual void redraw_overlay() override;
+    virtual void redraw_all() override;
+    virtual void activate() override;
+    virtual void deactivate() override;
+    virtual bool is_active() override;
+private:
+    size_t index_;
+    std::ofstream file_;
 };
 
 } // end namespace Core

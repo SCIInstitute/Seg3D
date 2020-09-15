@@ -117,7 +117,7 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     // Only create renderer if the render resources are valid.
     if ( Core::RenderResources::Instance()->valid_render_resources() )
     {
-      RendererHandle renderer( new Renderer( j ) );
+      Core::AbstractRendererHandle renderer( new Core::DebugRenderer( j ) );
       renderer->initialize();
       viewer->install_renderer( renderer );
     }
