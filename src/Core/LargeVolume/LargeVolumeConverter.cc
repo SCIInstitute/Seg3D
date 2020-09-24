@@ -650,7 +650,7 @@ bool LargeVolumeConverterPrivate::scan_file( const boost::filesystem::path& file
     return false;
   }
 
-  itk::ImageIOBase* IO = reader->GetImageIO();
+  const itk::ImageIOBase* IO = reader->GetImageIO();
 
   // Grab the information on the data type from the ITK image
   std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );

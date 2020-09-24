@@ -298,7 +298,7 @@ bool ITKLayerImporterPrivate::read_header()
   else if ( detect_analyze( extension ) ) 
   {
     this->file_type_ = "Analyze";
-    return this->scan_simple_volume< itk::AnalyzeImageIO >();
+    return this->scan_simple_volume< itk::NiftiImageIO >();
   } 
   else if ( detect_nifti( extension ) ) 
   {
@@ -440,7 +440,7 @@ bool ITKLayerImporterPrivate::read_data()
   } 
   else if ( detect_analyze( extension ) ) 
   {
-    return this->import_simple_volume<itk::AnalyzeImageIO>();
+    return this->import_simple_volume<itk::NiftiImageIO>();
   } 
   else if ( detect_nifti( extension ) ) 
   {
