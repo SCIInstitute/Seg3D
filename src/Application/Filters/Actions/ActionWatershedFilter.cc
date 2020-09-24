@@ -109,7 +109,7 @@ namespace Seg3D
 typedef double WtrLabelType; //WtrLabelType
 typedef WtrLabelType WtrPixelTypeOut; //WtrPixelTypeOut WtrLabelType // Should be the same
 typedef itk::Image< WtrPixelTypeOut, 3 > WtrImageTypeOut; //WtrImageTypeOut itk::Image< WtrPixelTypeOut, 3 >
-typedef itk::Image< unsigned long int, 3 > WtrImageTypeFilter; //WtrImageTypeFilter itk::Image< unsigned long int, 3 > 
+typedef itk::Image< unsigned long long, 3 > WtrImageTypeFilter; //WtrImageTypeFilter itk::Image< unsigned long long, 3 >
 
 bool ActionWatershedFilter::validate( Core::ActionContextHandle& context )
 {
