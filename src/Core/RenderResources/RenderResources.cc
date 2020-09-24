@@ -100,6 +100,7 @@ public:
 void RenderResourcesPrivate::initialize_gl_log_error(const std::string& error_string)
 {
 	this->gl_capable_ = false;
+  std::cout << error_string << "\n";
 	CORE_LOG_ERROR(error_string);
 }
 
@@ -311,18 +312,19 @@ bool RenderResources::valid_render_resources()
 {
   if (!this->private_->gl_capable_)
   {
+    std::cout << "not gl capable\n";
     return false;
   }
 
   while (this->private_->wait_for_render_resources())
   {
-#ifdef LOG_RENDER_RESOURCE_INIT
+//#ifdef LOG_RENDER_RESOURCE_INIT
 	  std::cout << "Waiting..." << std::endl;
-	  std::cout << std::boolalpha << "resources context: " << (this->private_->resources_context_ != nullptr) << " "
-		  << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << " "
-		  << "delete context: " << (this->private_->delete_context_ != nullptr) << " "
-		  << "GL capable: " << this->private_->gl_capable_ << std::endl;
-#endif
+	  std::cout << std::boolalpha << "resources context: " << (this->private_->resources_context_ != nullptr) << "\n"
+		  << "valid render resources: " << this->private_->resources_context_->valid_render_resources() << "\n"
+		  << "delete context: " << (this->private_->delete_context_ != nullptr) << "\n"
+		  << "GL capable: " << this->private_->gl_capable_ << "\n";
+//#endif
 
 	  boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
   }
@@ -343,6 +345,7 @@ void RenderResources::initialize_on_event_thread()
 
   boost::unique_lock< boost::mutex > lock( this->private_->thread_mutex_ );
   this->private_->resources_context_->create_render_context( this->private_->delete_context_ );
+
   this->private_->delete_context_->make_current();
   this->private_->initialize_gl();
   this->private_->query_video_memory_size();
