@@ -537,6 +537,8 @@ public:\
       case Core::DataType::USHORT_E: this->typed_run_filter<unsigned short>(); break;\
       case Core::DataType::INT_E: this->typed_run_filter<int>(); break;\
       case Core::DataType::UINT_E: this->typed_run_filter<unsigned int>(); break;\
+      case Core::DataType::LONGLONG_E: this->typed_run_filter<long long>(); break;\
+      case Core::DataType::ULONGLONG_E: this->typed_run_filter<unsigned long long>(); break;\
       case Core::DataType::FLOAT_E: this->typed_run_filter<float>(); break;\
       case Core::DataType::DOUBLE_E: this->typed_run_filter<double>(); break;\
     };\
@@ -564,6 +566,8 @@ public:\
       case Core::DataType::USHORT_E: this->typed_run_filter<unsigned short>(); break;\
       case Core::DataType::INT_E: this->typed_run_filter<int>(); break;\
       case Core::DataType::UINT_E: this->typed_run_filter<unsigned int>(); break;\
+      case Core::DataType::LONGLONG_E: this->typed_run_filter<long long>(); break;\
+      case Core::DataType::ULONGLONG_E: this->typed_run_filter<unsigned long long>(); break;\
       case Core::DataType::FLOAT_E: this->typed_run_filter<float>(); break;\
       case Core::DataType::DOUBLE_E: this->typed_run_filter<double>(); break;\
     };\
