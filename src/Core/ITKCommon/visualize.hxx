@@ -112,8 +112,8 @@ visualize_best_fit(const bfs::path & fn_prefix,
                    const base_transform_t * t_ab,
                    const std::vector<const match_t *> & ab,
                    const std::list<unsigned int> & inliers,
-                   const mask_t * a_mask = NULL,
-                   const mask_t * b_mask = NULL);
+                   const mask_t * a_mask = nullptr,
+                   const mask_t * b_mask = nullptr);
 
 //----------------------------------------------------------------
 // visualize_matches_v2

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -31,6 +31,9 @@
 // Created      : 2008/02/21
 // Copyright    : (C) 2008 University of Utah
 // Description  :
+
+// C++
+#include <mutex>
 
 // ITK includes:
 #include <itkImportImageFilter.h>
@@ -49,33 +52,33 @@ namespace bfs=boost::filesystem;
 
 //----------------------------------------------------------------
 // __sharedIRImageLoader
-// 
-static IRImageLoader * __sharedIRImageLoader = NULL;
+//
+static IRImageLoader * __sharedIRImageLoader = nullptr;
 
 //----------------------------------------------------------------
 // __IRImageLoaderSharedImageLoaderLock
-// 
-static itk::SimpleMutexLock __IRImageLoaderSharedImageLoaderLock;
+//
+static std::mutex __IRImageLoaderSharedImageLoaderLock;
 
 //----------------------------------------------------------------
 // IRImageLoader::sharedImageLoader
-// 
+//
 IRImageLoader *
 IRImageLoader::sharedImageLoader()
 {
-  __IRImageLoaderSharedImageLoaderLock.Lock();
-  if (__sharedIRImageLoader == NULL)
+  __IRImageLoaderSharedImageLoaderLock.lock();
+  if (__sharedIRImageLoader == nullptr)
   {
     __sharedIRImageLoader = new IRImageLoader();
   }
-  
-  __IRImageLoaderSharedImageLoaderLock.Unlock();
+
+  __IRImageLoaderSharedImageLoaderLock.unlock();
   return __sharedIRImageLoader;
 }
 
 //----------------------------------------------------------------
 // IRImageLoader::IRImageLoader
-// 
+//
 IRImageLoader::IRImageLoader() :
   SHRINK_FACTOR(1),
   PIXEL_SPACING(1.0),
@@ -85,25 +88,25 @@ IRImageLoader::IRImageLoader() :
 
 //----------------------------------------------------------------
 // IRImageLoader::~IRImageLoader
-// 
+//
 IRImageLoader::~IRImageLoader()
 {}
 
 //----------------------------------------------------------------
 // __IRImageLoaderImageAcessLock
-// 
-static itk::SimpleMutexLock __IRImageLoaderImageAcessLock;
-static itk::SimpleMutexLock __IRImageLoaderMaskAcessLock;
+//
+static std::mutex __IRImageLoaderImageAcessLock;
+static std::mutex __IRImageLoaderMaskAcessLock;
 
 //----------------------------------------------------------------
 // IRImageLoader::setTransformList
-// 
+//
 void
 IRImageLoader::setTransformList(const IRTransformVector & transforms,
                                 const TheTextVector & imageIDs)
 {
-  __IRImageLoaderImageAcessLock.Lock();
-  
+  __IRImageLoaderImageAcessLock.lock();
+
   IRTransformVector::const_iterator transformIter = transforms.begin();
   TheTextVector::const_iterator imageIDIter = imageIDs.begin();
   for (; transformIter != transforms.end(); transformIter++, imageIDIter++)
@@ -111,13 +114,13 @@ IRImageLoader::setTransformList(const IRTransformVector & transforms,
     _transformations[*imageIDIter] = *transformIter;
   }
   _images = imageMap();
-  
-  __IRImageLoaderImageAcessLock.Unlock();
+
+  __IRImageLoaderImageAcessLock.unlock();
 }
 
 //----------------------------------------------------------------
 // IRImageLoader::setShrinkFactor
-// 
+//
 void
 IRImageLoader::setShrinkFactor(unsigned int shrinkFactor)
 {
@@ -126,7 +129,7 @@ IRImageLoader::setShrinkFactor(unsigned int shrinkFactor)
 
 //----------------------------------------------------------------
 // IRImageLoader::shrinkFactor
-// 
+//
 unsigned int
 IRImageLoader::shrinkFactor()
 {
@@ -135,7 +138,7 @@ IRImageLoader::shrinkFactor()
 
 //----------------------------------------------------------------
 // IRImageLoader::setPixelSpacing
-// 
+//
 void
 IRImageLoader::setPixelSpacing(double pixelSpacing)
 {
@@ -144,7 +147,7 @@ IRImageLoader::setPixelSpacing(double pixelSpacing)
 
 //----------------------------------------------------------------
 // IRImageLoader::pixelSpacing
-// 
+//
 double
 IRImageLoader::pixelSpacing()
 {
@@ -153,7 +156,7 @@ IRImageLoader::pixelSpacing()
 
 //----------------------------------------------------------------
 // IRImageLoader::getImageSize
-// 
+//
 vec2d_t
 IRImageLoader::getImageSize(const std::string& imageID,
                             base_transform_t::Pointer transform)
@@ -164,7 +167,7 @@ IRImageLoader::getImageSize(const std::string& imageID,
   dynamic_cast<itk::LegendrePolynomialTransform<double, 1> *>
   (transform.GetPointer());
   const double SCALE = 2.0;
-  
+
   if (legendrePointer.IsNotNull())
   {
     imageSize[0] = legendrePointer->GetFixedParameters()[2] * SCALE;
@@ -174,7 +177,7 @@ IRImageLoader::getImageSize(const std::string& imageID,
   {
     // since this version does not rescale the image it is much faster
     image_t::Pointer image = getFullResImage(imageID);
-    
+
     // first find the size of the tile
     pnt2d_t bbox_min;
     pnt2d_t bbox_max;
@@ -182,15 +185,15 @@ IRImageLoader::getImageSize(const std::string& imageID,
     imageSize = bbox_max - bbox_min;
     imageSize *= _pixelSpacing;
   }
-  
+
   return imageSize;
 }
 
 //----------------------------------------------------------------
 // IRImageLoader::getFullResImage
-// 
+//
 // this does not cache the image
-// 
+//
 image_t::Pointer
 IRImageLoader::getFullResImage(const std::string& imageID)
 {
@@ -208,77 +211,77 @@ IRImageLoader::getFullResImage(const std::string& imageID)
 
 //----------------------------------------------------------------
 // IRImageLoader::getImage
-// 
+//
 image_t::Pointer
 IRImageLoader::getImage(const std::string& imageID)
 {
   imageCheckLoad(imageID);
-  
-  __IRImageLoaderImageAcessLock.Lock();
+
+  __IRImageLoaderImageAcessLock.lock();
   image_t::Pointer image = _images[imageID];
-  __IRImageLoaderImageAcessLock.Unlock();
-  
+  __IRImageLoaderImageAcessLock.unlock();
+
   return image;
 }
 
 //----------------------------------------------------------------
 // IRImageLoader::getMask
-// 
+//
 mask_t::Pointer
 IRImageLoader::getMask(const std::string& maskID)
 {
   maskCheckLoad(maskID);
-  
-  __IRImageLoaderImageAcessLock.Lock();
+
+  __IRImageLoaderImageAcessLock.lock();
   mask_t::Pointer mask = _masks[maskID];
-  __IRImageLoaderImageAcessLock.Unlock();
-  
+  __IRImageLoaderImageAcessLock.unlock();
+
   return mask;
 }
 
 //----------------------------------------------------------------
 // IRImageLoader::imageCheckLoad
-// 
+//
 void
 IRImageLoader::imageCheckLoad(const std::string& imageID)
 {
-  __IRImageLoaderImageAcessLock.Lock();
-  
+  __IRImageLoaderImageAcessLock.lock();
+
   if (_images.find(imageID) != _images.end())
   {
     while (_images[imageID].IsNull())
     {
       // if another thread is already loading this same image,
       // spin until it is loaded
-      __IRImageLoaderImageAcessLock.Unlock();
+      __IRImageLoaderImageAcessLock.unlock();
       sleep_msec(1000);
-      __IRImageLoaderImageAcessLock.Lock();
+      __IRImageLoaderImageAcessLock.lock();
     }
-    
-    __IRImageLoaderImageAcessLock.Unlock();
+
+    __IRImageLoaderImageAcessLock.unlock();
     return;
   }
-  
-  _images[imageID] = NULL;
-  __IRImageLoaderImageAcessLock.Unlock();
-  
+
+  _images[imageID] = nullptr;
+  __IRImageLoaderImageAcessLock.unlock();
+
   image_t::Pointer image = std_tile<image_t>(imageID.c_str(),
                                              _shrinkFactor,
                                              _pixelSpacing);
-  
-  __IRImageLoaderImageAcessLock.Lock();
+
+  __IRImageLoaderImageAcessLock.lock();
   _images[imageID] = image;
-  __IRImageLoaderImageAcessLock.Unlock();
+  __IRImageLoaderImageAcessLock.unlock();
 }
 
 //----------------------------------------------------------------
 // IRImageLoader::maskCheckLoad
-// 
+//
 void
 IRImageLoader::maskCheckLoad(const std::string& maskID)
 {
-  __IRImageLoaderMaskAcessLock.Lock();
-  
+  __IRImageLoaderMaskAcessLock.lock();
+
   if (_masks.find(maskID) != _masks.end())
   {
     if ( !maskID.empty() )
@@ -287,24 +290,24 @@ IRImageLoader::maskCheckLoad(const std::string& maskID)
       {
         // if another thread is already loading this same image,
         // spin until it is loaded
-        __IRImageLoaderMaskAcessLock.Unlock();
+        __IRImageLoaderMaskAcessLock.unlock();
         sleep_msec(1000);
-        __IRImageLoaderMaskAcessLock.Lock();
+        __IRImageLoaderMaskAcessLock.lock();
       }
     }
-    
-    __IRImageLoaderMaskAcessLock.Unlock();
+
+    __IRImageLoaderMaskAcessLock.unlock();
     return;
   }
-  
-  _masks[maskID] = NULL;
-  __IRImageLoaderMaskAcessLock.Unlock();
-  
+
+  _masks[maskID] = nullptr;
+  __IRImageLoaderMaskAcessLock.unlock();
+
   mask_t::Pointer mask;
   if ( !maskID.empty() )
     mask = std_tile<mask_t>(maskID.c_str(), _shrinkFactor, _pixelSpacing);
-  
-  __IRImageLoaderMaskAcessLock.Lock();
+
+  __IRImageLoaderMaskAcessLock.lock();
   _masks[maskID] = mask;
-  __IRImageLoaderMaskAcessLock.Unlock();
+  __IRImageLoaderMaskAcessLock.unlock();
 }

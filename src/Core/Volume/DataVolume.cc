@@ -50,11 +50,11 @@ public:
   bool generate_bricks();
 
   template< class DST_TYPE >
-  void copy_data( DST_TYPE* buffer, size_t width, size_t height, size_t depth, size_t x_start, 
+  void copy_data( DST_TYPE* buffer, size_t width, size_t height, size_t depth, size_t x_start,
     size_t x_end, size_t y_start, size_t y_end, size_t z_start, size_t z_end );
 
   template< class DST_TYPE, class SRC_TYPE >
-  void copy_typed_data( DST_TYPE* buffer, size_t width, size_t height, size_t depth, 
+  void copy_typed_data( DST_TYPE* buffer, size_t width, size_t height, size_t depth,
     size_t x_start, size_t x_end, size_t y_start, size_t y_end, size_t z_start, size_t z_end );
 
   // Handle to where the volume data is really stored
@@ -73,8 +73,8 @@ const unsigned int DataVolumePrivate::BRICK_SIZE_C = 256;
 const unsigned int DataVolumePrivate::OVERLAP_SIZE_C = 2;
 
 template< class DST_TYPE, class SRC_TYPE >
-void DataVolumePrivate::copy_typed_data( DST_TYPE* buffer, size_t width, size_t height, 
-    size_t depth, size_t x_start, size_t x_end, size_t y_start, size_t y_end, 
+void DataVolumePrivate::copy_typed_data( DST_TYPE* buffer, size_t width, size_t height,
+    size_t depth, size_t x_start, size_t x_end, size_t y_start, size_t y_end,
     size_t z_start, size_t z_end )
 {
   const double numeric_min = static_cast<double>( std::numeric_limits< DST_TYPE >::min() );
@@ -120,10 +120,10 @@ void DataVolumePrivate::copy_typed_data( DST_TYPE* buffer, size_t width, size_t 
   // Pad the texture in Z-direction with boundary values
   for ( size_t z = z_end - z_start + 2; z <= depth; ++z )
   {
-    memcpy( buffer + dst_index, buffer + dst_index - texture_stride_z, 
+    memcpy( buffer + dst_index, buffer + dst_index - texture_stride_z,
       sizeof( DST_TYPE ) * texture_stride_z );
     dst_index += texture_stride_z;
-  } 
+  }
 }
 
 template< class DST_TYPE >
@@ -156,12 +156,20 @@ void DataVolumePrivate::copy_data( DST_TYPE* buffer, size_t width, size_t height
     this->copy_typed_data< DST_TYPE, unsigned int >( buffer, width, height, depth,
       x_start, x_end, y_start, y_end, z_start, z_end );
     break;
+  case DataType::LONGLONG_E:
+    this->copy_typed_data< DST_TYPE, long long >( buffer, width, height, depth,
+      x_start, x_end, y_start, y_end, z_start, z_end );
+    break;
+  case DataType::ULONGLONG_E:
+    this->copy_typed_data< DST_TYPE, unsigned long long >( buffer, width, height, depth,
+      x_start, x_end, y_start, y_end, z_start, z_end );
+    break;
   case DataType::FLOAT_E:
     this->copy_typed_data< DST_TYPE, float >( buffer, width, height, depth,
       x_start, x_end, y_start, y_end, z_start, z_end );
     break;
   case DataType::DOUBLE_E:
-    this->copy_typed_data< DST_TYPE, double >( buffer, width, height, depth, 
+    this->copy_typed_data< DST_TYPE, double >( buffer, width, height, depth,
       x_start, x_end, y_start, y_end, z_start, z_end );
     break;
   }
@@ -246,7 +254,7 @@ bool DataVolumePrivate::generate_bricks()
           static_cast< double >( data_y_start ) - 0.5, static_cast< double >( data_z_start ) - 0.5 );
         tex_bbox_min = grid_trans * tex_bbox_min;
         Core::Point tex_bbox_max( static_cast< double >( data_x_start + texture_width - 1.0 ) + 0.5,
-          static_cast< double >( data_y_start + texture_height - 1.0 ) + 0.5, 
+          static_cast< double >( data_y_start + texture_height - 1.0 ) + 0.5,
           static_cast< double >( data_z_start + texture_depth - 1.0 ) + 0.5 );
         tex_bbox_max = grid_trans * tex_bbox_max;
 
@@ -256,9 +264,9 @@ bool DataVolumePrivate::generate_bricks()
         BBox texture_bbox( tex_bbox_min, tex_bbox_max );
         // Texel size in texture space
         Vector texel_size( 1.0 / texture_width, 1.0 / texture_height, 1.0 / texture_depth );
-        
-        pixel_buffer->set_buffer_data( sizeof( DataVolumeBrick::data_type ) * 
-          texture_width * texture_height * texture_depth, NULL, GL_STREAM_DRAW );
+
+        pixel_buffer->set_buffer_data( sizeof( DataVolumeBrick::data_type ) *
+          texture_width * texture_height * texture_depth, nullptr, GL_STREAM_DRAW );
         DataVolumeBrick::data_type* buffer = reinterpret_cast< DataVolumeBrick::data_type* >(
           pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
         if ( buffer == 0 )
@@ -267,7 +275,7 @@ bool DataVolumePrivate::generate_bricks()
           pixel_buffer->unbind();
           return false;
         }
-        this->copy_data( buffer, texture_width, texture_height, texture_depth, data_x_start, 
+        this->copy_data( buffer, texture_width, texture_height, texture_depth, data_x_start,
           data_x_end, data_y_start, data_y_end, data_z_start, data_z_end );
         pixel_buffer->unmap_buffer();
         Texture3DHandle tex( new Texture3D );
@@ -277,12 +285,12 @@ bool DataVolumePrivate::generate_bricks()
         tex->set_wrap_s( GL_CLAMP_TO_EDGE );
         tex->set_wrap_t( GL_CLAMP_TO_EDGE );
         tex->set_wrap_r( GL_CLAMP_TO_EDGE );
-        tex->set_image( static_cast< int >( texture_width ), static_cast< int >( texture_height ), 
+        tex->set_image( static_cast< int >( texture_width ), static_cast< int >( texture_height ),
           static_cast< int >( texture_depth ), DataVolumeBrick::TEXTURE_FORMAT_C,
           0, GL_ALPHA, DataVolumeBrick::TEXTURE_DATA_TYPE_C );
         tex->unbind();
 
-        DataVolumeBrickHandle brick( new DataVolumeBrick( brick_bbox, 
+        DataVolumeBrickHandle brick( new DataVolumeBrick( brick_bbox,
           texture_bbox, texel_size, tex ) );
         this->bricks_.push_back( brick );
       }
@@ -302,9 +310,9 @@ bool DataVolumePrivate::generate_bricks()
 // Class DataVolumePrivate
 //////////////////////////////////////////////////////////////////////////
 
-DataVolume::DataVolume( const GridTransform& grid_transform, 
+DataVolume::DataVolume( const GridTransform& grid_transform,
              const DataBlockHandle& data_block ) :
-  Volume( grid_transform ), 
+  Volume( grid_transform ),
   private_( new DataVolumePrivate )
 {
   this->private_->data_block_ = data_block;
@@ -389,7 +397,7 @@ NrrdDataHandle DataVolume::convert_to_nrrd()
 }
 
 DataBlock::generation_type DataVolume::get_generation() const
-{ 
+{
   if ( this->private_->data_block_ )
   {
     return this->private_->data_block_->get_generation();
@@ -431,21 +439,21 @@ void DataVolume::unregister_data()
 {
   if ( this->private_->data_block_ && this->private_->data_block_->get_generation() != -1 )
   {
-    Core::DataBlockManager::Instance()->unregister_datablock( 
+    Core::DataBlockManager::Instance()->unregister_datablock(
       this->private_->data_block_->get_generation() );
   }
 }
 
-bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename, 
+bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
                 DataVolumeHandle& volume, std::string& error )
 {
   volume.reset();
-  
+
   NrrdDataHandle nrrd;
   if ( ! ( NrrdData::LoadNrrd( filename.string(), nrrd, error ) ) ) return false;
-  
+
   Core::DataBlockHandle datablock( Core::NrrdDataBlock::New( nrrd ) );
-  
+
   // Load the datablock and trust any histogram recorded inside of it.
   datablock->set_histogram( nrrd->get_histogram( true ) );
 
@@ -453,31 +461,31 @@ bool DataVolume::LoadDataVolume( const boost::filesystem::path& filename,
   return true;
 }
 
-bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath, 
-                DataVolumeHandle& volume, std::string& error, 
+bool DataVolume::SaveDataVolume( const boost::filesystem::path& filepath,
+                DataVolumeHandle& volume, std::string& error,
                 bool compress, int level )
 {
-  NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData( 
+  NrrdDataHandle nrrd = NrrdDataHandle( new NrrdData(
     volume->private_->data_block_, volume->get_grid_transform() ) );
 
   nrrd->set_histogram( volume->private_->data_block_->get_histogram() );
-  
+
   DataBlock::shared_lock_type slock( volume->private_->data_block_->get_mutex() );
-  if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error, compress, level ) ) ) 
+  if ( ! ( NrrdData::SaveNrrd( filepath.string(), nrrd, error, compress, level ) ) )
   {
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   return true;
 }
 
-bool DataVolume::CreateEmptyData( GridTransform grid_transform, 
+bool DataVolume::CreateEmptyData( GridTransform grid_transform,
   DataType data_type, DataVolumeHandle& data )
 {
   DataBlockHandle data_block = StdDataBlock::New( grid_transform, data_type ) ;
   data_block->clear();
-  
+
   data = DataVolumeHandle( new DataVolume( grid_transform, data_block ) );
   return true;
 }
@@ -490,7 +498,7 @@ bool DataVolume::CreateInvalidData( GridTransform grid_transform, DataVolumeHand
   return true;
 }
 
-bool DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume, 
+bool DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume,
                       DataVolumeHandle& dst_volume )
 {
   const GridTransform& src_transform = src_volume->get_grid_transform();
@@ -510,25 +518,25 @@ bool DataVolume::ConvertToCanonicalVolume( const DataVolumeHandle& src_volume,
   }
 
   dst_volume.reset( new DataVolume( dst_transform, dst_data_block ) );
-  
+
   return true;
 }
 
-bool DataVolume::DuplicateVolume( const DataVolumeHandle& src_data_volume, 
+bool DataVolume::DuplicateVolume( const DataVolumeHandle& src_data_volume,
     DataVolumeHandle& dst_data_volume )
 {
   if ( !src_data_volume ) return false;
-  
+
   DataBlockHandle dst_data_block;
-  
+
   if ( !( DataBlock::Duplicate( src_data_volume->get_data_block(), dst_data_block ) ) )
   {
     return false;
   }
-  
-  dst_data_volume = DataVolumeHandle( new DataVolume( 
+
+  dst_data_volume = DataVolumeHandle( new DataVolume(
     src_data_volume->get_grid_transform(), dst_data_block ) );
-  
+
   if ( !dst_data_volume ) return false;
   return true;
 }
@@ -564,7 +572,7 @@ void DataVolume::get_bricks( std::vector< DataVolumeBrickHandle >& bricks )
   {
     return;
   }
-  
+
   {
     DataVolumePrivate::lock_type lock( this->private_->get_mutex() );
     if ( !this->private_->bricks_generated_ )

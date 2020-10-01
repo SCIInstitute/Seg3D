@@ -44,7 +44,7 @@
 #include <vector>
 
 // ITK includes:
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 
 
 namespace itk

@@ -592,20 +592,20 @@ bool ProjectPrivate::initialize_session_database()
 
   // Create table for storing the database version
   sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT NULL PRIMARY KEY);";
+    "(version INTEGER NOT nullptr PRIMARY KEY);";
 
   // Create table for sessions
   sql_statements += "CREATE TABLE session "
-    "(session_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "session_name TEXT NOT NULL, "
+    "(session_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "session_name TEXT NOT nullptr, "
     "session_file TEXT, "
-    "user_id TEXT NOT NULL, "
-    "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);";
+    "user_id TEXT NOT nullptr, "
+    "timestamp TEXT NOT nullptr DEFAULT CURRENT_TIMESTAMP);";
 
   // Create table for storing data files (generation numbers) used by each session
   sql_statements += "CREATE TABLE session_data "
-    "(session_id INTEGER NOT NULL REFERENCES session(session_id) ON DELETE CASCADE, "
-    "data_generation INTEGER NOT NULL, "
+    "(session_id INTEGER NOT nullptr REFERENCES session(session_id) ON DELETE CASCADE, "
+    "data_generation INTEGER NOT nullptr, "
     "PRIMARY KEY (session_id, data_generation));";
 
   // Create indices for the session_data table
@@ -631,25 +631,25 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing the database version
   sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT NULL PRIMARY KEY);";
+    "(version INTEGER NOT nullptr PRIMARY KEY);";
 
   // Create table for user names
   sql_statements += "CREATE TABLE user "
-    "(user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "user_name TEXT NOT NULL UNIQUE);";
+    "(user_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "user_name TEXT NOT nullptr UNIQUE);";
 
   // Create table for action names
   sql_statements += "CREATE TABLE action "
-    "(action_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "action_name TEXT NOT NULL UNIQUE);";
+    "(action_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "action_name TEXT NOT nullptr UNIQUE);";
 
   // Create table for storing provenance steps
   sql_statements += "CREATE TABLE provenance_step "
-    "(prov_step_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "action_id INTEGER NOT NULL REFERENCES action(action_id) ON DELETE CASCADE, "
-    "action_params TEXT NOT NULL, "
-    "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, "
-    "user_id INTEGER NOT NULL REFERENCES user(user_id) ON DELETE CASCADE);";
+    "(prov_step_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "action_id INTEGER NOT nullptr REFERENCES action(action_id) ON DELETE CASCADE, "
+    "action_params TEXT NOT nullptr, "
+    "timestamp TEXT NOT nullptr DEFAULT CURRENT_TIMESTAMP, "
+    "user_id INTEGER NOT nullptr REFERENCES user(user_id) ON DELETE CASCADE);";
 
   // Create index on provenance_step(action_id)
   sql_statements += "CREATE INDEX action_id_index ON provenance_step(action_id);";
@@ -659,26 +659,26 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing inputs of each provenance step
   sql_statements += "CREATE TABLE provenance_input "
-    "(input_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT NULL);";
+    "(input_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT nullptr);";
 
   // Create index on prov_step_id column of provenance_input
   sql_statements += "CREATE INDEX prov_input_index ON provenance_input(prov_step_id);";
 
   // Create table for storing outputs of each provenance step
   sql_statements += "CREATE TABLE provenance_output "
-    "(output_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT NULL UNIQUE);";
+    "(output_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT nullptr UNIQUE);";
 
   // Create index on prov_step_id column of provenance_output
   sql_statements += "CREATE INDEX prov_output_index ON provenance_output(prov_step_id);";
 
   // Create table for storing deleted provenance IDs of each provenance step
   sql_statements += "CREATE TABLE provenance_replaced "
-    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT NULL, "
+    "(prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT nullptr, "
     "PRIMARY KEY (prov_step_id, prov_id));";
 
   // Create index on prov_step_id column of provenance_replaced
@@ -686,8 +686,8 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing outputs of each provenance step
   sql_statements += "CREATE TABLE provenance_inputfiles_cache "
-    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "inputfiles_cache_id INTEGER NOT NULL PRIMARY KEY);";
+    "(prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "inputfiles_cache_id INTEGER NOT nullptr PRIMARY KEY);";
 
   // Create index on prov_step_id column of provenance_output
   sql_statements += "CREATE INDEX prov_inputfiles_cache_index ON provenance_inputfiles_cache(prov_step_id);";
@@ -752,14 +752,14 @@ bool ProjectPrivate::initialize_note_database()
 
   // Create table for the database version
   sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT NULL PRIMARY KEY);";
+    "(version INTEGER NOT nullptr PRIMARY KEY);";
 
   // Create table for notes
   sql_statements += "CREATE TABLE note "
-    "(note_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-    "note TEXT NOT NULL, "
-    "user_id TEXT NOT NULL, "
-    "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);";
+    "(note_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
+    "note TEXT NOT nullptr, "
+    "user_id TEXT NOT nullptr, "
+    "timestamp TEXT NOT nullptr DEFAULT CURRENT_TIMESTAMP);";
 
   // Set the database version to 1
   sql_statements += "INSERT INTO database_version VALUES (1);";
@@ -1208,7 +1208,7 @@ bool ProjectPrivate::rename_version1_session_files()
       continue;
     }
 
-    sql_str = "UPDATE session SET session_file = NULL WHERE session_id = " +
+    sql_str = "UPDATE session SET session_file = nullptr WHERE session_id = " +
       Core::ExportToString( session_id ) + ";";
     if ( !this->session_database_.run_sql_statement( sql_str, error ) )
     {

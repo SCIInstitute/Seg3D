@@ -49,10 +49,10 @@ the_transaction_t::the_transaction_t():
   mutex_(the_mutex_interface_t::create()),
   request_(NOTHING_E),
   state_(PENDING_E),
-  notify_cb_(NULL),
-  notify_cb_data_(NULL),
-  status_cb_(NULL),
-  status_cb_data_(NULL)
+  notify_cb_(nullptr),
+  notify_cb_data_(nullptr),
+  status_cb_(nullptr),
+  status_cb_data_(nullptr)
 {}
 
 //----------------------------------------------------------------
@@ -60,10 +60,10 @@ the_transaction_t::the_transaction_t():
 // 
 the_transaction_t::~the_transaction_t()
 {
-  if (mutex_ != NULL)
+  if (mutex_ != nullptr)
   {
     mutex_->delete_this();
-    mutex_ = NULL;
+    mutex_ = nullptr;
   }
 }
 
@@ -78,7 +78,7 @@ the_transaction_t::notify(the_transaction_handler_t * handler,
   set_state(s);
   blab(handler, message);
   
-  if (notify_cb_ == NULL)
+  if (notify_cb_ == nullptr)
   {
     handler->handle(this, s);
   }
@@ -95,9 +95,9 @@ void
 the_transaction_t::blab(the_transaction_handler_t * handler,
       const char * message)
 {
-  if (message == NULL) return;
+  if (message == nullptr) return;
   
-  if (status_cb_ == NULL)
+  if (status_cb_ == nullptr)
   {
     handler->blab(message);
   }
@@ -113,7 +113,7 @@ the_transaction_t::blab(the_transaction_handler_t * handler,
 bool
 the_transaction_t::callback_request()
 {
-  if (status_cb_ == NULL)
+  if (status_cb_ == nullptr)
   {
     return false;
   }
@@ -125,7 +125,7 @@ the_transaction_t::callback_request()
   }
   
   // execute the status callback:
-  status_cb_(status_cb_data_, this, NULL);
+  status_cb_(status_cb_data_, this, nullptr);
   
   while (true)
   {

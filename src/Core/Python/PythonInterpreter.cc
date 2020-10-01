@@ -613,7 +613,7 @@ void PythonInterpreter::run_file( const std::string& file_name )
   }
 
   FILE* fp = _Py_fopen(file_name.c_str(), "r+");
-  if ( fp != NULL )
+  if ( fp != nullptr )
   {
     PyRun_SimpleFileEx( fp, file_name.c_str(), 1 );
   }

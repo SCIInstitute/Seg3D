@@ -78,7 +78,7 @@ void TransferFunctionPrivate::build_lookup_texture()
   PixelBufferObjectHandle pbo( new PixelUnpackBuffer );
   pbo->bind();
   pbo->set_buffer_data( LUT_SIZE_C * 4 * sizeof( unsigned char ) * 2,
-    NULL, GL_STREAM_DRAW );
+    nullptr, GL_STREAM_DRAW );
   unsigned char* buffer = reinterpret_cast< unsigned char* >(
     pbo->map_buffer( GL_WRITE_ONLY ) );
 

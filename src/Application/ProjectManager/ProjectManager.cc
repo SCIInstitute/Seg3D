@@ -114,14 +114,14 @@ bool ProjectManagerPrivate::initialize_project_database()
 
   // Create table for storing the database version
   sql_statements << "CREATE TABLE database_version "
-                 << "(version INTEGER NOT NULL PRIMARY KEY);";
+                 << "(version INTEGER NOT nullptr PRIMARY KEY);";
 
   // Create table for storing projects
   sql_statements << "CREATE TABLE project "
-                 << "(project_id INTEGER NOT NULL PRIMARY KEY, "
-                 << "name TEXT NOT NULL, "
-                 << "path TEXT NOT NULL UNIQUE, "
-                 << "last_access_time INTEGER NOT NULL);";
+                 << "(project_id INTEGER NOT nullptr PRIMARY KEY, "
+                 << "name TEXT NOT nullptr, "
+                 << "path TEXT NOT nullptr UNIQUE, "
+                 << "last_access_time INTEGER NOT nullptr);";
 
   // Set the database version to 2
   sql_statements << "INSERT INTO database_version VALUES ("

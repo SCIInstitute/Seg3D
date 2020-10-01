@@ -289,7 +289,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
         img = shrink<image_t>(img, 2);
         tile_pyramid[i][j] = img;
         
-        if (mask_pyramid[i + 1][j].GetPointer() != NULL)
+        if (mask_pyramid[i + 1][j].GetPointer() != nullptr)
         {
           mask_t::ConstPointer msk(shrink<mask_t>(mask_pyramid[i + 1][j], 2));
           mask_pyramid[i][j] = msk;
@@ -368,7 +368,7 @@ ActionFFTFilter::run( Core::ActionContextHandle& context, Core::ActionResultHand
       std::cerr << "UNMATCHED: " << *iterator_at_index(in, i)
       << ", ignoring..."
       << std::endl;
-      image[i] = NULL;
+      image[i] = nullptr;
       num_unmatched++;
     }
     std::cerr << std::endl;

@@ -481,7 +481,7 @@ void SpeedlineTool::deactivate()
 //        < DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
 //        this->gradient_state_->get() ) );
 //
-//      if ( volume_slice != NULL )
+//      if ( volume_slice != nullptr )
 //      {
 //        this->private_->slice_no_[ i ]  = volume_slice->get_slice_number();
 //      } 

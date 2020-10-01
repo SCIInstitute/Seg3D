@@ -196,7 +196,7 @@ refine_one_pair(const image_t * i0,
   // setup the masks:
   typedef itk::ImageMaskSpatialObject<2> mask_so_t;
   mask_t::ConstPointer fi_mask = m0;
-  if (m0 != NULL)
+  if (m0 != nullptr)
   {
     mask_so_t::Pointer fi_mask_so = mask_so_t::New();
     fi_mask_so->SetImage(fi_mask);
@@ -204,7 +204,7 @@ refine_one_pair(const image_t * i0,
   }
   
   mask_t::ConstPointer mi_mask = m1;
-  if (m1 != NULL)
+  if (m1 != nullptr)
   {
     mask_so_t::Pointer mi_mask_so = mask_so_t::New();
     mi_mask_so->SetImage(mi_mask);
@@ -525,7 +525,7 @@ fast_variance(const image_t * a,
               const base_transform_t * t_ab,
               double samples_per_64x64 = 128.0)
 {
-  if (t_ab == NULL) return std::numeric_limits<double>::max();
+  if (t_ab == nullptr) return std::numeric_limits<double>::max();
   
   image_t::SpacingType a_sp = a->GetSpacing();
   image_t::SizeType a_sz = a->GetLargestPossibleRegion().GetSize();

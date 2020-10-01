@@ -85,8 +85,8 @@ private:
 struct the_thread_pool_data_t
 {
   the_thread_pool_data_t():
-    parent_(NULL),
-    thread_(NULL),
+    parent_(nullptr),
+    thread_(nullptr),
     id_(~0u)
   {}
   

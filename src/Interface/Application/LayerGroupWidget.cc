@@ -353,7 +353,7 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
   event->setAccepted( true );
   
   LayerGroupWidget* source_widget = dynamic_cast< LayerGroupWidget* >( event->source() );
-  if( source_widget != NULL && source_widget != this )
+  if( source_widget != nullptr && source_widget != this )
   {
     source_widget->private_->set_drop_target( this ); 
     event->setDropAction( Qt::MoveAction );
@@ -365,7 +365,7 @@ void LayerGroupWidget::dropEvent( QDropEvent* event )
 void LayerGroupWidget::dragEnterEvent( QDragEnterEvent* event)
 {
   LayerGroupWidget* source_widget = dynamic_cast< LayerGroupWidget* >( event->source() );
-  if( source_widget != NULL && source_widget != this )
+  if( source_widget != nullptr && source_widget != this )
   {
     this->private_->enable_drop_space( true );
   }

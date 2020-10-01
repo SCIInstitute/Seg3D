@@ -146,6 +146,8 @@ Core::DataType Matlab73LayerImporterPrivate::convert_type( const std::string& ma
   else if (matlab_type == "uint16") return Core::DataType::USHORT_E;
   else if (matlab_type == "int32")  return Core::DataType::INT_E;
   else if (matlab_type == "uint32") return Core::DataType::UINT_E;
+  else if (matlab_type == "int64")  return Core::DataType::LONGLONG_E;
+  else if (matlab_type == "uint64") return Core::DataType::ULONGLONG_E;
   else if (matlab_type == "single") return Core::DataType::FLOAT_E;
   else if (matlab_type == "double") return Core::DataType::DOUBLE_E;
   else                              return Core::DataType::UNKNOWN_E;
@@ -474,7 +476,7 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
   // get full space for dataset
   H5::DataSpace dataspace = dataset.getSpace();
   int rank = dataspace.getSimpleExtentNdims();
-  int ndims = dataspace.getSimpleExtentDims( dims, NULL);
+  int ndims = dataspace.getSimpleExtentDims( dims, nullptr);
   size_t length = this->data_block_->get_size() * Core::GetSizeDataType( this->data_type_ );
 
 
@@ -519,6 +521,18 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
     {
       unsigned int* data = reinterpret_cast<unsigned int*>( this->data_block_->get_data() );
       dataset.read(data, H5::PredType::NATIVE_UINT, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::LONGLONG_E:
+    {
+      long long* data = reinterpret_cast<long long*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_LONGLONG, memspace, dataspace);
+      break;
+    }
+    case Core::DataType::ULONGLONG_E:
+    {
+      unsigned long long* data = reinterpret_cast<unsigned long long*>( this->data_block_->get_data() );
+      dataset.read(data, H5::PredType::NATIVE_ULONGLONG, memspace, dataspace);
       break;
     }
     case Core::DataType::FLOAT_E:

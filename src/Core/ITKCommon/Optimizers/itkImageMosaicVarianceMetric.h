@@ -40,7 +40,7 @@
 #include <itkTransform.h>
 #include <itkInterpolateImageFunction.h>
 #include <itkSingleValuedCostFunction.h>
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 #include <itkGradientRecursiveGaussianImageFilter.h>
 
 /** .

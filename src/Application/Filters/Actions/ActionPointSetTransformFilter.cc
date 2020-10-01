@@ -156,7 +156,7 @@ public:
 
 		  resampler->Update();
 
-		  if (resampler->GetOutput() != NULL)
+		  if (resampler->GetOutput() != nullptr)
 		  {
 			  this->insert_itk_image_into_layer(dst_layer, resampler->GetOutput());
 		  }

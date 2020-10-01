@@ -177,7 +177,7 @@ refine_one_pair(const image_t * i0,
   // setup the masks:
   typedef itk::ImageMaskSpatialObject<2> mask_so_t;
   mask_t::ConstPointer fi_mask = m0;
-  if (m0 != NULL)
+  if (m0 != nullptr)
   {
     mask_so_t::Pointer fi_mask_so = mask_so_t::New();
     fi_mask_so->SetImage(fi_mask);
@@ -185,7 +185,7 @@ refine_one_pair(const image_t * i0,
   }
   
   mask_t::ConstPointer mi_mask = m1;
-  if (m1 != NULL)
+  if (m1 != nullptr)
   {
     mask_so_t::Pointer mi_mask_so = mask_so_t::New();
     mi_mask_so->SetImage(mi_mask);
@@ -595,7 +595,7 @@ fast_variance(const image_t * a,
               const base_transform_t * t_ab,
               double samples_per_64x64 = 128.0)
 {
-  if (t_ab == NULL) return std::numeric_limits<double>::max();
+  if (t_ab == nullptr) return std::numeric_limits<double>::max();
   
   image_t::SpacingType a_sp = a->GetSpacing();
   image_t::SizeType a_sz = a->GetLargestPossibleRegion().GetSize();
@@ -761,13 +761,13 @@ brute_force(const bool & brute_force_rotation,
     
     // resample the moving image:
     image_t::Pointer b_warped = warp<image_t>(b, rot.GetPointer());
-    mask_t::Pointer mb_warped = NULL;
-    if ( mb != NULL )
+    mask_t::Pointer mb_warped = nullptr;
+    if ( mb != nullptr )
       mb_warped = warp<mask_t>(mb, rot.GetPointer());
     static const pnt2d_t zero = pnt2d(0, 0);
     vec2d_t shift = b_warped->GetOrigin() - zero;
     b_warped->SetOrigin(zero);
-    if ( mb != NULL )
+    if ( mb != nullptr )
       mb_warped->SetOrigin(zero);
     
 //#if 0 // def DEBUG_EVERYTHING

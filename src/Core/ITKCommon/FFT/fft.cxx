@@ -96,13 +96,13 @@ namespace itk_fft
   {
   public:
     fft_cache_t():
-    fwd_(NULL),
-    inv_(NULL),
+    fwd_(nullptr),
+    inv_(nullptr),
     w_(0),
     h_(0),
     h_complex_(0),
     h_padded_(0),
-    buffer_(NULL)
+    buffer_(nullptr)
     {}
     
     ~fft_cache_t()
@@ -118,13 +118,13 @@ namespace itk_fft
         the_lock_t<the_mutex_interface_t> lock(fftw_mutex());
         
         fftwf_destroy_plan(fwd_);
-        fwd_ = NULL;
+        fwd_ = nullptr;
         
         fftwf_destroy_plan(inv_);
-        inv_ = NULL;
+        inv_ = nullptr;
         
         fftwf_free(buffer_);
-        buffer_ = NULL;
+        buffer_ = nullptr;
       }
       
       w_ = 0;
@@ -193,7 +193,7 @@ namespace itk_fft
   // fft_data_t::fft_data_t
   // 
   fft_data_t::fft_data_t(const itk_image_t::Pointer & real):
-  data_(NULL),
+  data_(nullptr),
   nx_(0),
   ny_(0)
   {
@@ -204,7 +204,7 @@ namespace itk_fft
   // fft_data_t::fft_data_t
   // 
   fft_data_t::fft_data_t(const unsigned int w, const unsigned int h):
-  data_(NULL),
+  data_(nullptr),
   nx_(0),
   ny_(0)
   {
@@ -216,7 +216,7 @@ namespace itk_fft
   // 
   fft_data_t::fft_data_t(const itk_image_t::Pointer & real,
                          const itk_image_t::Pointer & imag):
-  data_(NULL),
+  data_(nullptr),
   nx_(0),
   ny_(0)
   {
@@ -227,7 +227,7 @@ namespace itk_fft
   // fft_data_t::fft_data_t
   // 
   fft_data_t::fft_data_t(const fft_data_t & data):
-  data_(NULL),
+  data_(nullptr),
   nx_(0),
   ny_(0)
   {
@@ -242,7 +242,7 @@ namespace itk_fft
   {
 //    assert(this != &data);
     
-    if (data.data_ != NULL)
+    if (data.data_ != nullptr)
     {
       resize(data.nx_, data.ny_);
       data_ = (fft_complex_t *)(memcpy(data_,
@@ -263,8 +263,8 @@ namespace itk_fft
   void
   fft_data_t::cleanup()
   {
-    if (data_ != NULL) fftwf_free((fft_complex_t *)(data_));
-    data_ = NULL;
+    if (data_ != nullptr) fftwf_free((fft_complex_t *)(data_));
+    data_ = nullptr;
     nx_ = 0;
     ny_ = 0;
   }
@@ -279,10 +279,10 @@ namespace itk_fft
     const unsigned int old_sz = nx_ * ny_;
     if (old_sz == new_sz) return;
     
-    if (data_ != NULL) fftwf_free((fft_complex_t *)(data_));
+    if (data_ != nullptr) fftwf_free((fft_complex_t *)(data_));
     data_ = static_cast<fft_complex_t *>( fftwf_malloc(new_sz * sizeof(fft_complex_t)) );
-//    assert(data_ != NULL);
-    if (data_ == NULL)
+//    assert(data_ != nullptr);
+    if (data_ == nullptr)
     {
       CORE_THROW_EXCEPTION("fftwf_malloc failed");
     }
@@ -341,7 +341,7 @@ namespace itk_fft
     }
     
     // iterate over the imaginary component image:
-    if (imag.GetPointer() == NULL) return;
+    if (imag.GetPointer() == nullptr) return;
     itex = itex_t(imag, real->GetLargestPossibleRegion());
     for (itex.GoToBegin(); !itex.IsAtEnd(); ++itex)
     {

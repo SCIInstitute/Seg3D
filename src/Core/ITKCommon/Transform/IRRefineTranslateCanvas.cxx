@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::IRRefineTranslateCanvas
-// 
+//
 IRRefineTranslateCanvas::IRRefineTranslateCanvas()
 {
   this->maxOffset[0] = std::numeric_limits<double>::max();
@@ -58,13 +58,13 @@ IRRefineTranslateCanvas::IRRefineTranslateCanvas()
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::~IRRefineTranslateCanvas
-// 
+//
 IRRefineTranslateCanvas::~IRRefineTranslateCanvas()
 {}
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::setBaseTransforms
-// 
+//
 void
 IRRefineTranslateCanvas::
 setBaseTransforms(const TrasformBasePointerVector & transforms,
@@ -73,7 +73,7 @@ setBaseTransforms(const TrasformBasePointerVector & transforms,
 {
   TrasformBasePointerVector::const_iterator transformIter =
   transforms.begin();
-  
+
   TheTextVector::const_iterator imageIDIter = imageIDs.begin();
   TheTextVector::const_iterator maskIDIter = maskIDs.begin();
   for (; transformIter != transforms.end(); transformIter++, imageIDIter++, maskIDIter++)
@@ -84,7 +84,7 @@ setBaseTransforms(const TrasformBasePointerVector & transforms,
 }
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::setMaxOffset
-// 
+//
 void
 IRRefineTranslateCanvas::setMaxOffset(const double maxOffset[], bool isPercent)
 {
@@ -95,7 +95,7 @@ IRRefineTranslateCanvas::setMaxOffset(const double maxOffset[], bool isPercent)
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::setBlackMaskPercent
-// 
+//
 void
 IRRefineTranslateCanvas::setBlackMaskPercent(const double blackMaskPercent[])
 {
@@ -105,7 +105,7 @@ IRRefineTranslateCanvas::setBlackMaskPercent(const double blackMaskPercent[])
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::doClahe
-// 
+//
 void
 IRRefineTranslateCanvas::doClahe( bool _doClahe )
 {
@@ -115,7 +115,7 @@ IRRefineTranslateCanvas::doClahe( bool _doClahe )
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::fillTransformAndImageIDVectors
-// 
+//
 void
 IRRefineTranslateCanvas::
 fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
@@ -136,10 +136,10 @@ fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::fillTransformAndImageIDVectors
-// 
+//
 // silly other version that uses a list because fo some reason
 // paul likes using lists for the image IDs........
-// 
+//
 void
 IRRefineTranslateCanvas::
 fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
@@ -163,12 +163,12 @@ fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::buildConnections
-// 
+//
 void
 IRRefineTranslateCanvas::buildConnections( bool verbose )
 {
   _preProcessedConnectionVector.clear();
-  
+
   IRTransformationVector::const_iterator transformIter1, transformIter2;
   for (transformIter1 = _transformationVector.begin();
        transformIter1 != _transformationVector.end(); transformIter1++)
@@ -180,10 +180,10 @@ IRRefineTranslateCanvas::buildConnections( bool verbose )
       {
         continue;
       }
-      
+
       if ((*transformIter1)->overlapsTransform(*transformIter2))
       {
-        
+
         _preProcessedConnectionVector.push_back(new IRConnection(*transformIter1,
                                                                  *transformIter2,
                                                                  verbose));
@@ -191,13 +191,13 @@ IRRefineTranslateCanvas::buildConnections( bool verbose )
       }
     }
   }
-  
+
   return;
 }
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::fillGroupIDs
-// 
+//
 void
 IRRefineTranslateCanvas::fillGroupIDs()
 {
@@ -218,7 +218,7 @@ IRRefineTranslateCanvas::fillGroupIDs()
 //
 // removes transforms that are in a group that make up
 // less than cutoffPercentage of the mosaic
-// 
+//
 void
 IRRefineTranslateCanvas::pruneSmallGroups(float cutoffPercentage)
 {
@@ -228,7 +228,7 @@ IRRefineTranslateCanvas::pruneSmallGroups(float cutoffPercentage)
   {
     largestGroupID = std::max<long>(largestGroupID, (*iter)->groupID());
   }
-  
+
   std::vector<float> groupCounts;
   groupCounts.resize(largestGroupID + 1);
   for (std::vector<float>::iterator iter = groupCounts.begin();
@@ -236,15 +236,15 @@ IRRefineTranslateCanvas::pruneSmallGroups(float cutoffPercentage)
   {
     *iter = 0.0f;
   }
-  
+
   for (IRTransformationVector::iterator iter = _transformationVector.begin();
        iter != _transformationVector.end(); ++iter)
   {
     groupCounts[(*iter)->groupID()] += 1.0f;
   }
-  
+
   float transformCount = _transformationVector.size();
-  
+
   for (size_t i = 0; i < groupCounts.size(); i++)
   {
     if (groupCounts[i] / transformCount < cutoffPercentage)
@@ -256,46 +256,46 @@ IRRefineTranslateCanvas::pruneSmallGroups(float cutoffPercentage)
 
 //----------------------------------------------------------------
 // IRTransaction
-// 
+//
 class IRTransaction : public the_transaction_t
 {
 public:
   IRTransaction(IRRefineTranslateCanvas * canvas):
   canvas_(canvas)
   {}
-  
+
   // virtual:
   void execute(the_thread_interface_t * thread)
   {
     the_terminator_t terminator("IRTransaction");
     canvas_->findOffsetsThreadEntry();
   }
-  
+
   IRRefineTranslateCanvas * canvas_;
 };
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::findIdealTransformationOffsets
-// 
+//
 void
 IRRefineTranslateCanvas::findIdealTransformationOffsets(unsigned int numThreads)
 {
   the_thread_pool_t thread_pool(numThreads);
   thread_pool.set_idle_sleep_duration(50); // 50 usec
-  
+
   for(unsigned int i = 0; i < numThreads; i++)
   {
     IRTransaction * t = new IRTransaction(this);
     thread_pool.push_back(t);
   }
-  
+
   thread_pool.start();
   thread_pool.wait();
 }
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::releaseTensionOnSystem
-// 
+//
 void
 IRRefineTranslateCanvas::releaseTensionOnSystem()
 {
@@ -308,7 +308,7 @@ IRRefineTranslateCanvas::releaseTensionOnSystem()
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::systemEnergy
-// 
+//
 float
 IRRefineTranslateCanvas::systemEnergy()
 {
@@ -318,7 +318,7 @@ IRRefineTranslateCanvas::systemEnergy()
   {
     vec2d_t tension =
     (*iter)->tensionOnTransformation((*iter)->firstTransformation());
-    
+
     energy += tension*tension;
   }
   return energy;
@@ -326,7 +326,7 @@ IRRefineTranslateCanvas::systemEnergy()
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::maximumTension
-// 
+//
 float
 IRRefineTranslateCanvas::maximumTension()
 {
@@ -336,7 +336,7 @@ IRRefineTranslateCanvas::maximumTension()
   {
     vec2d_t tension =
     (*iter)->tensionOnTransformation((*iter)->firstTransformation());
-    
+
     maxTension = std::max<float>(sqrtf(tension*tension), maxTension);
   }
   return maxTension;
@@ -344,7 +344,7 @@ IRRefineTranslateCanvas::maximumTension()
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::maximumPullOnTransformation
-// 
+//
 float
 IRRefineTranslateCanvas::maximumPullOnTransformation()
 {
@@ -360,12 +360,12 @@ IRRefineTranslateCanvas::maximumPullOnTransformation()
 
 //----------------------------------------------------------------
 // __IRRefineTranslateCanvasConnectionLock
-// 
-static itk::SimpleMutexLock __IRRefineTranslateCanvasConnectionLock;
+//
+static std::mutex __IRRefineTranslateCanvasConnectionLock;
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::findOffsetsThreadEntry
-// 
+//
 void
 IRRefineTranslateCanvas::findOffsetsThreadEntry()
 {
@@ -373,7 +373,7 @@ IRRefineTranslateCanvas::findOffsetsThreadEntry()
   {
     IRConnection * connection = getConectionToProcess();
     if (!connection) break;
-    
+
     if (connection->findIdealOffset(maxOffset, maxOffsetIsPercent, blackMaskPercent, _doClahe) == 0)
     {
       connection->firstTransformation()->addConnection(connection);
@@ -385,28 +385,28 @@ IRRefineTranslateCanvas::findOffsetsThreadEntry()
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::addProcessedConnection
-// 
+//
 void
 IRRefineTranslateCanvas::addProcessedConnection(IRConnection* connection)
 {
-  __IRRefineTranslateCanvasConnectionLock.Lock();
+  __IRRefineTranslateCanvasConnectionLock.lock();
   _connectionVector.push_back(connection);
-  __IRRefineTranslateCanvasConnectionLock.Unlock();
+  __IRRefineTranslateCanvasConnectionLock.unlock();
   return;
 }
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::getConectionToProcess
 //
-// returns NULL if there are no more entries to process
-// 
+// returns nullptr if there are no more entries to process
+//
 IRConnection*
 IRRefineTranslateCanvas::getConectionToProcess()
 {
   double vectorSize = 1;
-  
-  __IRRefineTranslateCanvasConnectionLock.Lock();
-  IRConnection* connection = NULL;
+
+  __IRRefineTranslateCanvasConnectionLock.lock();
+  IRConnection* connection = nullptr;
   if (_preProcessedConnectionVector.size() > 0)
   {
     // by picking out  random connection we have less of a chance
@@ -416,21 +416,21 @@ IRRefineTranslateCanvas::getConectionToProcess()
     int element;
     element = rand() % _preProcessedConnectionVector.size();
     connection = _preProcessedConnectionVector[element];
-    
+
     _preProcessedConnectionVector[element] =
     _preProcessedConnectionVector.back();
-    
+
     _preProcessedConnectionVector.pop_back();
-    
+
     vectorSize = _preProcessedConnectionVector.size();
-    
+
     // for now give them in order since the tiles these
     // are now preloaded and are BIG
     //    connection = _preProcessedConnectionVector.back();
     //    _preProcessedConnectionVector.pop_back();
   }
-  __IRRefineTranslateCanvasConnectionLock.Unlock();
-  
+  __IRRefineTranslateCanvasConnectionLock.unlock();
+
   double task_percent = (initialSize - vectorSize) / initialSize;
   set_minor_progress(task_percent, 0.9);
   return connection;
@@ -438,22 +438,22 @@ IRRefineTranslateCanvas::getConectionToProcess()
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::setTransformAndNeighborsToGroupID
-// 
+//
 void
 IRRefineTranslateCanvas::
 setTransformAndNeighborsToGroupID(IRTransform* transform, long groupID)
 {
   std::stack<IRTransform*> transformStack;
-  
+
   transformStack.push(transform);
-  
+
   while (!transformStack.empty())
   {
     IRTransform* currentTransform = transformStack.top();
     transformStack.pop();
-    
+
     currentTransform->setGroupID(groupID);
-    
+
     IRConnectionVector connections = currentTransform->connections();
     for (IRConnectionVector::iterator iter = connections.begin();
          iter != connections.end(); ++iter)
@@ -463,23 +463,23 @@ setTransformAndNeighborsToGroupID(IRTransform* transform, long groupID)
       {
         neighbor = (*iter)->secondTransformation();
       }
-      
+
       if (neighbor->groupID() != groupID)
       {
         if (neighbor->groupID() != -1)
         {
           printf("Error! why was this groupID aready set!");
         }
-        
+
         transformStack.push(neighbor);
       }
     }
-  } 
+  }
 }
 
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::removeTransformsWithGroupID
-// 
+//
 void
 IRRefineTranslateCanvas::removeTransformsWithGroupID(long groupID)
 {
@@ -500,10 +500,10 @@ IRRefineTranslateCanvas::removeTransformsWithGroupID(long groupID)
         {
           neighbor = (*connIter)->secondTransformation();
         }
-        
+
         neighbor->removeConnection(*connIter);
         (*transIter)->removeConnection(*connIter);
-        
+
         for (size_t i = 0; i < _connectionVector.size(); i++)
         {
           if (_connectionVector[i] == *connIter)
@@ -513,7 +513,7 @@ IRRefineTranslateCanvas::removeTransformsWithGroupID(long groupID)
             break;
           }
         }
-        
+
         delete *connIter;
       }
       delete *transIter;

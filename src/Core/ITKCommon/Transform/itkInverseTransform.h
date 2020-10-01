@@ -113,8 +113,8 @@ public:
   virtual OutputPointType TransformPoint(const InputPointType & y) const override
   {
     // TODO: replace with exception
-//    assert(forward_ != NULL);
-    if (forward_ == NULL)
+//    assert(forward_ != nullptr);
+    if (forward_ == nullptr)
     {
       itkExceptionMacro(<< "Forward transform is null");
     }

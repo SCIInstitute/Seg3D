@@ -1170,7 +1170,7 @@ refine_mosaic(std::vector<itk::GridTransform::Pointer> & transform,
         oss << std::setw(4) << i << ". warping image tile" << std::endl;
         warped_tile[i] = warp<TImage>(tile[i], transform[i].GetPointer());
         
-        if (mask[i].GetPointer() != NULL)
+        if (mask[i].GetPointer() != nullptr)
         {
           oss << "      warping image tile mask" << std::endl;
           warped_mask[i] = warp<TMask>(mask[i], transform[i].GetPointer());
@@ -1282,7 +1282,7 @@ public:
     warp<TImage>(tile_[tile_index_],
                  transform_[tile_index_].GetPointer());
     
-    if (mask_[tile_index_].GetPointer() != NULL)
+    if (mask_[tile_index_].GetPointer() != nullptr)
     {
       oss << setw(4) << tile_index_ << ". warping image tile mask" << std::endl;
       warped_mask_[tile_index_] =
