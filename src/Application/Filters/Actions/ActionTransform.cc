@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -82,7 +82,7 @@ public:
   void transform_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
   // RUN_FILTER:
-  // Implementation of run of the Runnable base class, this function is called 
+  // Implementation of run of the Runnable base class, this function is called
   // when the thread is launched.
   virtual void run_filter();
 
@@ -94,8 +94,8 @@ public:
   }
 
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
     return "Transform";
@@ -131,7 +131,7 @@ void TransformAlgo::run_filter()
 void TransformAlgo::transform_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
   Core::DataBlockHandle input_datablock = input->get_data_volume()->get_data_block();
-  Core::DataBlockHandle output_datablock = Core::StdDataBlock::New( 
+  Core::DataBlockHandle output_datablock = Core::StdDataBlock::New(
     output->get_grid_transform(), input_datablock->get_data_type() );
 
   const void* src_data = input_datablock->get_data();
@@ -153,6 +153,10 @@ void TransformAlgo::transform_data_layer( DataLayerHandle input, DataLayerHandle
   case Core::DataType::UINT_E:
     data_size = sizeof( int );
     break;
+  case Core::DataType::LONGLONG_E:
+  case Core::DataType::ULONGLONG_E:
+    data_size = sizeof( long long );
+    break;
   case Core::DataType::FLOAT_E:
     data_size = sizeof( float );
     break;
@@ -171,11 +175,11 @@ void TransformAlgo::transform_data_layer( DataLayerHandle input, DataLayerHandle
   {
     // Centering should be preserved for each layer
     Core::GridTransform output_grid_transform = output->get_grid_transform();
-    output_grid_transform.set_originally_node_centered( 
+    output_grid_transform.set_originally_node_centered(
       input->get_grid_transform().get_originally_node_centered() );
 
     this->dispatch_insert_data_volume_into_layer( output, Core::DataVolumeHandle(
-      new Core::DataVolume( output_grid_transform, output_datablock ) ), 
+      new Core::DataVolume( output_grid_transform, output_datablock ) ),
       true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
@@ -256,7 +260,7 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
     context->report_error( "No input layers specified" );
     return false;
   }
-  
+
   Core::GridTransform src_grid_trans;
   for ( size_t i = 0; i < layer_ids.size(); ++i )
   {
@@ -278,12 +282,12 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
       context->report_error( "Input layers do not belong to the same group" );
       return false;
     }
-    
-    // Check for layer availability 
-    if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ], 
+
+    // Check for layer availability
+    if ( !LayerManager::CheckLayerAvailability( layer_ids[ i ],
       this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
-  
+
   const Core::Vector& spacing = this->private_->spacing_;
   if ( spacing[ 0 ] <= 0 || spacing[ 1 ] <= 0 || spacing[ 2 ] <= 0 )
   {
@@ -295,15 +299,15 @@ bool ActionTransform::validate( Core::ActionContextHandle& context )
   this->private_->output_grid_trans_.set_nx( src_grid_trans.get_nx() );
   this->private_->output_grid_trans_.set_ny( src_grid_trans.get_ny() );
   this->private_->output_grid_trans_.set_nz( src_grid_trans.get_nz() );
-  this->private_->output_grid_trans_.load_basis( this->private_->origin_, 
-    Core::Vector( spacing[ 0 ], 0, 0 ), Core::Vector( 0, spacing[ 1 ], 0 ), 
+  this->private_->output_grid_trans_.load_basis( this->private_->origin_,
+    Core::Vector( spacing[ 0 ], 0, 0 ), Core::Vector( 0, spacing[ 1 ], 0 ),
     Core::Vector( 0, 0, spacing[ 2 ] ) );
-  
+
   // Validation successful
   return true;
 }
 
-bool ActionTransform::run( Core::ActionContextHandle& context, 
+bool ActionTransform::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
@@ -332,9 +336,9 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     }
 
     switch ( algo->src_layers_[ i ]->get_type() )
-    { 
+    {
       case Core::VolumeType::DATA_E:
-        algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 
+        algo->create_and_lock_data_layer( this->private_->output_grid_trans_,
           algo->src_layers_[ i ], algo->dst_layers_[ i ] );
         break;
       case Core::VolumeType::MASK_E:
@@ -348,7 +352,7 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
     }
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
-  
+
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( dst_layer_ids ) );
   // If the action is run from a script (provenance is a special case of script),
@@ -368,8 +372,8 @@ bool ActionTransform::run( Core::ActionContextHandle& context,
   return true;
 }
 
-void ActionTransform::Dispatch( Core::ActionContextHandle context, 
-                const std::vector< std::string >& layer_ids, 
+void ActionTransform::Dispatch( Core::ActionContextHandle context,
+                const std::vector< std::string >& layer_ids,
                 const Core::Point& origin, const Core::Vector& spacing,
                 bool replace )
 {

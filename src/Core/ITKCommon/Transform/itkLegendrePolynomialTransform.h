@@ -42,7 +42,7 @@
 
 // ITK includes:
 #include <itkTransform.h>
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 #include <itkMacro.h>
 #include <itkImage.h>
 

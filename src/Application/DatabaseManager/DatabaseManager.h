@@ -97,8 +97,8 @@ public:
   /// Get metadata about a specific column of a specific database table.
   /// Returns true if the table and column exist, otherwise false.
   bool get_column_metadata( const std::string& table_name, const std::string& column_name,
-    char const** data_type = NULL, char const** coll_seq = NULL, 
-    int* not_null = NULL, int* primary_key = NULL, int* auto_inc = NULL ); 
+    char const** data_type = nullptr, char const** coll_seq = nullptr, 
+    int* not_null = nullptr, int* primary_key = nullptr, int* auto_inc = nullptr ); 
 
 private:
   boost::shared_ptr< DatabaseManagerPrivate > private_;

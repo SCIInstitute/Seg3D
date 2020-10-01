@@ -78,9 +78,9 @@ DatabaseManager::DatabaseManager( const DatabaseManager& src ) :
     // Copy the database content from the source
     sqlite3_backup* db_backup_obj = sqlite3_backup_init( this->private_->database_,
       "main", src.private_->database_, "main" );
-    if ( db_backup_obj == NULL )
+    if ( db_backup_obj == nullptr )
     {
-      CORE_THROW_EXCEPTION( std::string( "Failed to copy database: " ) + 
+      CORE_THROW_EXCEPTION( std::string( "Failed to copy database: " ) +
         sqlite3_errmsg( this->private_->database_ ) );
     }
 
@@ -94,7 +94,7 @@ DatabaseManager::DatabaseManager( const DatabaseManager& src ) :
 }
 
 DatabaseManager::~DatabaseManager()
-{ 
+{
   // We need to close the database to avoid memory leak.
   if ( this->private_->database_ )
   {
@@ -104,7 +104,7 @@ DatabaseManager::~DatabaseManager()
 
 static int InternalExecuteSqlStatement( sqlite3_stmt* statement, ResultSet& results )
 {
-  assert( statement != NULL );
+  assert( statement != nullptr );
 
   int result;
   while ( ( result = sqlite3_step( statement ) ) == SQLITE_ROW )
@@ -118,7 +118,7 @@ static int InternalExecuteSqlStatement( sqlite3_stmt* statement, ResultSet& resu
       case SQLITE_TEXT:
       case SQLITE_BLOB:
         {
-          std::string string_result = std::string( reinterpret_cast< const char* >( 
+          std::string string_result = std::string( reinterpret_cast< const char* >(
             sqlite3_column_text( statement, j ) ) );
           temp_any = boost::any( string_result );
           break;
@@ -156,22 +156,22 @@ bool DatabaseManager::run_sql_statement( const std::string& sql_str, std::string
   return this->run_sql_statement( sql_str, dummy_results, error );
 }
 
-bool DatabaseManager::run_sql_statement( const std::string& sql_str, ResultSet& results, 
+bool DatabaseManager::run_sql_statement( const std::string& sql_str, ResultSet& results,
   std::string& error )
 {
   results.clear();
 
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
 
-  if ( this->private_->database_ == NULL )
+  if ( this->private_->database_ == nullptr )
   {
     error = "Invalid database connection.";
     return false;
   }
 
-  sqlite3_stmt* statement = NULL;
-  if ( sqlite3_prepare_v2( this->private_->database_, sql_str.c_str(), 
-    static_cast< int >( sql_str.size() ), &statement, NULL ) != SQLITE_OK )
+  sqlite3_stmt* statement = nullptr;
+  if ( sqlite3_prepare_v2( this->private_->database_, sql_str.c_str(),
+    static_cast< int >( sql_str.size() ), &statement, nullptr ) != SQLITE_OK )
   {
     error =  "The SQL statement '" + sql_str + "' failed to compile with error: "
       + sqlite3_errmsg( this->private_->database_ );
@@ -183,7 +183,7 @@ bool DatabaseManager::run_sql_statement( const std::string& sql_str, ResultSet& 
     error =  "The SQL statement '" + sql_str + "' returned error: "
       + sqlite3_errmsg( this->private_->database_ );
     return false;
-  } 
+  }
 
   return true;
 }
@@ -192,7 +192,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
 {
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
 
-  if ( this->private_->database_ == NULL )
+  if ( this->private_->database_ == nullptr )
   {
     error = "Invalid database connection.";
     return false;
@@ -200,13 +200,13 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
 
   ResultSet dummy_results;
   const char* head = sql_str.c_str();
-  const char* tail = NULL;
+  const char* tail = nullptr;
   // The input string length including the null terminator
-  int num_bytes = static_cast< int >( sql_str.size() + 1 ); 
+  int num_bytes = static_cast< int >( sql_str.size() + 1 );
   while ( num_bytes > 1 )
   {
-    sqlite3_stmt* statement = NULL;
-    if ( sqlite3_prepare_v2( this->private_->database_, head, 
+    sqlite3_stmt* statement = nullptr;
+    if ( sqlite3_prepare_v2( this->private_->database_, head,
       num_bytes, &statement, &tail ) != SQLITE_OK )
     {
       error =  "The SQL statement '" + std::string( head ) + "' failed to compile with error: "
@@ -214,14 +214,14 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
       return false;
     }
 
-    if ( statement == NULL ) break;
+    if ( statement == nullptr ) break;
 
     if( InternalExecuteSqlStatement( statement, dummy_results ) != SQLITE_DONE )
     {
       error =  "The SQL statement '" + std::string( head ) + "' returned error: "
         + sqlite3_errmsg( this->private_->database_ );
       return false;
-    } 
+    }
 
     num_bytes -= static_cast< int >( tail - head );
     head = tail;
@@ -230,7 +230,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
   return true;
 }
 
-bool DatabaseManager::load_database( const boost::filesystem::path& database_file, 
+bool DatabaseManager::load_database( const boost::filesystem::path& database_file,
   std::string& error )
 {
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
@@ -238,79 +238,79 @@ bool DatabaseManager::load_database( const boost::filesystem::path& database_fil
   int result;
   sqlite3* temp_open_database;
   sqlite3_backup* backup_database_object;
-  
+
   result = sqlite3_open( database_file.string().c_str(), &temp_open_database );
-  
-  if ( result != SQLITE_OK ) 
+
+  if ( result != SQLITE_OK )
   {
     sqlite3_close( temp_open_database );
     error = std::string( "Could not open database file '" ) + database_file.string() + "'.";
     return false;
   }
-  
-  backup_database_object = 
+
+  backup_database_object =
     sqlite3_backup_init( this->private_->database_, "main", temp_open_database, "main" );
-  
+
   if ( backup_database_object )
   {
     sqlite3_backup_step( backup_database_object, -1 );
     sqlite3_backup_finish( backup_database_object );
   }
-  
+
   sqlite3_close( temp_open_database );
 
   result = sqlite3_errcode( this->private_->database_ );
-  if ( result != SQLITE_OK ) 
+  if ( result != SQLITE_OK )
   {
     error = "Internal error in database.";
     return false;
   }
-  
+
   // Enable foreign key
   this->run_sql_statement( "PRAGMA foreign_keys = ON;", error );
 
   error = "";
-  return true;  
+  return true;
 }
 
 
-bool DatabaseManager::save_database( const boost::filesystem::path& database_file, 
+bool DatabaseManager::save_database( const boost::filesystem::path& database_file,
   std::string& error )
 {
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
   int result;
   sqlite3* temp_open_database;
   sqlite3_backup* backup_database_object;
-  
+
   result = sqlite3_open( database_file.string().c_str(), &temp_open_database );
-  
-  if ( result != SQLITE_OK ) 
+
+  if ( result != SQLITE_OK )
   {
     sqlite3_close( temp_open_database );
     error = std::string( "Could not open database file '" ) + database_file.string() + "'.";
     return false;
   }
-  
-  backup_database_object = 
+
+  backup_database_object =
     sqlite3_backup_init( temp_open_database, "main", this->private_->database_, "main" );
-  
+
   if ( backup_database_object )
   {
     sqlite3_backup_step( backup_database_object, -1 );
     sqlite3_backup_finish( backup_database_object );
   }
-  
+
   result = sqlite3_errcode( temp_open_database );
-  if ( result != SQLITE_OK ) 
+  if ( result != SQLITE_OK )
   {
     error = "Internal error in database.";
     return false;
   }
-  
+
   sqlite3_close( temp_open_database );
 
   error = "";
-  return true;  
+  return true;
 }
 
 long long DatabaseManager::get_last_insert_rowid()
@@ -323,10 +323,10 @@ long long DatabaseManager::get_last_insert_rowid()
   return 0;
 }
 
-bool DatabaseManager::get_column_metadata( const std::string& table_name, 
-                      const std::string& column_name, char const** data_type /*= NULL*/, 
-                      char const** coll_seq /*= NULL*/, int* not_null /*= NULL*/, 
-                      int* primary_key /*= NULL*/, int* auto_inc /*= NULL */ )
+bool DatabaseManager::get_column_metadata( const std::string& table_name,
+                      const std::string& column_name, char const** data_type /*= nullptr*/,
+                      char const** coll_seq /*= nullptr*/, int* not_null /*= nullptr*/,
+                      int* primary_key /*= nullptr*/, int* auto_inc /*= nullptr */ )
 {
   if ( this->private_->database_ == 0 )
   {

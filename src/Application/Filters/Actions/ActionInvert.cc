@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -61,7 +61,7 @@ public:
   {
     Core::DataBlockHandle dst_data_block = Core::StdDataBlock::New(
       dst->get_grid_transform(), src->get_data_type() );
-    if ( !dst_data_block )  
+    if ( !dst_data_block )
     {
       this->report_error( "Could not allocate enough memory." );
       return;
@@ -78,7 +78,7 @@ public:
     T min_val = static_cast< T >( src->get_min() );
     T max_val = static_cast< T >( src->get_max() );
     T bias = max_val + min_val;
-    
+
     size_t index = 0;
     for ( size_t z = 0; z < nz; ++z )
     {
@@ -103,7 +103,7 @@ public:
     }
 
     this->dispatch_insert_data_volume_into_layer( dst,
-      Core::DataVolumeHandle( new Core::DataVolume( 
+      Core::DataVolumeHandle( new Core::DataVolume(
       dst->get_grid_transform(), dst_data_block ) ), true );
   }
 
@@ -120,7 +120,7 @@ public:
       this->report_error( "Could not allocate enough memory." );
       return;
     }
-    
+
     Core::MaskDataBlock::shared_lock_type lock( mask_datablock->get_mutex() );
     unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_datablock->get_data() );
     size_t z_plane_size = mask_datablock->get_nx() * mask_datablock->get_ny();
@@ -147,15 +147,15 @@ public:
     lock.unlock();
 
     Core::MaskDataBlockHandle output_mask;
-    Core::MaskDataBlockManager::Convert( output_datablock, 
+    Core::MaskDataBlockManager::Convert( output_datablock,
       output->get_grid_transform(), output_mask );
     if ( !output_mask )
     {
       this->report_error( "Could not allocate enough memory." );
       return;
     }
-    
-    this->dispatch_insert_mask_volume_into_layer( output, Core::MaskVolumeHandle( 
+
+    this->dispatch_insert_mask_volume_into_layer( output, Core::MaskVolumeHandle(
       new Core::MaskVolume( output->get_grid_transform(), output_mask ) ) );
   }
 
@@ -183,6 +183,12 @@ public:
     case Core::DataType::UINT_E:
       this->invert_data< unsigned int >( src_data_block, output );
       break;
+    case Core::DataType::LONGLONG_E:
+      this->invert_data< long long >( src_data_block, output );
+      break;
+    case Core::DataType::ULONGLONG_E:
+      this->invert_data< unsigned long long >( src_data_block, output );
+      break;
     case Core::DataType::FLOAT_E:
       this->invert_data< float >( src_data_block, output );
       break;
@@ -193,7 +199,7 @@ public:
   }
 
   // RUN_FILTER:
-  // Implementation of run of the Runnable base class, this function is called 
+  // Implementation of run of the Runnable base class, this function is called
   // when the thread is launched.
   virtual void run_filter()
   {
@@ -209,7 +215,7 @@ public:
       break;
     }
   }
-  
+
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
@@ -218,11 +224,11 @@ public:
   }
 
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "Invert";  
+    return "Invert";
   }
 };
 
@@ -234,22 +240,22 @@ bool ActionInvert::validate( Core::ActionContextHandle& context )
   // Check for layer existence and type information
   if ( ! LayerManager::CheckLayerExistence( this->layer_id_, context, this->sandbox_ ) ) return false;
 
-  // Check for layer availability 
-  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
+  // Check for layer availability
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_,
     this->replace_, context, this->sandbox_ ) ) return false;
 
   // Validation successful
   return true;
 }
 
-bool ActionInvert::run( Core::ActionContextHandle& context, 
+bool ActionInvert::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
   boost::shared_ptr< InvertFilterAlgo > algo( new InvertFilterAlgo );
   algo->set_sandbox( this->sandbox_ );
 
-  // Find the handle to the layer 
+  // Find the handle to the layer
   if ( !( algo->find_layer( this->layer_id_, algo->src_layer_ ) ) )
   {
     return false;
@@ -260,13 +266,13 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
     // Copy the handles as destination and source will be the same
     algo->dst_layer_ = algo->src_layer_;
     // Mark the layer for processing.
-    algo->lock_for_processing( algo->dst_layer_ );  
+    algo->lock_for_processing( algo->dst_layer_ );
   }
   else
   {
     // Lock the src layer, so it cannot be used else where
     algo->lock_for_use( algo->src_layer_ );
-    
+
     // Create the destination layer, which will show progress
     switch ( algo->src_layer_->get_type() )
     {
@@ -284,7 +290,7 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
   algo->connect_abort( algo->dst_layer_ );
 
   // Return the id of the destination layer.
-  result = Core::ActionResultHandle( new Core::ActionResult( 
+  result = Core::ActionResultHandle( new Core::ActionResult(
     algo->dst_layer_->get_layer_id() ) );
   // If the action is run from a script (provenance is a special case of script),
   // return a notifier that the script engine can wait on.
@@ -296,7 +302,7 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
 
   // Build the undo-redo record
   algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
-  
+
   // Start the filter.
   Core::Runnable::Start( algo );
 
@@ -304,9 +310,9 @@ bool ActionInvert::run( Core::ActionContextHandle& context,
 }
 
 
-void ActionInvert::Dispatch( Core::ActionContextHandle context, 
+void ActionInvert::Dispatch( Core::ActionContextHandle context,
   std::string layer_id, bool replace )
-{ 
+{
   // Create a new action
   ActionInvert* action = new ActionInvert;
 
@@ -317,5 +323,5 @@ void ActionInvert::Dispatch( Core::ActionContextHandle context,
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-  
+
 } // end namespace Seg3D

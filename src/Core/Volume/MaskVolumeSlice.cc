@@ -144,7 +144,7 @@ void MaskVolumeSlice::upload_texture()
     PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
     pixel_buffer->bind();
     pixel_buffer->set_buffer_data( sizeof(unsigned char) * nx * ny,
-      NULL, GL_STREAM_DRAW );
+      nullptr, GL_STREAM_DRAW );
     unsigned char* buffer = reinterpret_cast<unsigned char*>(
       pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
@@ -158,7 +158,7 @@ void MaskVolumeSlice::upload_texture()
     pixel_buffer->unmap_buffer();
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
     tex->set_sub_image( 0, 0, static_cast<int>( nx ), 
-      static_cast<int>( ny ), NULL, GL_ALPHA, GL_UNSIGNED_BYTE );
+      static_cast<int>( ny ), nullptr, GL_ALPHA, GL_UNSIGNED_BYTE );
     tex->unbind();
 
     // Step 3. release the pixel unpack buffer

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -90,14 +90,14 @@ public:
 public:
 
   template< class T >
-  void crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst, 
+  void crop_typed_data( Core::DataBlockHandle src, Core::DataBlockHandle dst,
     LayerHandle dst_layer );
 
   void crop_data_layer( DataLayerHandle input, DataLayerHandle output );
   void crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output );
 
   // RUN_FILTER:
-  // Implementation of run of the Runnable base class, this function is called 
+  // Implementation of run of the Runnable base class, this function is called
   // when the thread is launched.
   virtual void run_filter();
 
@@ -109,11 +109,11 @@ public:
   }
 
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "Crop";  
+    return "Crop";
   }
 };
 
@@ -184,14 +184,14 @@ void CropAlgo::run_filter()
 void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
 {
   Core::DataBlockHandle input_datablock = input->get_data_volume()->get_data_block();
-  Core::DataBlockHandle output_datablock = Core::StdDataBlock::New( 
+  Core::DataBlockHandle output_datablock = Core::StdDataBlock::New(
     output->get_grid_transform(), input_datablock->get_data_type() );
-  if ( !output_datablock ) 
+  if ( !output_datablock )
   {
     this->report_error( "Could not allocate enough memory" );
     return;
   }
-  
+
   Core::DataBlock::shared_lock_type data_lock( input_datablock->get_mutex() );
   switch ( input_datablock->get_data_type() )
   {
@@ -213,6 +213,12 @@ void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
   case Core::DataType::UINT_E:
     this->crop_typed_data< unsigned int >( input_datablock, output_datablock, output );
     break;
+  case Core::DataType::LONGLONG_E:
+    this->crop_typed_data< long long >( input_datablock, output_datablock, output );
+    break;
+  case Core::DataType::ULONGLONG_E:
+    this->crop_typed_data< unsigned long long >( input_datablock, output_datablock, output );
+    break;
   case Core::DataType::FLOAT_E:
     this->crop_typed_data< float >( input_datablock, output_datablock, output );
     break;
@@ -229,11 +235,11 @@ void CropAlgo::crop_data_layer( DataLayerHandle input, DataLayerHandle output )
   {
     // Centering should be preserved for each layer
     Core::GridTransform output_grid_transform = output->get_grid_transform();
-    output_grid_transform.set_originally_node_centered( 
+    output_grid_transform.set_originally_node_centered(
       input->get_grid_transform().get_originally_node_centered() );
 
     this->dispatch_insert_data_volume_into_layer( output, Core::DataVolumeHandle(
-      new Core::DataVolume( output_grid_transform, output_datablock ) ), 
+      new Core::DataVolume( output_grid_transform, output_datablock ) ),
       true );
     output->update_progress_signal_( 1.0 );
     this->dispatch_unlock_layer( output );
@@ -253,12 +259,12 @@ void CropAlgo::crop_mask_layer( MaskLayerHandle input, MaskLayerHandle output )
   Core::MaskDataBlockHandle input_mask = input->get_mask_volume()->get_mask_data_block();
   Core::DataBlockHandle output_mask = Core::StdDataBlock::New(
     output->get_grid_transform(), Core::DataType::UCHAR_E );
-  if ( !output_mask ) 
+  if ( !output_mask )
   {
     this->report_error( "Could not allocate enough memory" );
     return;
   }
-  
+
   Core::MaskDataBlock::shared_lock_type data_lock( input_mask->get_mutex() );
   const unsigned char* src_data = input_mask->get_mask_data();
   unsigned char* dst_data = reinterpret_cast< unsigned char* >( output_mask->get_data() );
@@ -338,7 +344,7 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
     context->report_error( "No input layers specified" );
     return false;
   }
-  
+
   Core::GridTransform grid_trans;
   for ( size_t i = 0; i < this->private_->layer_ids_.size(); ++i )
   {
@@ -361,12 +367,12 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
       context->report_error( "Input layers do not belong to the same group" );
       return false;
     }
-    
-    // Check for layer availability 
-    if ( !LayerManager::CheckLayerAvailability( this->private_->layer_ids_[ i ], 
+
+    // Check for layer availability
+    if ( !LayerManager::CheckLayerAvailability( this->private_->layer_ids_[ i ],
       this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
-  
+
   const Core::Point& origin = this->private_->origin_;
   const Core::Vector& size = this->private_->size_;
 
@@ -404,19 +410,19 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
     return false;
   }
 
-  // Compute the cropped grid transform 
-  Core::Point clamped_origin( this->private_->start_x_, 
+  // Compute the cropped grid transform
+  Core::Point clamped_origin( this->private_->start_x_,
     this->private_->start_y_, this->private_->start_z_ );
   clamped_origin = trans * clamped_origin;
   trans( 0, 3 ) = clamped_origin[ 0 ];
   trans( 1, 3 ) = clamped_origin[ 1 ];
   trans( 2, 3 ) = clamped_origin[ 2 ];
   this->private_->output_grid_trans_.load_matrix( trans );
-  this->private_->output_grid_trans_.set_nx( static_cast< size_t >( 
+  this->private_->output_grid_trans_.set_nx( static_cast< size_t >(
     this->private_->end_x_ - this->private_->start_x_ + 1 ) );
-  this->private_->output_grid_trans_.set_ny( static_cast< size_t >( 
+  this->private_->output_grid_trans_.set_ny( static_cast< size_t >(
     this->private_->end_y_ - this->private_->start_y_ + 1 ) );
-  this->private_->output_grid_trans_.set_nz( static_cast< size_t >( 
+  this->private_->output_grid_trans_.set_nz( static_cast< size_t >(
     this->private_->end_z_ - this->private_->start_z_ + 1 ) );
   this->private_->output_grid_trans_.set_originally_node_centered(
     grid_trans.get_originally_node_centered() );
@@ -425,7 +431,7 @@ bool ActionCrop::validate( Core::ActionContextHandle& context )
   return true;
 }
 
-bool ActionCrop::run( Core::ActionContextHandle& context, 
+bool ActionCrop::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
@@ -462,7 +468,7 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
     switch ( algo->src_layers_[ i ]->get_type() )
     {
     case Core::VolumeType::DATA_E:
-      algo->create_and_lock_data_layer( this->private_->output_grid_trans_, 
+      algo->create_and_lock_data_layer( this->private_->output_grid_trans_,
         algo->src_layers_[ i ], algo->dst_layers_[ i ] );
       break;
     case Core::VolumeType::MASK_E:
@@ -480,7 +486,7 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
     }
     dst_layer_ids[ i ] = algo->dst_layers_[ i ]->get_layer_id();
   }
-  
+
   // Return the ids of the destination layer.
   result = Core::ActionResultHandle( new Core::ActionResult( dst_layer_ids ) );
   // If the action is run from a script (provenance is a special case of script),
@@ -500,9 +506,9 @@ bool ActionCrop::run( Core::ActionContextHandle& context,
   return true;
 }
 
-void ActionCrop::Dispatch( Core::ActionContextHandle context, 
-                const std::vector< std::string >& layer_ids, 
-                const Core::Point& origin, 
+void ActionCrop::Dispatch( Core::ActionContextHandle context,
+                const std::vector< std::string >& layer_ids,
+                const Core::Point& origin,
                 const Core::Vector& size, bool replace )
 {
   ActionCrop* action = new ActionCrop;

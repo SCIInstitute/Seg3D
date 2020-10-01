@@ -34,10 +34,10 @@ namespace Core
 {
 
 DataBlock::DataBlock() :
-  nx_( 0 ), 
-  ny_( 0 ), 
-  nz_( 0 ), 
-  data_type_( DataType::UNKNOWN_E ), 
+  nx_( 0 ),
+  ny_( 0 ),
+  nz_( 0 ),
+  data_type_( DataType::UNKNOWN_E ),
   data_( 0 ),
   generation_( -1 )
 {
@@ -68,17 +68,17 @@ double DataBlock::get_data_at( index_type index ) const
     {
       signed char* data = reinterpret_cast<signed char*>( this->data_ );
       return static_cast<double>( data[ index ] );
-    }     
+    }
   case DataType::UCHAR_E:
     {
       unsigned char* data = reinterpret_cast<unsigned char*>( this->data_ );
       return static_cast<double>( data[ index ] );
-    }     
+    }
   case DataType::SHORT_E:
     {
       short* data = reinterpret_cast<short*>( this->data_ );
       return static_cast<double>( data[ index ] );
-    }     
+    }
   case DataType::USHORT_E:
     {
       unsigned short* data = reinterpret_cast<unsigned short*>( this->data_ );
@@ -88,24 +88,34 @@ double DataBlock::get_data_at( index_type index ) const
     {
       int* data = reinterpret_cast<int*>( this->data_ );
       return static_cast<double>( data[ index ] );
-    }     
+    }
   case DataType::UINT_E:
     {
       unsigned int* data = reinterpret_cast<unsigned int*>( this->data_ );
       return static_cast<double>( data[ index ] );
-    }       
+    }
+  case DataType::LONGLONG_E:
+    {
+      long long* data = reinterpret_cast<long long*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }
+  case DataType::ULONGLONG_E:
+    {
+      unsigned long long* data = reinterpret_cast<unsigned long long*>( this->data_ );
+      return static_cast<double>( data[ index ] );
+    }
   case DataType::FLOAT_E:
     {
       float* data = reinterpret_cast<float*>( this->data_ );
       return static_cast<double>( data[ index ] );
-    }     
+    }
   case DataType::DOUBLE_E:
     {
       double* data = reinterpret_cast<double*>( this->data_ );
       return data[ index ];
-    }     
+    }
   }
-  
+
   return 0.0;
 }
 
@@ -119,43 +129,55 @@ void DataBlock::set_data_at( index_type index, double value )
       signed char* data = reinterpret_cast<signed char*>( this->data_ );
       data[ index ] = static_cast<signed char>( value );
       return;
-    }     
+    }
     case DataType::UCHAR_E:
     {
       unsigned char* data = reinterpret_cast<unsigned char*>( this->data_ );
       data[ index ] = static_cast<unsigned char>( value );
       return;
-    }     
+    }
     case DataType::SHORT_E:
     {
       short* data = reinterpret_cast<short*>( this->data_ );
       data[ index ] = static_cast<short>( value );
       return;
-    }     
+    }
     case DataType::USHORT_E:
     {
       unsigned short* data = reinterpret_cast<unsigned short*>( this->data_ );
       data[ index ] = static_cast<unsigned short>( value );
       return;
-    } 
+    }
     case DataType::INT_E:
     {
       int* data = reinterpret_cast<int*>( this->data_ );
       data[ index ] = static_cast<int>( value );
       return;
-    }     
+    }
     case DataType::UINT_E:
     {
       unsigned int* data = reinterpret_cast<unsigned int*>( this->data_ );
       data[ index ] = static_cast<unsigned int>( value );
       return;
-    } 
+    }
+    case DataType::LONGLONG_E:
+    {
+      long long* data = reinterpret_cast<long long*>( this->data_ );
+      data[ index ] = static_cast<long long>( value );
+      return;
+    }
+    case DataType::ULONGLONG_E:
+    {
+      unsigned long long* data = reinterpret_cast<unsigned long long*>( this->data_ );
+      data[ index ] = static_cast<unsigned long long>( value );
+      return;
+    }
     case DataType::FLOAT_E:
     {
       float* data = reinterpret_cast<float*>( this->data_ );
       data[ index ] = static_cast<float>( value );
       return;
-    }     
+    }
     case DataType::DOUBLE_E:
     {
       double* data = reinterpret_cast<double*>( this->data_ );
@@ -263,6 +285,10 @@ bool DataBlock::update_histogram()
       return this->histogram_.compute( reinterpret_cast<int*>( get_data() ), get_size() );
     case DataType::UINT_E:
       return this->histogram_.compute( reinterpret_cast<unsigned int*>( get_data() ), get_size() );
+    case DataType::LONGLONG_E:
+      return this->histogram_.compute( reinterpret_cast<long long*>( get_data() ), get_size() );
+    case DataType::ULONGLONG_E:
+      return this->histogram_.compute( reinterpret_cast<unsigned long long*>( get_data() ), get_size() );
     case DataType::FLOAT_E:
       return this->histogram_.compute( reinterpret_cast<float*>( get_data() ), get_size() );
     case DataType::DOUBLE_E:
@@ -291,6 +317,9 @@ size_t DataBlock::get_elem_size() const
     case DataType::INT_E:
     case DataType::UINT_E:
       return sizeof( int );
+    case DataType::LONGLONG_E:
+    case DataType::ULONGLONG_E:
+      return sizeof( long long );
     case DataType::FLOAT_E:
       return sizeof( float );
     case DataType::DOUBLE_E:
@@ -311,7 +340,7 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
     case 2:
     {
       unsigned char tmp;
-    
+
       size_t size8 = size & ~(0x7);
       size_t j = 0;
       for ( ; j < size8; j+=8 )
@@ -324,7 +353,7 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
         udata += 2;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
         udata += 2;
-        
+
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
         udata += 2;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
@@ -334,7 +363,7 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
         udata += 2;
       }
-                  
+
       for( ;  j < size; j++ )
       {
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 1 ]; udata[ 1 ] = tmp;
@@ -352,29 +381,29 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
       {
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
 
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
         tmp = udata[ 0 ]; udata[ 0 ] = udata[ 3 ]; udata[ 3 ] = tmp;
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 2 ]; udata[ 2 ] = tmp;
-        udata += 4;     
+        udata += 4;
       }
       for( ;  j < size; j++ )
       {
@@ -383,8 +412,8 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
         udata += 4;
       }
       return;
-    
-    } 
+
+    }
     case 8:
     {
       size_t size8 = size & ~(0x7);
@@ -433,7 +462,7 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
         tmp = udata[ 1 ]; udata[ 1 ] = udata[ 6 ]; udata[ 6 ] = tmp;
         tmp = udata[ 2 ]; udata[ 2 ] = udata[ 5 ]; udata[ 5 ] = tmp;
         tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
-        udata += 8;     
+        udata += 8;
       }
       for( ;  j < size; j++ )
       {
@@ -443,7 +472,7 @@ void SwapEndian( void* data, size_t size, size_t elem_size )
         tmp = udata[ 3 ]; udata[ 3 ] = udata[ 4 ]; udata[ 4 ] = tmp;
         udata += 8;
       }
-      return; 
+      return;
     }
   }
 }
@@ -454,7 +483,7 @@ void DataBlock::swap_endian()
 
   switch( this->data_type_ )
   {
-    case DataType::CHAR_E: 
+    case DataType::CHAR_E:
     case DataType::UCHAR_E:
       break;
     case DataType::SHORT_E:
@@ -466,6 +495,8 @@ void DataBlock::swap_endian()
     case DataType::FLOAT_E:
       SwapEndian( get_data(), get_size(), 4 );
       break;
+    case DataType::LONGLONG_E:
+    case DataType::ULONGLONG_E:
     case DataType::DOUBLE_E:
       SwapEndian( get_data(), get_size(), 8 );
       break;
@@ -479,7 +510,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
   size_t size = dst_data_block->get_size();
   switch ( dst_data_block->get_data_type() )
   {
-    case DataType::CHAR_E:  
+    case DataType::CHAR_E:
     {
       signed char* dst = reinterpret_cast<signed char*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -501,7 +532,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       }
       return true;
     }
-    case DataType::UCHAR_E: 
+    case DataType::UCHAR_E:
     {
       unsigned char* dst = reinterpret_cast<unsigned char*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -520,10 +551,10 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned char>( src[ j ] );
-      }     
+      }
       return true;
     }
-    case DataType::SHORT_E: 
+    case DataType::SHORT_E:
     {
       short* dst = reinterpret_cast<short*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -542,10 +573,10 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<short>( src[ j ] );
-      }     
+      }
       return true;
     }
-    case DataType::USHORT_E:  
+    case DataType::USHORT_E:
     {
       unsigned short* dst = reinterpret_cast<unsigned short*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -564,10 +595,10 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned short>( src[ j ] );
-      } 
+      }
       return true;
     }
-    case DataType::INT_E: 
+    case DataType::INT_E:
     {
       int* dst = reinterpret_cast<int*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -586,10 +617,10 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<int>( src[ j ] );
-      }   
+      }
       return true;
     }
-    case DataType::UINT_E:  
+    case DataType::UINT_E:
     {
       unsigned int* dst = reinterpret_cast<unsigned int*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -608,10 +639,54 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned int>( src[ j ] );
-      } 
+      }
       return true;
     }
-    case DataType::FLOAT_E: 
+    case DataType::LONGLONG_E:
+    {
+      long long* dst = reinterpret_cast<long long*>( dst_data_block->get_data() );
+      size_t size8 = size & ~(0x7);
+      size_t j = 0;
+      for ( ; j < size8; j+=8 )
+      {
+        dst[ j ] = static_cast<long long>( src[ j ] );
+        dst[ j + 1 ] = static_cast<long long>( src[ j + 1 ] );
+        dst[ j + 2 ] = static_cast<long long>( src[ j + 2 ] );
+        dst[ j + 3 ] = static_cast<long long>( src[ j + 3 ] );
+        dst[ j + 4 ] = static_cast<long long>( src[ j + 4 ] );
+        dst[ j + 5 ] = static_cast<long long>( src[ j + 5 ] );
+        dst[ j + 6 ] = static_cast<long long>( src[ j + 6 ] );
+        dst[ j + 7 ] = static_cast<long long>( src[ j + 7 ] );
+      }
+      for ( ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<long long>( src[ j ] );
+      }
+      return true;
+    }
+    case DataType::ULONGLONG_E:
+    {
+      unsigned long long* dst = reinterpret_cast<unsigned long long*>( dst_data_block->get_data() );
+      size_t size8 = size & ~(0x7);
+      size_t j = 0;
+      for ( ; j < size8; j+=8 )
+      {
+        dst[ j ] = static_cast<unsigned long long>( src[ j ] );
+        dst[ j + 1 ] = static_cast<unsigned long long>( src[ j + 1 ] );
+        dst[ j + 2 ] = static_cast<unsigned long long>( src[ j + 2 ] );
+        dst[ j + 3 ] = static_cast<unsigned long long>( src[ j + 3 ] );
+        dst[ j + 4 ] = static_cast<unsigned long long>( src[ j + 4 ] );
+        dst[ j + 5 ] = static_cast<unsigned long long>( src[ j + 5 ] );
+        dst[ j + 6 ] = static_cast<unsigned long long>( src[ j + 6 ] );
+        dst[ j + 7 ] = static_cast<unsigned long long>( src[ j + 7 ] );
+      }
+      for ( ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<unsigned long long>( src[ j ] );
+      }
+      return true;
+    }
+    case DataType::FLOAT_E:
     {
       float* dst = reinterpret_cast<float*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
@@ -630,10 +705,10 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<float>( src[ j ] );
-      }       
+      }
       return true;
     }
-    case DataType::DOUBLE_E:  
+    case DataType::DOUBLE_E:
     {
       double* dst = reinterpret_cast<double*>( dst_data_block->get_data() );
             size_t size8 = size & ~(0x7);
@@ -652,7 +727,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       for ( ; j < size; j++ )
       {
         dst[ j ] = static_cast<double>( src[ j ] );
-      } 
+      }
       return true;
     }
     default:
@@ -664,7 +739,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
 }
 
 
-bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block, 
+bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block,
   DataBlockHandle& dst_data_block, DataType new_data_type )
 {
   dst_data_block.reset();
@@ -674,37 +749,43 @@ bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block,
 
   dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
     src_data_block->get_ny(), src_data_block->get_nz(), new_data_type );
-    
+
   if ( !dst_data_block )
   {
     return false;
   }
-  
+
   switch( src_data_block->get_data_type() )
   {
     case DataType::CHAR_E:
-      return ConvertDataTypeInternal<signed char>( 
+      return ConvertDataTypeInternal<signed char>(
         reinterpret_cast<signed char*>( src_data_block->get_data() ), dst_data_block );
     case DataType::UCHAR_E:
-      return ConvertDataTypeInternal<unsigned char>( 
+      return ConvertDataTypeInternal<unsigned char>(
         reinterpret_cast<unsigned char*>( src_data_block->get_data() ), dst_data_block );
     case DataType::SHORT_E:
-      return ConvertDataTypeInternal<short>( 
+      return ConvertDataTypeInternal<short>(
         reinterpret_cast<short*>( src_data_block->get_data() ), dst_data_block );
     case DataType::USHORT_E:
-      return ConvertDataTypeInternal<unsigned short>( 
+      return ConvertDataTypeInternal<unsigned short>(
         reinterpret_cast<unsigned short*>( src_data_block->get_data() ), dst_data_block );
     case DataType::INT_E:
-      return ConvertDataTypeInternal<int>( 
+      return ConvertDataTypeInternal<int>(
         reinterpret_cast<int*>( src_data_block->get_data() ), dst_data_block );
     case DataType::UINT_E:
-      return ConvertDataTypeInternal<unsigned int>( 
+      return ConvertDataTypeInternal<unsigned int>(
         reinterpret_cast<unsigned int*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::LONGLONG_E:
+      return ConvertDataTypeInternal<long long>(
+        reinterpret_cast<long long*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::ULONGLONG_E:
+      return ConvertDataTypeInternal<unsigned long long>(
+        reinterpret_cast<unsigned long long*>( src_data_block->get_data() ), dst_data_block );
     case DataType::FLOAT_E:
-      return ConvertDataTypeInternal<float>( 
+      return ConvertDataTypeInternal<float>(
         reinterpret_cast<float*>( src_data_block->get_data() ), dst_data_block );
     case DataType::DOUBLE_E:
-      return ConvertDataTypeInternal<double>( 
+      return ConvertDataTypeInternal<double>(
         reinterpret_cast<double*>( src_data_block->get_data() ), dst_data_block );
     default:
       dst_data_block.reset();
@@ -713,7 +794,7 @@ bool DataBlock::ConvertDataType( const DataBlockHandle& src_data_block,
 }
 
 template<class DATA>
-static bool PermuteDataInternal( const DataBlockHandle& src_data_block, 
+static bool PermuteDataInternal( const DataBlockHandle& src_data_block,
   DataBlockHandle& dst_data_block, std::vector<int>& permutation )
 {
   DATA* src = reinterpret_cast<DATA*>( src_data_block->get_data() );
@@ -723,47 +804,47 @@ static bool PermuteDataInternal( const DataBlockHandle& src_data_block,
 
   std::vector<index_type> start(3);
   std::vector<index_type> stride(3);
-  
+
   index_type nx = static_cast<index_type>( src_data_block->get_nx() );
   index_type ny = static_cast<index_type>( src_data_block->get_ny() );
   index_type nz = static_cast<index_type>( src_data_block->get_nz() );
   index_type nxy = nx*ny;
   index_type nxyz = nx*ny*nz;
-  
+
   for ( index_type j = 0; j < 3; j++)
   {
     if ( permutation[ j ] == 1 )
     {
       start[ j ] = 0;
-      stride[ j ] = 1; 
+      stride[ j ] = 1;
     }
     else if ( permutation[ j ] == -1 )
     {
       start[ j ] = nx - 1;
-      stride[ j ] = -1;   
+      stride[ j ] = -1;
     }
     else if ( permutation[ j ] == 2 )
     {
       start[ j ] = 0;
-      stride[ j ] = nx; 
+      stride[ j ] = nx;
     }
     else if ( permutation[ j ] == -2 )
     {
       start[ j ] = nxy - nx;
-      stride[ j ] = -nx;  
+      stride[ j ] = -nx;
     }
     else if ( permutation[ j ] == 3 )
     {
       start[ j ] = 0;
-      stride[ j ] = nxy; 
+      stride[ j ] = nxy;
     }
     else if ( permutation[ j ] == -3 )
     {
       start[ j ] = nxyz - nxy;
-      stride[ j ] = -nxy;   
+      stride[ j ] = -nxy;
     }
   }
-  
+
   index_type dnx = static_cast<index_type>( dst_data_block->get_nx() );
   index_type dny = static_cast<index_type>( dst_data_block->get_ny() );
   index_type dnz = static_cast<index_type>( dst_data_block->get_nz() );
@@ -788,11 +869,11 @@ static bool PermuteDataInternal( const DataBlockHandle& src_data_block,
     }
     sz += sz_stride;
   }
-  
+
   return true;
 }
 
-bool DataBlock::PermuteData( const DataBlockHandle& src_data_block, 
+bool DataBlock::PermuteData( const DataBlockHandle& src_data_block,
   DataBlockHandle& dst_data_block, std::vector<int> permutation )
 {
   dst_data_block.reset();
@@ -805,49 +886,55 @@ bool DataBlock::PermuteData( const DataBlockHandle& src_data_block,
     dst_data_block.reset();
     return false;
   }
-  
+
   size_t dn[3];
   dn[ 0 ] = 1;
   dn[ 1 ] = 1;
   dn[ 2 ] = 1;
-  
+
   for ( size_t j = 0; j < 3; j++)
   {
     if ( permutation[ j ] == 1 || permutation[ j ] == -1 ) dn[ j ] = src_data_block->get_nx();
     if ( permutation[ j ] == 2 || permutation[ j ] == -2 ) dn[ j ] = src_data_block->get_ny();
-    if ( permutation[ j ] == 3 || permutation[ j ] == -3 ) dn[ j ] = src_data_block->get_nz();    
+    if ( permutation[ j ] == 3 || permutation[ j ] == -3 ) dn[ j ] = src_data_block->get_nz();
   }
-  
+
   if ( dn[ 0 ] * dn[ 1 ] * dn[ 2 ] == 0 ) return false;
-  
-  dst_data_block = StdDataBlock::New( dn[ 0 ], dn[ 1 ], dn[ 2 ], 
-    src_data_block->get_data_type() );  
+
+  dst_data_block = StdDataBlock::New( dn[ 0 ], dn[ 1 ], dn[ 2 ],
+    src_data_block->get_data_type() );
 
   switch( src_data_block->get_data_type() )
   {
     case DataType::CHAR_E:
-      return PermuteDataInternal<signed char>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<signed char>( src_data_block, dst_data_block,
         permutation );
     case DataType::UCHAR_E:
-      return PermuteDataInternal<unsigned char>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<unsigned char>( src_data_block, dst_data_block,
         permutation );
     case DataType::SHORT_E:
-      return PermuteDataInternal<short>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<short>( src_data_block, dst_data_block,
         permutation );
     case DataType::USHORT_E:
-      return PermuteDataInternal<unsigned short>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<unsigned short>( src_data_block, dst_data_block,
         permutation );
     case DataType::INT_E:
-      return PermuteDataInternal<int>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<int>( src_data_block, dst_data_block,
         permutation );
     case DataType::UINT_E:
-      return PermuteDataInternal<unsigned int>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<unsigned int>( src_data_block, dst_data_block,
+        permutation );
+    case DataType::LONGLONG_E:
+      return PermuteDataInternal<long long>( src_data_block, dst_data_block,
+        permutation );
+    case DataType::ULONGLONG_E:
+      return PermuteDataInternal<unsigned long long>( src_data_block, dst_data_block,
         permutation );
     case DataType::FLOAT_E:
-      return PermuteDataInternal<float>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<float>( src_data_block, dst_data_block,
         permutation );
     case DataType::DOUBLE_E:
-      return PermuteDataInternal<double>( src_data_block, dst_data_block, 
+      return PermuteDataInternal<double>( src_data_block, dst_data_block,
         permutation );
     default:
       return false;
@@ -860,103 +947,135 @@ static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHa
 {
   float fmin = static_cast<float>( min );
   float fmax = static_cast<float>( max );
-  
+
   size_t size = dst_data_block->get_size();
   switch ( dst_data_block->get_data_type() )
   {
-    case DataType::CHAR_E:  
+    case DataType::CHAR_E:
     {
       signed char* dst = reinterpret_cast<signed char*>( dst_data_block->get_data() );
 
       float offset = 0.5f - static_cast<float>( 0x80 );
       float multiplier = 0.0f;
       if ( fmax > fmin ) multiplier = static_cast<float>( 0x100 ) / (fmax - fmin);
-      
+
       for ( size_t j = 0 ; j < size; j++ )
       {
-        dst[ j ] = static_cast<signed char>( multiplier * 
+        dst[ j ] = static_cast<signed char>( multiplier *
           (static_cast<float>( src[ j ] ) - fmin)  + offset );
       }
-      
+
       return true;
     }
-    case DataType::UCHAR_E: 
+    case DataType::UCHAR_E:
     {
       unsigned char* dst = reinterpret_cast<unsigned char*>( dst_data_block->get_data() );
-      
+
       float offset = 0.5f;
       float multiplier = 0.0f;
       if ( fmax > fmin ) multiplier = static_cast<float>( 0x100 ) / (fmax - fmin);
-             
+
       for ( size_t j = 0 ; j < size; j++ )
       {
-        dst[ j ] = static_cast<unsigned char>( multiplier * 
+        dst[ j ] = static_cast<unsigned char>( multiplier *
           (static_cast<float>( src[ j ] ) - fmin)  + offset );
       }
       return true;
     }
-    case DataType::SHORT_E: 
+    case DataType::SHORT_E:
     {
       short* dst = reinterpret_cast<short*>( dst_data_block->get_data() );
 
       float offset = 0.5f - static_cast<float>( 0x8000 );
       float multiplier = 0.0f;
       if ( fmax > fmin ) multiplier = static_cast<float>( 0x10000 ) / (fmax - fmin);
-      
+
       for ( size_t j = 0 ; j < size; j++ )
       {
-        dst[ j ] = static_cast<short>( multiplier * 
+        dst[ j ] = static_cast<short>( multiplier *
           (static_cast<float>( src[ j ] ) - fmin)  + offset );
       }
-      
+
       return true;
     }
-    case DataType::USHORT_E:  
+    case DataType::USHORT_E:
     {
       unsigned short* dst = reinterpret_cast<unsigned short*>( dst_data_block->get_data() );
 
       float offset = 0.5f;
       float multiplier = 0.0f;
       if ( fmax > fmin ) multiplier = static_cast<float>( 0x10000 ) / (fmax - fmin);
-      
+
       for ( size_t j = 0 ; j < size; j++ )
       {
-        dst[ j ] = static_cast<unsigned short>( multiplier * 
+        dst[ j ] = static_cast<unsigned short>( multiplier *
           (static_cast<float>( src[ j ] ) - fmin)  + offset);
       }
-      
+
       return true;
     }
-    case DataType::INT_E: 
+    case DataType::INT_E:
     {
       int* dst = reinterpret_cast<int*>( dst_data_block->get_data() );
 
       double offset = 0.5 -  static_cast<double>( 0x80000000 );
       double multiplier = 0.0;
       if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) / (max - min);
-      
+
       for ( size_t j = 0 ; j < size; j++ )
       {
-        dst[ j ] = static_cast<int>( multiplier * 
+        dst[ j ] = static_cast<int>( multiplier *
           (static_cast<double>( src[ j ] ) - min)  + offset);
       }
-      
+
       return true;
     }
-    case DataType::UINT_E:  
+    case DataType::UINT_E:
     {
       unsigned int* dst = reinterpret_cast<unsigned int*>( dst_data_block->get_data() );
 
       double offset = 0.5;
       double multiplier = 0.0;
       if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) / (max - min);
-      
+
       for ( size_t j = 0 ; j < size; j++ )
       {
-        dst[ j ] = static_cast<unsigned int>( multiplier * 
+        dst[ j ] = static_cast<unsigned int>( multiplier *
           (static_cast<double>( src[ j ] ) - min)  + offset);
       }
-      
+
+      return true;
+    }
+    case DataType::LONGLONG_E:
+    {
+      long long* dst = reinterpret_cast<long long*>( dst_data_block->get_data() );
+
+      double offset = 0.5 -  static_cast<double>( 0x80000000 ) * static_cast<double>( 0x100000000ull );
+      double multiplier = 0.0;
+      if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) * static_cast<double>( 0x100000000ull ) / (max - min);
+
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<long long>( multiplier *
+          (static_cast<double>( src[ j ] ) - fmin)  + offset );
+      }
+
+      return true;
+    }
+    case DataType::ULONGLONG_E:
+    {
+      unsigned long long* dst = reinterpret_cast<unsigned long long*>( dst_data_block->get_data() );
+
+      double offset = 0.5;
+      double multiplier = 0.0;
+      if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) * static_cast<double>( 0x100000000ull ) / (max - min);
+
+      for ( size_t j = 0 ; j < size; j++ )
+      {
+        dst[ j ] = static_cast<unsigned long long>( multiplier *
+          (static_cast<double>( src[ j ] ) - fmin)  + offset);
+      }
+
       return true;
     }
     default:
@@ -967,39 +1086,40 @@ static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHa
   }
 }
 
-bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block, 
+bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block,
   DataBlockHandle& dst_data_block, DataType new_data_type )
 {
   dst_data_block.reset();
   if ( !src_data_block ) return false;
-  
+
   shared_lock_type lock( src_data_block->get_mutex( ) );
 
   if ( new_data_type != DataType::CHAR_E && new_data_type != DataType::UCHAR_E &&
     new_data_type != DataType::SHORT_E && new_data_type != DataType::USHORT_E &&
-    new_data_type != DataType::INT_E && new_data_type != DataType::UINT_E )
+    new_data_type != DataType::INT_E && new_data_type != DataType::UINT_E &&
+    new_data_type != DataType::LONGLONG_E && new_data_type != DataType::ULONGLONG_E )
   {
     return false;
-  } 
+  }
 
   dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
     src_data_block->get_ny(), src_data_block->get_nz(), new_data_type );
-    
+
   if ( !dst_data_block )
   {
     return false;
   }
-  
+
   double min = src_data_block->get_min();
   double max = src_data_block->get_max();
-  
+
   switch( src_data_block->get_data_type() )
   {
     case DataType::CHAR_E:
-      return QuantizeDataInternal<signed char>( min, max, 
+      return QuantizeDataInternal<signed char>( min, max,
         reinterpret_cast<signed char*>( src_data_block->get_data() ), dst_data_block );
     case DataType::UCHAR_E:
-      return QuantizeDataInternal<unsigned char>( min, max, 
+      return QuantizeDataInternal<unsigned char>( min, max,
         reinterpret_cast<unsigned char*>( src_data_block->get_data() ), dst_data_block );
     case DataType::SHORT_E:
       return QuantizeDataInternal<short>( min, max,
@@ -1013,6 +1133,12 @@ bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block,
     case DataType::UINT_E:
       return QuantizeDataInternal<unsigned int>( min, max,
         reinterpret_cast<unsigned int*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::LONGLONG_E:
+      return QuantizeDataInternal<long long>( min, max,
+        reinterpret_cast<long long*>( src_data_block->get_data() ), dst_data_block );
+    case DataType::ULONGLONG_E:
+      return QuantizeDataInternal<unsigned long long>( min, max,
+        reinterpret_cast<unsigned long long*>( src_data_block->get_data() ), dst_data_block );
     case DataType::FLOAT_E:
       return QuantizeDataInternal<float>( min, max,
         reinterpret_cast<float*>( src_data_block->get_data() ), dst_data_block );
@@ -1024,7 +1150,7 @@ bool DataBlock::QuantizeData( const DataBlockHandle& src_data_block,
   }
 }
 
-bool DataBlock::Duplicate( const DataBlockHandle& src_data_block, 
+bool DataBlock::Duplicate( const DataBlockHandle& src_data_block,
     DataBlockHandle& dst_data_block )
 {
   // Step (1) : Check whether there is a source data block
@@ -1037,9 +1163,9 @@ bool DataBlock::Duplicate( const DataBlockHandle& src_data_block,
   // Step (3): Generate a new data block with the right type
   dst_data_block = StdDataBlock::New( src_data_block->get_nx(),
     src_data_block->get_ny(), src_data_block->get_nz(), src_data_block->get_data_type() );
-    
-  // Step (4): Copy the data  
-  size_t mem_size = src_data_block->get_size(); 
+
+  // Step (4): Copy the data
+  size_t mem_size = src_data_block->get_size();
   switch( src_data_block->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -1060,6 +1186,12 @@ bool DataBlock::Duplicate( const DataBlockHandle& src_data_block,
     case DataType::UINT_E:
       mem_size *= sizeof( unsigned int );
       break;
+    case DataType::LONGLONG_E:
+      mem_size *= sizeof( long long );
+      break;
+    case DataType::ULONGLONG_E:
+      mem_size *= sizeof( unsigned long long );
+      break;
     case DataType::FLOAT_E:
       mem_size *= sizeof( float );
       break;
@@ -1070,7 +1202,7 @@ bool DataBlock::Duplicate( const DataBlockHandle& src_data_block,
       return false;
   }
   std::memcpy( dst_data_block->get_data(), src_data_block->get_data(), mem_size );
-  
+
   // Step (5) : Copy the histogram
   dst_data_block->set_histogram( src_data_block->get_histogram() );
 
@@ -1078,12 +1210,12 @@ bool DataBlock::Duplicate( const DataBlockHandle& src_data_block,
 }
 
 template<class T>
-bool ExtractSliceInternal( DataBlock* volume_data_block, 
+bool ExtractSliceInternal( DataBlock* volume_data_block,
     DataSliceHandle& slice, SliceType type, DataBlock::index_type index )
 {
   // Clear the handle so it does not refer to anything
   slice.reset();
-  
+
   // Create a datablock in which the slice is generated
   DataBlockHandle slice_data_block;
 
@@ -1091,7 +1223,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
   size_t nx = volume_data_block->get_nx();
   size_t ny = volume_data_block->get_ny();
   size_t nz = volume_data_block->get_nz();
-  
+
   // The algorithm is optimized for the axis type
   switch( type )
   {
@@ -1100,15 +1232,15 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
     {
       // Check whether the slice is in range
       if ( index < 0 || index >= static_cast<DataBlock::index_type>( nx ) ) return false;
-    
+
       // Create a new datablock for this slice
       slice_data_block = StdDataBlock::New( 1, ny, nz, volume_data_block->get_data_type() );
       if ( !slice_data_block ) return false;
-      
+
       // Get the direct pointers to the data
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
-      
+
       // Short cut so we do not need to recompute this one over and over again
       size_t nxy = nx * ny;
       // Size for loop unrolling
@@ -1121,7 +1253,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
         for ( ; y < ny8; y += 8 )
         {
           // Copy the data over
-          size_t a = y + z * ny; 
+          size_t a = y + z * ny;
           size_t b = index + y * nx + z * nxy;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b+= nx;
@@ -1138,7 +1270,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
           slice_ptr[ y + z * ny ] = volume_ptr[ index + y * nx + z * nxy ];
         }
       }
-      
+
       slice = DataSliceHandle( new DataSlice( slice_data_block, type, index ) );
       return true;
     }
@@ -1147,15 +1279,15 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
     {
       // Check whether the slice is in range
       if ( index < 0 || index >= static_cast<DataBlock::index_type>( ny ) ) return false;
-    
+
       // Create a new datablock for this slice
       slice_data_block = StdDataBlock::New( nx, 1, nz, volume_data_block->get_data_type() );
       if ( !slice_data_block ) return false;
-      
+
       // Get the direct pointers to the data
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
-      
+
       // Short cut so we do not need to recompute this one over and over again
       size_t nxy = nx * ny;
       // Size for loop unrolling
@@ -1168,7 +1300,7 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
         for ( ; x < nx8; x += 8 )
         {
           // Copy the data over
-          size_t a = x + z * nx; 
+          size_t a = x + z * nx;
           size_t b = x + index * nx + z * nxy;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
           slice_ptr[ a ] = volume_ptr[ b ]; a++; b++;
@@ -1194,15 +1326,15 @@ bool ExtractSliceInternal( DataBlock* volume_data_block,
     {
       // Check range of data
       if ( index < 0 || index >= static_cast<DataBlock::index_type>( nz ) ) return false;
-    
+
       // Create a new data block
       slice_data_block = StdDataBlock::New( nx, ny, 1, volume_data_block->get_data_type() );
       if ( !slice_data_block ) return false;
-      
+
       // Get direct pointers to the data
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
-      
+
       // Copy the data as one block copy. As data is properly aligned in data, it can be
       // done in one copy, unlike the previous two
       std::memcpy( slice_ptr, volume_ptr + index * ( nx * ny ), nx * ny * sizeof( T ) );
@@ -1224,7 +1356,7 @@ bool DataBlock::extract_slice( SliceType type, index_type index, DataSliceHandle
 
   // For each of the supported datatypes grab the slice using a templated function
   switch( this->get_data_type() )
-  { 
+  {
     case DataType::CHAR_E:
       return ExtractSliceInternal<signed char>( this, slice, type, index );
     case DataType::UCHAR_E:
@@ -1237,6 +1369,10 @@ bool DataBlock::extract_slice( SliceType type, index_type index, DataSliceHandle
       return ExtractSliceInternal<int>( this, slice, type, index );
     case DataType::UINT_E:
       return ExtractSliceInternal<unsigned int>( this, slice, type, index );
+    case DataType::LONGLONG_E:
+      return ExtractSliceInternal<long long>( this, slice, type, index );
+    case DataType::ULONGLONG_E:
+      return ExtractSliceInternal<unsigned long long>( this, slice, type, index );
     case DataType::FLOAT_E:
       return ExtractSliceInternal<float>( this, slice, type, index );
     case DataType::DOUBLE_E:
@@ -1254,17 +1390,17 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
   size_t nx = volume_data_block->get_nx();
   size_t ny = volume_data_block->get_ny();
   size_t nz = volume_data_block->get_nz();
-  
+
   // Get the slice DataBlock
   DataBlockHandle slice_data_block = slice->get_data_block();
-  
+
   // Need to have a write lock for the volume
   // NOTE: once the data is altered, the generation number needs to be increased
   DataBlock::lock_type lock( volume_data_block->get_mutex() );
   // Need to have a read lock on the slice
   DataBlock::shared_lock_type slock( slice_data_block->get_mutex() );
-  
-  DataBlock::index_type index = slice->get_index();   
+
+  DataBlock::index_type index = slice->get_index();
   // For each axis there is an optimized algorithm
   switch( slice->get_slice_type() )
   {
@@ -1273,11 +1409,11 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
     {
       // Check the range of the slice number
       if ( index < 0 || index >= static_cast<DataBlock::index_type>( nx ) ) return false;
-    
+
       // Get the pointers for source and destination
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
-      
+
       size_t nxy = nx * ny;
       // For loop unroll
       size_t ny8 = RemoveRemainder8( ny );
@@ -1289,7 +1425,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
         for ( ; y < ny8; y += 8 )
         {
           // Copy data back
-          size_t a = y + z * ny; 
+          size_t a = y + z * ny;
           size_t b = index + y * nx + z * nxy;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b+= nx;
@@ -1306,7 +1442,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
           volume_ptr[ index + y * nx + z * nxy ] = slice_ptr[ y + z * ny ];
         }
       }
-      
+
       volume_data_block->increase_generation();
 
       return true;
@@ -1315,11 +1451,11 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
     {
       // Check the range of the slice number
       if ( index < 0 || index >= static_cast<DataBlock::index_type>( ny ) ) return false;
-            
+
       // Get the pointers for source and destination
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
-      
+
       size_t nxy = nx * ny;
       // For loop unroll
       size_t nx8 = RemoveRemainder8( nx );
@@ -1331,7 +1467,7 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
         for ( ; x < nx8; x += 8 )
         {
           // Copy data back
-          size_t a = x + z * nx; 
+          size_t a = x + z * nx;
           size_t b = x + index * nx + z * nxy;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
           volume_ptr[ b ] = slice_ptr[ a ]; a++; b++;
@@ -1350,23 +1486,23 @@ bool InsertSliceInternal( DataBlock* volume_data_block, const DataSliceHandle& s
       }
 
       volume_data_block->increase_generation();
-      
+
       return true;
     }
     case SliceType::AXIAL_E:
     {
       // Check the range of the slice number
       if ( index < 0 || index >= static_cast<DataBlock::index_type>( nz ) ) return false;
-          
+
       // Get the pointers for source and destination
       T* volume_ptr = reinterpret_cast<T*>( volume_data_block->get_data() );
       T* slice_ptr = reinterpret_cast<T*>( slice_data_block->get_data() );
-      
+
       // Copy data as one memory block back
       std::memcpy( volume_ptr + index * ( nx * ny ), slice_ptr, nx * ny * sizeof( T ) );
-      
+
       volume_data_block->increase_generation();
-      
+
       return true;
     }
     default:
@@ -1384,7 +1520,7 @@ bool DataBlock::insert_slice( const DataSliceHandle slice )
 
   // Jump to the right algorithm for each data type
   switch( this->get_data_type() )
-  { 
+  {
     case DataType::CHAR_E:
       return InsertSliceInternal<signed char>( this, slice );
     case DataType::UCHAR_E:
@@ -1397,6 +1533,10 @@ bool DataBlock::insert_slice( const DataSliceHandle slice )
       return InsertSliceInternal<int>( this, slice );
     case DataType::UINT_E:
       return InsertSliceInternal<unsigned int>( this, slice );
+    case DataType::LONGLONG_E:
+      return InsertSliceInternal<long long>( this, slice );
+    case DataType::ULONGLONG_E:
+      return InsertSliceInternal<unsigned long long>( this, slice );
     case DataType::FLOAT_E:
       return InsertSliceInternal<float>( this, slice );
     case DataType::DOUBLE_E:
@@ -1435,7 +1575,7 @@ bool PadInternal( DataBlockHandle src, DataBlockHandle dst, int pad, double val)
     DataBlock::index_type pnz = dst->get_nz();
 
     DataBlock::index_type p = static_cast<DataBlock::index_type>(pad);
-    
+
     if (p > 0)
     {
         size_t size = dst->get_size();
@@ -1477,7 +1617,7 @@ bool PadInternal( DataBlockHandle src, DataBlockHandle dst, int pad, double val)
             }
         }
     }
-    
+
     return true;
 }
 
@@ -1499,7 +1639,7 @@ bool DataBlock::Pad( DataBlockHandle src_data_block,
   dst_data_block = StdDataBlock::New( src_data_block->get_nx() +  2*pad,
     src_data_block->get_ny() +  2*pad, src_data_block->get_nz() +  2*pad,
         src_data_block->get_data_type() );
-    
+
   switch( src_data_block->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -1514,6 +1654,10 @@ bool DataBlock::Pad( DataBlockHandle src_data_block,
             return PadInternal<int>(src_data_block,dst_data_block,pad, val);
     case DataType::UINT_E:
             return PadInternal<unsigned int>(src_data_block,dst_data_block,pad, val);
+    case DataType::LONGLONG_E:
+            return PadInternal<long long>(src_data_block,dst_data_block,pad, val);
+    case DataType::ULONGLONG_E:
+            return PadInternal<unsigned long long>(src_data_block,dst_data_block,pad, val);
     case DataType::FLOAT_E:
             return PadInternal<float>(src_data_block,dst_data_block,pad, val);
     case DataType::DOUBLE_E:
@@ -1561,12 +1705,12 @@ bool ClipInternal( DataBlockHandle src, DataBlockHandle dst, double val)
       for ( DataBlock::index_type x = 0; x < mnx; x++, sk++, dk++ )
       {
         ddata[dk] = sdata[sk];
-      } 
+      }
       for ( DataBlock::index_type x = 0; x < dx_offset; x++, dk++ )
       {
         ddata[dk] = typed_val;
       }
-    } 
+    }
     for ( DataBlock::index_type m = 0; m < dy_offset; m++, dk++ )
     {
       ddata[dk] = typed_val;
@@ -1576,7 +1720,7 @@ bool ClipInternal( DataBlockHandle src, DataBlockHandle dst, double val)
   {
     ddata[dk] = typed_val;
   }
-    
+
     return true;
 }
 
@@ -1595,7 +1739,7 @@ bool DataBlock::Clip( DataBlockHandle src_data_block,
   // Step (3): Generate a new data block with the right type
   dst_data_block = StdDataBlock::New( width, height, depth,
         src_data_block->get_data_type() );
-    
+
   switch( src_data_block->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -1610,6 +1754,10 @@ bool DataBlock::Clip( DataBlockHandle src_data_block,
             return ClipInternal<int>(src_data_block,dst_data_block, val);
     case DataType::UINT_E:
             return ClipInternal<unsigned int>(src_data_block,dst_data_block, val);
+    case DataType::LONGLONG_E:
+            return ClipInternal<long long>(src_data_block,dst_data_block, val);
+    case DataType::ULONGLONG_E:
+            return ClipInternal<unsigned long long>(src_data_block,dst_data_block, val);
     case DataType::FLOAT_E:
             return ClipInternal<float>(src_data_block,dst_data_block, val);
     case DataType::DOUBLE_E:

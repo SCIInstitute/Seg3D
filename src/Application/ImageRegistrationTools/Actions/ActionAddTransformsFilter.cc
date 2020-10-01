@@ -321,7 +321,7 @@ ActionAddTransformsFilter::run( Core::ActionContextHandle& context, Core::Action
       grid_transforms[i] =
       dynamic_cast<itk::GridTransform *>(transform_stos.GetPointer());
       
-      if ( grid_transforms[i].GetPointer() == NULL )
+      if ( grid_transforms[i].GetPointer() == nullptr )
       {
         std::cerr << stos[i].fn_load_ << " is not a grid transform.  Currently "
         << "ir-add-transforms only supports grid transforms." << std::endl;

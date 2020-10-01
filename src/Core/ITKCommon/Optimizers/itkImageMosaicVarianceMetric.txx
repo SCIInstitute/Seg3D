@@ -375,7 +375,7 @@ GetValueAndDerivative(const params_t & parameters,
   
   // reset the accumulators:
   derivative = derivative_t(n_concat);
-  derivative.Fill(NumericTraits<ITK_TYPENAME derivative_t::ValueType>::Zero);
+  derivative.Fill(NumericTraits<typename derivative_t::ValueType>::Zero);
   measure = NumericTraits<measure_t>::Zero;
   m_NumberOfPixelsCounted = 0;
   

@@ -57,7 +57,7 @@ reset(const unsigned int num_images,
     {
       for (unsigned int j = 0; j < num_images; j++)
       {
-        path[cascade][i][j] = NULL;
+        path[cascade][i][j] = nullptr;
         cost[cascade][i][j] = std::numeric_limits<double>::max();
       }
     }
@@ -85,7 +85,7 @@ assemble_cascades(const unsigned int num_images,
         // attempt to establish a mapping between images i and j
         // via an intermediate mapping:
         
-        translate_transform_t::Pointer best_ij = NULL;
+        translate_transform_t::Pointer best_ij = nullptr;
         double best_metric = std::numeric_limits<double>::max();
         
         for (unsigned int sa = 0; sa < intermediate; sa++)
@@ -143,8 +143,8 @@ establish_mappings(const unsigned int num_images,
     
     for (unsigned int j = i + 1; j < num_images; j++)
     {
-      mapping[i][j] = NULL;
-      mapping[j][i] = NULL;
+      mapping[i][j] = nullptr;
+      mapping[j][i] = nullptr;
       mapping_cost[i][j] = std::numeric_limits<double>::max();
       mapping_cost[j][i] = std::numeric_limits<double>::max();
       
