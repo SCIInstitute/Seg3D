@@ -526,13 +526,13 @@ bool Matlab73LayerImporterPrivate::import_mat_array( H5::DataSet& dataset, std::
     case Core::DataType::LONGLONG_E:
     {
       long long* data = reinterpret_cast<long long*>( this->data_block_->get_data() );
-      dataset.read(data, H5::PredType::NATIVE_LONGLONG, memspace, dataspace);
+      dataset.read(data, H5::PredType::NATIVE_LLONG, memspace, dataspace);
       break;
     }
     case Core::DataType::ULONGLONG_E:
     {
       unsigned long long* data = reinterpret_cast<unsigned long long*>( this->data_block_->get_data() );
-      dataset.read(data, H5::PredType::NATIVE_ULONGLONG, memspace, dataspace);
+      dataset.read(data, H5::PredType::NATIVE_ULLONG, memspace, dataspace);
       break;
     }
     case Core::DataType::FLOAT_E:
