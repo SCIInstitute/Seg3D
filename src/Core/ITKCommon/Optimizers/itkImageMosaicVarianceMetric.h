@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -59,14 +59,14 @@
 
 namespace itk
 {
-  
+
 /** \class ImageMosaicVarianceMetric
  * \brief Computes mean pixel variance within the overlapping regions
  * of a mosaic.
  *
  */
-template <class TImage, class TInterpolator> 
-class ITK_EXPORT ImageMosaicVarianceMetric : public SingleValuedCostFunction 
+template <class TImage, class TInterpolator>
+class ITK_EXPORT ImageMosaicVarianceMetric : public SingleValuedCostFunction
 {
 public:
   /** Standard class typedefs. */
@@ -74,65 +74,65 @@ public:
   typedef SingleValuedCostFunction  Superclass;
   typedef SmartPointer<Self>    Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
-  
+
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-  
+
   /** Run-time type information (and related methods). */
   itkTypeMacro(ImageMosaicVarianceMetric, SingleValuedCostFunction);
-  
+
   /** Type of the moving Image. */
   typedef TInterpolator     interpolator_t;
   typedef TImage      image_t;
   typedef typename TImage::PixelType  pixel_t;
-  
+
   /** Constant for the image dimension */
   itkStaticConstMacro(ImageDimension, unsigned int, TImage::ImageDimension);
-  
+
   typedef itk::Image<unsigned char,
          itkGetStaticConstMacro(ImageDimension)> mask_t;
-  
+
   /** Type of the transform base class */
-  typedef Transform<Superclass::ParametersValueType, 
+  typedef Transform<Superclass::ParametersValueType,
                     itkGetStaticConstMacro(ImageDimension),
                     itkGetStaticConstMacro(ImageDimension)> transform_t;
-  
+
   typedef typename transform_t::InputPointType  point_t;
   typedef typename transform_t::ParametersType  params_t;
   typedef typename transform_t::JacobianType  jacobian_t;
-  
+
   /** Gaussian filter to compute the gradient of the mosaic images */
   // typedef typename NumericTraits<pixel_t>::RealType
   typedef float
   scalar_t;
-  
+
   typedef CovariantVector<scalar_t, itkGetStaticConstMacro(ImageDimension)>
   gradient_pixel_t;
-  
+
   typedef Image<gradient_pixel_t, itkGetStaticConstMacro(ImageDimension)>
   gradient_image_t;
-  
+
   typedef GradientRecursiveGaussianImageFilter<image_t, gradient_image_t>
   gradient_filter_t;
-  
+
   /** Type of the measure. */
   typedef Superclass::MeasureType measure_t;
-  
+
   /** Type of the derivative. */
   typedef Superclass::DerivativeType derivative_t;
-  
+
   /** Get the number of pixels considered in the computation. */
   itkGetConstReferenceMacro( NumberOfPixelsCounted, unsigned long );
-  
+
   /** Set/Get the region over which the metric will be computed */
   itkSetMacro( MosaicRegion, typename image_t::RegionType );
   itkGetConstReferenceMacro( MosaicRegion, typename image_t::RegionType );
-  
+
   /** Initialize transform parameter offsets.
-      
+
       Setup the mapping from individual transform parameter indices to
       the corresponding indices in the  concatenated parameter vector.
-      
+
       The radial distortion transforms typically share the same parameters
       across all images in the mosaic, therefore it is slow and unnecessary
       to duplicate the same parameters parameters in the concatenated
@@ -140,42 +140,42 @@ public:
       This also allows a significant speedup of the optimization. On the
       other hand, translation parameters are typically unique for each
       image.
-      
+
       params_shared is a vector of boolean flags indicating which of
       the transform parameters are shared (true) or unique (false).
-      
+
       NOTE: this function will fail if the transform_ has not been
       initialized.
   */
   void setup_param_map(const std::vector<bool> & params_shared,
            const std::vector<bool> & params_active);
-  
+
   /** Concatenate parameters of each transform into one big vector.
-      
+
       NOTE: this function will fail if SetupTransformParameterOffsets
       has not been called yet.
   */
   params_t GetTransformParameters() const;
-  
+
   /** virtual: Set the parameters defining the transforms:
-      
+
       NOTE: this function will fail if SetupTransformParameterOffsets
       has not been called yet.
   */
   void SetTransformParameters(const params_t & parameters) const;
-  
+
   /** virtual: Return the number of parameters required by the transforms.
-      
+
       NOTE: this function will fail if SetupTransformParameterOffsets
       has not been called yet.
   */
   unsigned int GetNumberOfParameters() const;
-  
+
   /** Initialize the Metric by making sure that all the components
       are present and plugged together correctly.
   */
   virtual void Initialize() throw (ExceptionObject);
-  
+
   /** virtual: Get the value for single valued optimizers. */
   measure_t GetValue(const params_t & parameters) const
   {
@@ -184,7 +184,7 @@ public:
     GetValueAndDerivative(parameters, measure, derivative);
     return measure;
   }
-  
+
   /** virtual: Get the derivatives of the match measure. */
   void GetDerivative(const params_t & parameters,
          derivative_t & derivative) const
@@ -192,18 +192,18 @@ public:
     measure_t measure;
     GetValueAndDerivative(parameters, measure, derivative);
   }
-  
+
   /** virtual: Get value and derivatives for multiple valued optimizers. */
   void GetValueAndDerivative(const params_t & parameters,
                              measure_t & value,
            derivative_t & derivative) const;
-  
+
   //----------------------------------------------------------------
   // image_data_t
-  // 
+  //
   // This datastructure is used to speed up access to relevant
   // information when evaluating GetValueAndDerivative:
-  // 
+  //
   class image_data_t
   {
   public:
@@ -213,77 +213,77 @@ public:
       dPdx_(measure_t(0)),
       dPdy_(measure_t(0))
     {}
-    
+
     // image id:
     unsigned int id_;
-    
+
     // image value:
     measure_t P_;
-    
+
     // partial derivative with respect to x:
     measure_t dPdx_;
-    
+
     // partial derivative with respect to y:
     measure_t dPdy_;
-    
+
     // a pointer to the Jacobian of the transform:
-    const jacobian_t * J_;
+    jacobian_t J_;
   };
-  
+
   // calculate the bounding box for a given set of image bounding boxes:
   void CalcMosaicBBox(point_t & mosaic_min,
           point_t & mosaic_max,
           std::vector<point_t> & image_min,
           std::vector<point_t> & image_max) const;
-  
+
   // calculate the mosaic variance image as well as maximum and mean variance:
   typename image_t::Pointer variance(measure_t & max_var,
              measure_t & avg_var) const;
-  
+
   typename image_t::Pointer variance(const typename TImage::SpacingType & sp,
              const pnt2d_t & mosaic_min,
              const pnt2d_t & mosaic_max,
              measure_t & max_var,
              measure_t & avg_var) const;
-  
+
   typename image_t::Pointer variance(const typename TImage::SpacingType & sp,
              const pnt2d_t & mosaic_min,
              const typename TImage::SizeType & sz,
              measure_t & max_var,
              measure_t & avg_var) const;
-  
+
   typename image_t::Pointer variance() const
   {
     measure_t max_var;
     measure_t avg_var;
     return variance(max_var, avg_var);
   }
-  
+
   // mosaic images:
   std::vector<typename image_t::ConstPointer> image_;
   std::vector<typename mask_t::ConstPointer>  mask_;
-  
+
   // image transforms (cascaded):
   mutable std::vector<typename transform_t::Pointer> transform_;
-  
+
   // image interpolators:
   std::vector<typename interpolator_t::Pointer> interpolator_;
-  
+
   // image gradients:
   std::vector<typename gradient_image_t::ConstPointer> gradient_;
-  
+
   // adresses of the individual transform parameter indices within the
   // concatenated parameter vector:
   std::vector<std::vector<unsigned int> > address_;
-  
+
   // number of shared/unique parameters per transform:
   unsigned int n_shared_;
   unsigned int n_unique_;
-  
+
   // this mask defines which of the individual transform parameters are
   // active and will be included into the metric parameter vector:
   std::vector<bool> param_active_;
-  
+
 protected:
   ImageMosaicVarianceMetric():
     n_shared_(0),
@@ -291,24 +291,24 @@ protected:
     param_active_(0),
     m_NumberOfPixelsCounted(0)
   {}
-  
+
   virtual ~ImageMosaicVarianceMetric()
   {}
-  
+
   // standard ITK debugging helper:
   void PrintSelf(std::ostream & os, Indent indent) const;
-  
+
   // number of pixels in the overlapping regions of the mosaic:
   mutable unsigned long m_NumberOfPixelsCounted;
-  
+
 private:
   // unimplemented on purpose:
   ImageMosaicVarianceMetric(const Self &);
   void operator = (const Self &);
-  
+
   typename image_t::RegionType m_MosaicRegion;
 };
-  
+
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

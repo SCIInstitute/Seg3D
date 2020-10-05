@@ -342,7 +342,7 @@ refine_one_pair(const TImage * i0,
   // perform the registration:
   try
   {
-    registration->StartRegistration();
+    registration->Update();
   }
   catch (itk::ExceptionObject & exception)
   {
@@ -1466,10 +1466,10 @@ else
               i + row < 0 || i + row >= edgeLen ||
               j + column < 0 || j + column >= edgeLen)
             continue;
-          
+
           //forget the diagonal neighbors
           if (i && j) continue;
-          
+
           //get the neighbor
           int neighbor = seed + edgeLen * i + j;
           if (strategy == TOP_LEFT_SNAKE)
@@ -1480,10 +1480,10 @@ else
               col = edgeLen - col - 1;
             neighbor = col + rw * edgeLen;
           }
-          
+
           if (neighbor > num_images || neighbor < 0)
             continue;
-          
+
           std::cout << "matching image " <<
             seed << " to " << neighbor << ". " << std::endl;
           //oss << "matching image " <<
