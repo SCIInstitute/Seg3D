@@ -29,7 +29,6 @@
 // HDF5 includes
 #include <itk_hdf5.h>
 #include <itk_H5Cpp.h>
-#include <itkhdf5/H5LTpublic.h>
 
 // Core includes
 #include <Core/DataBlock/StdDataBlock.h>
@@ -39,6 +38,247 @@
 #include <Application/LayerIO/Matlab73LayerImporter.h>
 
 #include <iostream>
+
+// Implementations of a few HDF5HL library functions so we don't have it as a dependency
+// Copied from https://github.com/HDFGroup/hdf5/blob/hdf5-1_10_4/hl/src/H5LT.c
+
+
+/*-------------------------------------------------------------------------
+* Function: H5LTget_dataset_ndims
+*
+* Purpose: Gets the dimensionality of a dataset.
+*
+* Return: Success: 0, Failure: -1
+*
+* Programmer: Pedro Vicente, pvn@ncsa.uiuc.edu
+*
+* Date: September 4, 2001
+*
+*-------------------------------------------------------------------------
+*/
+
+herr_t H5LTget_dataset_ndims( hid_t loc_id,
+                             const char *dset_name,
+                             int *rank )
+{
+    hid_t       did = -1;
+    hid_t       sid = -1;
+
+    /* check the arguments */
+    if (dset_name == NULL) 
+      return -1;
+
+    /* Open the dataset. */
+    if((did = H5Dopen2(loc_id, dset_name, H5P_DEFAULT)) < 0)
+        return -1;
+
+    /* Get the dataspace handle */
+    if((sid = H5Dget_space(did)) < 0)
+        goto out;
+
+    /* Get rank */
+    if((*rank = H5Sget_simple_extent_ndims(sid)) < 0)
+        goto out;
+
+    /* Terminate access to the dataspace */
+    if(H5Sclose(sid) < 0)
+        goto out;
+
+    /* End access to the dataset */
+    if(H5Dclose(did))
+        return -1;
+
+    return 0;
+
+out:
+    H5E_BEGIN_TRY {
+        H5Dclose(did);
+        H5Sclose(sid);
+    } H5E_END_TRY;
+    return -1;
+}
+
+
+/*-------------------------------------------------------------------------
+* Function: H5LTget_dataset_info
+*
+* Purpose: Gets information about a dataset.
+*
+* Return: Success: 0, Failure: -1
+*
+* Programmer: Pedro Vicente, pvn@ncsa.uiuc.edu
+*
+* Date: September 4, 2001
+*  Modified: February 28, 2006: checked for NULL parameters
+*
+*-------------------------------------------------------------------------
+*/
+
+herr_t H5LTget_dataset_info( hid_t loc_id,
+                            const char *dset_name,
+                            hsize_t *dims,
+                            H5T_class_t *type_class,
+                            size_t *type_size )
+{
+    hid_t       did = -1;
+    hid_t       tid = -1;
+    hid_t       sid = -1;
+
+    /* check the arguments */
+    if (dset_name == NULL) 
+      return -1;
+
+    /* open the dataset. */
+    if((did = H5Dopen2(loc_id, dset_name, H5P_DEFAULT)) < 0)
+        return -1;
+
+    /* get an identifier for the datatype. */
+    tid = H5Dget_type(did);
+
+    /* get the class. */
+    if(type_class != NULL)
+        *type_class = H5Tget_class(tid);
+
+    /* get the size. */
+    if(type_size!=NULL)
+        *type_size = H5Tget_size(tid);
+
+    if(dims != NULL) {
+        /* get the dataspace handle */
+        if((sid = H5Dget_space(did)) < 0)
+            goto out;
+
+        /* get dimensions */
+        if(H5Sget_simple_extent_dims(sid, dims, NULL) < 0)
+            goto out;
+
+        /* terminate access to the dataspace */
+        if(H5Sclose(sid) < 0)
+            goto out;
+    } /* end if */
+
+    /* release the datatype. */
+    if(H5Tclose(tid))
+        return -1;
+
+    /* end access to the dataset */
+    if(H5Dclose(did))
+        return -1;
+
+    return 0;
+
+out:
+    H5E_BEGIN_TRY {
+        H5Tclose(tid);
+        H5Sclose(sid);
+        H5Dclose(did);
+    } H5E_END_TRY;
+    return -1;
+
+}
+
+
+/*-------------------------------------------------------------------------
+* Function: H5LT_get_attribute_disk
+*
+* Purpose: Reads an attribute named attr_name with the datatype stored on disk
+*
+* Return: Success: 0, Failure: -1
+*
+* Programmer: Pedro Vicente, pvn@ncsa.uiuc.edu
+*
+* Date: September 19, 2002
+*
+* Comments:
+*
+* Modifications:
+*
+*-------------------------------------------------------------------------
+*/
+
+herr_t H5LT_get_attribute_disk( hid_t loc_id,
+                               const char *attr_name,
+                               void *attr_out )
+{
+    /* identifiers */
+    hid_t attr_id;
+    hid_t attr_type;
+
+    if(( attr_id = H5Aopen(loc_id, attr_name, H5P_DEFAULT)) < 0)
+        return -1;
+
+    if((attr_type = H5Aget_type(attr_id)) < 0)
+        goto out;
+
+    if(H5Aread(attr_id, attr_type, attr_out) < 0)
+        goto out;
+
+    if(H5Tclose(attr_type) < 0)
+        goto out;
+
+    if ( H5Aclose( attr_id ) < 0 )
+        return -1;;
+
+    return 0;
+
+out:
+    H5Tclose( attr_type );
+    H5Aclose( attr_id );
+    return -1;
+}
+
+
+/*-------------------------------------------------------------------------
+* Function: H5LTget_attribute_string
+*
+* Purpose: Reads an attribute named attr_name
+*
+* Return: Success: 0, Failure: -1
+*
+* Programmer: Pedro Vicente, pvn@ncsa.uiuc.edu
+*
+* Date: September 19, 2002
+*
+* Comments:
+*
+* Modifications:
+*
+*-------------------------------------------------------------------------
+*/
+
+
+herr_t H5LTget_attribute_string( hid_t loc_id,
+                                const char *obj_name,
+                                const char *attr_name,
+                                char *data )
+{
+    /* identifiers */
+    hid_t      obj_id;
+
+    /* check the arguments */
+    if (obj_name == NULL) 
+      return -1;
+    if (attr_name == NULL) 
+      return -1;
+
+    /* Open the object */
+    if ((obj_id = H5Oopen( loc_id, obj_name, H5P_DEFAULT)) < 0)
+        return -1;
+
+    /* Get the attribute */
+    if ( H5LT_get_attribute_disk( obj_id, attr_name, data ) < 0 ) 
+    {
+      H5Oclose(obj_id); 
+      return -1;
+    }
+
+    /* Close the object */
+    if(H5Oclose(obj_id) < 0)
+        return -1;
+
+    return 0;
+
+}
 
 #define MAX_DIMS 3
 #define BUFFER_SIZE 256
