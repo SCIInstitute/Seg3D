@@ -131,6 +131,7 @@ void QtRenderWidget::initializeGL()
 {
   this->context()->setShareContext(share);
 
+//  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
   glClearColor( 1.0f, 0.3f, 1.0f, 1.0f );
 
   if ( Core::RenderResources::Instance()->valid_render_resources() )
@@ -168,6 +169,7 @@ void QtRenderWidget::paintGL()
 
   if ( !texture || !overlay_texture )
   {
+      std::cout << "texture problem \n";
     return;
   }
 
