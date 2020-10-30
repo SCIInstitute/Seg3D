@@ -34,7 +34,7 @@ jobs:
         ./repair_package.sh
 
     - name: Upload installer
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: Seg3DMacInstaller
-        path: bin/Seg3D/Seg3D2-2.5.0-Darwin.pkg
+        path: bin/Seg3D/Seg3D2-2.*-Darwin.pkg
