@@ -932,13 +932,13 @@ void LayerFilter::run()
   // If more filters are running wait until one of them finished computing
   LayerFilterLock::Instance()->lock();
   
-  try
-  {
+  //try
+  //{
     this->run_filter();
-  }
-  catch( ... )
-  {
-  }
+  //}
+  //catch( ... )
+  //{
+  //}
   
   // Release the lock so another filter can start
   LayerFilterLock::Instance()->unlock();

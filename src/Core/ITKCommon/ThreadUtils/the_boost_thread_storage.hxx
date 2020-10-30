@@ -53,7 +53,7 @@ public:
   // virtual: check whether the thread storage has been initialized:
   bool is_ready() const
   {
-    return (boost::thread_specific_ptr<the_thread_observer_t>::get() != NULL);
+    return (boost::thread_specific_ptr<the_thread_observer_t>::get() != nullptr);
   }
   
   // virtual: check whether the thread has been stopped:

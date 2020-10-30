@@ -96,7 +96,7 @@ public:
   //----------------------------------------------------------------
   // status_cb_t
   // 
-  // NOTE: if status is NULL, it means the transaction is requesting
+  // NOTE: if status is nullptr, it means the transaction is requesting
   // a callback from the main thread.  This could be used by the
   // transaction for some GUI user interaction (such as finding replacement
   // tiles for a mosaic, etc...)
@@ -115,7 +115,7 @@ public:
   // notify the transaction about a change in it's state:
   virtual void notify(the_transaction_handler_t * handler,
           state_t s,
-          const char * message = NULL);
+          const char * message = nullptr);
   
   // helper:
   virtual void blab(the_transaction_handler_t * handler,

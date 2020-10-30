@@ -61,7 +61,7 @@ public:
   void detach_texture( TextureHandle texture, unsigned int attachment = GL_COLOR_ATTACHMENT0_EXT );
   void attach_renderbuffer( RenderbufferHandle renderbuffer, unsigned int attachment );
   void detach_renderbuffer( RenderbufferHandle renderbuffer, unsigned int attachment );
-  bool check_status( GLenum* status = NULL );
+  bool check_status( GLenum* status = nullptr );
 
 private:
   unsigned int id_;

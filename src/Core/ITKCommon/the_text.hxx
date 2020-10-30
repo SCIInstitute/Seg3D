@@ -82,7 +82,7 @@ public:
   inline void clear()
   {
     delete [] text_;
-    text_ = NULL;
+    text_ = nullptr;
     size_ = 0;
   }
   

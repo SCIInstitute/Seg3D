@@ -417,7 +417,7 @@ draw_keys(native_image_t::Pointer * image,
        i != keys.end(); ++i)
   {
     const descriptor_t & d = *i;
-    if (d.extrema_ == NULL) continue;
+    if (d.extrema_ == nullptr) continue;
     
     const double & v = d.extrema_->mass_;
     key_min = std::min(key_min, v);
@@ -433,7 +433,7 @@ draw_keys(native_image_t::Pointer * image,
   for (unsigned int i = 0; i < num_keys; i++, ++iter)
   {
     const descriptor_t & key = *iter;
-    if (key.extrema_ == NULL) continue;
+    if (key.extrema_ == nullptr) continue;
     
 //#if 0
 //    const double t = (key.extrema_->mass_ - key_min) / key_rng;

@@ -74,7 +74,7 @@ public:
   
   // the thread will own the mutex passed down to it,
   // it will delete the mutex when the thread is deleted:
-  the_thread_interface_t(the_mutex_interface_t * mutex = NULL);
+  the_thread_interface_t(the_mutex_interface_t * mutex = nullptr);
   
   //----------------------------------------------------------------
   // creator_t

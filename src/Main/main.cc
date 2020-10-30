@@ -54,7 +54,7 @@ int main( int argc, char **argv )
   putenv("LANG=C");
 
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
-  Seg3DBase* app = NULL;
+  Seg3DBase* app = nullptr;
   bool headless = Core::Application::Instance()->is_command_line_parameter( "headless" );
   if ( headless )
     app = new Seg3DHeadless();

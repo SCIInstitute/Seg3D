@@ -75,7 +75,7 @@ bool GLSLShader::set_source_file( const std::string& file_name )
   source_file.close();
 
   const char* str = source_str.c_str();
-  glShaderSource( this->shader_id_, 1, &str, NULL );
+  glShaderSource( this->shader_id_, 1, &str, nullptr );
 
   return true;
 }
@@ -93,7 +93,7 @@ void GLSLShader::set_source( const std::string& source )
   source_str += source;
 
   const char* shader_str = source_str.c_str();
-  glShaderSource( this->shader_id_, 1, &shader_str, NULL );
+  glShaderSource( this->shader_id_, 1, &shader_str, nullptr );
 }
 
 bool GLSLShader::compile()

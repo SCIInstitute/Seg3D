@@ -445,7 +445,7 @@ public:
       load_data(data, mask, shrink_factor, clahe_slope, clahe_window);
       
       // we don't care about the image data here, get rid of it:
-      data = NULL;
+      data = nullptr;
       
       // gather childrens masks and clip this nodes mask against it children:
       for (typename std::list<link_t>::const_iterator
@@ -465,7 +465,7 @@ public:
           // clip this nodes mask against the childs mask:
           base_transform_t::ConstPointer t = link.stos_.t01_.GetPointer();
 
-          if ( mask != mask_t::Pointer(NULL) && imask != mask_t::Pointer(NULL) )
+          if ( mask != mask_t::Pointer(nullptr) && imask != mask_t::Pointer(nullptr) )
             clip_mask_a_by_b(mask, imask, t);
         }
       }

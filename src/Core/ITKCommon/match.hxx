@@ -50,8 +50,8 @@ class match_t
 {
 public:
   match_t():
-  a_(NULL),
-  b_(NULL),
+  a_(nullptr),
+  b_(nullptr),
   error_(std::numeric_limits<double>::max()),
   r_(1.0)
   {}
@@ -65,14 +65,14 @@ public:
   error_(error),
   r_(r)
   {
-    assert(a != NULL && b != NULL);
+    assert(a != nullptr && b != nullptr);
   }
   
   // this will be used to sort the matches from best to worst:
   inline bool operator < (const match_t & match) const
   {
     // FIXME:
-    assert(a_ != NULL && b_ != NULL);
+    assert(a_ != nullptr && b_ != nullptr);
     
     return error_ < match.error_;
   }

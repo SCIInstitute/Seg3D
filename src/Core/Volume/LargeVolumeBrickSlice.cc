@@ -67,13 +67,13 @@ public:
     Vector spacing =  schema->get_level_spacing( bi.level_ );
 
     BBox total = BBox( total_trans.get_origin() - total_trans.project( Vector( 0.5, 0.5, 0.5 ) ) , total_trans.project( Point (
-      static_cast<double>(total_trans.get_nx()), 
-      static_cast<double>(total_trans.get_ny()), 
+      static_cast<double>(total_trans.get_nx()),
+      static_cast<double>(total_trans.get_ny()),
       static_cast<double>(total_trans.get_nz()) ) ) - total_trans.project( Vector( 0.5, 0.5, 0.5 ) ) );
 
     this->outer_ = BBox( brick_trans.get_origin() - brick_trans.project( Vector( 0.5, 0.5, 0.5 ) ) , brick_trans.project( Point (
-      static_cast<double>(brick_trans.get_nx()), 
-      static_cast<double>(brick_trans.get_ny()), 
+      static_cast<double>(brick_trans.get_nx()),
+      static_cast<double>(brick_trans.get_ny()),
       static_cast<double>(brick_trans.get_nz()) ) ) - brick_trans.project( Vector( 0.5, 0.5, 0.5 ) ) );
 
     Point inner_min = outer_.min() + spacing * overlap;
@@ -99,7 +99,7 @@ public:
     PixelBufferObjectHandle pixel_buffer(new PixelUnpackBuffer);
     pixel_buffer->bind();
     pixel_buffer->set_buffer_data(sizeof(unsigned short) * width * height,
-      NULL, GL_STREAM_DRAW);
+      nullptr, GL_STREAM_DRAW);
     unsigned short* buffer = reinterpret_cast< unsigned short* >( pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
     int row_start = slice_data_start;
@@ -109,7 +109,7 @@ public:
       current_index = row_start;
       for (int i = 0; i < width; i++)
       {
-        buffer[ j * width + i ] = static_cast<unsigned short>(  
+        buffer[ j * width + i ] = static_cast<unsigned short>(
         ( data[ current_index ] - typed_value_min ) * inv_value_range );
 
         current_index += h_stride;
@@ -121,7 +121,7 @@ public:
     pixel_buffer->unmap_buffer();
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     this->texture_->set_sub_image(0, 0, width,
-      height, NULL, GL_LUMINANCE, GL_UNSIGNED_SHORT);
+      height, nullptr, GL_LUMINANCE, GL_UNSIGNED_SHORT);
     this->texture_->unbind();
 
     // Step 3. release the pixel unpack buffer
@@ -195,11 +195,11 @@ public:
     switch (data_block->get_data_type())
     {
     case DataType::UCHAR_E:
-      copy_slice_data(reinterpret_cast<unsigned char*>(data), slice_data_start, 
+      copy_slice_data(reinterpret_cast<unsigned char*>(data), slice_data_start,
         width, height, h_stride, v_stride, min_val, max_val );
       break;
     case DataType::CHAR_E:
-      copy_slice_data(reinterpret_cast<signed char*>(data), slice_data_start, 
+      copy_slice_data(reinterpret_cast<signed char*>(data), slice_data_start,
         width, height, h_stride, v_stride, min_val, max_val );
       break;
     case DataType::USHORT_E:
@@ -217,7 +217,15 @@ public:
     case DataType::INT_E:
       copy_slice_data(reinterpret_cast<int*>(data), slice_data_start,
         width, height, h_stride, v_stride, min_val, max_val );
-      break;    
+      break;
+    case DataType::ULONGLONG_E:
+      copy_slice_data(reinterpret_cast<unsigned long long*>(data), slice_data_start,
+        width, height, h_stride, v_stride, min_val, max_val );
+      break;
+    case DataType::LONGLONG_E:
+      copy_slice_data(reinterpret_cast<long long*>(data), slice_data_start,
+        width, height, h_stride, v_stride, min_val, max_val );
+      break;
     case DataType::FLOAT_E:
       copy_slice_data(reinterpret_cast<float*>(data), slice_data_start,
         width, height, h_stride, v_stride, min_val, max_val );
@@ -225,7 +233,7 @@ public:
     case DataType::DOUBLE_E:
       copy_slice_data(reinterpret_cast<double*>(data), slice_data_start,
         width, height, h_stride, v_stride, min_val, max_val );
-      break;    
+      break;
     default:
       break;
     }
@@ -236,7 +244,7 @@ public:
   }
 };
 
-LargeVolumeBrickSlice::LargeVolumeBrickSlice( LargeVolumeHandle volume, 
+LargeVolumeBrickSlice::LargeVolumeBrickSlice( LargeVolumeHandle volume,
   LargeVolumeSchemaHandle schema, const BrickInfo& bi ) :
   private_(new LargeVolumeBrickSlicePrivate(volume, schema, bi))
 {

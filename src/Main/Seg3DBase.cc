@@ -100,21 +100,21 @@ void RedirectIOToConsole()
 	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
 	fp = _fdopen(hConHandle, "w");
 	*stdout = *fp;
-	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stdout, nullptr, _IONBF, 0);
 
 	// redirect unbuffered STDIN to the console
 	lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
 	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
 	fp = _fdopen(hConHandle, "r");
 	*stdin = *fp;
-	setvbuf(stdin, NULL, _IONBF, 0);
+	setvbuf(stdin, nullptr, _IONBF, 0);
 
 	// redirect unbuffered STDERR to the console
 	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
 	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
 	fp = _fdopen(hConHandle, "w");
 	*stderr = *fp;
-	setvbuf(stderr, NULL, _IONBF, 0);
+	setvbuf(stderr, nullptr, _IONBF, 0);
 }
 #endif
 
@@ -279,7 +279,7 @@ void Seg3DBase::initialize_sockets()
 #ifdef BUILD_WITH_PYTHON
   // -- Add a socket for receiving actions --
     CORE_LOG_MESSAGE( std::string("Starting a socket on port: ") + Core::ExportToString( this->port_number ) );
-    Seg3D::ActionSocket::Instance()->start( this->port_number );
+    ActionSocket::Instance()->start( this->port_number );
     InterfaceManager::Instance()->set_initializing( true );
     InterfaceManager::Instance()->splash_screen_visibility_state_->set( false );
     InterfaceManager::Instance()->set_initializing( false );

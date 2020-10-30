@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -38,7 +38,7 @@ LiveWireImageFunction<TInputImage>
 {
   this->m_GradientMagnitudeWeight = 0.43;
   this->m_ZeroCrossingWeight = 0.43;
-  this->m_GradientDirectionWeight = 0.14; 
+  this->m_GradientDirectionWeight = 0.14;
   this->m_UseFaceConnectedness = true;
   this->m_UseImageSpacing = true;
 
@@ -49,7 +49,7 @@ LiveWireImageFunction<TInputImage>
 
   this->m_AnchorSeed.Fill( 0 );
 }
- 
+
 // Destructor
 template<class TInputImage>
 LiveWireImageFunction<TInputImage>
@@ -69,7 +69,7 @@ LiveWireImageFunction<TInputImage>
 
   /**
    * Generate images for generating the weights from the input image
-   */ 
+   */
   typedef CastImageFilter<InputImageType, RealImageType> CasterType;
   typename CasterType::Pointer caster = CasterType::New();
   caster->SetInput( this->GetInputImage() );
@@ -82,40 +82,40 @@ LiveWireImageFunction<TInputImage>
   this->m_GradientImage = gradient->GetOutput();
 
   this->m_GradientMagnitudeImage = RealImageType::New();
-  this->m_GradientMagnitudeImage->SetOrigin( 
+  this->m_GradientMagnitudeImage->SetOrigin(
     this->GetInputImage()->GetOrigin() );
-  this->m_GradientMagnitudeImage->SetSpacing( 
+  this->m_GradientMagnitudeImage->SetSpacing(
     this->GetInputImage()->GetSpacing() );
-  this->m_GradientMagnitudeImage->SetRegions( 
+  this->m_GradientMagnitudeImage->SetRegions(
     this->GetInputImage()->GetLargestPossibleRegion() );
   this->m_GradientMagnitudeImage->Allocate();
 
-  ImageRegionIterator<GradientImageType> ItG( this->m_GradientImage, 
+  ImageRegionIterator<GradientImageType> ItG( this->m_GradientImage,
     this->m_GradientImage->GetLargestPossibleRegion() );
-  ImageRegionIterator<RealImageType> ItM( this->m_GradientMagnitudeImage, 
+  ImageRegionIterator<RealImageType> ItM( this->m_GradientMagnitudeImage,
     this->m_GradientMagnitudeImage->GetLargestPossibleRegion() );
   for ( ItG.GoToBegin(), ItM.GoToBegin(); !ItG.IsAtEnd(); ++ItG, ++ItM )
     {
     ItM.Set( ( ItG.Get() ).GetNorm() );
-    } 
+    }
 
   typedef RescaleIntensityImageFilter<RealImageType, RealImageType> RescalerType;
   typename RescalerType::Pointer rescaler = RescalerType::New();
   rescaler->SetInput( this->m_GradientMagnitudeImage );
   rescaler->SetOutputMinimum( NumericTraits<RealType>::Zero );
   rescaler->SetOutputMaximum( NumericTraits<RealType>::One );
-  rescaler->Update();  
+  rescaler->Update();
   this->m_RescaledGradientMagnitudeImage = rescaler->GetOutput();
 
   if ( !this->m_ZeroCrossingImage )
     {
-				typedef ZeroCrossingBasedEdgeDetectionImageFilter<RealImageType, RealImageType> 
+				typedef ZeroCrossingBasedEdgeDetectionImageFilter<RealImageType, RealImageType>
 						ZeroCrossingFilterType;
-				typename ZeroCrossingFilterType::Pointer 
+				typename ZeroCrossingFilterType::Pointer
       zeroCrossing = ZeroCrossingFilterType::New();
 				zeroCrossing->SetInput( caster->GetOutput() );
-				zeroCrossing->SetForegroundValue( NumericTraits<RealType>::One ); 
-				zeroCrossing->SetBackgroundValue( NumericTraits<RealType>::Zero ); 
+				zeroCrossing->SetForegroundValue( NumericTraits<RealType>::One );
+				zeroCrossing->SetBackgroundValue( NumericTraits<RealType>::Zero );
 				zeroCrossing->Update();
 				this->m_ZeroCrossingImage = zeroCrossing->GetOutput();
     }
@@ -152,7 +152,7 @@ LiveWireImageFunction<TInputImage>
   costImage->Allocate();
   costImage->FillBuffer( NumericTraits<RealType>::max() );
   costImage->SetPixel( this->m_AnchorSeed, 0.0 );
-  
+
   this->m_PathDirectionImage = OffsetImageType::New();
   this->m_PathDirectionImage->SetOrigin( this->GetInputImage()->GetOrigin() );
   this->m_PathDirectionImage->SetSpacing( this->GetInputImage()->GetSpacing() );
@@ -161,12 +161,12 @@ LiveWireImageFunction<TInputImage>
 
   typename ConstNeighborhoodIterator<InputImageType>::RadiusType radius;
   radius.Fill( 1 );
-  ConstNeighborhoodIterator<BooleanImageType> It( radius, expanded, 
+  ConstNeighborhoodIterator<BooleanImageType> It( radius, expanded,
     expanded->GetLargestPossibleRegion() );
   unsigned int numberOfNeighbors = 1;
   for ( unsigned int d = 0; d < ImageDimension; d++ )
     {
-    numberOfNeighbors *= ( 2*radius[d] + 1 ); 
+    numberOfNeighbors *= ( 2*radius[d] + 1 );
     }
   Neighborhood<RealType, ImageDimension> scaleFactors;
   scaleFactors.SetRadius( radius );
@@ -175,41 +175,41 @@ LiveWireImageFunction<TInputImage>
     scaleFactors[n] = 0;
     if ( n == static_cast<unsigned int>( 0.5 * numberOfNeighbors ) )
       {
-      continue; 
-      } 
-    typename Neighborhood<RealType, ImageDimension>::OffsetType offset 
+      continue;
+      }
+    typename Neighborhood<RealType, ImageDimension>::OffsetType offset
       = scaleFactors.GetOffset( n );
-   
+
 				bool isFaceConnected = true;
-				unsigned int sumOffset = 0; 
+				unsigned int sumOffset = 0;
 				for ( unsigned int d = 0; d < ImageDimension; d++ )
 						{
 						sumOffset += vnl_math_abs( offset[d] );
 						if ( this->m_UseImageSpacing )
 								{
-								scaleFactors[n] += ( static_cast<RealType>( offset[d] * offset[d] ) 
-										* this->GetInputImage()->GetSpacing()[d] 
-          * this->GetInputImage()->GetSpacing()[d] );  
+								scaleFactors[n] += ( static_cast<RealType>( offset[d] * offset[d] )
+										* this->GetInputImage()->GetSpacing()[d]
+          * this->GetInputImage()->GetSpacing()[d] );
 								}
 						else
 								{
-								scaleFactors[n] += static_cast<RealType>( offset[d] * offset[d] );  
+								scaleFactors[n] += static_cast<RealType>( offset[d] * offset[d] );
 								}
 						if ( sumOffset > 1 && this->m_UseFaceConnectedness )
 								{
 								isFaceConnected = false;
 								break;
 								}
-      }      
+      }
 				if ( !isFaceConnected )
 						{
 						scaleFactors[n] = 0;
 						}
     if ( scaleFactors[n] > 0 )
       {
-      scaleFactors[n] = vcl_sqrt( scaleFactors[n] );
-      } 
-    }   
+      scaleFactors[n] = std::sqrt( scaleFactors[n] );
+      }
+    }
 
   /**
    * Generate the PathDirectionImage with Dijkstra's algorithm
@@ -217,13 +217,13 @@ LiveWireImageFunction<TInputImage>
 
   PriorityQueueElementType anchorElement( this->m_AnchorSeed, 0.0 );
 
-  if ( this->m_MaskImage && 
-       this->m_MaskImage->GetPixel( this->m_AnchorSeed ) 
+  if ( this->m_MaskImage &&
+       this->m_MaskImage->GetPixel( this->m_AnchorSeed )
          != this->m_InsidePixelValue )
     {
-    itkWarningMacro( "The anchor seed is outside the user-defined mask region." ); 
+    itkWarningMacro( "The anchor seed is outside the user-defined mask region." );
     return;
-    }    
+    }
 
   typename PriorityQueueType::Pointer Q = PriorityQueueType::New();
   Q->Initialize();
@@ -231,18 +231,18 @@ LiveWireImageFunction<TInputImage>
 
   while ( !Q->Empty() )
     {
-    PriorityQueueElementType centerElement = Q->Peek(); 
+    PriorityQueueElementType centerElement = Q->Peek();
     Q->Pop();
 
     expanded->SetPixel( centerElement.m_Element, true );
-    It.SetLocation( centerElement.m_Element ); 
+    It.SetLocation( centerElement.m_Element );
     PointType centerPoint;
-    this->GetInputImage()->TransformIndexToPhysicalPoint( 
+    this->GetInputImage()->TransformIndexToPhysicalPoint(
       centerElement.m_Element, centerPoint );
 
-				typename GradientImageType::PixelType centerGradient 
+				typename GradientImageType::PixelType centerGradient
 						= this->m_GradientImage->GetPixel( centerElement.m_Element );
-    RealType centerNorm 
+    RealType centerNorm
       = this->m_GradientMagnitudeImage->GetPixel( centerElement.m_Element );
 
     for ( unsigned int n = 0; n < numberOfNeighbors; n++ )
@@ -250,27 +250,27 @@ LiveWireImageFunction<TInputImage>
       if ( scaleFactors[n] == 0 )
         {
         continue;
-        } 
+        }
       bool inBounds;
       bool isExpanded = It.GetPixel( n, inBounds );
       if ( isExpanded || !inBounds )
         {
         continue;
-        }  
+        }
 
 						IndexType neighborIndex = It.GetIndex( n );
-            
-						if ( this->m_MaskImage && this->m_MaskImage->GetPixel( 
+
+						if ( this->m_MaskImage && this->m_MaskImage->GetPixel(
 						  neighborIndex ) != this->m_InsidePixelValue )
 								{
 								continue;
-								}    
+								}
 
-						typename GradientImageType::PixelType neighborGradient 
+						typename GradientImageType::PixelType neighborGradient
 								= this->m_GradientImage->GetPixel( neighborIndex );
-						RealType neighborNorm 
+						RealType neighborNorm
 						  = this->m_GradientMagnitudeImage->GetPixel( neighborIndex );
-						
+
 						RealType fz = 0.0;
       RealType fg = 0.0;
       RealType fd = 0.0;
@@ -278,34 +278,34 @@ LiveWireImageFunction<TInputImage>
       if ( this->m_ZeroCrossingWeight > 0 && this->m_ZeroCrossingImage )
         {
         fz = 1.0 - this->m_ZeroCrossingImage->GetPixel( neighborIndex );
-        } 
+        }
 
 						if ( this->m_GradientMagnitudeWeight > 0.0 )
 								{
-								fg = 1.0 - 
+								fg = 1.0 -
 								  this->m_RescaledGradientMagnitudeImage->GetPixel( neighborIndex );
 								}
-						if ( this->m_GradientDirectionWeight > 0.0 
+						if ( this->m_GradientDirectionWeight > 0.0
 											&& neighborNorm > 0 && centerNorm > 0 )
 								{
 								PointType neighborPoint;
-								this->GetInputImage()->TransformIndexToPhysicalPoint( 
+								this->GetInputImage()->TransformIndexToPhysicalPoint(
 										neighborIndex, neighborPoint );
-								typename PointType::VectorType vector 
+								typename PointType::VectorType vector
 										= neighborPoint - centerPoint;
-								RealType vectorNorm = vector.GetNorm();            
+								RealType vectorNorm = vector.GetNorm();
 
-								RealType centerMin = vnl_math_min( centerGradient * vector, 
-										centerGradient * -vector );            
-								RealType neighborMin = vnl_math_min( neighborGradient * vector, 
-										neighborGradient * -vector );            
+								RealType centerMin = vnl_math_min( centerGradient * vector,
+										centerGradient * -vector );
+								RealType neighborMin = vnl_math_min( neighborGradient * vector,
+										neighborGradient * -vector );
 
-								fd = 1.0 - ( vcl_acos( centerMin / ( centerNorm * vectorNorm ) ) +  
-										vcl_acos( neighborMin / ( neighborNorm * vectorNorm ) ) )
+								fd = 1.0 - ( std::acos( centerMin / ( centerNorm * vectorNorm ) ) +
+										std::acos( neighborMin / ( neighborNorm * vectorNorm ) ) )
 										/ vnl_math::pi;
 								}
-            
-						RealType neighborCost 
+
+						RealType neighborCost
 						  = centerElement.m_Priority + scaleFactors[n] *
         ( fg * this->m_GradientMagnitudeWeight
 								+ fz * this->m_ZeroCrossingWeight
@@ -324,29 +324,29 @@ LiveWireImageFunction<TInputImage>
 								{
 								Q->Pop();
 								element = Q->Peek();
-								} 
-            }  
+								}
+            }
     }
 }
 
 template <class TInputImage>
-typename LiveWireImageFunction<TInputImage>::OutputType::Pointer 
+typename LiveWireImageFunction<TInputImage>::OutputType::Pointer
 LiveWireImageFunction<TInputImage>
 ::EvaluateAtIndex( const IndexType &index ) const
-{ 
+{
   if ( !this->IsInsideBuffer( index ) )
     {
     itkWarningMacro( "Requested index is not inside buffer." );
     return nullptr;
     }
 
-  if ( this->m_MaskImage && 
-       this->m_MaskImage->GetPixel( index ) 
+  if ( this->m_MaskImage &&
+       this->m_MaskImage->GetPixel( index )
          != this->m_InsidePixelValue )
     {
-    itkWarningMacro( "The index is outside the user-defined mask region." ); 
+    itkWarningMacro( "The index is outside the user-defined mask region." );
     return nullptr;
-    }    
+    }
 
   typename OutputType::Pointer output = OutputType::New();
   output->Initialize();
@@ -356,7 +356,7 @@ LiveWireImageFunction<TInputImage>
     {
     output->AddVertex( VertexType( currentIndex ) );
     currentIndex += this->m_PathDirectionImage->GetPixel( currentIndex );
-    } 
+    }
   output->AddVertex( VertexType( currentIndex ) );
 
   return output;
@@ -372,26 +372,26 @@ LiveWireImageFunction<TInputImage>
 {
   Superclass::PrintSelf( os, indent );
 
-  os << indent << "AnchorSeed: " 
+  os << indent << "AnchorSeed: "
      << this->m_AnchorSeed << std::endl;
-  os << indent << "GradientMagnitudeWeight: " 
+  os << indent << "GradientMagnitudeWeight: "
      << this->m_GradientMagnitudeWeight << std::endl;
-  os << indent << "GradientDirectionWeight: " 
+  os << indent << "GradientDirectionWeight: "
      << this->m_GradientDirectionWeight << std::endl;
-  os << indent << "ZeroCrossingWeight: " 
+  os << indent << "ZeroCrossingWeight: "
      << this->m_ZeroCrossingWeight << std::endl;
-  os << indent << "UseImageSpacing: " 
+  os << indent << "UseImageSpacing: "
      << this->m_UseImageSpacing << std::endl;
-  os << indent << "UseFaceConnectedness: " 
+  os << indent << "UseFaceConnectedness: "
      << this->m_UseFaceConnectedness << std::endl;
 
   os << indent << "MaskImage"
      << this->m_MaskImage << std::endl;
   os << indent << "InsidePixelValue"
      << this->m_InsidePixelValue << std::endl;
-  
+
 }
-  
+
 } // end namespace itk
 
 #endif
