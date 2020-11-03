@@ -127,6 +127,7 @@ public:
 
     extract_filter->SetExtractionRegion( desired_region );
     extract_filter->SetInput( image );
+    extract_filter->SetDirectionCollapseToIdentity();
     extract_filter->Update();
 
     typename TYPED_IMAGE_TYPE_2D::Pointer input_image_2D = extract_filter->GetOutput();
@@ -357,7 +358,7 @@ bool ActionSpeedline::validate( ActionContextHandle& context )
     context->report_error( "Invalid slice type." );
     return false;
   }
-  
+
   DataLayerHandle target_layer = LayerManager::FindDataLayer( this->private_->target_layer_id_ );
   if (! target_layer )
   {
