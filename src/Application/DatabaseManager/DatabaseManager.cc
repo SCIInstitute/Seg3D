@@ -78,7 +78,7 @@ DatabaseManager::DatabaseManager( const DatabaseManager& src ) :
     // Copy the database content from the source
     sqlite3_backup* db_backup_obj = sqlite3_backup_init( this->private_->database_,
       "main", src.private_->database_, "main" );
-    if ( db_backup_obj == nullptr )
+    if ( db_backup_obj == NULL )
     {
       CORE_THROW_EXCEPTION( std::string( "Failed to copy database: " ) +
         sqlite3_errmsg( this->private_->database_ ) );
@@ -104,7 +104,7 @@ DatabaseManager::~DatabaseManager()
 
 static int InternalExecuteSqlStatement( sqlite3_stmt* statement, ResultSet& results )
 {
-  assert( statement != nullptr );
+  assert( statement != NULL );
 
   int result;
   while ( ( result = sqlite3_step( statement ) ) == SQLITE_ROW )
@@ -163,15 +163,15 @@ bool DatabaseManager::run_sql_statement( const std::string& sql_str, ResultSet& 
 
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
 
-  if ( this->private_->database_ == nullptr )
+  if ( this->private_->database_ == NULL )
   {
     error = "Invalid database connection.";
     return false;
   }
 
-  sqlite3_stmt* statement = nullptr;
+  sqlite3_stmt* statement = NULL;
   if ( sqlite3_prepare_v2( this->private_->database_, sql_str.c_str(),
-    static_cast< int >( sql_str.size() ), &statement, nullptr ) != SQLITE_OK )
+    static_cast< int >( sql_str.size() ), &statement, NULL ) != SQLITE_OK )
   {
     error =  "The SQL statement '" + sql_str + "' failed to compile with error: "
       + sqlite3_errmsg( this->private_->database_ );
@@ -192,7 +192,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
 {
   DatabaseManagerPrivate::lock_type lock( this->private_->get_mutex() );
 
-  if ( this->private_->database_ == nullptr )
+  if ( this->private_->database_ == NULL )
   {
     error = "Invalid database connection.";
     return false;
@@ -200,12 +200,12 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
 
   ResultSet dummy_results;
   const char* head = sql_str.c_str();
-  const char* tail = nullptr;
+  const char* tail = NULL;
   // The input string length including the null terminator
   int num_bytes = static_cast< int >( sql_str.size() + 1 );
   while ( num_bytes > 1 )
   {
-    sqlite3_stmt* statement = nullptr;
+    sqlite3_stmt* statement = NULL;
     if ( sqlite3_prepare_v2( this->private_->database_, head,
       num_bytes, &statement, &tail ) != SQLITE_OK )
     {
@@ -214,7 +214,7 @@ bool DatabaseManager::run_sql_script( const std::string& sql_str, std::string& e
       return false;
     }
 
-    if ( statement == nullptr ) break;
+    if ( statement == NULL ) break;
 
     if( InternalExecuteSqlStatement( statement, dummy_results ) != SQLITE_DONE )
     {
@@ -324,9 +324,9 @@ long long DatabaseManager::get_last_insert_rowid()
 }
 
 bool DatabaseManager::get_column_metadata( const std::string& table_name,
-                      const std::string& column_name, char const** data_type /*= nullptr*/,
-                      char const** coll_seq /*= nullptr*/, int* not_null /*= nullptr*/,
-                      int* primary_key /*= nullptr*/, int* auto_inc /*= nullptr */ )
+                      const std::string& column_name, char const** data_type /*= NULL*/,
+                      char const** coll_seq /*= NULL*/, int* not_null /*= NULL*/,
+                      int* primary_key /*= NULL*/, int* auto_inc /*= NULL */ )
 {
   if ( this->private_->database_ == 0 )
   {
