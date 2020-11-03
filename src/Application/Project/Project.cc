@@ -56,7 +56,7 @@
 #include <Application/Layer/LayerManager.h>
 
 // NOTE: This include is needed for APPLE to deal with directories that are bundled as a single file.
-#if defined( __APPLE__ )  
+#if defined( __APPLE__ )
 #  include <CoreServices/CoreServices.h>
 #endif
 
@@ -84,8 +84,8 @@ public:
     project_( 0 ),
     changed_( false ),
     last_saved_session_time_stamp_( boost::posix_time::second_clock::local_time() ),
-    need_anonymize_( false ) 
-  { 
+    need_anonymize_( false )
+  {
   }
 
 public:
@@ -99,21 +99,21 @@ public:
 
   // CLEAN_UP_SESSION_DATABASE:
   // this function cleans up sessions in the session list that have been deleted by the user
-  bool clean_up_session_database(); 
-  
+  bool clean_up_session_database();
+
   // CLEAN_UP_DATA_FILES:
   // Clean up files that are not used by any session.
-  void clean_up_data_files(); 
-  
+  void clean_up_data_files();
+
   // SAVE_STATE:
   // Save the state of the current project into the xml file and save the database
   // in the database file
-  bool save_state( const boost::filesystem::path& project_directory );  
-      
+  bool save_state( const boost::filesystem::path& project_directory );
+
   // SET_LAST_SAVED_SESSION_TIME_STAMP
   // this function updates the time of when the last session was saved
   void set_last_saved_session_time_stamp();
-    
+
   // INITIALIZE_SESSION_DATABASE:
   // Create tables for the session database.
   bool initialize_session_database();
@@ -129,16 +129,16 @@ public:
   // INITIALIZE_NOTE_DATABASE:
   // Create tables for the note database.
   bool initialize_note_database();
-  
+
   // INSERT_SESSION_INTO_DATABASE
   // Inset a session into the database
-  SessionID insert_session_into_database( const std::string& session_name, 
+  SessionID insert_session_into_database( const std::string& session_name,
     const std::string& user_id, const std::string& timestamp = "" );
-  
+
   // DELETE_SESSION_FROM_DATABASE:
   // this deletes a session from the database
   bool delete_session_from_database( SessionID session_id );
-  
+
   // SET_SESSION_DATA:
   // Add the data generation numbers used by the session into the database.
   bool set_session_data( SessionID id, const std::set< long long >& generations );
@@ -154,13 +154,13 @@ public:
 
   // GET_PROVENANCE_STEPS:
   // Get all the provenance steps that lead to the given provenance ID.
-  void get_provenance_steps( const std::vector< ProvenanceID >& prov_ids, 
+  void get_provenance_steps( const std::vector< ProvenanceID >& prov_ids,
     std::set< ProvenanceStepID >& prov_steps );
-  
+
   // EXTRACT_SESSION_INFO:
   // Extract session information from the database query result.
   void extract_session_info( ResultSet& result_set, std::vector< SessionInfo >& sessions );
-  
+
   // GET_ALL_SESSIONS:
   // Get a list of all sessions.
   bool get_all_sessions( std::vector< SessionInfo >& sessions );
@@ -179,7 +179,7 @@ public:
 
   // PARSE_SESSION_PROVENANCE_IDS:
   // Parse the session XML file and get the provenance IDs referenced by the session.
-  bool parse_session_provenance_ids( const boost::filesystem::path& file_path, 
+  bool parse_session_provenance_ids( const boost::filesystem::path& file_path,
     std::vector< long long >& prov_ids );
 
   // SET_SESSION_FILE:
@@ -191,15 +191,15 @@ public:
   // GET_SESSION_FILE:
   // Get the path of the session XML file.
   bool get_session_file( SessionID id, boost::filesystem::path& file_path, std::string& error );
-  
+
   // PROCESS_INPUTFILE_IMPROTERS
   // try to copy all the files into the project
-  bool process_inputfile_importers(); 
+  bool process_inputfile_importers();
 
   // INSERT_NOTE_INTO_DATABASE:
   // Add a note into the note database. If the timestamp is empty, the database will use the
   // current timestamp.
-  long long insert_note_into_database( const std::string& note, 
+  long long insert_note_into_database( const std::string& note,
     const std::string& user_id, const std::string& timestamp = "" );
 
   // GET_ALL_NOTES:
@@ -246,12 +246,12 @@ public:
 
   // The database that contains the session list
   DatabaseManager session_database_;
-  
+
   // NOTE: This variable is preventing a circular dependency
   // Layer session saving will add this number to this list so it can be included
   // into the final session database.
   std::set<long long> session_generation_numbers_;
-  
+
   // The database that contains the provenance information
   DatabaseManager provenance_database_;
 
@@ -266,7 +266,7 @@ public:
 
   // Cached action_id to action_name map
   std::map< long long, std::string > action_name_map_;
-  
+
   // Whether data needs to be anonymized on the next save
   bool need_anonymize_;
 
@@ -285,13 +285,13 @@ void ProjectPrivate::update_project_size()
 
   // Iteratively scan through the full directory
   long long size = this->compute_directory_size( project_path );
-  
+
   // Update the project with the new size
   this->project_->project_size_state_->set( size );
 }
 
 
-// NOTE: This function needs to return a value in long long, even in 32 bit mode, as 
+// NOTE: This function needs to return a value in long long, even in 32 bit mode, as
 // file sizes can exceed 2GB. The total of directory with session can be larger than
 // the total size
 long long ProjectPrivate::compute_directory_size( const boost::filesystem::path& directory )
@@ -302,7 +302,7 @@ long long ProjectPrivate::compute_directory_size( const boost::filesystem::path&
 
   // Reset the counter
   long long size = 0;
-  
+
   // Walk through elements in the directory
   boost::filesystem::directory_iterator dir_end;
   for( boost::filesystem::directory_iterator dir_itr( directory ); dir_itr != dir_end; ++dir_itr )
@@ -310,7 +310,7 @@ long long ProjectPrivate::compute_directory_size( const boost::filesystem::path&
     // Filename of the next component in the directory
     std::string filename = dir_itr->path().filename().string();
     boost::filesystem::path dir_file = directory / filename;
-      
+
     // We only scan directories and regular files, to avoid circular dependencies from
     // symbolic links.
     if ( boost::filesystem::is_regular_file( dir_file ) )
@@ -336,21 +336,21 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
   {
     // If something went wrong, log the problem and continue
     // We should not completely fail. The user should have the opportunity to try again/
-    std::string error = std::string( "Could not create directory '" ) + 
+    std::string error = std::string( "Could not create directory '" ) +
       project_directory.filename().string() + "'.";
     CORE_LOG_ERROR( error );
-    
+
     // Return false to force the program to try again.
-    return false; 
+    return false;
   }
 
-#if defined( __APPLE__ )  
+#if defined( __APPLE__ )
   // Specialty code for bundles
   if ( PreferencesManager::Instance()->generate_osx_project_bundle_state_->get() )
-  {   
+  {
     // Get a list with possible extensions.
     std::vector<std::string> project_path_extensions = Project::GetProjectPathExtensions();
-    
+
     // Check if it has the special extension, old version do not have the extension and we should
     // leave them the way they were, in order to prevent it from hiding files the user saved
     // in that directory.
@@ -364,11 +364,11 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
           // This code sets the special flags on the mac
           FSRef file_ref;
           Boolean is_directory;
-          FSPathMakeRef( reinterpret_cast<const unsigned char*>( 
+          FSPathMakeRef( reinterpret_cast<const unsigned char*>(
             project_directory.string().c_str() ), &file_ref, &is_directory );
           FSCatalogInfo info;
           FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
-          
+
           FileInfo&  finder_info = *reinterpret_cast<FileInfo*>( &info.finderInfo );
           finder_info.finderFlags |= kHasBundle;
           FSSetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info);
@@ -386,45 +386,45 @@ bool ProjectPrivate::UpdateProjectDirectory( const boost::filesystem::path& proj
   // All session XMLs are stored here
   if ( !Core::CreateOrIgnoreDirectory( project_directory / SESSION_DIR_C ) )
   {
-    std::string error = "Could not create sessions directory in project folder '" + 
+    std::string error = "Could not create sessions directory in project folder '" +
       project_directory.filename().string() + "'.";
     CORE_LOG_ERROR( error );
-    return false; 
+    return false;
   }
-  
+
   // Data directory logic
   // All the session data files are stored here
   if ( !Core::CreateOrIgnoreDirectory( project_directory / DATA_DIR_C ) )
-  { 
-    std::string error = "Could not create data directory in project folder '" + 
+  {
+    std::string error = "Could not create data directory in project folder '" +
       project_directory.filename().string() + "'.";
     CORE_LOG_ERROR( error );
-    return false; 
+    return false;
   }
-  
+
   // Database directory logic
   // All the database files (session, provenance, and notes) are stored here.
   if ( !Core::CreateOrIgnoreDirectory( project_directory / DATABASE_DIR_C ) )
   {
-    std::string error = "Could not create database directory in project folder '" + 
+    std::string error = "Could not create database directory in project folder '" +
       project_directory.filename().string() + "'.";
     CORE_LOG_ERROR( error );
-    return false; 
+    return false;
   }
 
   // Inputfiles directory logic
   // All input files are stored here
   if ( !Core::CreateOrIgnoreDirectory( project_directory / INPUTFILES_DIR_C ) )
-  {           
-    std::string error = "Could not create inputfiles directory in project folder '" + 
+  {
+    std::string error = "Could not create inputfiles directory in project folder '" +
       project_directory.filename().string() + "'.";
     CORE_LOG_ERROR( error );
-    return false; 
+    return false;
   }
 
   // Everything worked, we should have a valid project directory
   return true;
-} 
+}
 
 
 bool ProjectPrivate::clean_up_session_database()
@@ -447,7 +447,7 @@ bool ProjectPrivate::clean_up_session_database()
   for( size_t i = 0; i < result_set.size(); ++i )
   {
     SessionID session_id = boost::any_cast< long long >( ( result_set[ i ] )[ "session_id" ] );
-    
+
     // Check the existence of the session file
     boost::filesystem::path session_file;
     if ( !this->get_session_file( session_id, session_file, error ) )
@@ -466,7 +466,7 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
   {
     CORE_LOG_ERROR( "Tried to save state, while no project directory is active." );
     return false;
-  } 
+  }
 
   // Save the project file using the name specified
   std::string project_file_name = this->project_->project_file_state_->get();
@@ -482,7 +482,7 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   if ( ! stateio.export_to_file( project_file ) )
   {
     std::string error = std::string( "Failed to save the state of the project in file '" ) +
@@ -490,14 +490,14 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   this->project_->project_files_generated_state_->set( true );
   this->project_->project_files_accessible_state_->set( true );
 
   std::string error;
 
   // Save the session database to disk
-  boost::filesystem::path session_database = project_directory / 
+  boost::filesystem::path session_database = project_directory /
     DATABASE_DIR_C / SESSION_DATABASE_C;
   if ( !this->session_database_.save_database( session_database, error ) )
   {
@@ -522,7 +522,7 @@ bool ProjectPrivate::save_state( const boost::filesystem::path& project_director
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   return true;
 }
 
@@ -547,15 +547,15 @@ void ProjectPrivate::clean_up_data_files()
     generations[ i ] = boost::any_cast< long long >( result_set[ i ][ "data_generation" ] );
   }
 
-  
+
   boost::filesystem::path project_path( this->project_->project_path_state_->get() );
   boost::filesystem::path data_path = project_path / "data";
-  
+
   boost::filesystem::directory_iterator dir_end;
   for ( boost::filesystem::directory_iterator dir_itr( data_path ); dir_itr != dir_end; ++dir_itr )
   {
     boost::filesystem::path file_path = dir_itr->path();
-    
+
     // Skip directories
     if ( !boost::filesystem::is_regular_file( file_path ) ) continue;
     // Skip non-nrrd files
@@ -592,20 +592,20 @@ bool ProjectPrivate::initialize_session_database()
 
   // Create table for storing the database version
   sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT nullptr PRIMARY KEY);";
+    "(version INTEGER NOT NULL PRIMARY KEY);";
 
   // Create table for sessions
   sql_statements += "CREATE TABLE session "
-    "(session_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "session_name TEXT NOT nullptr, "
+    "(session_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "session_name TEXT NOT NULL, "
     "session_file TEXT, "
-    "user_id TEXT NOT nullptr, "
-    "timestamp TEXT NOT nullptr DEFAULT CURRENT_TIMESTAMP);";
+    "user_id TEXT NOT NULL, "
+    "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);";
 
   // Create table for storing data files (generation numbers) used by each session
   sql_statements += "CREATE TABLE session_data "
-    "(session_id INTEGER NOT nullptr REFERENCES session(session_id) ON DELETE CASCADE, "
-    "data_generation INTEGER NOT nullptr, "
+    "(session_id INTEGER NOT NULL REFERENCES session(session_id) ON DELETE CASCADE, "
+    "data_generation INTEGER NOT NULL, "
     "PRIMARY KEY (session_id, data_generation));";
 
   // Create indices for the session_data table
@@ -631,25 +631,25 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing the database version
   sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT nullptr PRIMARY KEY);";
+    "(version INTEGER NOT NULL PRIMARY KEY);";
 
   // Create table for user names
   sql_statements += "CREATE TABLE user "
-    "(user_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "user_name TEXT NOT nullptr UNIQUE);";
+    "(user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "user_name TEXT NOT NULL UNIQUE);";
 
   // Create table for action names
   sql_statements += "CREATE TABLE action "
-    "(action_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "action_name TEXT NOT nullptr UNIQUE);";
+    "(action_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "action_name TEXT NOT NULL UNIQUE);";
 
   // Create table for storing provenance steps
   sql_statements += "CREATE TABLE provenance_step "
-    "(prov_step_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "action_id INTEGER NOT nullptr REFERENCES action(action_id) ON DELETE CASCADE, "
-    "action_params TEXT NOT nullptr, "
-    "timestamp TEXT NOT nullptr DEFAULT CURRENT_TIMESTAMP, "
-    "user_id INTEGER NOT nullptr REFERENCES user(user_id) ON DELETE CASCADE);";
+    "(prov_step_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "action_id INTEGER NOT NULL REFERENCES action(action_id) ON DELETE CASCADE, "
+    "action_params TEXT NOT NULL, "
+    "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+    "user_id INTEGER NOT NULL REFERENCES user(user_id) ON DELETE CASCADE);";
 
   // Create index on provenance_step(action_id)
   sql_statements += "CREATE INDEX action_id_index ON provenance_step(action_id);";
@@ -659,26 +659,26 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing inputs of each provenance step
   sql_statements += "CREATE TABLE provenance_input "
-    "(input_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT nullptr);";
+    "(input_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT NULL);";
 
   // Create index on prov_step_id column of provenance_input
   sql_statements += "CREATE INDEX prov_input_index ON provenance_input(prov_step_id);";
 
   // Create table for storing outputs of each provenance step
   sql_statements += "CREATE TABLE provenance_output "
-    "(output_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT nullptr UNIQUE);";
+    "(output_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT NULL UNIQUE);";
 
   // Create index on prov_step_id column of provenance_output
   sql_statements += "CREATE INDEX prov_output_index ON provenance_output(prov_step_id);";
 
   // Create table for storing deleted provenance IDs of each provenance step
   sql_statements += "CREATE TABLE provenance_replaced "
-    "(prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "prov_id INTEGER NOT nullptr, "
+    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "prov_id INTEGER NOT NULL, "
     "PRIMARY KEY (prov_step_id, prov_id));";
 
   // Create index on prov_step_id column of provenance_replaced
@@ -686,8 +686,8 @@ bool ProjectPrivate::initialize_provenance_database()
 
   // Create table for storing outputs of each provenance step
   sql_statements += "CREATE TABLE provenance_inputfiles_cache "
-    "(prov_step_id INTEGER NOT nullptr REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
-    "inputfiles_cache_id INTEGER NOT nullptr PRIMARY KEY);";
+    "(prov_step_id INTEGER NOT NULL REFERENCES provenance_step(prov_step_id) ON DELETE CASCADE, "
+    "inputfiles_cache_id INTEGER NOT NULL PRIMARY KEY);";
 
   // Create index on prov_step_id column of provenance_output
   sql_statements += "CREATE INDEX prov_inputfiles_cache_index ON provenance_inputfiles_cache(prov_step_id);";
@@ -714,7 +714,7 @@ bool ProjectPrivate::clear_provenance_database()
 
   // Delete records from table for user names
   sql_statements += "DELETE FROM user;";
-    
+
   // Delete records from table for action names
   sql_statements += "DELETE FROM action;";
 
@@ -723,7 +723,7 @@ bool ProjectPrivate::clear_provenance_database()
 
   // Delete records from table for storing inputs of each provenance step
   sql_statements += "DELETE FROM provenance_input;";
-  
+
   // Delete records from table for storing outputs of each provenance step
   sql_statements += "DELETE FROM provenance_output;";
 
@@ -732,7 +732,7 @@ bool ProjectPrivate::clear_provenance_database()
 
   // Delete records from table for storing outputs of each provenance step
   sql_statements += "DELETE FROM provenance_inputfiles_cache;";
-  
+
   std::string error;
   if ( !this->provenance_database_.run_sql_script( sql_statements, error ) )
   {
@@ -752,14 +752,14 @@ bool ProjectPrivate::initialize_note_database()
 
   // Create table for the database version
   sql_statements += "CREATE TABLE database_version "
-    "(version INTEGER NOT nullptr PRIMARY KEY);";
+    "(version INTEGER NOT NULL PRIMARY KEY);";
 
   // Create table for notes
   sql_statements += "CREATE TABLE note "
-    "(note_id INTEGER NOT nullptr PRIMARY KEY AUTOINCREMENT, "
-    "note TEXT NOT nullptr, "
-    "user_id TEXT NOT nullptr, "
-    "timestamp TEXT NOT nullptr DEFAULT CURRENT_TIMESTAMP);";
+    "(note_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+    "note TEXT NOT NULL, "
+    "user_id TEXT NOT NULL, "
+    "timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);";
 
   // Set the database version to 1
   sql_statements += "INSERT INTO database_version VALUES (1);";
@@ -774,20 +774,20 @@ bool ProjectPrivate::initialize_note_database()
   return true;
 }
 
-SessionID ProjectPrivate::insert_session_into_database( const std::string& session_name, 
+SessionID ProjectPrivate::insert_session_into_database( const std::string& session_name,
   const std::string& user_id, const std::string& timestamp )
 {
   std::string sql_statement;
   if ( timestamp.empty() )
   {
     sql_statement = "INSERT INTO session (session_name, user_id) VALUES ('" +
-      DatabaseManager::EscapeQuotes( session_name ) + "', '" + 
+      DatabaseManager::EscapeQuotes( session_name ) + "', '" +
       DatabaseManager::EscapeQuotes( user_id ) + "');";
   }
   else
   {
     sql_statement = "INSERT INTO session (session_name, user_id, timestamp) VALUES ('" +
-      DatabaseManager::EscapeQuotes( session_name ) + "', '" + 
+      DatabaseManager::EscapeQuotes( session_name ) + "', '" +
       DatabaseManager::EscapeQuotes( user_id ) + "', '" + timestamp + "');";
   }
 
@@ -803,7 +803,7 @@ SessionID ProjectPrivate::insert_session_into_database( const std::string& sessi
 
 bool ProjectPrivate::delete_session_from_database( SessionID session_id )
 {
-  std::string sql_str = "DELETE FROM session WHERE session_id = " + 
+  std::string sql_str = "DELETE FROM session WHERE session_id = " +
     Core::ExportToString( session_id ) + ";";
 
   std::string error;
@@ -812,11 +812,11 @@ bool ProjectPrivate::delete_session_from_database( SessionID session_id )
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   return true;
 }
 
-bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& prov_ids, 
+bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& prov_ids,
                       ProvenanceTrail& provenance_trail )
 {
   if ( prov_ids.size() == 0 ) return false;
@@ -830,7 +830,7 @@ bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& 
 
   // String stream for extracting timestamp value
   std::stringstream ss;
-  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet( 
+  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet(
     "%Y-%m-%d %H:%M:%S" ) ) );
   ss.exceptions( std::ios_base::failbit );
 
@@ -885,7 +885,7 @@ bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& 
     {
       return false;
     }
-    
+
     ProvenanceStep::timestamp_type timestamp;
     ss.str( timestamp_str );
     try
@@ -968,7 +968,7 @@ bool ProjectPrivate::query_provenance_trail( const std::vector< ProvenanceID >& 
 void ProjectPrivate::extract_session_info( ResultSet& result_set, std::vector< SessionInfo >& sessions )
 {
   std::stringstream ss;
-  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet( 
+  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet(
     "%Y-%m-%d %H:%M:%S" ) ) );
   ss.exceptions( std::ios_base::failbit );
 
@@ -1010,20 +1010,20 @@ bool ProjectPrivate::get_all_sessions( std::vector< SessionInfo >& sessions )
   return true;
 }
 
-long long ProjectPrivate::insert_note_into_database( const std::string& note, 
+long long ProjectPrivate::insert_note_into_database( const std::string& note,
   const std::string& user_id, const std::string& timestamp )
 {
   std::string sql_statement;
   if ( timestamp.empty() )
   {
     sql_statement = "INSERT INTO note (note, user_id) VALUES ('" +
-      DatabaseManager::EscapeQuotes( note ) + "', '" + 
+      DatabaseManager::EscapeQuotes( note ) + "', '" +
       DatabaseManager::EscapeQuotes( user_id ) + "');";
   }
   else
   {
     sql_statement = "INSERT INTO note (note, user_id, timestamp) VALUES ('" +
-      DatabaseManager::EscapeQuotes( note ) + "', '" + 
+      DatabaseManager::EscapeQuotes( note ) + "', '" +
       DatabaseManager::EscapeQuotes( user_id ) + "', '" + timestamp + "');";
   }
 
@@ -1053,9 +1053,9 @@ void ProjectPrivate::convert_version1_project()
 
   // I/O stream for timestamp conversion
   std::stringstream ss;
-  ss.imbue( std::locale( std::locale::classic(), new boost::posix_time::time_facet( 
+  ss.imbue( std::locale( std::locale::classic(), new boost::posix_time::time_facet(
     "%Y-%m-%d %H:%M:%S" ) ) );
-  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet( 
+  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet(
     "%d-%b-%Y-%H-%M-%S" ) ) );
   ss.exceptions( std::ios_base::failbit );
 
@@ -1063,7 +1063,7 @@ void ProjectPrivate::convert_version1_project()
   // NOTE: This assumes that the time zone and DST setting when the session was saved
   // is the same as the current machine setting, which isn't always true. But this is the
   // best guess I can do since the old timestamp didn't ecode local time information.
-  boost::posix_time::time_duration time_diff = boost::posix_time::second_clock::local_time() - 
+  boost::posix_time::time_duration time_diff = boost::posix_time::second_clock::local_time() -
     boost::posix_time::second_clock::universal_time();
 
   int number_of_sessions = static_cast< int >( sessions.size() );
@@ -1076,13 +1076,13 @@ void ProjectPrivate::convert_version1_project()
 
     std::vector< std::string > session_info_strs = Core::SplitString( old_session_name, " - " );
 
-    // Ensure it is a valid name  
+    // Ensure it is a valid name
     if ( session_info_strs.size() < 3 ) continue;
 
     boost::filesystem::path old_path = project_path / SESSION_DIR_C / ( old_session_name + ".xml" );
 
     // If the old one does not exist, just continue - we should not fail -
-    if( ! boost::filesystem::exists( old_path ) ) continue; 
+    if( ! boost::filesystem::exists( old_path ) ) continue;
 
     // Convert the timestamp to universal time
     ss.str( session_info_strs[ 0 ] );
@@ -1106,7 +1106,7 @@ void ProjectPrivate::convert_version1_project()
 
     if ( !generations.empty() )
     {
-      generation_count = Core::Max( generation_count, 
+      generation_count = Core::Max( generation_count,
         *( std::max_element( generations.begin(), generations.end() ) ) );
     }
 
@@ -1123,7 +1123,7 @@ void ProjectPrivate::convert_version1_project()
   }
 
   // Finally we set the session list to an empty vector so we aren't tempted to do this again.
-  // This variable remains empty and unused from this point onward. 
+  // This variable remains empty and unused from this point onward.
   this->project_->sessions_state_->clear();
 
   // Set the generation count
@@ -1132,7 +1132,7 @@ void ProjectPrivate::convert_version1_project()
   // Need to overwrite the generation_count_state, otherwise at the end of session load
   // it will be set back to zero if there was no generation_count_state in the old project
   this->project_->generation_count_state_->set( generation_count + 1);
-     
+
   // ==== Convert notes ====
 
   const std::vector< std::string >& notes = this->project_->project_notes_state_->get();
@@ -1144,7 +1144,7 @@ void ProjectPrivate::convert_version1_project()
 
     std::vector< std::string > note_info = Core::SplitString( note_components[ 0 ], " - " );
     if ( note_info.size() < 2 ) continue;
-    
+
     boost::posix_time::ptime note_time( boost::posix_time::not_a_date_time );
     ss.str( note_info[ 0 ] );
     try
@@ -1181,7 +1181,7 @@ bool ProjectPrivate::rename_version1_session_files()
   }
 
   boost::filesystem::path sessions_path = this->project_->get_project_sessions_path();
-  
+
   for ( size_t i = 0; i < results.size(); ++i )
   {
     std::string session_file_name;
@@ -1189,26 +1189,26 @@ bool ProjectPrivate::rename_version1_session_files()
     {
       session_file_name = boost::any_cast< std::string >( results[ i ][ "session_file" ] );
     }
-    catch ( ... ) 
+    catch ( ... )
     {
-      continue; 
+      continue;
     }
 
     SessionID session_id = boost::any_cast< SessionID >( results[ i ][ "session_id" ] );
     boost::filesystem::path old_session_file = sessions_path / session_file_name;
-    boost::filesystem::path new_session_file = sessions_path / 
+    boost::filesystem::path new_session_file = sessions_path /
       ( Core::ExportToString( session_id ) + ".xml" );
 
     try
     {
       boost::filesystem::rename( old_session_file, new_session_file );
     }
-    catch ( ... ) 
+    catch ( ... )
     {
       continue;
     }
 
-    sql_str = "UPDATE session SET session_file = nullptr WHERE session_id = " +
+    sql_str = "UPDATE session SET session_file = NULL WHERE session_id = " +
       Core::ExportToString( session_id ) + ";";
     if ( !this->session_database_.run_sql_statement( sql_str, error ) )
     {
@@ -1267,7 +1267,7 @@ bool ProjectPrivate::parse_session_data( const boost::filesystem::path& file_pat
   return true;
 }
 
-bool ProjectPrivate::parse_session_provenance_ids( const boost::filesystem::path& file_path, 
+bool ProjectPrivate::parse_session_provenance_ids( const boost::filesystem::path& file_path,
                           std::vector< long long >& prov_ids )
 {
   Core::StateIO state_io;
@@ -1320,7 +1320,7 @@ bool ProjectPrivate::parse_session_provenance_ids( const boost::filesystem::path
 
 void ProjectPrivate::set_session_file( SessionID id, const std::string& file_name )
 {
-  std::string sql_str = "UPDATE session SET session_file = '" + 
+  std::string sql_str = "UPDATE session SET session_file = '" +
     DatabaseManager::EscapeQuotes( file_name ) +
     "' WHERE session_id = " + Core::ExportToString( id ) + ";";
   std::string err;
@@ -1388,19 +1388,19 @@ bool ProjectPrivate::process_inputfile_importers()
   }
 
   // Get the directory in which we need to store the input files.
-  boost::filesystem::path inputfiles_dir = this->project_->get_project_inputfiles_path(); 
+  boost::filesystem::path inputfiles_dir = this->project_->get_project_inputfiles_path();
   if ( ! boost::filesystem::exists( inputfiles_dir ) )
   {
     // Directory does not exist
     return false;
-  } 
-  
+  }
+
   // TODO: Keep the records that could not be written
   for ( size_t j = 0; j < this->input_file_importers_.size();  j++ )
   {
     InputFilesImporterHandle importer = this->input_file_importers_[ j ];
     InputFilesID inputfiles_id = importer->get_inputfiles_id();
-    
+
     boost::filesystem::path import_dir = inputfiles_dir / Core::ExportToString( inputfiles_id );
     if ( boost::filesystem::exists( import_dir ) )
     {
@@ -1424,23 +1424,23 @@ bool ProjectPrivate::process_inputfile_importers()
       catch ( ... )
       {
         CORE_LOG_ERROR( std::string( "Could not create directory '" ) + import_dir.string() +
-          "'." );     
+          "'." );
       }
     }
-    
+
     if ( boost::filesystem::exists( import_dir ) )
     {
       if ( !importer->copy_files( import_dir ) )
       {
-        CORE_LOG_ERROR( std::string( "Could not import original files into directory '" ) + 
+        CORE_LOG_ERROR( std::string( "Could not import original files into directory '" ) +
           import_dir.string() + "'." );
       }
     }
   }
-  
+
   // Clear the list with importers
   this->input_file_importers_.clear();
-  
+
   return true;
 }
 
@@ -1459,7 +1459,7 @@ bool ProjectPrivate::get_all_notes( ProjectNoteList& notes )
   }
 
   std::stringstream ss;
-  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet( 
+  ss.imbue( std::locale( ss.getloc(), new boost::posix_time::time_input_facet(
     "%Y-%m-%d %H:%M:%S" ) ) );
   ss.exceptions( std::ios_base::failbit );
 
@@ -1487,7 +1487,7 @@ bool ProjectPrivate::get_all_notes( ProjectNoteList& notes )
 bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::path& file_path, std::string& error )
 {
   // Query session information from database
-  std::string sql_str = "SELECT session_file FROM session WHERE session_id = " + 
+  std::string sql_str = "SELECT session_file FROM session WHERE session_id = " +
     Core::ExportToString( session_id ) + ";";
   ResultSet result_set;
   if ( !this->session_database_.run_sql_statement( sql_str, result_set, error ) ||
@@ -1502,7 +1502,7 @@ bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::
   boost::filesystem::path project_path( this->project_->project_path_state_->get() );
 
   // Get the session XML file
-  boost::filesystem::path session_file = project_path / SESSION_DIR_C / 
+  boost::filesystem::path session_file = project_path / SESSION_DIR_C /
     ( Core::ExportToString( session_id ) + ".xml" );
   if ( !boost::filesystem::exists( session_file ) )
   {
@@ -1524,13 +1524,13 @@ bool ProjectPrivate::get_session_file( SessionID session_id, boost::filesystem::
   return true;
 }
 
-void ProjectPrivate::get_provenance_steps( const std::vector< ProvenanceID >& prov_ids, 
+void ProjectPrivate::get_provenance_steps( const std::vector< ProvenanceID >& prov_ids,
                       std::set< ProvenanceStepID >& prov_steps )
 {
   typedef std::queue< ProvenanceID > prov_id_queue_type;
   void ( prov_id_queue_type::*push_queue_func )( const ProvenanceID& ) = &prov_id_queue_type::push;
   prov_id_queue_type provenance_queue;
-  std::for_each( prov_ids.begin(), prov_ids.end(), boost::bind( 
+  std::for_each( prov_ids.begin(), prov_ids.end(), boost::bind(
     push_queue_func, &provenance_queue, _1 ) );
 
   while ( !provenance_queue.empty() )
@@ -1589,13 +1589,13 @@ void ProjectPrivate::set_project_changed( Core::ActionHandle action, Core::Actio
       // NOTE: Changing the variable
       Core::Application::lock_type lock( Core::Application::GetMutex() );
       this->changed_ = true;
-    } 
+    }
   }
 }
 
 long long ProjectPrivate::get_user_id( const std::string& user_name )
 {
-  std::string sql_str = "SELECT user_id FROM user WHERE user_name = '" + 
+  std::string sql_str = "SELECT user_id FROM user WHERE user_name = '" +
     DatabaseManager::EscapeQuotes( user_name ) + "';";
   std::string error;
   ResultSet results;
@@ -1609,15 +1609,15 @@ long long ProjectPrivate::get_user_id( const std::string& user_name )
   {
     return boost::any_cast< long long >( results[ 0 ][ "user_id" ] );
   }
-  
-  sql_str = "INSERT INTO user (user_name) VALUES('" + 
+
+  sql_str = "INSERT INTO user (user_name) VALUES('" +
     DatabaseManager::EscapeQuotes( user_name ) + "');";
   if ( !this->provenance_database_.run_sql_statement( sql_str, error ) )
   {
     CORE_LOG_ERROR( error );
     return -1;
   }
-  
+
   return this->provenance_database_.get_last_insert_rowid();
 }
 
@@ -1655,7 +1655,7 @@ bool ProjectPrivate::get_user_name( long long user_id, std::string& user_name )
     user_name = it->second;
     return true;
   }
-  
+
   std::string sql_str = "SELECT user_name FROM user WHERE user_id = " +
     Core::ExportToString( user_id ) + ";";
   ResultSet results;
@@ -1665,13 +1665,13 @@ bool ProjectPrivate::get_user_name( long long user_id, std::string& user_name )
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   if ( results.size() == 0 )
   {
     CORE_LOG_ERROR( "Invalid provenance database." );
     return false;
   }
-  
+
   try
   {
     user_name = boost::any_cast< std::string >( results[ 0 ][ "user_name" ] );
@@ -1818,7 +1818,7 @@ void Project::initialize()
   {
     // Initialize the colors with the default colors from the preference manager
     std::string stateid = std::string( "color_" ) + Core::ExportToString( j );
-    this->add_state( stateid, this->color_states_[ j ], 
+    this->add_state( stateid, this->color_states_[ j ],
       PreferencesManager::Instance()->get_default_colors()[ j ] );
   }
 
@@ -1834,7 +1834,7 @@ void Project::initialize()
   // Each time an action is executed, check whether it changes the project data, if so
   // mark this in the project, so the UI can query the user for a save action if the application
   // is closed while there is unsaved data.
-  this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect( 
+  this->add_connection( Core::ActionDispatcher::Instance()->post_action_signal_.connect(
     boost::bind( &ProjectPrivate::set_project_changed, this->private_, _1, _2 ) ) );
 }
 
@@ -1842,29 +1842,29 @@ bool Project::load_project( const boost::filesystem::path& project_file )
 {
   // This function sets state variables directly, hence we need to be on the application thread
   ASSERT_IS_APPLICATION_THREAD();
-  
+
   // Ensure the filename is an actual file that exists
   boost::filesystem::path full_filename;
-  
+
   try
   {
-    full_filename = boost::filesystem::absolute( project_file ); 
+    full_filename = boost::filesystem::absolute( project_file );
 
     // Ensure the given file actually exists
     if ( ! boost::filesystem::exists( full_filename ) )
     {
       std::string error = std::string( "File '" ) + project_file.string() +
         "' does not exist.";
-      CORE_LOG_ERROR( error );      
+      CORE_LOG_ERROR( error );
       return false;
     }
-    
+
     // Ensure it is a regular file and not a directory or a symbolic link
     if ( ! boost::filesystem::is_regular_file( full_filename ) )
     {
       std::string error = std::string( "File '" ) + project_file.string() +
         "' is not a regular file.";
-      CORE_LOG_ERROR( error );      
+      CORE_LOG_ERROR( error );
       return false;
     }
   }
@@ -1875,7 +1875,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   // Load the information from the file
   Core::StateIO stateio;
   if ( !stateio.import_from_file( project_file ) )
@@ -1883,19 +1883,19 @@ bool Project::load_project( const boost::filesystem::path& project_file )
     // We could not load the file, hence send a message to the user
     std::string error = std::string( "Could not open project file '" ) + project_file.string() + "'.";
     CORE_LOG_ERROR( error );
-    return false; 
+    return false;
   }
-  
-  if ( !this->load_states( stateio ) )  
+
+  if ( !this->load_states( stateio ) )
   {
     // We could not load the file, hence send a message to the user
     std::string error = std::string( "Could not read project file '" ) + project_file.string() +  "'.";
     CORE_LOG_ERROR( error );
-    return false; 
+    return false;
   }
   // First update the state variables that were not saved, such as
   // project name and project path
-  
+
   bool is_bundle = false;
 
 #ifdef __APPLE__
@@ -1905,11 +1905,11 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   {
     FSRef file_ref;
     Boolean is_directory;
-    FSPathMakeRef( reinterpret_cast<const unsigned char*>( 
+    FSPathMakeRef( reinterpret_cast<const unsigned char*>(
       full_filename.parent_path().string().c_str() ), &file_ref, &is_directory );
     FSCatalogInfo info;
     FSGetCatalogInfo( &file_ref, kFSCatInfoFinderInfo, &info, 0, 0, 0 );
-    
+
     FileInfo&  finder_info = *reinterpret_cast<FileInfo*>( &info.finderInfo );
     if ( finder_info.finderFlags & kHasBundle ) is_bundle = true;
   }
@@ -1917,15 +1917,15 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   {
   }
 
-#endif  
-  
+#endif
+
   if ( is_bundle )
   {
     if ( full_filename.parent_path().stem().string() != full_filename.stem().string() )
     {
       boost::filesystem::path new_project_file = full_filename.parent_path() /
         ( full_filename.parent_path().stem().string() + Project::GetDefaultProjectFileExtension() );
-    
+
       try
       {
         boost::filesystem::rename( full_filename, new_project_file );
@@ -1951,7 +1951,7 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   //{
   //  return false;
   //}
-  
+
   this->project_path_state_->set( full_filename.parent_path().string() );
 
   // Since we load this one from disk, it obviously exists on disk
@@ -1985,9 +1985,9 @@ bool Project::load_project( const boost::filesystem::path& project_file )
       this->private_->initialize_provenance_database();
     }
 
-    boost::filesystem::path note_db_file = full_filename.parent_path() / 
+    boost::filesystem::path note_db_file = full_filename.parent_path() /
       DATABASE_DIR_C / NOTE_DATABASE_C;
-    if ( !boost::filesystem::exists( note_db_file ) || 
+    if ( !boost::filesystem::exists( note_db_file ) ||
       !this->private_->note_database_.load_database( note_db_file, error ) )
     {
       this->private_->initialize_note_database();
@@ -2000,12 +2000,12 @@ bool Project::load_project( const boost::filesystem::path& project_file )
   return true;
 }
 
-bool Project::save_project( const boost::filesystem::path& project_path, 
+bool Project::save_project( const boost::filesystem::path& project_path,
   const std::string& project_name, bool anonymize )
 {
   // This function sets state variables directly, hence we need to be on the application thread.
   ASSERT_IS_APPLICATION_THREAD();
-  
+
   // Ensure that we have the full path
   boost::filesystem::path full_path;
   try
@@ -2014,21 +2014,21 @@ bool Project::save_project( const boost::filesystem::path& project_path,
   }
   catch ( ... )
   {
-    std::string error = std::string( "Could not resolve directory name '" ) + 
+    std::string error = std::string( "Could not resolve directory name '" ) +
       project_path.string() + "'.";
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   // Directory may not exist, but if it exists it needs to be directory
-  if ( boost::filesystem::exists( project_path ) && 
+  if ( boost::filesystem::exists( project_path ) &&
      !boost::filesystem::is_directory( project_path ) )
   {
     std::string error = std::string( "'" ) + project_path.string() + "' is not a directory.";
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   // Remove patient-specific data if project should be anonymized
   if( anonymize )
   {
@@ -2038,7 +2038,7 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     {
       boost::filesystem::remove_all( inputfiles_dir );
     }
-    catch ( ... ) 
+    catch ( ... )
     {
       CORE_LOG_ERROR( "Couldn't remove directory '" + inputfiles_dir.string() + "' for anonymization." );
       return false;
@@ -2053,17 +2053,17 @@ bool Project::save_project( const boost::filesystem::path& project_path,
   }
 
   // NOTE: This function has several modes:
-  // (1) If the project has not been saved yet, the project will be saved to the location 
+  // (1) If the project has not been saved yet, the project will be saved to the location
   // indicated and a session will be saved, as a session is needed to load a project
   // (2) If the project exists and the name is the same, we only save a session
   // (3) If the project is in the same directory but the project name is changed, we save a new
   // session and rename the project file
   // (4) If the project is directed towards a new directory all files are copied and the project
   // is saved in the new location. Afterwards the project refers to that new project.
-  
+
   if ( this->project_files_generated_state_->get() == false ||
     this->project_files_accessible_state_->get() == false )
-  {   
+  {
     // Set the new project name.
     this->project_name_state_->set( project_name );
     this->project_file_state_->set( project_name + Project::GetDefaultProjectFileExtension() );
@@ -2071,19 +2071,19 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     // Set the new directory in which this project is saved.
     this->project_path_state_->set( project_path.string() );
 
-    // Make sure that the program knows that the current project now lives on disk. 
+    // Make sure that the program knows that the current project now lives on disk.
     this->project_files_generated_state_->set( true );
 
     // Save the current session so there is something to load when the project is opened.
     return this->save_session( AUTO_SESSION_NAME_C );
   }
-  else 
+  else
   {
     boost::filesystem::path current_project_path( this->project_path_state_->get() );
     current_project_path = boost::filesystem::absolute( current_project_path );
     std::string current_project_name = this->project_name_state_->get();
     std::string current_project_file = this->project_file_state_->get();
-    
+
     if ( current_project_path == project_path && current_project_name == project_name )
     {
       // All the user wanted is to save a session, as it is the same name and directory
@@ -2094,8 +2094,8 @@ bool Project::save_project( const boost::filesystem::path& project_path,
     {
       // OK, the user gave us a new name, but directory is the same
       // Update the project information
-      this->project_name_state_->set( project_name ); 
-      
+      this->project_name_state_->set( project_name );
+
       // Save out a session with the current information
       bool succeeded = this->save_session( this->current_session_name_state_->get() );
 
@@ -2103,24 +2103,24 @@ bool Project::save_project( const boost::filesystem::path& project_path,
       {
         boost::filesystem::path current_xml_file = current_project_path / current_project_file;
         // Remove the old project file
-        try 
+        try
         {
           boost::filesystem::remove( current_xml_file );
         }
         catch( ... )
         {
-          std::string error = std::string( "Could not delete file '" ) + 
+          std::string error = std::string( "Could not delete file '" ) +
             current_xml_file.string() + "'.";
           CORE_LOG_ERROR( error );
         }
       }
-      
+
       return succeeded;
     }
     else
     {
       // OK copy the full project to the new directory
-      // Some users have requested that all files/folders be copied, even ones they put in the 
+      // Some users have requested that all files/folders be copied, even ones they put in the
       // project folder.  This is why we need to do a recursive copy instead of explicity
       // copying certain files and folders.
       if ( !Core::RecursiveCopyDirectory( current_project_path, project_path ) )
@@ -2138,31 +2138,31 @@ bool Project::save_project( const boost::filesystem::path& project_path,
         {
           boost::filesystem::remove_all( inputfiles_dir );
         }
-        catch ( ... ) 
+        catch ( ... )
         {
-          CORE_LOG_ERROR( "Couldn't remove directory '" + 
+          CORE_LOG_ERROR( "Couldn't remove directory '" +
             inputfiles_dir.string() + "' for anonymization." );
           return false;
         }
-        
+
         // Remove meta data from session files
         boost::filesystem::path session_dir = project_path / SESSION_DIR_C;
-        
+
         // Iterate through directory
-        boost::filesystem::directory_iterator it = 
+        boost::filesystem::directory_iterator it =
           boost::filesystem::directory_iterator( session_dir );
         boost::filesystem::directory_iterator it_end;
-                
+
         while ( it != it_end )
         {
           boost::filesystem::path filename = (*it).path();
           if ( filename.extension().string() == ".xml" )
-          {         
+          {
             Core::StateIO state_io;
-            if ( !state_io.import_from_file( filename ) ) 
+            if ( !state_io.import_from_file( filename ) )
             {
               // NOTE: Rather remove a file than let patient data continue to persist
-              
+
               try
               {
                 boost::filesystem::remove( filename );
@@ -2170,29 +2170,29 @@ bool Project::save_project( const boost::filesystem::path& project_path,
               }
               catch( ... )
               {
-                CORE_LOG_ERROR( "Couldn't remove file '" + filename.string() 
+                CORE_LOG_ERROR( "Couldn't remove file '" + filename.string()
                   + "' for anonymization." );
-                return false;             
+                return false;
               }
             }
-            
+
             // Find the layer manager element
             TiXmlElement* root_element = state_io.get_current_element();
             TiXmlElement* lm_element = root_element->FirstChildElement( "layermanager" );
-            if ( lm_element == 0 ) 
+            if ( lm_element == 0 )
             {
               // does not contain layer manager so continue
               continue;
             }
-            
+
             // Finr the groups element
             TiXmlElement* groups_element = lm_element->FirstChildElement( "groups" );
-            if ( groups_element == 0 ) 
+            if ( groups_element == 0 )
             {
               // does not contain layer groups so continue
               continue;
             }
-            
+
             TiXmlElement* group_element = groups_element->FirstChildElement();
             while ( group_element != 0 )
             {
@@ -2209,15 +2209,15 @@ bool Project::save_project( const boost::filesystem::path& project_path,
                     {
                       state_element->FirstChild()->SetValue( "" );
                     }
-                  }                   
+                  }
                 }
-                
+
                 state_element = state_element->NextSiblingElement( "State" );
               }
 
               group_element = group_element->NextSiblingElement();
             }
-            
+
             group_element = groups_element->FirstChildElement();
             while ( group_element != 0 )
             {
@@ -2244,9 +2244,9 @@ bool Project::save_project( const boost::filesystem::path& project_path,
                       {
                         state_element->FirstChild()->SetValue( "" );
                       }
-                    }                   
+                    }
                   }
-                  
+
                   state_element = state_element->NextSiblingElement( "State" );
                 }
 
@@ -2255,11 +2255,11 @@ bool Project::save_project( const boost::filesystem::path& project_path,
 
               group_element = group_element->NextSiblingElement();
             }
-            
+
             if ( !state_io.export_to_file( filename ) )
             {
               // NOTE: Rather remove a file than let patient data continue to persist
-              
+
               try
               {
                 boost::filesystem::remove( filename );
@@ -2267,18 +2267,18 @@ bool Project::save_project( const boost::filesystem::path& project_path,
               }
               catch( ... )
               {
-                CORE_LOG_ERROR( "Couldn't remove file '" + filename.string() 
+                CORE_LOG_ERROR( "Couldn't remove file '" + filename.string()
                   + "' for anonymization." );
-                return false;             
+                return false;
               }
             }
           }
           ++it;
         }
-        
+
         // This will instruct the save session to strip the meta data out, when it is
         // saved at the end of this function.
-        
+
         this->set_need_anonymize( true );
         // Done anonymizing
       }
@@ -2289,18 +2289,18 @@ bool Project::save_project( const boost::filesystem::path& project_path,
       {
         boost::filesystem::remove( old_project_file );
       }
-      catch ( ... ) 
+      catch ( ... )
       {
         CORE_LOG_ERROR( "Couldn't remove file '" + old_project_file.string() + "'." );
       }
 
       // Update the project
       this->project_name_state_->set( project_name );
-      this->project_file_state_->set( project_name + 
+      this->project_file_state_->set( project_name +
         Project::GetDefaultProjectFileExtension() );
       this->project_path_state_->set( project_path.string() );
-      
-      // This will save a session and update the project file and 
+
+      // This will save a session and update the project file and
       // provenance database
       return this->save_session( AUTO_SESSION_NAME_C );
     }
@@ -2353,7 +2353,7 @@ bool Project::save_state()
 }
 
 
-bool Project::export_project( const boost::filesystem::path& export_path, 
+bool Project::export_project( const boost::filesystem::path& export_path,
   const std::string& project_name, long long session_id )
 {
   // This function sets state variables directly, hence we need to be on the application thread.
@@ -2366,7 +2366,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
   }
 
   std::string error;
-  if ( boost::filesystem::exists( export_path ) && 
+  if ( boost::filesystem::exists( export_path ) &&
     !boost::filesystem::is_directory( export_path ) )
   {
     error = std::string( "Could not export project, because '"  ) +
@@ -2417,7 +2417,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
   }
 
   // Save out the session database
-  boost::filesystem::path export_session_db_path = 
+  boost::filesystem::path export_session_db_path =
     export_path / DATABASE_DIR_C / SESSION_DATABASE_C;
   if ( !export_session_db.save_database( export_session_db_path, error ) )
   {
@@ -2443,7 +2443,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
   // Copy those data files
   BOOST_FOREACH( Core::DataBlock::generation_type generation, generations )
   {
-    boost::filesystem::path src_file = project_path / DATA_DIR_C / 
+    boost::filesystem::path src_file = project_path / DATA_DIR_C /
       ( Core::ExportToString( generation ) + ".nrrd" );
     boost::filesystem::path dst_file = export_path / DATA_DIR_C /
       ( Core::ExportToString( generation ) + ".nrrd" );
@@ -2491,9 +2491,9 @@ bool Project::export_project( const boost::filesystem::path& export_path,
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   // Save out the provenance database
-  boost::filesystem::path export_provenance_db_path = 
+  boost::filesystem::path export_provenance_db_path =
     export_path / DATABASE_DIR_C / PROVENANCE_DATABASE_C;
   if ( !export_prov_db.save_database( export_provenance_db_path, error ) )
   {
@@ -2511,7 +2511,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
   BOOST_FOREACH( ResultSet::value_type result, result_set )
   {
     long long inputfiles_cache_id = boost::any_cast< long long >( result[ "inputfiles_cache_id" ] );
-    boost::filesystem::path src_dir = project_path / INPUTFILES_DIR_C / 
+    boost::filesystem::path src_dir = project_path / INPUTFILES_DIR_C /
       Core::ExportToString( inputfiles_cache_id );
     boost::filesystem::path dst_dir = export_path / INPUTFILES_DIR_C /
       Core::ExportToString( inputfiles_cache_id );
@@ -2532,7 +2532,7 @@ bool Project::export_project( const boost::filesystem::path& export_path,
   }
 
   // Write out the project file
-  boost::filesystem::path export_project_file = export_path / 
+  boost::filesystem::path export_project_file = export_path /
     ( project_name + GetDefaultProjectFileExtension() );
   Core::StateIO stateio;
   stateio.initialize();
@@ -2578,15 +2578,15 @@ bool Project::check_project_files()
     this->project_files_accessible_state_->set( false );
     return false;
   }
-  
-  
+
+
 
   //// Check if s3d file still exists
   //if ( !boost::filesystem::exists( project_path / ( this->project_file_state_->get() ) ) )
   //{
   //  //this->project_files_generated_state_->set( false );
   //  this->project_files_accessible_state_->set( false );
-  //  return false;   
+  //  return false;
   //}
 
   //// Check if session database file still exists
@@ -2594,7 +2594,7 @@ bool Project::check_project_files()
   //{
   //  //this->project_files_generated_state_->set( false );
   //  this->project_files_accessible_state_->set( false );
-  //  return false;   
+  //  return false;
   //}
 
   //// Check if provenance database file still exists
@@ -2602,7 +2602,7 @@ bool Project::check_project_files()
   //{
   //  //this->project_files_generated_state_->set( false );
   //  this->project_files_accessible_state_->set( false );
-  //  return false;   
+  //  return false;
   //}
 
   this->project_files_accessible_state_->set( true );
@@ -2623,10 +2623,10 @@ bool Project::load_session( SessionID session_id )
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   // Tell program that project does not yet need to be saved.
   this->reset_project_changed();
-  
+
   Core::StateIO state_io;
   if ( !state_io.import_from_file( session_file ) )
   {
@@ -2641,17 +2641,17 @@ bool Project::load_session( SessionID session_id )
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   this->project_files_generated_state_->set( true );
   this->project_files_accessible_state_->set( true );
 
   // We need to restore provenance and generation count from the project
-  Core::DataBlock::generation_type generation = this->generation_count_state_->get(); 
+  Core::DataBlock::generation_type generation = this->generation_count_state_->get();
   Core::DataBlockManager::Instance()->set_generation_count( generation );
   ProvenanceID provenance_id = this->provenance_count_state_->get();
   SetProvenanceCount( provenance_id );
 
-  return true;    
+  return true;
 }
 
 bool Project::load_last_session()
@@ -2685,7 +2685,7 @@ bool Project::save_session( const std::string& name )
 
   std::string session_name = name;
   // Update the session name if needed
-  if ( session_name.empty() ) 
+  if ( session_name.empty() )
   {
     session_name = this->current_session_name_state_->get();
   }
@@ -2700,7 +2700,7 @@ bool Project::save_session( const std::string& name )
   if ( !ProjectPrivate::UpdateProjectDirectory( project_path ) )
   {
     return false;
-  } 
+  }
 
   // Copy all the input files into the project directory
   this->private_->process_inputfile_importers();
@@ -2721,7 +2721,7 @@ bool Project::save_session( const std::string& name )
   {
     user_id = "unknown";
   }
-  
+
   // Convert the old session files if necessary
   if ( this->private_->conversion_needed_ )
   {
@@ -2738,14 +2738,14 @@ bool Project::save_session( const std::string& name )
   }
 
   // Write the XML file in the session directory
-  boost::filesystem::path session_path = project_path / SESSION_DIR_C / 
+  boost::filesystem::path session_path = project_path / SESSION_DIR_C /
     ( Core::ExportToString( session_id ) + ".xml" );
   if ( !state_io.export_to_file( session_path ) )
   {
-    std::string error = std::string( "Could not save session file '" ) + 
+    std::string error = std::string( "Could not save session file '" ) +
       session_path.string() + "'.";
     CORE_LOG_ERROR( error );
-    
+
     // NOTE: We need to delete it when saving fails
     this->private_->delete_session_from_database( session_id );
     return false;
@@ -2763,13 +2763,13 @@ bool Project::save_session( const std::string& name )
 
   // Update the size of the project
   this->private_->update_project_size();
-  
+
   // Add a timestamp of when the last session was saved for auto save functionality
   this->private_->set_last_saved_session_time_stamp();
 
   // Tell program that project does not yet need to be saved.
   this->reset_project_changed();
-  
+
   // Signal the user interface the new session list
   SessionInfoListHandle session_list( new SessionInfoList );
   this->private_->get_all_sessions( *session_list );
@@ -2792,15 +2792,15 @@ bool Project::delete_session( SessionID session_id )
     {
       boost::filesystem::remove( session_file );
     }
-    catch ( ... ) 
+    catch ( ... )
     {
       CORE_LOG_ERROR( "Couldn't delete file '" + session_file.string() + "'." );
     }
   }
-  
+
   // Delete the file from the database
   this->private_->delete_session_from_database( session_id );
-  
+
   // Remove redundant files from the project
   this->private_->clean_up_data_files();
 
@@ -2816,7 +2816,7 @@ bool Project::delete_session( SessionID session_id )
   this->session_list_changed_signal_( session_list );
 
   return true;
-} 
+}
 
 bool Project::get_session_info( SessionID session_id, SessionInfo& session_info )
 {
@@ -2871,11 +2871,11 @@ bool Project::pre_save_states( Core::StateIO& state_io )
     for ( size_t j = 0; j < this->color_states_.size(); j++ )
     {
       // NOTE: color_states_ is only used locally for storing and retrieving colors
-      this->color_states_[ j ]->set( 
+      this->color_states_[ j ]->set(
         PreferencesManager::Instance()->color_states_[ j ]->get() );
     }
   }
-  
+
   // We need to store the generation count
   // NOTE: Again this is an internally used variable, and it is only synchronized so generation
   // numbers are unique project wide.
@@ -2896,7 +2896,7 @@ bool Project::post_load_states( const Core::StateIO& state_io )
   {
     for ( size_t j = 0; j < this->color_states_.size(); j++ )
     {
-      PreferencesManager::Instance()->color_states_[ j ]->set( 
+      PreferencesManager::Instance()->color_states_[ j ]->set(
         this->color_states_[ j ]->get() );
     }
   }
@@ -2906,7 +2906,7 @@ bool Project::post_load_states( const Core::StateIO& state_io )
 
   // We need to restore provenance and generation count for the project
 
-  Core::DataBlock::generation_type generation = this->generation_count_state_->get(); 
+  Core::DataBlock::generation_type generation = this->generation_count_state_->get();
   Core::DataBlockManager::Instance()->set_generation_count( generation );
 
   ProvenanceID provenance_id = this->provenance_count_state_->get();
@@ -2942,21 +2942,21 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
   if ( user_id == -1 || action_id == -1 ) return -1;
 
   // Make sure action_params is not empty.
-  // NOTE: A non-empty parameter string simplifies the query process 
+  // NOTE: A non-empty parameter string simplifies the query process
   std::string action_params = step->get_action_params();
   if ( action_params.empty() )
   {
     action_params = " ";
   }
-    
+
   ProvenanceIDList output_list = step->get_output_provenance_ids();
   ProvenanceIDList input_list = step->get_input_provenance_ids();
   ProvenanceIDList deleted_list = step->get_replaced_provenance_ids();
   InputFilesID inputfiles_id = step->get_inputfiles_id();
 
   std::string sql_str = "INSERT INTO provenance_step (action_id, action_params, user_id)"
-    " VALUES(" + Core::ExportToString( action_id ) + ", '" + 
-    DatabaseManager::EscapeQuotes( action_params ) + 
+    " VALUES(" + Core::ExportToString( action_id ) + ", '" +
+    DatabaseManager::EscapeQuotes( action_params ) +
     "', " + Core::ExportToString( user_id ) + ");";
   std::string error;
   if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
@@ -2989,7 +2989,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
       return -1;
     }
   }
-  
+
   for ( size_t i = 0; i < deleted_list.size(); ++i )
   {
     sql_str = "INSERT INTO provenance_replaced (prov_step_id,prov_id) VALUES(" + Core::ExportToString( step_id ) + ", " +
@@ -3001,12 +3001,12 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
       return -1;
     }
   }
-  
+
   if ( inputfiles_id > -1 )
   { // If it is a valid ID add it to the table
-    sql_str = "INSERT INTO provenance_inputfiles_cache VALUES (" + 
+    sql_str = "INSERT INTO provenance_inputfiles_cache VALUES (" +
       Core::ExportToString( step_id ) + ", " + Core::ExportToString( inputfiles_id ) + ");";
-      
+
     if ( !this->private_->provenance_database_.run_sql_statement( sql_str, error ) )
     {
       CORE_LOG_ERROR( error );
@@ -3014,7 +3014,7 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
       return -1;
     }
   }
-  
+
   return step_id;
 }
 
@@ -3036,13 +3036,13 @@ void Project::update_provenance_record( ProvenanceStepID record_id, const Proven
   std::string action_params = prov_step->get_action_params();
 
   // Make sure action_params is not empty.
-  // NOTE: A non-empty parameter string simplifies the query process 
+  // NOTE: A non-empty parameter string simplifies the query process
   if ( action_params.empty() )
   {
     action_params = " ";
   }
 
-  std::string sql_str = "UPDATE provenance_step SET action_params = '" + 
+  std::string sql_str = "UPDATE provenance_step SET action_params = '" +
     DatabaseManager::EscapeQuotes( action_params ) +
     "' WHERE prov_step_id = " + Core::ExportToString( record_id ) + ";";
   std::string error;
@@ -3097,7 +3097,7 @@ void Project::request_session_list()
     Core::Application::PostEvent( boost::bind( &Project::request_session_list, this ) );
     return;
   }
-  
+
   SessionInfoListHandle session_list( new SessionInfoList );
   this->private_->get_all_sessions( *session_list );
   this->session_list_changed_signal_( session_list );
@@ -3105,9 +3105,9 @@ void Project::request_session_list()
 
 std::string Project::GetDefaultProjectPathExtension()
 {
-  std::vector<std::string> path_extensions = 
+  std::vector<std::string> path_extensions =
     Core::SplitString( CORE_APPLICATION_PROJECT_FOLDER_EXTENSION, ";");
-    
+
   if ( path_extensions.size() > 0 )
   {
     return path_extensions[ 0 ];
@@ -3117,12 +3117,12 @@ std::string Project::GetDefaultProjectPathExtension()
     return ".seg3dproj";
   }
 }
-  
+
 std::string Project::GetDefaultProjectFileExtension()
 {
-  std::vector<std::string> file_extensions = 
+  std::vector<std::string> file_extensions =
     Core::SplitString( CORE_APPLICATION_PROJECT_EXTENSION, ";");
-    
+
   if ( file_extensions.size() > 0 )
   {
     return file_extensions[ 0 ];
@@ -3135,9 +3135,9 @@ std::string Project::GetDefaultProjectFileExtension()
 
 std::vector<std::string> Project::GetProjectPathExtensions()
 {
-  std::vector<std::string> path_extensions = 
+  std::vector<std::string> path_extensions =
     Core::SplitString( CORE_APPLICATION_PROJECT_FOLDER_EXTENSION, ";");
-    
+
   if ( path_extensions.size() > 0 )
   {
     return path_extensions;
@@ -3147,13 +3147,13 @@ std::vector<std::string> Project::GetProjectPathExtensions()
     std::vector<std::string> default_vector( 1, ".seg3dproj" );
     return default_vector;
   }
-} 
-  
-std::vector<std::string> Project::GetProjectFileExtensions()    
+}
+
+std::vector<std::string> Project::GetProjectFileExtensions()
 {
-  std::vector<std::string> file_extensions = 
+  std::vector<std::string> file_extensions =
     Core::SplitString( CORE_APPLICATION_PROJECT_EXTENSION, ";");
-    
+
   if ( file_extensions.size() )
   {
     return file_extensions;
@@ -3176,7 +3176,7 @@ bool Project::execute_or_add_inputfiles_importer( const InputFilesImporterHandle
   this->private_->input_file_importers_.push_back( importer );
 
   // If the project exists on disk copy all the files over
-  return this->private_->process_inputfile_importers(); 
+  return this->private_->process_inputfile_importers();
 }
 
 int Project::get_version()
@@ -3200,7 +3200,7 @@ bool Project::add_note( const std::string& note )
   {
     this->request_note_list();
   }
-  
+
   return succeeded;
 }
 
@@ -3211,7 +3211,7 @@ void Project::request_note_list()
     Core::Application::PostEvent( boost::bind( &Project::request_note_list, this ) );
     return;
   }
-  
+
   ProjectNoteListHandle note_list( new ProjectNoteList );
   this->private_->get_all_notes( *note_list );
   this->note_list_changed_signal_( note_list );
