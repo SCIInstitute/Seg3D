@@ -262,23 +262,16 @@ ENDIF()
 #
 IF(SEG3D_BUILD_INTERFACE)
   # see http://doc.qt.io/qt-5/cmake-manual.html
-  FIND_PACKAGE(Qt5Core REQUIRED HINTS ${Qt5_PATH})
+  FIND_PACKAGE(Qt5 COMPONENTS Core Gui OpenGL Widgets Svg REQUIRED HINTS ${Qt5_PATH})
+  
   GET_TARGET_PROPERTY(QtCore_location_Release Qt5::Core LOCATION_Release)
   #GET_TARGET_PROPERTY(QtCore_location_Debug Qt5::Core LOCATION_Debug)
-
-  FIND_PACKAGE(Qt5Gui REQUIRED HINTS ${Qt5_PATH})
   GET_TARGET_PROPERTY(QtGui_location_Release Qt5::Gui LOCATION_Release)
-
-  FIND_PACKAGE(Qt5OpenGL REQUIRED HINTS ${Qt5_PATH})
   GET_TARGET_PROPERTY(QtOpenGL_location_Release Qt5::OpenGL LOCATION_Release)
-
-  FIND_PACKAGE(Qt5Widgets REQUIRED HINTS ${Qt5_PATH})
   GET_TARGET_PROPERTY(QtWidgets_location_Release Qt5::Widgets LOCATION_Release)
-
-  FIND_PACKAGE(Qt5Svg REQUIRED HINTS ${Qt5_PATH})
   GET_TARGET_PROPERTY(QtSvg_location_Release Qt5::Svg LOCATION_Release)
 
-  IF(NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND)
+  IF(NOT Qt5_FOUND)
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
   ENDIF()
 
