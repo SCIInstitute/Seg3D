@@ -93,6 +93,8 @@ public:
   typedef typename Superclass::FixedParametersValueType FixedParametersValueType;
   typedef typename Superclass::ParametersType           ParametersType;
   typedef typename Superclass::JacobianType             JacobianType;
+  using JacobianPositionType = typename Superclass::JacobianPositionType;
+  using InverseJacobianPositionType = typename Superclass::InverseJacobianPositionType;
 
   typedef typename Superclass::InputPointType PointType;
   typedef PointType InputPointType;
@@ -242,7 +244,7 @@ public:
   // virtual:
   virtual void
   ComputeJacobianWithRespectToPosition(const PointType & pt,
-                                       JacobianType & jacobian) const override
+                                       JacobianPositionType & jacobian) const override
   {
     transform_[active_params_]->ComputeJacobianWithRespectToPosition(pt, jacobian);
   }

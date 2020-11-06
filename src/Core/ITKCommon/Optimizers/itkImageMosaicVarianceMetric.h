@@ -99,7 +99,7 @@ public:
 
   typedef typename transform_t::InputPointType  point_t;
   typedef typename transform_t::ParametersType  params_t;
-  typedef typename transform_t::JacobianType  jacobian_t;
+  typedef typename transform_t::JacobianPositionType jacobian_t;
 
   /** Gaussian filter to compute the gradient of the mosaic images */
   // typedef typename NumericTraits<pixel_t>::RealType
