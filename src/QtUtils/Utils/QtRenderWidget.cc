@@ -166,6 +166,15 @@ void QtRenderWidget::paintGL()
 
   Core::Texture2DHandle texture = this->private_->viewer_->get_texture();
   Core::Texture2DHandle overlay_texture = this->private_->viewer_->get_overlay_texture();
+    
+//    std::cout<<"texture ID: "<<std::endl;
+//    std::cout<<"overlay texture ID: "<<std::endl;
+    
+    unsigned int tid = texture->get_id();
+    unsigned int otid = overlay_texture->get_id();
+
+//    std::cout<<"texture ID: "<<texture->get_id()<<std::endl;
+//    std::cout<<"overlay texture ID: "<<overlay_texture->get_id()<<std::endl;
 
   if ( !texture || !overlay_texture )
   {
