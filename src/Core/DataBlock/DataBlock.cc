@@ -1050,7 +1050,7 @@ static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHa
     {
       long long* dst = reinterpret_cast<long long*>( dst_data_block->get_data() );
 
-      double offset = 0.5 -  static_cast<double>( 0x80000000 ) * static_cast<double>( 0x100000000ull );
+      const static double offset = 0.5 -  static_cast<double>( 0x80000000 ) * static_cast<double>( 0x100000000ull );
       double multiplier = 0.0;
       if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) * static_cast<double>( 0x100000000ull ) / (max - min);
 
@@ -1066,7 +1066,7 @@ static bool QuantizeDataInternal( double min, double max, DATA* src, DataBlockHa
     {
       unsigned long long* dst = reinterpret_cast<unsigned long long*>( dst_data_block->get_data() );
 
-      double offset = 0.5;
+      const static double offset = 0.5;
       double multiplier = 0.0;
       if ( max > min ) multiplier = static_cast<double>( 0x100000000ull ) * static_cast<double>( 0x100000000ull ) / (max - min);
 
