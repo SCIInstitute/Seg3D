@@ -15,7 +15,6 @@ cache:
 before_install:
   # set up dependency cache
   - if [ ! -d $HOME/deps ]; then mkdir $HOME/deps; fi
-  - if [ ! -f $HOME/deps/cmake3.tgz ]; then wget --quiet --directory-prefix=$HOME/deps http://www.sci.utah.edu/devbuilds/seg3d/cmake3.tgz; fi
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
   # TODO: build (hopefully) temporarily headless
   #- sudo add-apt-repository --yes ppa:beineri/opt-qt59-trusty
@@ -40,10 +39,9 @@ addons:
     - clang
 #before_script:
 script:
-  - tar xzf $HOME/deps/cmake3.tgz
   - cd bin
   #- $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON -DQt5_PATH:PATH=/usr ../Superbuild
-  - $TRAVIS_BUILD_DIR/cmake3/bin/cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
+  - cmake -GNinja -DTRAVIS_BUILD:BOOL=ON ../Superbuild
   - travis_wait 70 ninja
 
 #after_failure:
