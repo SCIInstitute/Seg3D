@@ -60,9 +60,9 @@ static the_boost_thread_storage_t THREAD_STORAGE;
 // 
 the_boost_thread_t::the_boost_thread_t():
   the_thread_interface_t(the_boost_mutex_t::create()),
-  boost_thread_(NULL)
+  boost_thread_(nullptr)
 {
-  if (THREAD_STORAGE.get() == NULL)
+  if (THREAD_STORAGE.get() == nullptr)
   {
     THREAD_STORAGE.reset(new the_thread_observer_t(*this));
   }
@@ -162,7 +162,7 @@ the_boost_thread_t::wait()
   
   boost_thread_->join();
   delete boost_thread_;
-  boost_thread_ = NULL;
+  boost_thread_ = nullptr;
 }
 
 //----------------------------------------------------------------
@@ -202,5 +202,5 @@ the_boost_thread_t::run()
   work();
   
   // clean up the thread storage:
-  THREAD_STORAGE.reset(NULL);
+  THREAD_STORAGE.reset(nullptr);
 }

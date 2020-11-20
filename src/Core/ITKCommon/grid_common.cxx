@@ -72,7 +72,7 @@ setup_grid_transform(the_grid_transform_t & transform,
   // the mosaic to tile transform is typically more stable:
   approx_transform_t::Pointer mosaic_to_tile_approx;
   
-  if (gt == NULL)
+  if (gt == nullptr)
   {
     mosaic_to_tile_approx =
       approx_transform<approx_transform_t>(tile_min,
@@ -103,7 +103,7 @@ setup_grid_transform(the_grid_transform_t & transform,
       pnt2d_t & xy = xy_arr[index];
       pnt2d_t & xy_approx = xy_apx[index];
       
-      if (gt == NULL)
+      if (gt == nullptr)
       {
         // general transform:
         if (!find_inverse(tile_min,
@@ -223,7 +223,7 @@ setup_mesh_transform(the_mesh_transform_t & transform,
   // the mosaic to tile transform is typically more stable:
   approx_transform_t::Pointer mosaic_to_tile_approx;
   
-  if (gt == NULL)
+  if (gt == nullptr)
   {
     mosaic_to_tile_approx =
       approx_transform<approx_transform_t>(tile_min,
@@ -257,7 +257,7 @@ setup_mesh_transform(the_mesh_transform_t & transform,
       pnt2d_t & xy_approx = xy_apx[index];
       uv_list[index] = pq;
       
-      if (gt == NULL)
+      if (gt == nullptr)
       {
         // general transform:
         if (!find_inverse(tile_min,

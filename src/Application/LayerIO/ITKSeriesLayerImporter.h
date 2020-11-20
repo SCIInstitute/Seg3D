@@ -31,9 +31,9 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif 
+#endif
 
-// Boost includes 
+// Boost includes
 #include <boost/filesystem.hpp>
 
 // Core includes
@@ -43,8 +43,14 @@
 #include <Application/LayerIO/LayerFileSeriesImporter.h>
 #include <Application/LayerIO/LayerIO.h>
 
+// ITK
+#include <itkCommonEnums.h>
+
 namespace Seg3D
 {
+  // CONVERT_DATA_TYPE:
+  // Copy the data type we get from itk and convert to a Seg3D enum type
+  Core::DataType convert_data_type(itk::CommonEnums::IOComponent type);
 
 // Forward declaration for internals of this class
 class ITKSeriesLayerImporterPrivate;
@@ -72,8 +78,8 @@ public:
   /// Hence it is best to run this on a separate thread if needed ( from the GUI ).
   virtual bool get_file_info( LayerImporterFileInfoHandle& info );
 
-  // -- Import data from file --  
-public: 
+  // -- Import data from file --
+public:
   /// GET_FILE_DATA
   /// Get the file data from the file/ file series
   /// NOTE: The information is generated again, so that hints can be processed

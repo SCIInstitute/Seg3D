@@ -137,7 +137,7 @@ bool LargeVolumeBrickLevel::insert_slice_internals( DataBlockHandle slice )
         IndexVector::index_type sy_begin2 = Max( by * eff_brick_size.y() - overlap , static_cast<IndexVector::index_type>( 0 ) );
         IndexVector::index_type sy_end2 = Min( ( by + 1 ) * eff_brick_size.y() + overlap, sny );
         IndexVector::index_type sy_end = Min( ( by + 1 ) * eff_brick_size.y() + overlap, sny + overlap ) ;
-        
+
         IndexVector::index_type sx_begin = bx * eff_brick_size.x() - overlap;
         IndexVector::index_type sx_begin2 = Max(bx * eff_brick_size.x() - overlap, static_cast<IndexVector::index_type>( 0 ) );
         IndexVector::index_type sx_end2 = Min( ( bx + 1 ) * eff_brick_size.x() + overlap, snx );
@@ -145,8 +145,8 @@ bool LargeVolumeBrickLevel::insert_slice_internals( DataBlockHandle slice )
 
         // Copy brick;
 
-        for ( IndexVector::index_type p = sy_begin * nx ; p < sy_begin2 * nx ; p++, data++ )  
-        { 
+        for ( IndexVector::index_type p = sy_begin * nx ; p < sy_begin2 * nx ; p++, data++ )
+        {
           *data = T(0);
         }
 
@@ -154,7 +154,7 @@ bool LargeVolumeBrickLevel::insert_slice_internals( DataBlockHandle slice )
         {
           // Add overlap
           for ( IndexVector::index_type p = sx_begin; p < sx_begin2 ; p++, data++ )
-          { 
+          {
             *data = T(0);
           }
 
@@ -165,19 +165,19 @@ bool LargeVolumeBrickLevel::insert_slice_internals( DataBlockHandle slice )
 
           // Add overlap
           for ( IndexVector::index_type p = sx_end2; p < sx_end ; p++, data++ )
-          { 
+          {
             *data = T(0);
           }
         }
 
-        for ( IndexVector::index_type p = sy_end2 * nx ; p < sy_end * nx ; p++, data++ )  
-        { 
+        for ( IndexVector::index_type p = sy_end2 * nx ; p < sy_end * nx ; p++, data++ )
+        {
           *data = T(0);
         }
 
-      } 
+      }
     }
-  } 
+  }
   else
   {
     for ( IndexVector::index_type by = 0; by < this->layout_.y(); by++ )
@@ -222,10 +222,14 @@ bool LargeVolumeBrickLevel::insert_slice( DataBlockHandle slice )
       return this->insert_slice_internals<int>( slice );
     case DataType::UINT_E:
       return this->insert_slice_internals<unsigned int>( slice );
+    case DataType::LONGLONG_E:
+      return this->insert_slice_internals<long long>( slice );
+    case DataType::ULONGLONG_E:
+      return this->insert_slice_internals<unsigned long long>( slice );
     case DataType::FLOAT_E:
       return this->insert_slice_internals<float>( slice );
     case DataType::DOUBLE_E:
-      return this->insert_slice_internals<double>( slice );   
+      return this->insert_slice_internals<double>( slice );
   }
 
   return false;
@@ -244,7 +248,7 @@ bool LargeVolumeBrickLevel::sync_buffers( bool done, std::string& error )
   {
     IndexVector::index_type buffer_start = this->buffer_count_ - this->buffer_index_;
     IndexVector::index_type buffer_size = this->buffer_count_ - buffer_start;
-        
+
     IndexVector brick_size = this->schema_->get_brick_size();
     IndexVector eff_brick_size = this->schema_->get_effective_brick_size();
     IndexVector::index_type overlap = this->schema_->get_overlap();
@@ -262,7 +266,7 @@ bool LargeVolumeBrickLevel::sync_buffers( bool done, std::string& error )
       IndexVector::index_type end = Min( z_end , buffer_size );
 
             IndexVector::index_type offset = buffer_start + start - b_start;
-            
+
       if ( end >= 0 && start < buffer_size && start < end)
       {
 
@@ -270,7 +274,7 @@ bool LargeVolumeBrickLevel::sync_buffers( bool done, std::string& error )
 
         for (size_t k = 0; k < this->buffers_.size(); k++ )
         {
-          
+
 
           IndexVector::index_type brick = k + z * (this->layout_.x() * this->layout_.y() );
           BrickInfo bi( brick, this->level_ );
@@ -331,21 +335,21 @@ public:
   DataBlockHandle load_file( const boost::filesystem::path& filename, std::string& error );
 
   /// LOAD_FILE_INTERNALS
-  /// Intrernals for dealing with data type 
+  /// Intrernals for dealing with data type
   template<class T>
   DataBlockHandle load_file_internals( const boost::filesystem::path& filename, std::string& error );
 
   /// SCAN_FILE
   /// Scan file to determine type and size
   bool scan_file( const boost::filesystem::path& filename, std::string& error );
-    
+
     // -- downsample --
 public:
     /// DOWNSAMPLE
     /// Down sample a slice based on the level ratios
     bool downsample( DataBlockHandle input, DataBlockHandle output,
         const IndexVector& input_ratio, const IndexVector& output_ratio );
-    
+
     /// DOWNSAMPLE_INTERNALS
     /// Templated version that does internal computation
     template<class T, class U>
@@ -356,7 +360,7 @@ public:
     /// Down sample a slice based on the level ratios and adds it to the existing slice
     bool downsample_add( DataBlockHandle input, DataBlockHandle output,
         const IndexVector& input_ratio, const IndexVector& output_ratio );
-    
+
     /// DOWNSAMPLE_ADD_INTERNALS
     /// Templated version that does internal computation
     template<class T, class U>
@@ -379,7 +383,7 @@ public:
     // -- slice processor --
 public:
     bool process_slice( size_t level, std::string& error );
-    
+
 
     // slices at different resolution levels
     std::vector<DataBlockHandle> slices_;
@@ -429,11 +433,15 @@ bool LargeVolumeConverterPrivate::compute_min_max( DataBlockHandle slice, double
     case DataType::INT_E:
       return compute_min_max_internals<int>( slice, min, max);
     case DataType::UINT_E:
-      return compute_min_max_internals<unsigned int>( slice, min, max); 
+      return compute_min_max_internals<unsigned int>( slice, min, max);
+    case DataType::LONGLONG_E:
+      return compute_min_max_internals<long long>( slice, min, max);
+    case DataType::ULONGLONG_E:
+      return compute_min_max_internals<unsigned long long>( slice, min, max);
     case DataType::FLOAT_E:
       return compute_min_max_internals<float>( slice, min, max);
     case DataType::DOUBLE_E:
-      return compute_min_max_internals<double>( slice, min, max); 
+      return compute_min_max_internals<double>( slice, min, max);
   }
 
   return false;
@@ -445,7 +453,7 @@ bool LargeVolumeConverterPrivate::process_slice( size_t level, std::string& erro
   bool first_slice = ( this->index_[ level ] == 0);
 
     DataBlockHandle slice = slices_[ level ];
-    
+
     // Brick the data
     if ( first_slice )
   {
@@ -484,13 +492,13 @@ bool LargeVolumeConverterPrivate::process_slice( size_t level, std::string& erro
   {
     this->brick_level_[ level ]->sync_buffers( false, error );
   }
-    
+
     // Down sample data for next level
     if ( level < this->schema_->get_num_levels() - 1 )
     {
         IndexVector input_ratio = this->schema_->get_level_downsample_ratio( level );
         IndexVector output_ratio = this->schema_->get_level_downsample_ratio( level + 1);
-        
+
         if ( output_ratio.z() / input_ratio.z() == 2 )
         {
             if ( index_[ level ] % 2 )
@@ -518,7 +526,7 @@ bool LargeVolumeConverterPrivate::process_slice( size_t level, std::string& erro
           if (! this->process_slice( level + 1, error ) )
           {
             return false;
-          }       
+          }
         }
             }
         }
@@ -529,13 +537,13 @@ bool LargeVolumeConverterPrivate::process_slice( size_t level, std::string& erro
                 error = "Failed to downsample slice.";
                 return false;
             }
-            
+
             if (! this->process_slice( level + 1, error ) )
             {
                 return false;
             }
         }
-        
+
     }
 
   index_[ level ]++;
@@ -571,14 +579,14 @@ DataBlockHandle LargeVolumeConverterPrivate::load_file_internals( const boost::f
 
   try
   {
-    image_data = typename ITKImageContainer::Handle( 
-        new ITKImageContainer( reader->GetOutput() ) ); 
+    image_data = typename ITKImageContainer::Handle(
+        new ITKImageContainer( reader->GetOutput() ) );
   }
   catch ( ... )
   {
     error = "Importer could not read itk object.";
     return DataBlockHandle();
-  } 
+  }
 
   return ITKDataBlock::New( image_data );
 }
@@ -596,15 +604,19 @@ DataBlockHandle LargeVolumeConverterPrivate::load_file( const boost::filesystem:
     case DataType::USHORT_E:
       return this->load_file_internals<unsigned short>( filename, error );
     case DataType::SHORT_E:
-      return this->load_file_internals<short>( filename, error ); 
+      return this->load_file_internals<short>( filename, error );
     case DataType::UINT_E:
       return this->load_file_internals<unsigned int>( filename, error );
     case DataType::INT_E:
-      return this->load_file_internals<int>( filename, error );   
+      return this->load_file_internals<int>( filename, error );
+    case DataType::ULONGLONG_E:
+      return this->load_file_internals<unsigned long long>( filename, error );
+    case DataType::LONGLONG_E:
+      return this->load_file_internals<long long>( filename, error );
     case DataType::FLOAT_E:
       return this->load_file_internals<float>( filename, error );
     case DataType::DOUBLE_E:
-      return this->load_file_internals<double>( filename, error );    
+      return this->load_file_internals<double>( filename, error );
   }
 
   error = "Could not determine data type.";
@@ -622,14 +634,14 @@ bool LargeVolumeConverterPrivate::scan_file( const boost::filesystem::path& file
   if ( Core::FileUtil::CheckExtension( filename, ".png") )
   {
     reader->SetImageIO( itk::PNGImageIO::New() );
-  } 
+  }
   else if ( Core::FileUtil::CheckExtension( filename, ".tif|.tiff") )
   {
-    reader->SetImageIO( itk::TIFFImageIO::New() );  
+    reader->SetImageIO( itk::TIFFImageIO::New() );
   }
   else if ( Core::FileUtil::CheckExtension( filename, ".jpg|.jpeg") )
   {
-    reader->SetImageIO( itk::JPEGImageIO::New() );  
+    reader->SetImageIO( itk::JPEGImageIO::New() );
   }
   else if ( Core::FileUtil::CheckExtension( filename, ".dcm|.dicom") )
   {
@@ -650,17 +662,19 @@ bool LargeVolumeConverterPrivate::scan_file( const boost::filesystem::path& file
     return false;
   }
 
-  itk::ImageIOBase* IO = reader->GetImageIO();
+  const itk::ImageIOBase* IO = reader->GetImageIO();
 
   // Grab the information on the data type from the ITK image
   std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
-  
+
   if( type_string == "unsigned_char" ) this->data_type_ = Core::DataType::UCHAR_E;
   if( type_string == "char" ) this->data_type_ = Core::DataType::CHAR_E;
   if( type_string == "unsigned_short" ) this->data_type_ = Core::DataType::USHORT_E;
   if( type_string == "short" ) this->data_type_ = Core::DataType::SHORT_E;
   if( type_string == "unsigned_int" ) this->data_type_ = Core::DataType::UINT_E;
   if( type_string == "int" ) this->data_type_ = Core::DataType::INT_E;
+  if( type_string == "unsigned_long_long" ) this->data_type_ = Core::DataType::ULONGLONG_E;
+  if( type_string == "long_long" ) this->data_type_ = Core::DataType::LONGLONG_E;
   if( type_string == "float" ) this->data_type_ = Core::DataType::FLOAT_E;
   if( type_string == "double" ) this->data_type_ = Core::DataType::DOUBLE_E;
 
@@ -669,20 +683,20 @@ bool LargeVolumeConverterPrivate::scan_file( const boost::filesystem::path& file
     error = "Could not determine data type.";
     return false;
   }
-  
+
   // Grab the image from the output so we can read its transform
   Core::ITKUCharImage2DDataHandle image_data;
   try
   {
-    image_data =  Core::ITKUCharImage2DDataHandle( 
-        new Core::ITKUCharImage2DData( reader->GetOutput() ) ); 
+    image_data =  Core::ITKUCharImage2DDataHandle(
+        new Core::ITKUCharImage2DData( reader->GetOutput() ) );
   }
   catch ( ... )
   {
     error = "Importer could not read itk object.";
     return false;
-  } 
-  
+  }
+
   this->data_size_.x( image_data->get_nx() );
   this->data_size_.y( image_data->get_ny() );
 
@@ -711,7 +725,7 @@ bool LargeVolumeConverterPrivate::downsample_internals( DataBlockHandle input, D
             {
                 *dst = static_cast<T>( ( static_cast<U>( src[0] ) + static_cast<U>( src[1] ) + static_cast<U>( src[nx] ) +  static_cast<U>( src[nx+1] ) ) / 4 );
             }
-        
+
             if (nx % 2)
             {
                 *dst = static_cast<T>( ( static_cast<U>( src[0] ) + static_cast<U>( src[nx] ) ) / 2 );
@@ -719,14 +733,14 @@ bool LargeVolumeConverterPrivate::downsample_internals( DataBlockHandle input, D
                 src++;
             }
         }
-        
+
         if ( ny % 2 )
         {
             for ( DataBlock::index_type x = 0; x < (nx-1); x += 2, src += 2, dst++ )
             {
                 *dst = static_cast<T>( ( static_cast<U>( src[0] ) + static_cast<U>( src[1] ) ) / 2 );
             }
-        
+
             if (nx % 2)
             {
                 *dst = *src;
@@ -743,7 +757,7 @@ bool LargeVolumeConverterPrivate::downsample_internals( DataBlockHandle input, D
             {
                 *dst = static_cast<T>( ( static_cast<U>( src[0] ) + static_cast<U>( src[1] ) ) / 2 );
             }
-        
+
             if (nx % 2)
             {
                 *dst = *src;
@@ -761,7 +775,7 @@ bool LargeVolumeConverterPrivate::downsample_internals( DataBlockHandle input, D
                 *dst = static_cast<T>( ( static_cast<U>( src[0] ) + static_cast<U>( src[nx] ) ) / 2 );
             }
         }
-        
+
         if ( ny % 2 )
         {
             for ( DataBlock::index_type x = 0; x < nx; x ++, src ++, dst++ )
@@ -778,7 +792,7 @@ bool LargeVolumeConverterPrivate::downsample_internals( DataBlockHandle input, D
             *dst = *src;
         }
     }
-    
+
     return true;
 }
 
@@ -789,7 +803,7 @@ bool LargeVolumeConverterPrivate::downsample( DataBlockHandle input, DataBlockHa
     {
         return false;
     }
-    
+
     switch( input->get_data_type() )
     {
         case DataType::UCHAR_E:
@@ -804,12 +818,16 @@ bool LargeVolumeConverterPrivate::downsample( DataBlockHandle input, DataBlockHa
             return this->downsample_internals<unsigned int, unsigned long long>( input, output, input_ratio, output_ratio );
         case DataType::INT_E:
             return this->downsample_internals<int, long long>( input, output, input_ratio, output_ratio );
+        case DataType::ULONGLONG_E:
+            return this->downsample_internals<unsigned long long, unsigned int>( input, output, input_ratio, output_ratio );
+        case DataType::LONGLONG_E:
+            return this->downsample_internals<long long, int>( input, output, input_ratio, output_ratio );
         case DataType::FLOAT_E:
             return this->downsample_internals<float, float>( input, output, input_ratio, output_ratio );
         case DataType::DOUBLE_E:
             return this->downsample_internals<double, double>( input, output, input_ratio, output_ratio );
     }
-    
+
     return false;
 }
 
@@ -834,7 +852,7 @@ bool LargeVolumeConverterPrivate::downsample_add_internals( DataBlockHandle inpu
             {
                 *dst = static_cast<T>( ( static_cast<U>( dst[0] * 4 ) + static_cast<U>( src[0] ) + static_cast<U>( src[1] ) + static_cast<U>( src[nx] ) +  static_cast<U>( src[nx+1] ) ) / 8 );
             }
-        
+
             if (nx % 2)
             {
                 *dst = static_cast<T>( ( static_cast<U>( dst[0] * 2 ) + static_cast<U>( src[0] ) + static_cast<U>( src[nx] ) ) / 4 );
@@ -842,14 +860,14 @@ bool LargeVolumeConverterPrivate::downsample_add_internals( DataBlockHandle inpu
                 src++;
             }
         }
-        
+
         if ( ny % 2 )
         {
             for ( DataBlock::index_type x = 0; x < (nx-1); x += 2, src += 2, dst++ )
             {
                 *dst = static_cast<T>( ( static_cast<U>( dst[0] * 2 ) +  static_cast<U>( src[0] ) + static_cast<U>( src[1] ) ) / 4 );
             }
-        
+
             if (nx % 2)
             {
                 *dst = static_cast<T>( ( static_cast<U>( *dst ) + static_cast<U>( *src ) ) / 2 );
@@ -866,7 +884,7 @@ bool LargeVolumeConverterPrivate::downsample_add_internals( DataBlockHandle inpu
             {
                 *dst = static_cast<T>( ( static_cast<U>( dst[0] * 2 ) + static_cast<U>( src[0] ) + static_cast<U>( src[1] ) ) / 4 );
             }
-        
+
             if (nx % 2)
             {
                 *dst = static_cast<T>( ( static_cast<U>( *dst ) + static_cast<U>( *src ) ) / 2 );
@@ -884,7 +902,7 @@ bool LargeVolumeConverterPrivate::downsample_add_internals( DataBlockHandle inpu
                 *dst = static_cast<T>( ( static_cast<U>( dst[0] * 2 ) + static_cast<U>( src[0] ) + static_cast<U>( src[nx] ) ) / 4 );
             }
         }
-        
+
         if ( ny % 2 )
         {
             for ( DataBlock::index_type x = 0; x < nx; x ++, src++, dst++ )
@@ -901,7 +919,7 @@ bool LargeVolumeConverterPrivate::downsample_add_internals( DataBlockHandle inpu
             *dst = static_cast<T>( ( static_cast<U>( *dst ) + static_cast<U>( *src ) ) / 2 );
         }
     }
-    
+
     return true;
 }
 
@@ -913,7 +931,7 @@ bool LargeVolumeConverterPrivate::downsample_add( DataBlockHandle input, DataBlo
     {
         return false;
     }
-    
+
     switch( input->get_data_type() )
     {
         case DataType::UCHAR_E:
@@ -928,12 +946,16 @@ bool LargeVolumeConverterPrivate::downsample_add( DataBlockHandle input, DataBlo
             return downsample_add_internals<unsigned int, unsigned long long>( input, output, input_ratio, output_ratio );
         case DataType::INT_E:
             return downsample_add_internals<int, long long>( input, output, input_ratio, output_ratio );
+        case DataType::ULONGLONG_E:
+            return downsample_add_internals<unsigned long long, unsigned long long>( input, output, input_ratio, output_ratio );
+        case DataType::LONGLONG_E:
+            return downsample_add_internals<long long, long long>( input, output, input_ratio, output_ratio );
         case DataType::FLOAT_E:
             return downsample_add_internals<float, float>( input, output, input_ratio, output_ratio );
         case DataType::DOUBLE_E:
             return downsample_add_internals<double, double>( input, output, input_ratio, output_ratio );
     }
-    
+
     return false;
 }
 
@@ -1020,7 +1042,7 @@ bool LargeVolumeConverter::run_phase2( std::string& error )
     // Calculate size for down sample slices
     size_t slice_buffer_size = 0;
   size_t element_size = Core::GetSizeDataType( this->private_->schema_->get_data_type() );
-    
+
     // Calculate size for each slice
   for ( size_t j = 0; j < num_levels; j++)
   {
@@ -1041,7 +1063,7 @@ bool LargeVolumeConverter::run_phase2( std::string& error )
     // Initialize parameters for each level
     this->private_->slices_.resize( num_levels );
     this->private_->index_.resize( num_levels, 0 );
-  
+
   this->private_->brick_level_.resize( num_levels );
 
     // Allocate resample buffers
@@ -1068,7 +1090,7 @@ bool LargeVolumeConverter::run_phase2( std::string& error )
   if ( buffer_size == 0 )
   {
     error = "Please allocate more memory to conversion process.";
-    return false; 
+    return false;
   }
 
     for ( size_t j = 0; j < num_levels; j++ )
@@ -1088,11 +1110,11 @@ bool LargeVolumeConverter::run_phase2( std::string& error )
 
         // indicate which slice is being processed
         std::cout << "Processing file: " << this->private_->files_[ slice_idx ].string() << std::endl;
-    
+
         // load slice
         this->private_->slices_[ 0 ] = this->private_->load_file( this->private_->files_[ slice_idx ], error );
-    
-    if (! this->private_->slices_[ 0 ] ) 
+
+    if (! this->private_->slices_[ 0 ] )
     {
       return false;
     }
@@ -1101,9 +1123,9 @@ bool LargeVolumeConverter::run_phase2( std::string& error )
     {
       std::cout << "WARNING: Dimensions of the slices are not equal, clipping/padding image to fit dimensions of first image." <<std::endl;
       DataBlock::Clip( this->private_->slices_[ 0 ], this->private_->slices_[ 0 ], total_size.x(), total_size.y(), 1, 0.0 );
-    } 
-  
-    
+    }
+
+
     if (! this->private_->compute_min_max( this->private_->slices_[ 0 ], min, max ) )
     {
       error = "Could not compute min and max.";
@@ -1142,12 +1164,12 @@ void LargeVolumeConverterPrivate::run_phase3_parallel( int thread_num, int num_t
     {
     if ( thread_num == 0 )
     {
-      std::cout << "processing level: " << ExportToString( j ) << std::endl; 
+      std::cout << "processing level: " << ExportToString( j ) << std::endl;
     }
 
         IndexVector layout = this->schema_->get_level_layout( j );
         IndexVector::index_type num_bricks = layout[0] * layout[1] * layout[2];
-        
+
     if ( thread_num == 0 )
     {
       std::cout << "processing brick: 000000/000000";
@@ -1160,7 +1182,7 @@ void LargeVolumeConverterPrivate::run_phase3_parallel( int thread_num, int num_t
         std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b" << std::setfill('0') << std::setw(6) << (k+1) << "/" << std::setfill('0') << std::setw(6) << num_bricks;
         std::cout.flush();
       }
-      
+
       BrickInfo bi( k ,j );
             if (! this->schema_->reprocess_brick( bi, error) )
       {
@@ -1175,7 +1197,7 @@ void LargeVolumeConverterPrivate::run_phase3_parallel( int thread_num, int num_t
     {
       std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b" << std::setfill('0') << std::setw(6) << num_bricks << "/" << std::setfill('0') << std::setw(6) << num_bricks;
       std::cout << std::endl;
-            
+
     }
   }
 

@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -54,11 +54,11 @@ bool ActionNeighborhoodConnectedFilter::validate( Core::ActionContextHandle& con
   if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
 
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, 
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_,
     Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
-  
-  // Check for layer availability 
-  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_, 
+
+  // Check for layer availability
+  if ( ! LayerManager::CheckLayerAvailabilityForProcessing( this->target_layer_,
     context, this->sandbox_ ) ) return false;
 
   if ( this->seeds_.size() == 0 )
@@ -66,7 +66,7 @@ bool ActionNeighborhoodConnectedFilter::validate( Core::ActionContextHandle& con
     context->report_error( "There needs to be at least one seed point." );
     return false;
   }
-  
+
   // Validation successful
   return true;
 }
@@ -84,7 +84,7 @@ public:
   LayerHandle dst_layer_;
 
   std::vector< std::vector< int > > seeds_;
-  
+
 public:
   template< class T >
   void typed_run( Core::DataBlock* src )
@@ -92,13 +92,13 @@ public:
     const T* src_data = reinterpret_cast< T* >( src->get_data() );
 
     // Allocate the data block for storing the results
-    Core::DataBlockHandle dst_mask = Core::StdDataBlock::New( 
+    Core::DataBlockHandle dst_mask = Core::StdDataBlock::New(
       this->src_layer_->get_grid_transform(), Core::DataType::UCHAR_E );
 
     if ( !dst_mask )
     {
       this->report_error( "Could not allocate enough memory." );
-      return;   
+      return;
     }
 
     // Get the dimensions
@@ -128,7 +128,7 @@ public:
       max_val = Core::Max( max_val, value );
       seeds.push( seed );
     }
-    
+
     std::vector< int > neighbor_index( 3 );
     size_t visited_voxels = seeds.size();
     size_t last_report_voxels = visited_voxels;
@@ -147,7 +147,7 @@ public:
         {
           neighbor_index[ i ] -= 1;
           size_t offset = src->to_index( static_cast< size_t >( neighbor_index[ 0 ] ),
-            static_cast< size_t >( neighbor_index[ 1 ] ), 
+            static_cast< size_t >( neighbor_index[ 1 ] ),
             static_cast< size_t >( neighbor_index[ 2 ] ) );
           if ( dst_data[ offset ] != 1 &&
             src_data[ offset ] >= min_val &&
@@ -158,13 +158,13 @@ public:
           }
           ++visited_voxels;
         }
-        
+
         neighbor_index = seed_index;
         if ( neighbor_index[ i ] < dimensions[ i ] - 1 )
         {
           neighbor_index[ i ] += 1;
           size_t offset = src->to_index( static_cast< size_t >( neighbor_index[ 0 ] ),
-            static_cast< size_t >( neighbor_index[ 1 ] ), 
+            static_cast< size_t >( neighbor_index[ 1 ] ),
             static_cast< size_t >( neighbor_index[ 2 ] ) );
           if ( dst_data[ offset ] != 1 &&
             src_data[ offset ] >= min_val &&
@@ -180,7 +180,7 @@ public:
       if ( visited_voxels - last_report_voxels > progress_threshold )
       {
         if ( this->check_abort() )  return;
-        
+
         this->dst_layer_->update_progress_signal_( visited_voxels * 0.8 / total_voxels );
         last_report_voxels = visited_voxels;
       }
@@ -190,22 +190,22 @@ public:
     {
       return;
     }
-    
+
     this->dst_layer_->update_progress_signal_( 0.8 );
     Core::MaskDataBlockHandle mask_datablock;
-    if ( !( Core::MaskDataBlockManager::Convert( dst_mask, 
+    if ( !( Core::MaskDataBlockManager::Convert( dst_mask,
       this->dst_layer_->get_grid_transform(), mask_datablock ) ) )
     {
       this->report_error( "Could not allocate enough memory." );
-      return;   
+      return;
     }
-      
+
     this->dst_layer_->update_progress_signal_( 1.0 );
-    
+
     this->dispatch_insert_mask_volume_into_layer( this->dst_layer_,
       Core::MaskVolumeHandle( new Core::MaskVolume(
       this->dst_layer_->get_grid_transform(), mask_datablock ) ) );
-      
+
   }
 
   // RUN_FILTER:
@@ -215,7 +215,7 @@ public:
   {
 
     // Add the seeds to the filter, and compute the threshold values
-    Core::DataBlockHandle datablock = dynamic_cast< DataLayer* >( 
+    Core::DataBlockHandle datablock = dynamic_cast< DataLayer* >(
       this->src_layer_.get() )->get_data_volume()->get_data_block();
 
     switch ( datablock->get_data_type() )
@@ -238,15 +238,21 @@ public:
     case Core::DataType::UINT_E:
       this->typed_run< unsigned int >( datablock.get() );
       break;
+    case Core::DataType::LONGLONG_E:
+      this->typed_run< long long >( datablock.get() );
+      break;
+    case Core::DataType::ULONGLONG_E:
+      this->typed_run< unsigned long long >( datablock.get() );
+      break;
     case Core::DataType::FLOAT_E:
       this->typed_run< float >( datablock.get() );
       break;
     case Core::DataType::DOUBLE_E:
       this->typed_run< double >( datablock.get() );
       break;
-    }   
+    }
   }
-  
+
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
@@ -255,16 +261,16 @@ public:
   }
 
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "NeighborhoodConnected"; 
+    return "NeighborhoodConnected";
   }
 };
 
 
-bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context, 
+bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
@@ -305,18 +311,18 @@ bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context,
   catch ( ... )
   {
     algo->report_error( "Could not allocate enough memory." );
-    return false; 
+    return false;
   }
-  
+
   if ( algo->seeds_.size() == 0 )
   {
     context->report_error( "All seed points are out of the volume boundary" );
     return false;
   }
-  
+
   // Lock the src layer, so it cannot be used else where
   algo->lock_for_use( algo->src_layer_ );
-  
+
   // Create the destination layer, which will show progress
   algo->create_and_lock_mask_layer_from_layer( algo->src_layer_, algo->dst_layer_ );
   algo->connect_abort( algo->dst_layer_ );
@@ -333,16 +339,16 @@ bool ActionNeighborhoodConnectedFilter::run( Core::ActionContextHandle& context,
 
   // Build the undo-redo record
   algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
-  
+
   // Start the filter on a separate thread.
   Core::Runnable::Start( algo );
 
   return true;
 }
 
-void ActionNeighborhoodConnectedFilter::Dispatch( Core::ActionContextHandle context, 
+void ActionNeighborhoodConnectedFilter::Dispatch( Core::ActionContextHandle context,
     std::string target_layer, const std::vector< Core::Point >& seeds )
-{ 
+{
   // Create a new action
   ActionNeighborhoodConnectedFilter* action = new ActionNeighborhoodConnectedFilter;
 
@@ -353,5 +359,5 @@ void ActionNeighborhoodConnectedFilter::Dispatch( Core::ActionContextHandle cont
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-  
+
 } // end namespace Seg3D

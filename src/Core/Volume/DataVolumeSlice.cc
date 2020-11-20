@@ -39,14 +39,14 @@ const unsigned int DataVolumeSlice::TEXTURE_DATA_TYPE_C = GL_UNSIGNED_SHORT;
 
 const unsigned int DataVolumeSlice::TEXTURE_FORMAT_C = GL_LUMINANCE16;
 
-DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume, 
+DataVolumeSlice::DataVolumeSlice( const DataVolumeHandle& data_volume,
                  VolumeSliceType type, size_t slice_num ) :
   VolumeSlice( data_volume, type, slice_num )
 {
   this->data_block_ = data_volume->get_data_block().get();
   if ( this->data_block_ )
   {
-    this->add_connection( this->data_block_->data_changed_signal_.connect( 
+    this->add_connection( this->data_block_->data_changed_signal_.connect(
       boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
   }
 }
@@ -82,7 +82,7 @@ void CopyTypedData( DataVolumeSlice* slice, TYPE1* buffer, DataBlock* data_block
 
   const size_t nx = slice->nx();
   const size_t ny = slice->ny();
-  
+
   TYPE2* data = static_cast<TYPE2*>( data_block->get_data() );
   size_t row_start = current_index;
   for ( size_t j = 0; j < ny; j++ )
@@ -91,9 +91,9 @@ void CopyTypedData( DataVolumeSlice* slice, TYPE1* buffer, DataBlock* data_block
     for ( size_t i = 0; i < nx; i++ )
     {
       // NOTE: removed unnecessary addition for unsigned texture types
-      // buffer[ j * nx + i ] = static_cast<TYPE1>(   ( data[ current_index ] - typed_value_min ) 
+      // buffer[ j * nx + i ] = static_cast<TYPE1>(   ( data[ current_index ] - typed_value_min )
       //  * inv_value_range + numeric_min );
-      buffer[ j * nx + i ] = static_cast<TYPE1>(  
+      buffer[ j * nx + i ] = static_cast<TYPE1>(
         ( data[ current_index ] - typed_value_min ) * inv_value_range );
 
       current_index += x_stride;
@@ -125,22 +125,22 @@ void DataVolumeSlice::upload_texture()
     // Make sure there is no pixel unpack buffer bound
     PixelUnpackBuffer::RestoreDefault();
 
-    tex->set_image( static_cast< int >( nx ), 
+    tex->set_image( static_cast< int >( nx ),
       static_cast< int >( ny ), TEXTURE_FORMAT_C );
     this->set_size_changed( false );
   }
-  
+
   // Step 1. copy the data in the slice to a pixel unpack buffer
   PixelBufferObjectHandle pixel_buffer( new PixelUnpackBuffer );
   pixel_buffer->bind();
   pixel_buffer->set_buffer_data( sizeof( texture_data_type ) * nx * ny,
-    NULL, GL_STREAM_DRAW );
+    nullptr, GL_STREAM_DRAW );
   texture_data_type* buffer = reinterpret_cast< texture_data_type* >(
     pixel_buffer->map_buffer( GL_WRITE_ONLY ) );
 
   // Lock the volume
   DataBlock::shared_lock_type volume_lock( this->data_block_->get_mutex() );
-  
+
   switch ( this->data_block_->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -161,6 +161,12 @@ void DataVolumeSlice::upload_texture()
     case DataType::UINT_E:
       CopyTypedData< texture_data_type, unsigned int >( this, buffer, this->data_block_ );
       break;
+    case DataType::LONGLONG_E:
+      CopyTypedData< texture_data_type, long long >( this, buffer, this->data_block_ );
+      break;
+    case DataType::ULONGLONG_E:
+      CopyTypedData< texture_data_type, unsigned long long >( this, buffer, this->data_block_ );
+      break;
     case DataType::FLOAT_E:
       CopyTypedData< texture_data_type, float >( this, buffer, this->data_block_ );
       break;
@@ -170,12 +176,12 @@ void DataVolumeSlice::upload_texture()
   }
 
   volume_lock.unlock();
-  
+
   // Step 2. copy from the pixel buffer to texture
   pixel_buffer->unmap_buffer();
   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  tex->set_sub_image( 0, 0, static_cast<int>( nx ), 
-    static_cast<int>( ny ), NULL, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
+  tex->set_sub_image( 0, 0, static_cast<int>( nx ),
+    static_cast<int>( ny ), nullptr, GL_LUMINANCE, TEXTURE_DATA_TYPE_C );
   tex->unbind();
 
   // Step 3. release the pixel unpack buffer
@@ -206,7 +212,7 @@ void DataVolumeSlice::set_volume( const VolumeHandle& volume )
   this->data_block_ = data_volume->get_data_block().get();
   if ( this->data_block_ )
   {
-    this->add_connection( this->data_block_->data_changed_signal_.connect( 
+    this->add_connection( this->data_block_->data_changed_signal_.connect(
       boost::bind( &VolumeSlice::handle_volume_updated, this ) ) );
   }
 }
@@ -244,7 +250,7 @@ void ThresholdTypedData( const DataVolumeSlice* slice, DataBlock* data_block,
     current_index = row_start;
     for ( size_t i = 0; i < nx; i++ )
     {
-      in_range = ( data[ current_index ] >= min_val && 
+      in_range = ( data[ current_index ] >= min_val &&
         data[ current_index ] <= max_val );
       buffer[ j * nx + i ] = negative_constraint ? !in_range : in_range;
       current_index += x_stride;
@@ -253,7 +259,7 @@ void ThresholdTypedData( const DataVolumeSlice* slice, DataBlock* data_block,
   }
 }
 
-void DataVolumeSlice::create_threshold_mask( std::vector< unsigned char >& mask, 
+void DataVolumeSlice::create_threshold_mask( std::vector< unsigned char >& mask,
     double min_val, double max_val, bool negative_constraint ) const
 {
   lock_type lock( this->get_mutex() );
@@ -263,35 +269,43 @@ void DataVolumeSlice::create_threshold_mask( std::vector< unsigned char >& mask,
   switch ( this->data_block_->get_data_type() )
   {
   case DataType::CHAR_E:
-    ThresholdTypedData< signed char >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< signed char >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::UCHAR_E:
-    ThresholdTypedData< unsigned char >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< unsigned char >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::SHORT_E:
-    ThresholdTypedData< short >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< short >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::USHORT_E:
-    ThresholdTypedData< unsigned short >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< unsigned short >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::INT_E:
-    ThresholdTypedData< int >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< int >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::UINT_E:
-    ThresholdTypedData< unsigned int >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< unsigned int >( this, this->data_block_, &mask[ 0 ],
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::LONGLONG_E:
+    ThresholdTypedData< long long >( this, this->data_block_, &mask[ 0 ],
+      min_val, max_val, negative_constraint );
+    break;
+  case DataType::ULONGLONG_E:
+    ThresholdTypedData< unsigned long long >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::FLOAT_E:
-    ThresholdTypedData< float >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< float >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   case DataType::DOUBLE_E:
-    ThresholdTypedData< double >( this, this->data_block_, &mask[ 0 ], 
+    ThresholdTypedData< double >( this, this->data_block_, &mask[ 0 ],
       min_val, max_val, negative_constraint );
     break;
   }

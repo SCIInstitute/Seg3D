@@ -432,6 +432,12 @@ Histogram NrrdData::get_histogram( bool trust_meta_data )
     case Core::DataType::UINT_E:
       result.compute( reinterpret_cast<unsigned int *>( this->get_data() ), this->get_size() );
       break;
+    case Core::DataType::LONGLONG_E:
+      result.compute( reinterpret_cast<long long *>( this->get_data() ), this->get_size() );
+      break;
+    case Core::DataType::ULONGLONG_E:
+      result.compute( reinterpret_cast<unsigned long long *>( this->get_data() ), this->get_size() );
+      break;
     case Core::DataType::FLOAT_E:
       result.compute( reinterpret_cast<float *>( this->get_data() ), this->get_size() );
       break;

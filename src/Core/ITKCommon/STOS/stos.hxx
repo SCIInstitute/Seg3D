@@ -254,7 +254,7 @@ public:
     itk::TransformBase::Pointer tmp = load_transform(si);
     
     t01_ = dynamic_cast<base_transform_t *>(tmp.GetPointer());
-    bool ok = t01_.GetPointer() != NULL;
+    bool ok = t01_.GetPointer() != nullptr;
     
     fn_mask_[0].clear();
     fn_mask_[1].clear();

@@ -221,6 +221,12 @@ bool GDCMLayerImporterPrivate::read_header()
     case gdcm::PixelFormat::UINT32:
       this->pixel_type_ = Core::DataType::UINT_E;
       break;
+    case gdcm::PixelFormat::INT64:
+      this->pixel_type_ = Core::DataType::LONGLONG_E;
+      break;
+    case gdcm::PixelFormat::UINT64:
+      this->pixel_type_ = Core::DataType::ULONGLONG_E;
+      break;
     case gdcm::PixelFormat::FLOAT32:
       this->pixel_type_ = Core::DataType::FLOAT_E;
       break;

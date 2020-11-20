@@ -84,14 +84,14 @@ class the_dynamic_array_t
 {
 public:
   the_dynamic_array_t():
-    array_(NULL),
+    array_(nullptr),
     page_size_(16),
     size_(0),
     init_value_()
   {}
   
   the_dynamic_array_t(const size_t & init_size):
-    array_(NULL),
+    array_(nullptr),
     page_size_(init_size),
     size_(0),
     init_value_()
@@ -100,7 +100,7 @@ public:
   the_dynamic_array_t(const size_t & init_size,
           const size_t & page_size,
           const T & init_value):
-    array_(NULL),
+    array_(nullptr),
     page_size_(page_size),
     size_(0),
     init_value_(init_value)
@@ -110,7 +110,7 @@ public:
   
   // copy constructor:
   the_dynamic_array_t(const the_dynamic_array_t<T> & a):
-    array_(NULL),
+    array_(nullptr),
     page_size_(0),
     size_(0),
     init_value_(a.init_value_)
@@ -134,7 +134,7 @@ public:
     }
     
     delete array_;
-    array_ = NULL;
+    array_ = nullptr;
     
     size_ = 0;
   }
@@ -211,7 +211,7 @@ public:
   
   // number of pages currently allocated:
   inline size_t num_pages() const
-  { return (array_ == NULL) ? 0 : array_->size(); }
+  { return (array_ == nullptr) ? 0 : array_->size(); }
   
   inline const T * page(const size_t & page_index) const
   { return &((*(*array_)[page_index])[0]); }

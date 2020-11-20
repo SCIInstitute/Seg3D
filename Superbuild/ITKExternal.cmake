@@ -50,7 +50,9 @@ SET(itk_CACHE_ARGS
   "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
   "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
   "-DITK_BUILD_DEFAULT_MODULES:BOOL=OFF"
-  "-DITKV3_COMPATIBILITY:BOOL=ON"
+  "-DITKV4_COMPATIBILITY:BOOL=OFF"
+  "-DITK_LEGACY_REMOVE:BOOL=ON"
+  "-DITK_FUTURE_LEGACY_REMOVE:BOOL=OFF"
   "-DModule_ITKRegistrationCommon:BOOL=ON"
   "-DModule_ITKSmoothing:BOOL=ON"
   "-DModule_ITKAnisotropicSmoothing:BOOL=ON"
@@ -68,7 +70,7 @@ SET(itk_CACHE_ARGS
   "-DModule_ITKIOGIPL:BOOL=ON"
   "-DModule_IITKIOMeta:BOOL=ON"
   "-DModule_ITKIONRRD:BOOL=ON"
-  "-DModule_ITKDeprecated:BOOL=ON"
+  "-DModule_ITKDeprecated:BOOL=OFF"
   "-DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}"
   "-DCMAKE_CXX_FLAGS_DEBUG:STATIC=${CMAKE_CXX_FLAGS_DEBUG}"
   "-DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}"
@@ -86,12 +88,12 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "origin/itk-4.13.1")
+SET(itk_GIT_TAG "master")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
 ExternalProject_Add(ITK_external
-  GIT_REPOSITORY "https://github.com/CIBC-Internal/itk.git"
+  GIT_REPOSITORY "https://github.com/InsightSoftwareConsortium/ITK.git"
   GIT_TAG ${itk_GIT_TAG}
   UPDATE_COMMAND ""
   PATCH_COMMAND ""
@@ -101,6 +103,6 @@ ExternalProject_Add(ITK_external
 
 # hardcoded, since we need this before ITK's configure step
 ExternalProject_Get_Property(ITK_external INSTALL_DIR)
-SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-4.13" CACHE PATH "")
+SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.2" CACHE PATH "")
 
 MESSAGE(STATUS "ITK_DIR=${ITK_DIR}")

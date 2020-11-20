@@ -93,7 +93,7 @@ NormalizeImageFilterWithMask<TInputImage, TOutputImage>
 
   // Set the parameters for Shift
   m_ShiftScaleFilter->SetShift(-m_StatisticsFilter->GetMean());
-  m_ShiftScaleFilter->SetScale(NumericTraits<ITK_TYPENAME StatisticsImageFilterWithMask<TInputImage>::RealType>::One
+  m_ShiftScaleFilter->SetScale(NumericTraits<typename StatisticsImageFilterWithMask<TInputImage>::RealType>::One
                                / m_StatisticsFilter->GetSigma());
   m_ShiftScaleFilter->SetInput(this->GetInput());
   

@@ -39,7 +39,7 @@ void Seg3DLibrary::exportSegFile(const QString& export_path)
   const std::string path = export_path.toStdString();
   const std::string extension = ".nrrd";
   std::vector< LayerHandle > layers;
-  Seg3D::LayerManager::Instance()->get_layers(layers);
+  LayerManager::Instance()->get_layers(layers);
 
   for(int i = 0; i < layers.size(); i++)
   {
