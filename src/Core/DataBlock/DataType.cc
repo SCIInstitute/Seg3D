@@ -41,7 +41,7 @@ namespace Core
 
 bool ImportFromString( const std::string& data_type_string, DataType& data_type )
 {
-  std::string lower_data_type = boost::to_lower_copy( data_type_string ); 
+  std::string lower_data_type = boost::to_lower_copy( data_type_string );
   boost::erase_all( lower_data_type , " " );
 
   if ( lower_data_type == "char" || lower_data_type == "signedchar")
@@ -189,7 +189,8 @@ bool IsInteger( const DataType& data_type )
 {
   return ( data_type == DataType::CHAR_E || data_type == DataType::UCHAR_E ||
       data_type == DataType::SHORT_E || data_type == DataType::USHORT_E ||
-      data_type == DataType::INT_E || data_type == DataType::UINT_E );
+      data_type == DataType::INT_E || data_type == DataType::UINT_E ||
+      data_type == DataType::LONGLONG_E || data_type == DataType::ULONGLONG_E );
 }
 
 bool IsReal( const DataType& data_type )

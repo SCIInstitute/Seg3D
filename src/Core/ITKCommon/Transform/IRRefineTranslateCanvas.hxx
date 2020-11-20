@@ -128,7 +128,7 @@ public:
 private:
   void addProcessedConnection(IRConnection* connection);
   
-  // returns NULL if there are no more entries to process
+  // returns nullptr if there are no more entries to process
   IRConnection* getConectionToProcess();
   
   void setTransformAndNeighborsToGroupID(IRTransform* transform,

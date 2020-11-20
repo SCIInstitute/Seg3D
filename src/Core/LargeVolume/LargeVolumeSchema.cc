@@ -89,7 +89,7 @@ public:
   {
     const IndexVector& effective_brick_size = this->effective_brick_size_;
 
-    return IndexVector( Ceil( size.xd() / effective_brick_size.x() ), 
+    return IndexVector( Ceil( size.xd() / effective_brick_size.x() ),
       Ceil( size.yd() / effective_brick_size.y() ), Ceil( size.zd() / effective_brick_size.z() ) );
   }
 
@@ -126,7 +126,7 @@ public:
 
     return Ceil( size.xd() / effective_brick_size.x() ) * Ceil( size.yd() / effective_brick_size.y() ) * Ceil( size.zd() / effective_brick_size.z() );
   }
-  
+
   IndexVector compute_remainder_brick( const BrickInfo& bi,
                                   const IndexVector& index )
   {
@@ -134,7 +134,7 @@ public:
     const IndexVector& size = this->level_size_[ bi.level_ ];
     const size_t overlap = this->overlap_;
     IndexVector remainder_brick_size = this->brick_size_;
-    
+
     if ( index.x() == layout.x() - 1 ) remainder_brick_size.x( size.x() - ( this->effective_brick_size_.x() * index.x()) + 2 * overlap );
     if ( index.y() == layout.y() - 1 ) remainder_brick_size.y( size.y() - ( this->effective_brick_size_.y() * index.y()) + 2 * overlap );
     if ( index.z() == layout.z() - 1 ) remainder_brick_size.z( size.z() - ( this->effective_brick_size_.z() * index.z()) + 2 * overlap );
@@ -150,7 +150,7 @@ public:
   }
 
 
-  void compute_cached_level_info() 
+  void compute_cached_level_info()
   {
     this->level_spacing_.clear();
     this->level_size_.clear();
@@ -180,7 +180,7 @@ public:
                      const IndexVector& clip_start,
                      const IndexVector& clip_end );
 
-  void load_and_substitue_missing_bricks( std::vector<BrickInfo>& want_to_render, SliceType slice, 
+  void load_and_substitue_missing_bricks( std::vector<BrickInfo>& want_to_render, SliceType slice,
     double depth, const std::string& load_key, std::vector<BrickInfo>& current_render );
 
   // -- contents in the text header --
@@ -210,7 +210,7 @@ public:
 
   double min_;
   double max_;
-  
+
   bfs::path dir_;
   LargeVolumeSchema* schema_;
 };
@@ -247,7 +247,7 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
 
   const IndexVector::index_type vxstride = vnx - ( bxend - bxstart  );
   const IndexVector::index_type vystride = ( vny - ( byend - bystart ) ) * vnx;
-  
+
   // same code from here to return
   T* src = reinterpret_cast<T*>( brick->get_data() );
   T* dst = reinterpret_cast<T*>( volume->get_data() );
@@ -262,8 +262,8 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
       for ( IndexVector::index_type x = bxstart; x < bxend; x++ , src++, dst++ )
       {
         *dst = *src;
-      }     
-    } 
+      }
+    }
   }
 
   return true;
@@ -284,7 +284,7 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
   const IndexVector::index_type bxstart = overlap;
   const IndexVector::index_type bystart = overlap;
   const IndexVector::index_type bzstart = overlap;
-  
+
   const IndexVector::index_type bxend = bnx - overlap;
   const IndexVector::index_type byend = bny - overlap;
   const IndexVector::index_type bzend = bnz - overlap;
@@ -299,7 +299,7 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
 
   const IndexVector::index_type vxstride = vnx - ( bnx - 2 * overlap );
   const IndexVector::index_type vystride = ( vny - ( bny - 2 * overlap ) ) * vnx;
-  
+
   // same code from here to return
   T* src = reinterpret_cast<T*>( brick->get_data() );
   T* dst = reinterpret_cast<T*>( volume->get_data() );
@@ -314,8 +314,8 @@ bool LargeVolumeSchemaPrivate::insert_brick_internals( DataBlockHandle volume, D
       for ( IndexVector::index_type x = bxstart; x < bxend; x++ , src++, dst++ )
       {
         *dst = *src;
-      }     
-    } 
+      }
+    }
   }
 
   return true;
@@ -345,14 +345,14 @@ bool LargeVolumeSchema::load( std::string& error)
     std::ifstream file_text( filename.string().c_str() );
     std::string line;
     std::map<std::string,std::string> values;
-    
+
     // read text file
 
     while( !file_text.eof() )
     {
       // Grab the next line
       std::getline( file_text, line );
-    
+
       std::vector<std::string> key_value = SplitString( line, ":" );
       if ( key_value.size() == 2 )
       {
@@ -369,7 +369,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'size'.";
       return false;
     }
-    
+
     if (! ImportFromString( values[ "size" ], this->private_->size_ ) )
     {
       error = "Could not read size field.";
@@ -381,7 +381,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'origin'.";
       return false;
     }
-    
+
     if ( !ImportFromString( values[ "origin" ], this->private_->origin_ ) )
     {
       error = "Could not read origin field.";
@@ -393,7 +393,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'spacing'.";
       return false;
     }
-    
+
     if ( !ImportFromString( values["spacing" ], this->private_->spacing_ ) )
     {
       error = "Could not read spacing field.";
@@ -406,7 +406,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'bricksize'.";
       return false;
     }
-    
+
     if (! ImportFromString( values[ "bricksize" ], this->private_->brick_size_ ) )
     {
       IndexVector::index_type single_brick_size;
@@ -425,7 +425,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'overlap'.";
       return false;
     }
-    
+
     if (! ImportFromString( values[ "overlap" ], this->private_->overlap_ ) )
     {
       error = "Could not read overlap field.";
@@ -441,7 +441,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'datatype'.";
       return false;
     }
-    
+
     if (! ImportFromString( values[ "datatype" ], this->private_->data_type_ ) )
     {
       error = "Could not read datatype field.";
@@ -453,7 +453,7 @@ bool LargeVolumeSchema::load( std::string& error)
       error = "Volume file does not contain a field called 'endian'.";
       return false;
     }
-    
+
     if ( values[ "endian" ] == "little" )
     {
       this->private_->little_endian_ = true;
@@ -489,11 +489,11 @@ bool LargeVolumeSchema::load( std::string& error)
     }
 
     size_t level = 0;
-    
+
     while ( values.find( "level" + ExportToString(level)) != values.end() )
     {
       std::string level_string = values[ "level" + ExportToString(level) ];
-      
+
       IndexVector ratios;
       if (! ImportFromString( level_string, ratios ))
       {
@@ -502,10 +502,10 @@ bool LargeVolumeSchema::load( std::string& error)
       }
 
       this->private_->levels_.push_back( ratios );
-      
+
       level++;
     }
-    
+
     this->private_->compute_cached_level_info();
   }
   catch (...)
@@ -527,10 +527,10 @@ bool LargeVolumeSchema::save( std::string& error ) const
   }
 
   bfs::path filename = this->private_->dir_ / VOLUME_FILE_NAME_;
-  
+
   try {
     std::ofstream text_file( filename.string().c_str() );
-  
+
     text_file << "size: " << ExportToString( this->private_->size_ ) << std::endl;
     text_file << "origin: " << ExportToString( this->private_->origin_ ) << std::endl;
     text_file << "spacing: " << ExportToString( this->private_->spacing_ ) << std::endl;
@@ -541,9 +541,9 @@ bool LargeVolumeSchema::save( std::string& error ) const
     text_file << "endian: " << ( this->private_->little_endian_ ? "little" : "big" ) << std::endl;
     text_file << "min: " << ExportToString( this->private_->min_ ) << std::endl;
     text_file << "max: " << ExportToString( this->private_->max_ ) << std::endl;
-    
+
     for (size_t j = 0 ; j < this->private_->levels_.size(); j++ )
-    {    
+    {
       text_file << "level" << j << ": " << ExportToString( this->private_->levels_[j] ) << std::endl;
     }
   }
@@ -685,7 +685,7 @@ void LargeVolumeSchema::set_dir( const bfs::path& dir )
   this->private_->dir_ = dir;
 }
 
-void LargeVolumeSchema::set_parameters( const IndexVector& size, const Vector& spacing, const Point& origin, 
+void LargeVolumeSchema::set_parameters( const IndexVector& size, const Vector& spacing, const Point& origin,
   const IndexVector& brick_size, size_t overlap, DataType data_type )
 {
   this->private_->size_ = size;
@@ -720,8 +720,8 @@ void LargeVolumeSchema::compute_levels()
   {
     IndexVector size = this->private_->compute_level_size( cur_level );
     IndexVector layout  = this->private_->compute_brick_layout( size );
-    while ( 
-      (this->private_->downsample_x_ && layout.x() > 1) || 
+    while (
+      (this->private_->downsample_x_ && layout.x() > 1) ||
       (this->private_->downsample_y_ && layout.y() > 1) ||
       (this->private_->downsample_z_ && layout.z() > 1) )
     {
@@ -735,7 +735,7 @@ void LargeVolumeSchema::compute_levels()
       if ( spacing.x() < min_spacing ) ratio.x( 2 * ratio.x() );
       if ( spacing.y() < min_spacing ) ratio.y( 2 * ratio.y() );
       if ( spacing.z() < min_spacing ) ratio.z( 2 * ratio.z() );
-  
+
       this->private_->levels_.push_back( ratio );
       cur_level++;
       size = this->private_->compute_level_size( cur_level );
@@ -777,7 +777,7 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
 {
   IndexVector size = this->get_brick_size( bi );
   brick = StdDataBlock::New( size[0], size[1], size[2], this->get_data_type() );
-  
+
   if ( !brick )
   {
     error = "Could not allocate brick.";
@@ -789,7 +789,7 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
   if ( !bfs::exists(brick_file ) )
   {
     error = "Could not open brick.";
-    return false; 
+    return false;
   }
 
   size_t file_size = bfs::file_size( brick_file );
@@ -817,7 +817,7 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
       {
         error = "Brick '" + brick_file.string() + "' contains invalid data.";
         brick->clear();
-        return false;     
+        return false;
       }
     }
     catch ( ... )
@@ -840,9 +840,9 @@ bool LargeVolumeSchema::read_brick( DataBlockHandle& brick, const BrickInfo& bi,
       error = "Error reading file '" + brick_file.string() + "'.";
       brick->clear();
       return false;
-    } 
+    }
   }
-  else 
+  else
   {
     error = "Brick file is too large to be a brick.";
     brick->clear();
@@ -861,8 +861,8 @@ bool LargeVolumeSchema::append_brick_buffer( DataBlockHandle data_block, size_t 
     size_t offset, const BrickInfo& bi, std::string& error ) const
 {
   IndexVector size = this->get_brick_size( bi );
-  
-  size_t slice_size = data_block->get_nx() * data_block->get_ny(); 
+
+  size_t slice_size = data_block->get_nx() * data_block->get_ny();
 
   if ( size[0] != data_block->get_nx() || size[1] != data_block->get_ny() )
   {
@@ -884,7 +884,7 @@ bool LargeVolumeSchema::append_brick_buffer( DataBlockHandle data_block, size_t 
   try
   {
     std::ofstream output( brick_file.string().c_str(), std::ios_base::app | std::ios_base::binary | std::ios_base::out );
-    
+
     output.seekp( offset * size[0] * size[1] * GetSizeDataType( this->get_data_type()), std::ios_base::beg );
     output.write( reinterpret_cast<char *>( data_block->get_data() ) + buffer_offset, buffer_size );
   }
@@ -892,7 +892,7 @@ bool LargeVolumeSchema::append_brick_buffer( DataBlockHandle data_block, size_t 
   {
     error = "Could not write to file '" + brick_file.string() + "'.";
     return false;
-  } 
+  }
 
   return true;
 }
@@ -900,7 +900,7 @@ bool LargeVolumeSchema::append_brick_buffer( DataBlockHandle data_block, size_t 
 bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo& bi, std::string& error ) const
 {
   IndexVector size = this->get_brick_size( bi );
-  
+
   if ( size[0] != data_block->get_nx() || size[1] != data_block->get_ny() ||
     size[2] != data_block->get_nz() )
   {
@@ -918,7 +918,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
 
   size_t brick_size = size[0] * size[1] * size[2] * GetSizeDataType( this->get_data_type() );
 
-  if ( this->private_->compression_) 
+  if ( this->private_->compression_)
   {
     std::vector<char> buffer( brick_size + 12 );
     zlib_uLongf brick_size_ul = brick_size + 12;
@@ -930,7 +930,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
       error = "Could not compress file.";
       return false;
     }
-  
+
     if ( brick_size_ul < brick_size )
     {
       // Compression succeeded
@@ -945,8 +945,8 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
         return false;
       }
 
-    } 
-    else 
+    }
+    else
     {
       try
       {
@@ -957,7 +957,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
       {
         error = "Could not write to file '" + brick_file.string() + "'.";
         return false;
-      }   
+      }
     }
   }
   else
@@ -971,7 +971,7 @@ bool LargeVolumeSchema::write_brick( DataBlockHandle data_block, const BrickInfo
     {
       error = "Could not write to file '" + brick_file.string() + "'.";
       return false;
-    }   
+    }
   }
 
   return true;
@@ -1003,7 +1003,7 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
   children.clear();
 
   BrickInfo::index_type level = bi.level_;
-  if (level == 0 ) return false;  
+  if (level == 0 ) return false;
 
   IndexVector ratio = this->get_level_downsample_ratio( level );
   IndexVector ratio_next = this->get_level_downsample_ratio( level - 1 );
@@ -1019,7 +1019,7 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
 
   Vector spacing = this->get_level_spacing( level );
   IndexVector eb = this->private_->effective_brick_size_;
-  
+
   switch ( slice )
   {
   case SliceType::SAGITTAL_E:
@@ -1031,19 +1031,19 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
         if ( spacing.x() * eb.xd() * ( index.xd() + 0.5 ) > depth - origin.x() )
         {
           x_index = 2 * x_index;
-        } 
-        else 
-        {
-          x_index = 2 * x_index + 1; 
         }
-      } 
+        else
+        {
+          x_index = 2 * x_index + 1;
+        }
+      }
 
       x_index = Min( x_index, layout_next.x() - 1 );
 
-      for (IndexVector::index_type y = rat.y() * index.y(); 
+      for (IndexVector::index_type y = rat.y() * index.y();
           y < Min( layout_next.y(), rat.y() * ( index.y() + 1 ) ); y++ )
       {
-        for (IndexVector::index_type z = rat.z() * index.z(); 
+        for (IndexVector::index_type z = rat.z() * index.z();
           z < Min( layout_next.z(), rat.z() * ( index.z() + 1 ) ); z++ )
         {
           children.push_back( BrickInfo( layout_next.x() * layout_next.y() * z +
@@ -1063,19 +1063,19 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
         if (spacing.y() * eb.yd() * ( index.yd() + 0.5 ) > depth - origin.y())
         {
           y_index = 2 * y_index;
-        } 
-        else 
-        {
-          y_index = 2 * y_index + 1; 
         }
-      } 
+        else
+        {
+          y_index = 2 * y_index + 1;
+        }
+      }
 
       y_index = Min( y_index, layout_next.y() - 1 );
 
-      for (IndexVector::index_type x = rat.x() * index.x(); 
+      for (IndexVector::index_type x = rat.x() * index.x();
           x < Min( layout_next.x(), rat.x() * ( index.x() + 1 ) ); x++ )
       {
-        for (IndexVector::index_type z = rat.z() * index.z(); 
+        for (IndexVector::index_type z = rat.z() * index.z();
           z < Min( layout_next.z(), rat.z() * ( index.z() + 1 ) ); z++ )
         {
           children.push_back( BrickInfo( layout_next.x() * layout_next.y() * z +
@@ -1094,19 +1094,19 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
         if (spacing.z() * eb.zd() * ( index.zd() + 0.5 ) > depth - origin.z())
         {
           z_index = 2 * z_index;
-        } 
-        else 
-        {
-          z_index = 2 * z_index + 1; 
         }
-      } 
+        else
+        {
+          z_index = 2 * z_index + 1;
+        }
+      }
 
       z_index = Min( z_index, layout_next.z() - 1 );
 
-      for (IndexVector::index_type x = rat.x() * index.x(); 
+      for (IndexVector::index_type x = rat.x() * index.x();
           x < Min( layout_next.x(), rat.x() * ( index.x() + 1 ) ); x++ )
       {
-        for (IndexVector::index_type y = rat.y() * index.y(); 
+        for (IndexVector::index_type y = rat.y() * index.y();
           y < Min( layout_next.y(), rat.y() * ( index.y() + 1 ) ); y++ )
         {
           children.push_back( BrickInfo( layout_next.x() * layout_next.y() * z_index +
@@ -1114,14 +1114,14 @@ bool LargeVolumeSchema::get_children( const BrickInfo& bi, SliceType slice, doub
         }
       }
       return true;
-    } 
+    }
   }
 
   return false;
 }
 
 
-std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world_viewport, 
+std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world_viewport,
   int width, int height, SliceType slice, const BBox& effective_bbox, double depth,
   const std::string& load_key )
 {
@@ -1138,7 +1138,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
   }
 
   bool found_right_level = false;
-  
+
   size_t overlap = this->get_overlap();
 
   BBox viewable_box( Point(-1.0, -1.0, -1.0), Point( 1.0, 1.0, 1.0 ));
@@ -1185,13 +1185,13 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
         Point proj_q3 = world_viewport.project( q3 );
         Point proj_q4 = world_viewport.project( q4 );
 
-        if ( Abs( proj_p1.x() - proj_q1.x() ) * width > 2.0 || 
+        if ( Abs( proj_p1.x() - proj_q1.x() ) * width > 2.0 ||
            Abs( proj_p1.y() - proj_q1.y() ) * height > 2.0 ||
-           Abs( proj_p2.x() - proj_q2.x() ) * width > 2.0 || 
+           Abs( proj_p2.x() - proj_q2.x() ) * width > 2.0 ||
            Abs( proj_p2.y() - proj_q2.y() ) * height > 2.0 ||
-           Abs( proj_p3.x() - proj_q3.x() ) * width > 2.0 || 
-           Abs( proj_p3.y() - proj_q3.y() ) * height > 2.0 ||         
-           Abs( proj_p4.x() - proj_q4.x() ) * width > 2.0 || 
+           Abs( proj_p3.x() - proj_q3.x() ) * width > 2.0 ||
+           Abs( proj_p3.y() - proj_q3.y() ) * height > 2.0 ||
+           Abs( proj_p4.x() - proj_q4.x() ) * width > 2.0 ||
            Abs( proj_p4.y() - proj_q4.y() ) * height > 2.0 )
         {
           std::vector<BrickInfo> children;
@@ -1202,7 +1202,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
           }
           else
           {
-            result.push_back( bi );       
+            result.push_back( bi );
           }
         }
         else
@@ -1242,13 +1242,13 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
         Point proj_q3 = world_viewport.project( q3 );
         Point proj_q4 = world_viewport.project( q4 );
 
-        if ( Abs( proj_p1.x() - proj_q1.x() ) * width > 2.0 || 
+        if ( Abs( proj_p1.x() - proj_q1.x() ) * width > 2.0 ||
            Abs( proj_p1.y() - proj_q1.y() ) * height > 2.0 ||
-           Abs( proj_p2.x() - proj_q2.x() ) * width > 2.0 || 
+           Abs( proj_p2.x() - proj_q2.x() ) * width > 2.0 ||
            Abs( proj_p2.y() - proj_q2.y() ) * height > 2.0 ||
-           Abs( proj_p3.x() - proj_q3.x() ) * width > 2.0 || 
-           Abs( proj_p3.y() - proj_q3.y() ) * height > 2.0 ||         
-           Abs( proj_p4.x() - proj_q4.x() ) * width > 2.0 || 
+           Abs( proj_p3.x() - proj_q3.x() ) * width > 2.0 ||
+           Abs( proj_p3.y() - proj_q3.y() ) * height > 2.0 ||
+           Abs( proj_p4.x() - proj_q4.x() ) * width > 2.0 ||
            Abs( proj_p4.y() - proj_q4.y() ) * height > 2.0 )
         {
           std::vector<BrickInfo> children;
@@ -1259,7 +1259,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
           }
           else
           {
-            result.push_back( bi );       
+            result.push_back( bi );
           }
         }
         else
@@ -1299,13 +1299,13 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
         Point proj_q3 = world_viewport.project( q3 );
         Point proj_q4 = world_viewport.project( q4 );
 
-        if ( Abs( proj_p1.x() - proj_q1.x() ) * width > 2.0 || 
+        if ( Abs( proj_p1.x() - proj_q1.x() ) * width > 2.0 ||
            Abs( proj_p1.y() - proj_q1.y() ) * height > 2.0 ||
-           Abs( proj_p2.x() - proj_q2.x() ) * width > 2.0 || 
+           Abs( proj_p2.x() - proj_q2.x() ) * width > 2.0 ||
            Abs( proj_p2.y() - proj_q2.y() ) * height > 2.0 ||
-           Abs( proj_p3.x() - proj_q3.x() ) * width > 2.0 || 
-           Abs( proj_p3.y() - proj_q3.y() ) * height > 2.0 ||         
-           Abs( proj_p4.x() - proj_q4.x() ) * width > 2.0 || 
+           Abs( proj_p3.x() - proj_q3.x() ) * width > 2.0 ||
+           Abs( proj_p3.y() - proj_q3.y() ) * height > 2.0 ||
+           Abs( proj_p4.x() - proj_q4.x() ) * width > 2.0 ||
            Abs( proj_p4.y() - proj_q4.y() ) * height > 2.0 )
         {
           std::vector<BrickInfo> children;
@@ -1316,7 +1316,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
           }
           else
           {
-            result.push_back( bi );       
+            result.push_back( bi );
           }
         }
         else
@@ -1334,7 +1334,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_volume( Transform world
   return current_render;
 }
 
-void LargeVolumeSchemaPrivate::load_and_substitue_missing_bricks( std::vector<BrickInfo>& want_to_render, 
+void LargeVolumeSchemaPrivate::load_and_substitue_missing_bricks( std::vector<BrickInfo>& want_to_render,
   SliceType slice, double depth, const std::string& load_key, std::vector<BrickInfo>& current_render )
 {
   LargeVolumeCache* cache = LargeVolumeCache::Instance();
@@ -1440,7 +1440,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_region( const BBox& reg
           level++;
         }
         break;
-      } 
+      }
     case SliceType::AXIAL_E:
       {
         depth = region.min().z();
@@ -1451,7 +1451,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_region( const BBox& reg
           level++;
         }
         break;
-      } 
+      }
   }
 
 
@@ -1485,7 +1485,7 @@ std::vector<BrickInfo> LargeVolumeSchema::get_bricks_for_region( const BBox& reg
       {
         want_to_render.push_back(BrickInfo( x + nx * y + nxy * z, level ));
       }
-    } 
+    }
   }
 
   std::vector<BrickInfo> current_render;
@@ -1557,18 +1557,18 @@ bool LargeVolumeSchema::get_level_start_and_end( const GridTransform& region, in
 
   Point origin = this->get_origin() - ( 0.5 * data_spacing ) + ( 0.5 * spacing );
 
-  start = IndexVector(  
+  start = IndexVector(
     Max( 0, Floor( ( rbox.min().x() - tbox.min().x() ) / spacing.x() ) ),
     Max( 0, Floor( ( rbox.min().y() - tbox.min().y() ) / spacing.y() ) ),
     Max( 0, Floor( ( rbox.min().z() - tbox.min().z() ) / spacing.z() ) ) );
 
-  end = IndexVector(  
+  end = IndexVector(
     Min( static_cast<int>( trans.get_nx() ), Floor( ( rbox.max().x() - tbox.min().x() ) / spacing.x() ) ),
     Min( static_cast<int>( trans.get_ny() ), Floor( ( rbox.max().y() - tbox.min().y() ) / spacing.y() ) ),
     Min( static_cast<int>( trans.get_nz() ), Floor( ( rbox.max().z() - tbox.min().z() ) / spacing.z() ) ) );
 
   gt = GridTransform( end.x() - start.x(), end.y() - start.y(), end.z() - start.z(),
-    origin + Vector( start.xd() * spacing.x(), start.yd() * spacing.y(), start.zd() * spacing.z()), 
+    origin + Vector( start.xd() * spacing.x(), start.yd() * spacing.y(), start.zd() * spacing.z()),
     spacing.x() * Vector( 1.0, 0.0, 0.0 ), spacing.y() * Vector( 0.0, 1.0, 0.0 ), spacing.z() * Vector( 0.0, 0.0, 1.0 ) );
 
   return true;
@@ -1590,6 +1590,10 @@ bool LargeVolumeSchema::insert_brick( DataBlockHandle volume, DataBlockHandle br
     return this->private_->insert_brick_internals<unsigned int>( volume, brick, offset, clip_start, clip_end );
   case DataType::INT_E:
     return this->private_->insert_brick_internals<int>( volume, brick, offset, clip_start, clip_end );
+  case DataType::ULONGLONG_E:
+    return this->private_->insert_brick_internals<unsigned long long>( volume, brick, offset, clip_start, clip_end );
+  case DataType::LONGLONG_E:
+    return this->private_->insert_brick_internals<long long>( volume, brick, offset, clip_start, clip_end );
   case DataType::FLOAT_E:
     return this->private_->insert_brick_internals<float>( volume, brick, offset, clip_start, clip_end );
   case DataType::DOUBLE_E:
@@ -1615,6 +1619,10 @@ bool LargeVolumeSchema::insert_brick( DataBlockHandle volume, DataBlockHandle br
     return this->private_->insert_brick_internals<unsigned int>( volume, brick, offset );
   case DataType::INT_E:
     return this->private_->insert_brick_internals<int>( volume, brick, offset );
+  case DataType::ULONGLONG_E:
+    return this->private_->insert_brick_internals<unsigned long long>( volume, brick, offset );
+  case DataType::LONGLONG_E:
+    return this->private_->insert_brick_internals<long long>( volume, brick, offset );
   case DataType::FLOAT_E:
     return this->private_->insert_brick_internals<float>( volume, brick, offset );
   case DataType::DOUBLE_E:

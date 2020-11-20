@@ -113,7 +113,7 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
       data_block = mask_list[ j ].data_block_;
       mask_entry_index = j;
 
-      for ( size_t k = 0; k < 8; k++) 
+      for ( size_t k = 0; k < 8; k++)
       {
         if ( !( mask_list[j].bits_used_.test( k ) ) )
         {
@@ -130,9 +130,9 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
   if ( !( data_block.get() ) )
   {
     // Could not find empty position, so create a new data block
-    data_block = StdDataBlock::New( grid_transform.get_nx(), grid_transform.get_ny(), 
+    data_block = StdDataBlock::New( grid_transform.get_nx(), grid_transform.get_ny(),
       grid_transform.get_nz(), DataType::UCHAR_E );
-    if ( !data_block ) return false;        
+    if ( !data_block ) return false;
     mask_bit = 0;
     mask_entry_index = mask_list.size();
     mask_list.push_back( MaskDataBlockEntry( data_block, grid_transform ) );
@@ -140,13 +140,13 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
 
   // Generate the new mask
   mask = MaskDataBlockHandle( new MaskDataBlock( data_block, mask_bit ) );
-  
+
   // Clear the mask before using it
-  
+
   size_t data_size = grid_transform.get_nx() * grid_transform.get_ny() * grid_transform.get_nz();
   unsigned char* data = mask->get_mask_data();
   unsigned char not_mask_value = ~( mask->get_mask_value() );
-  
+
   size_t data_size8 =  RemoveRemainder8( data_size );
   size_t i = 0;
   for ( ; i< data_size8; i+=8 )
@@ -172,7 +172,7 @@ bool MaskDataBlockManager::create( GridTransform grid_transform, MaskDataBlockHa
   return true;
 }
 
-bool MaskDataBlockManager::create( DataBlock::generation_type generation, unsigned int bit, 
+bool MaskDataBlockManager::create( DataBlock::generation_type generation, unsigned int bit,
                   GridTransform& grid_transform, MaskDataBlockHandle& mask )
 {
   lock_type lock( this->get_mutex() );
@@ -230,7 +230,7 @@ bool MaskDataBlockManager::compact()
   return false;
 }
 
-void MaskDataBlockManager::register_data_block( DataBlockHandle data_block, 
+void MaskDataBlockManager::register_data_block( DataBlockHandle data_block,
                          const GridTransform& grid_transform )
 {
   lock_type lock( get_mutex() );
@@ -259,7 +259,7 @@ template< class T >
 bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask, bool invert )
 {
   T* data_ptr = reinterpret_cast<T*>( data->get_data() );
-  
+
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value;
   unsigned char not_mask_value;
@@ -274,7 +274,7 @@ bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask, boo
     mask_value = mask->get_mask_value();
     not_mask_value = ~( mask->get_mask_value() );
   }
-  
+
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
   for ( size_t j = 0; j < size8; j+= 8 )
@@ -290,13 +290,13 @@ bool ConvertToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask, boo
   }
   for ( size_t j = size8; j < size; j++ )
   {
-    if ( data_ptr[ j ] ) mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value; 
+    if ( data_ptr[ j ] ) mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value;
   }
-  
+
   return true;
 }
 
-bool MaskDataBlockManager::Convert( DataBlockHandle data, 
+bool MaskDataBlockManager::Convert( DataBlockHandle data,
   GridTransform grid_transform, MaskDataBlockHandle& mask, bool invert )
 {
   if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
@@ -307,10 +307,10 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
   assert( mask->get_nx() == data->get_nx() );
   assert( mask->get_ny() == data->get_ny() );
   assert( mask->get_nz() == data->get_nz() );
-  
+
   DataBlock::shared_lock_type lock( data->get_mutex( ) );
   DataBlock::lock_type mask_lock( mask->get_mutex( ) );
-  
+
   switch( data->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -325,6 +325,10 @@ bool MaskDataBlockManager::Convert( DataBlockHandle data,
       return ConvertToMaskInternal<int>( data, mask, invert );
     case DataType::UINT_E:
       return ConvertToMaskInternal<unsigned int>( data, mask, invert );
+    case DataType::LONGLONG_E:
+      return ConvertToMaskInternal<long long>( data, mask, invert );
+    case DataType::ULONGLONG_E:
+      return ConvertToMaskInternal<unsigned long long>( data, mask, invert );
     case DataType::FLOAT_E:
       return ConvertToMaskInternal<float>( data, mask, invert );
     case DataType::DOUBLE_E:
@@ -340,7 +344,7 @@ template< class T >
 bool ConvertToMaskLargerThanInternal( DataBlockHandle data, MaskDataBlockHandle& mask, bool invert )
 {
   T* data_ptr = reinterpret_cast<T*>( data->get_data() );
-  
+
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value;
   unsigned char not_mask_value;
@@ -355,41 +359,41 @@ bool ConvertToMaskLargerThanInternal( DataBlockHandle data, MaskDataBlockHandle&
     mask_value = mask->get_mask_value();
     not_mask_value = ~( mask->get_mask_value() );
   }
-  
+
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
-  
+
   T zero = T( 0 );
-  
+
   for ( size_t j = 0; j < size8; j+= 8 )
   {
-    if ( data_ptr[ j ] > zero ) 
+    if ( data_ptr[ j ] > zero )
       mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value;
-    if ( data_ptr[ j + 1 ] > zero ) 
+    if ( data_ptr[ j + 1 ] > zero )
       mask_ptr[ j + 1 ] |= mask_value; else mask_ptr[ j + 1 ] &= not_mask_value;
-    if ( data_ptr[ j + 2 ] > zero ) 
+    if ( data_ptr[ j + 2 ] > zero )
       mask_ptr[ j + 2 ] |= mask_value; else mask_ptr[ j + 2 ] &= not_mask_value;
-    if ( data_ptr[ j + 3 ] > zero ) 
+    if ( data_ptr[ j + 3 ] > zero )
       mask_ptr[ j + 3 ] |= mask_value; else mask_ptr[ j + 3 ] &= not_mask_value;
-    if ( data_ptr[ j + 4 ] > zero ) 
+    if ( data_ptr[ j + 4 ] > zero )
       mask_ptr[ j + 4 ] |= mask_value; else mask_ptr[ j + 4 ] &= not_mask_value;
-    if ( data_ptr[ j + 5 ] > zero ) 
+    if ( data_ptr[ j + 5 ] > zero )
       mask_ptr[ j + 5 ] |= mask_value; else mask_ptr[ j + 5 ] &= not_mask_value;
-    if ( data_ptr[ j + 6 ] > zero ) 
+    if ( data_ptr[ j + 6 ] > zero )
       mask_ptr[ j + 6 ] |= mask_value; else mask_ptr[ j + 6 ] &= not_mask_value;
-    if ( data_ptr[ j + 7 ] > zero ) 
+    if ( data_ptr[ j + 7 ] > zero )
       mask_ptr[ j + 7 ] |= mask_value; else mask_ptr[ j + 7 ] &= not_mask_value;
   }
   for ( size_t j = size8; j < size; j++ )
   {
     if ( data_ptr[ j ] > zero )
-      mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value;  
+      mask_ptr[ j ] |= mask_value; else mask_ptr[ j ] &= not_mask_value;
   }
-  
+
   return true;
 }
 
-bool MaskDataBlockManager::ConvertLargerThan( DataBlockHandle data, 
+bool MaskDataBlockManager::ConvertLargerThan( DataBlockHandle data,
   GridTransform grid_transform, MaskDataBlockHandle& mask, bool invert )
 {
   if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
@@ -400,10 +404,10 @@ bool MaskDataBlockManager::ConvertLargerThan( DataBlockHandle data,
   assert( mask->get_nx() == data->get_nx() );
   assert( mask->get_ny() == data->get_ny() );
   assert( mask->get_nz() == data->get_nz() );
-  
+
   DataBlock::shared_lock_type lock( data->get_mutex( ) );
   DataBlock::lock_type mask_lock( mask->get_mutex( ) );
-  
+
   switch( data->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -418,6 +422,10 @@ bool MaskDataBlockManager::ConvertLargerThan( DataBlockHandle data,
       return ConvertToMaskLargerThanInternal<int>( data, mask, invert );
     case DataType::UINT_E:
       return ConvertToMaskInternal<unsigned int>( data, mask, invert );
+    case DataType::LONGLONG_E:
+      return ConvertToMaskLargerThanInternal<long long>( data, mask, invert );
+    case DataType::ULONGLONG_E:
+      return ConvertToMaskInternal<unsigned long long>( data, mask, invert );
     case DataType::FLOAT_E:
       return ConvertToMaskLargerThanInternal<float>( data, mask, invert );
     case DataType::DOUBLE_E:
@@ -434,42 +442,42 @@ bool ConvertLabelToMaskInternal( DataBlockHandle data, MaskDataBlockHandle& mask
 {
   T typed_label = static_cast<T>( label );
   T* data_ptr = reinterpret_cast<T*>( data->get_data() );
-  
+
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value = mask->get_mask_value();
   unsigned char not_mask_value = ~( mask->get_mask_value() );
-  
+
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
   for ( size_t j = 0; j < size8; j+= 8 )
   {
-    if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value; 
+    if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value;
       else mask_ptr[ j ] &= not_mask_value;
     if ( data_ptr[ j + 1 ] == typed_label ) mask_ptr[ j + 1 ] |= mask_value;
       else mask_ptr[ j + 1 ] &= not_mask_value;
-    if ( data_ptr[ j + 2 ] == typed_label ) mask_ptr[ j + 2 ] |= mask_value; 
+    if ( data_ptr[ j + 2 ] == typed_label ) mask_ptr[ j + 2 ] |= mask_value;
       else mask_ptr[ j + 2 ] &= not_mask_value;
-    if ( data_ptr[ j + 3 ] == typed_label ) mask_ptr[ j + 3 ] |= mask_value; 
+    if ( data_ptr[ j + 3 ] == typed_label ) mask_ptr[ j + 3 ] |= mask_value;
       else mask_ptr[ j + 3 ] &= not_mask_value;
-    if ( data_ptr[ j + 4 ] == typed_label ) mask_ptr[ j + 4 ] |= mask_value; 
+    if ( data_ptr[ j + 4 ] == typed_label ) mask_ptr[ j + 4 ] |= mask_value;
       else mask_ptr[ j + 4 ] &= not_mask_value;
-    if ( data_ptr[ j + 5 ] == typed_label ) mask_ptr[ j + 5 ] |= mask_value; 
+    if ( data_ptr[ j + 5 ] == typed_label ) mask_ptr[ j + 5 ] |= mask_value;
       else mask_ptr[ j + 5 ] &= not_mask_value;
-    if ( data_ptr[ j + 6 ] == typed_label ) mask_ptr[ j + 6 ] |= mask_value; 
+    if ( data_ptr[ j + 6 ] == typed_label ) mask_ptr[ j + 6 ] |= mask_value;
       else mask_ptr[ j + 6 ] &= not_mask_value;
-    if ( data_ptr[ j + 7 ] == typed_label ) mask_ptr[ j + 7 ] |= mask_value; 
+    if ( data_ptr[ j + 7 ] == typed_label ) mask_ptr[ j + 7 ] |= mask_value;
       else mask_ptr[ j + 7 ] &= not_mask_value;
   }
   for ( size_t j = size8; j < size; j++ )
   {
-    if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value; 
-      else mask_ptr[ j ] &= not_mask_value; 
+    if ( data_ptr[ j ] == typed_label ) mask_ptr[ j ] |= mask_value;
+      else mask_ptr[ j ] &= not_mask_value;
   }
-  
+
   return true;
 }
 
-bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data, 
+bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data,
   GridTransform grid_transform, MaskDataBlockHandle& mask, double label )
 {
   if ( !( MaskDataBlockManager::Instance()->create( grid_transform, mask ) ) )
@@ -480,10 +488,10 @@ bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data,
   assert( mask->get_nx() == data->get_nx() );
   assert( mask->get_ny() == data->get_ny() );
   assert( mask->get_nz() == data->get_nz() );
-  
+
   DataBlock::shared_lock_type lock( data->get_mutex( ) );
   DataBlock::lock_type mask_lock( mask->get_mutex( ) );
-  
+
   switch( data->get_data_type() )
   {
     case DataType::CHAR_E:
@@ -498,6 +506,10 @@ bool MaskDataBlockManager::ConvertLabel( DataBlockHandle data,
       return ConvertLabelToMaskInternal<int>( data, mask, label );
     case DataType::UINT_E:
       return ConvertLabelToMaskInternal<unsigned int>( data, mask, label );
+    case DataType::LONGLONG_E:
+      return ConvertLabelToMaskInternal<long long>( data, mask, label );
+    case DataType::ULONGLONG_E:
+      return ConvertLabelToMaskInternal<unsigned long long>( data, mask, label );
     case DataType::FLOAT_E:
       return ConvertLabelToMaskInternal<float>( data, mask, label );
     case DataType::DOUBLE_E:
@@ -516,11 +528,11 @@ bool ConvertLabelToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data
 
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value = mask->get_mask_value();
-  
-  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(), 
+
+  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(),
     GetDataType( reinterpret_cast< T* >( 0 ) ) );
   T* data_ptr = reinterpret_cast< T* >( data->get_data() );
-  
+
   const T on = static_cast<T>( label );
   const T off = static_cast<T>( 0 );
   size_t size = data->get_size();
@@ -562,11 +574,15 @@ bool MaskDataBlockManager::ConvertLabel( MaskDataBlockHandle mask, DataBlockHand
       return ConvertLabelToDataInternal<int>( mask, data, label );
     case DataType::UINT_E:
       return ConvertLabelToDataInternal<unsigned int>( mask, data, label );
+    case DataType::LONGLONG_E:
+      return ConvertLabelToDataInternal<long long>( mask, data, label );
+    case DataType::ULONGLONG_E:
+      return ConvertLabelToDataInternal<unsigned long long>( mask, data, label );
     case DataType::FLOAT_E:
       return ConvertLabelToDataInternal<float>( mask, data, label );
     case DataType::DOUBLE_E:
       return ConvertLabelToDataInternal<double>( mask, data, label );
-  } 
+  }
   return false;
 }
 
@@ -577,11 +593,11 @@ bool ConvertToDataInternal( MaskDataBlockHandle mask, DataBlockHandle& data, boo
 
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value = mask->get_mask_value();
-  
-  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(), 
+
+  data = StdDataBlock::New( mask->get_nx(), mask->get_ny(), mask->get_nz(),
     GetDataType( reinterpret_cast< T* >( 0 ) ) );
   T* data_ptr = reinterpret_cast< T* >( data->get_data() );
-  
+
   const T on = static_cast<T>( invert?0:1 );
   const T off = static_cast<T>( invert?1:0 );
   size_t size = data->get_size();
@@ -623,15 +639,19 @@ bool MaskDataBlockManager::Convert( MaskDataBlockHandle mask, DataBlockHandle& d
       return ConvertToDataInternal<int>( mask, data, invert );
     case DataType::UINT_E:
       return ConvertToDataInternal<unsigned int>( mask, data, invert );
+    case DataType::LONGLONG_E:
+      return ConvertToDataInternal<long long>( mask, data, invert );
+    case DataType::ULONGLONG_E:
+      return ConvertToDataInternal<unsigned long long>( mask, data, invert );
     case DataType::FLOAT_E:
       return ConvertToDataInternal<float>( mask, data, invert );
     case DataType::DOUBLE_E:
       return ConvertToDataInternal<double>( mask, data, invert );
-  } 
+  }
   return false;
 }
 
-bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block, 
+bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block,
   const GridTransform& grid_transform, MaskDataBlockHandle& dst_mask_data_block )
 {
   // Step (1): Create a new mask
@@ -645,7 +665,7 @@ bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block,
   // Step (2): Need to lock the source data
   MaskDataBlock::lock_type lock( dst_mask_data_block->get_mutex( ) );
   MaskDataBlock::shared_lock_type slock;
-  
+
   // NOTE: Need to check if we not already locked this one. If the underlying datablocks are
   // the same we do not need a read lock. In fact putting one would result in a deadlock
   if ( src_mask_data_block->get_data_block( ) != dst_mask_data_block->get_data_block( ) )
@@ -657,44 +677,44 @@ bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block,
   // Step (3): Get the mask data pointer and which bit is used
   unsigned char* src_mask_ptr = src_mask_data_block->get_mask_data();
   unsigned char src_mask_value = src_mask_data_block->get_mask_value();
-  
-  
+
+
   // Step (4): Security check
   if ( src_mask_data_block->get_size() != dst_mask_data_block->get_size() )
   {
     return false;
   }
-  
+
   // Step (2): Get the mask data pointer and which bit is used
   unsigned char* dst_mask_ptr = dst_mask_data_block->get_mask_data();
-  unsigned char dst_mask_value = dst_mask_data_block->get_mask_value(); 
-  unsigned char dst_not_mask_value = ~( dst_mask_data_block->get_mask_value() );  
-  
+  unsigned char dst_mask_value = dst_mask_data_block->get_mask_value();
+  unsigned char dst_not_mask_value = ~( dst_mask_data_block->get_mask_value() );
+
   size_t size = dst_mask_data_block->get_size();
   size_t size8 = RemoveRemainder8( size );
 
   for ( size_t j = 0; j < size8; j+= 8 )
   {
-    if ( src_mask_ptr[ j ] & src_mask_value ) 
+    if ( src_mask_ptr[ j ] & src_mask_value )
       dst_mask_ptr[ j ] |= dst_mask_value; else dst_mask_ptr[ j ] &= dst_not_mask_value;
-    if ( src_mask_ptr[ j + 1 ] & src_mask_value ) 
+    if ( src_mask_ptr[ j + 1 ] & src_mask_value )
       dst_mask_ptr[ j + 1 ] |= dst_mask_value; else dst_mask_ptr[ j + 1 ] &= dst_not_mask_value;
-    if ( src_mask_ptr[ j + 2 ] & src_mask_value ) 
+    if ( src_mask_ptr[ j + 2 ] & src_mask_value )
       dst_mask_ptr[ j + 2 ] |= dst_mask_value; else dst_mask_ptr[ j + 2 ] &= dst_not_mask_value;
-    if ( src_mask_ptr[ j + 3 ] & src_mask_value ) 
+    if ( src_mask_ptr[ j + 3 ] & src_mask_value )
       dst_mask_ptr[ j + 3 ] |= dst_mask_value; else dst_mask_ptr[ j + 3 ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 4 ] & src_mask_value )
-      dst_mask_ptr[ j + 4 ] |= dst_mask_value; else dst_mask_ptr[ j + 4 ] &= dst_not_mask_value;    
+      dst_mask_ptr[ j + 4 ] |= dst_mask_value; else dst_mask_ptr[ j + 4 ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 5 ] & src_mask_value )
-      dst_mask_ptr[ j + 5 ] |= dst_mask_value; else dst_mask_ptr[ j + 5 ] &= dst_not_mask_value;    
+      dst_mask_ptr[ j + 5 ] |= dst_mask_value; else dst_mask_ptr[ j + 5 ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 6 ] & src_mask_value )
-      dst_mask_ptr[ j + 6 ] |= dst_mask_value; else dst_mask_ptr[ j + 6 ] &= dst_not_mask_value;    
+      dst_mask_ptr[ j + 6 ] |= dst_mask_value; else dst_mask_ptr[ j + 6 ] &= dst_not_mask_value;
     if ( src_mask_ptr[ j + 7 ] & src_mask_value )
-      dst_mask_ptr[ j + 7 ] |= dst_mask_value; else dst_mask_ptr[ j + 7 ] &= dst_not_mask_value;    
+      dst_mask_ptr[ j + 7 ] |= dst_mask_value; else dst_mask_ptr[ j + 7 ] &= dst_not_mask_value;
   }
   for ( size_t j = size8; j < size; j++ )
   {
-    if ( src_mask_ptr[ j ] & src_mask_value ) 
+    if ( src_mask_ptr[ j ] & src_mask_value )
       dst_mask_ptr[ j ] |= dst_mask_value; else dst_mask_ptr[ j ] &= dst_not_mask_value;
   }
 
@@ -703,10 +723,10 @@ bool MaskDataBlockManager::Duplicate( MaskDataBlockHandle src_mask_data_block,
 
 
 template< class DATA >
-static bool CreateMaskFromNonZeroDataInternal( const DataBlockHandle& data, 
+static bool CreateMaskFromNonZeroDataInternal( const DataBlockHandle& data,
                         const MaskDataBlockHandle& mask )
 {
-  DATA* src   = reinterpret_cast<DATA*>( data->get_data() ); 
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data() );
   size_t size = mask->get_size();
 
   unsigned char* mask_data  = mask->get_mask_data();
@@ -722,8 +742,8 @@ static bool CreateMaskFromNonZeroDataInternal( const DataBlockHandle& data,
   return true;
 }
 
-bool MaskDataBlockManager::CreateMaskFromNonZeroData( const DataBlockHandle& data, 
-                           const GridTransform& grid_transform, 
+bool MaskDataBlockManager::CreateMaskFromNonZeroData( const DataBlockHandle& data,
+                           const GridTransform& grid_transform,
                            MaskDataBlockHandle& mask )
 {
   // Ensure there is no valid pointer left in the handle
@@ -760,6 +780,10 @@ bool MaskDataBlockManager::CreateMaskFromNonZeroData( const DataBlockHandle& dat
     return CreateMaskFromNonZeroDataInternal<int>( data, mask );
   case DataType::UINT_E:
     return CreateMaskFromNonZeroDataInternal<unsigned int>( data, mask );
+  case DataType::LONGLONG_E:
+    return CreateMaskFromNonZeroDataInternal<long long>( data, mask );
+  case DataType::ULONGLONG_E:
+    return CreateMaskFromNonZeroDataInternal<unsigned long long>( data, mask );
   case DataType::FLOAT_E:
     return CreateMaskFromNonZeroDataInternal<float>( data, mask );
   case DataType::DOUBLE_E:
@@ -770,13 +794,13 @@ bool MaskDataBlockManager::CreateMaskFromNonZeroData( const DataBlockHandle& dat
 }
 
 template< class DATA >
-static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data, 
-                         const GridTransform& grid_transform, 
+static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data,
+                         const GridTransform& grid_transform,
                          std::vector<MaskDataBlockHandle>& masks )
 {
   masks.clear();
 
-  DATA* src   = reinterpret_cast<DATA*>( data->get_data() ); 
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data() );
   size_t size = data->get_size();
 
   DATA used_bits(0);
@@ -820,8 +844,8 @@ static bool CreateMaskFromBitPlaneDataInternal( const DataBlockHandle& data,
   return true;
 }
 
-bool MaskDataBlockManager::CreateMaskFromBitPlaneData( const DataBlockHandle& data, 
-                            const GridTransform& grid_transform, 
+bool MaskDataBlockManager::CreateMaskFromBitPlaneData( const DataBlockHandle& data,
+                            const GridTransform& grid_transform,
                             std::vector<MaskDataBlockHandle>& masks )
 {
   // Ensure there is no valid pointer left in the handle
@@ -847,19 +871,23 @@ bool MaskDataBlockManager::CreateMaskFromBitPlaneData( const DataBlockHandle& da
     return CreateMaskFromBitPlaneDataInternal<int>( data, grid_transform, masks );
   case DataType::UINT_E:
     return CreateMaskFromBitPlaneDataInternal<unsigned int>( data, grid_transform, masks );
+  case DataType::LONGLONG_E:
+    return CreateMaskFromBitPlaneDataInternal<long long>( data, grid_transform, masks );
+  case DataType::ULONGLONG_E:
+    return CreateMaskFromBitPlaneDataInternal<unsigned long long>( data, grid_transform, masks );
   default:
     return false;
   }
 }
 
 template< class DATA >
-static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data, 
+static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data,
                       const GridTransform& grid_transform,
                       std::vector<MaskDataBlockHandle>& masks )
 {
   masks.clear();
 
-  DATA* src   = reinterpret_cast<DATA*>( data->get_data() ); 
+  DATA* src   = reinterpret_cast<DATA*>( data->get_data() );
   size_t size = data->get_size();
   DATA label( 0 );
   DATA zero_label( 0 );
@@ -872,7 +900,7 @@ static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data,
     {
       if ( src[ next_label_index ] != zero_label ) break;
       next_label_index++;
-    }  
+    }
 
     if ( next_label_index < size )
     {
@@ -894,7 +922,7 @@ static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data,
 
       for ( size_t j = next_label_index; j < size; j++ )
       {
-        if ( src[ j ] == label ) 
+        if ( src[ j ] == label )
         {
           src[ j ] = zero_label;
           mask_data[ j ] |= mask_value;
@@ -905,15 +933,15 @@ static bool CreateMaskFromLabelDataInternal( const DataBlockHandle& data,
         }
       }
 
-      masks.push_back( mask );    
+      masks.push_back( mask );
     }
   }
 
   return true;
 }
 
-bool MaskDataBlockManager::CreateMaskFromLabelData( const DataBlockHandle& data, 
-                           const GridTransform& grid_transform, 
+bool MaskDataBlockManager::CreateMaskFromLabelData( const DataBlockHandle& data,
+                           const GridTransform& grid_transform,
                            std::vector<MaskDataBlockHandle>& masks )
 {
   // Ensure there is no valid pointer left in the handle
@@ -939,6 +967,10 @@ bool MaskDataBlockManager::CreateMaskFromLabelData( const DataBlockHandle& data,
     return CreateMaskFromLabelDataInternal<int>( data, grid_transform, masks );
   case DataType::UINT_E:
     return CreateMaskFromLabelDataInternal<unsigned int>( data, grid_transform, masks );
+  case DataType::LONGLONG_E:
+    return CreateMaskFromLabelDataInternal<long long>( data, grid_transform, masks );
+  case DataType::ULONGLONG_E:
+    return CreateMaskFromLabelDataInternal<unsigned long long>( data, grid_transform, masks );
   case DataType::FLOAT_E:
     return CreateMaskFromLabelDataInternal<float>( data, grid_transform, masks );
   case DataType::DOUBLE_E:
@@ -955,9 +987,9 @@ bool InscribeInternal( MaskDataBlockHandle mask, DataBlockHandle data, double la
 
   unsigned char* mask_ptr = mask->get_mask_data();
   unsigned char mask_value = mask->get_mask_value();
-  
+
   T* data_ptr = reinterpret_cast< T* >( data->get_data() );
-  
+
   const T label_value = static_cast<T>( label );
   size_t size = data->get_size();
   size_t size8 = size & ~(0x7);
@@ -978,7 +1010,7 @@ bool InscribeInternal( MaskDataBlockHandle mask, DataBlockHandle data, double la
     for ( size_t j = size8; j < size; j++ )
     {
       if ( !( mask_ptr[ j ] & mask_value ) ) data_ptr[ j ] = label_value;
-    } 
+    }
   }
   else
   {
@@ -998,11 +1030,11 @@ bool InscribeInternal( MaskDataBlockHandle mask, DataBlockHandle data, double la
       if ( mask_ptr[ j ] & mask_value ) data_ptr[ j ] = label_value;
     }
   }
-  
+
   return true;
 }
 
-bool MaskDataBlockManager::Inscribe( MaskDataBlockHandle mask, DataBlockHandle data, double label, 
+bool MaskDataBlockManager::Inscribe( MaskDataBlockHandle mask, DataBlockHandle data, double label,
     bool invert )
 {
   // Check if there is any data
@@ -1032,6 +1064,10 @@ bool MaskDataBlockManager::Inscribe( MaskDataBlockHandle mask, DataBlockHandle d
     return InscribeInternal<int>( mask, data, label, invert );
   case DataType::UINT_E:
     return InscribeInternal<unsigned int>( mask, data, label, invert );
+  case DataType::LONGLONG_E:
+    return InscribeInternal<long long>( mask, data, label, invert );
+  case DataType::ULONGLONG_E:
+    return InscribeInternal<unsigned long long>( mask, data, label, invert );
   case DataType::FLOAT_E:
     return InscribeInternal<float>( mask, data, label, invert );
   case DataType::DOUBLE_E:

@@ -156,22 +156,16 @@ ENDIF()
 IF(SEG3D_BUILD_INTERFACE)
   SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #SET(CMAKE_AUTOMOC ON)
+  
+  FIND_PACKAGE(Qt5 COMPONENTS Core Gui OpenGL Svg REQUIRED HINTS ${Qt5_PATH})
 
-  IF(IS_DIRECTORY ${Qt5_PATH})
-    FIND_PACKAGE(Qt5Core REQUIRED HINTS ${Qt5_PATH})
-    FIND_PACKAGE(Qt5Gui REQUIRED HINTS ${Qt5_PATH})
-    FIND_PACKAGE(Qt5OpenGL REQUIRED HINTS ${Qt5_PATH})
-  ELSE()
-    MESSAGE(SEND_ERROR "Set Qt5_PATH to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
-  ENDIF()
-
-  IF(Qt5Core_FOUND)
-    MESSAGE(STATUS "Found Qt version: ${Qt5Core_VERSION}")
-    IF(${Qt5Core_VERSION} VERSION_LESS "5.12")
+  IF(Qt5_FOUND)
+    MESSAGE(STATUS "Found Qt version: ${Qt5_VERSION}")
+    IF(${Qt5_VERSION} VERSION_LESS "5.12")
       MESSAGE(FATAL_ERROR "Qt 5.12 or greater is required for building the Seg3D GUI")
     ENDIF()
   ELSE()
-    MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI")
+    MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI. Set Qt5_PATH to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
   ENDIF()
 
   IF(APPLE)
@@ -343,6 +337,7 @@ IF(SEG3D_BUILD_INTERFACE)
     "-DQt5Core_DIR:PATH=${Qt5Core_DIR}"
     "-DQt5Gui_DIR:PATH=${Qt5Gui_DIR}"
     "-DQt5OpenGL_DIR:PATH=${Qt5OpenGL_DIR}"
+    "-DQt5Svg_DIR:PATH=${Qt5Svg_DIR}"
     "-DMACDEPLOYQT_OUTPUT_LEVEL:STRING=${MACDEPLOYQT_OUTPUT_LEVEL}"
   )
 ENDIF()

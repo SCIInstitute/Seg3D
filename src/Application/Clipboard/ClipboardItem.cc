@@ -68,7 +68,7 @@ ClipboardItem::~ClipboardItem()
 
 ClipboardItemHandle ClipboardItem::clone() const
 {
-  ClipboardItem* cpy = new ClipboardItem( this->private_->width_, 
+  ClipboardItem* cpy = new ClipboardItem( this->private_->width_,
     this->private_->height_, this->private_->data_type_ );
   cpy->private_->buffer_ = this->private_->buffer_;
   cpy->private_->provenance_id_ = this->private_->provenance_id_;
@@ -125,6 +125,10 @@ void ClipboardItem::resize( size_t width, size_t height, Core::DataType data_typ
   case Core::DataType::INT_E:
   case Core::DataType::UINT_E:
     buffer_size = sizeof( int );
+    break;
+  case Core::DataType::LONGLONG_E:
+  case Core::DataType::ULONGLONG_E:
+    buffer_size = sizeof( long long );
     break;
   case Core::DataType::FLOAT_E:
     buffer_size = sizeof( float );

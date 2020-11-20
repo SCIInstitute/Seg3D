@@ -31,7 +31,7 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif 
+#endif
 
 // STL includes
 #include <map>
@@ -64,7 +64,7 @@ public:
   DatabaseManager( const DatabaseManager& src );
 
   virtual ~DatabaseManager();
-  
+
 public:
   /// RUN_SQL_STATEMENT:
   /// Execute the given SQL statement on the database. If the statement generates
@@ -76,7 +76,7 @@ public:
   /// Execute the given SQL statement on the database.
   /// Returns true on success, otherwise false.
   bool run_sql_statement( const std::string& sql_str, std::string& error );
-  
+
   /// RUN_SQL_SCRIPT:
   /// Execute multiple SQL statements sequentially.
   bool run_sql_script( const std::string& sql_str, std::string& error );
@@ -84,7 +84,7 @@ public:
   /// SAVE_DATABASE:
   /// Save the database to disk
   bool save_database( const boost::filesystem::path& database_file, std::string& error );
-  
+
   /// LOAD_DATABASE:
   /// Load the database from disk
   bool load_database( const boost::filesystem::path& database_file, std::string& error );
@@ -97,8 +97,8 @@ public:
   /// Get metadata about a specific column of a specific database table.
   /// Returns true if the table and column exist, otherwise false.
   bool get_column_metadata( const std::string& table_name, const std::string& column_name,
-    char const** data_type = NULL, char const** coll_seq = NULL, 
-    int* not_null = NULL, int* primary_key = NULL, int* auto_inc = NULL ); 
+    char const** data_type = NULL, char const** coll_seq = NULL,
+    int* not_null = NULL, int* primary_key = NULL, int* auto_inc = NULL );
 
 private:
   boost::shared_ptr< DatabaseManagerPrivate > private_;
@@ -112,4 +112,3 @@ public:
 } // end namespace seg3d
 
 #endif
-

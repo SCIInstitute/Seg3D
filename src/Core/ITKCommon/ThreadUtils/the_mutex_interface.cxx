@@ -43,7 +43,7 @@
 // the_mutex_interface_t::creator_
 // 
 the_mutex_interface_t::creator_t
-the_mutex_interface_t::creator_ = NULL;
+the_mutex_interface_t::creator_ = nullptr;
 
 //----------------------------------------------------------------
 // the_mutex_interface_t::~the_mutex_interface_t
@@ -66,6 +66,6 @@ the_mutex_interface_t::set_creator(the_mutex_interface_t::creator_t creator)
 the_mutex_interface_t *
 the_mutex_interface_t::create()
 {
-  if (creator_ == NULL) return NULL;
+  if (creator_ == nullptr) return nullptr;
   return creator_();
 }

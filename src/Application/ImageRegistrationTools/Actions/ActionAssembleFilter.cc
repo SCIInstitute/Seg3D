@@ -382,7 +382,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
       image_t::SpacingType mosaic_sp = image.front()->GetSpacing();
       if ( this->defer_image_loading_ )
       {
-        image[0] = image_t::Pointer(NULL);
+        image[0] = image_t::Pointer(nullptr);
       }
       
       mosaic_sz[0] = static_cast<unsigned int>((mosaic_max[0] - mosaic_min[0]) / mosaic_sp[0]);
@@ -477,7 +477,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
               {
                 if ( verbose )
                   std::cout << "unloading " << (*iter) << std::endl;
-                image[i] = image_t::Pointer(NULL);
+                image[i] = image_t::Pointer(nullptr);
               }
             }
           }
@@ -590,7 +590,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
         
         if ( verbose )
           std::cout << "unloading " << (*iter).string() << std::endl;
-        image[i] = image_t::Pointer(NULL);
+        image[i] = image_t::Pointer(nullptr);
       }
     }
     
@@ -691,7 +691,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
       return true;
     }
     
-    if (mosaic_mask.GetPointer() == NULL)
+    if (mosaic_mask.GetPointer() == nullptr)
     {
       // assemble the mosaic mask:
       std::cout << "assembling mosaic mask..." << std::endl;
@@ -704,7 +704,7 @@ ActionAssembleFilter::run( Core::ActionContextHandle& context, Core::ActionResul
           mask[i] = std_mask<image_t>(image[i], false);
           
           // free up the image memory, we no longer need it:
-          image[i] = image_t::Pointer(NULL);
+          image[i] = image_t::Pointer(nullptr);
         }
       }
       
