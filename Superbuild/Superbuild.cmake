@@ -157,15 +157,16 @@ IF(SEG3D_BUILD_INTERFACE)
   SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #SET(CMAKE_AUTOMOC ON)
 
+  IF (TRAVIS_BUILD)
+    SET(QT_MIN_VERSION "5.9")
+  ELSE()
+    SET(QT_MIN_VERSION "5.12")
+  ENDIF()
+
   FIND_PACKAGE(Qt5 COMPONENTS Core Gui OpenGL Svg REQUIRED HINTS ${Qt5_PATH})
 
   IF(Qt5_FOUND)
     MESSAGE(STATUS "Found Qt version: ${Qt5_VERSION}")
-    IF (TRAVIS_BUILD)
-      SET(QT_MIN_VERSION "5.9")
-    ELSE()
-      SET(QT_MIN_VERSION "5.12")
-    ENDIF()
 
     IF(${Qt5_VERSION} VERSION_LESS QT_MIN_VERSION)
       MESSAGE(FATAL_ERROR "Qt ${QT_MIN_VERSION} or greater is required for building the Seg3D GUI")
