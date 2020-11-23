@@ -153,15 +153,15 @@ ELSE()
   OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
 ENDIF()
 
+IF (TRAVIS_BUILD)
+  SET(QT_MIN_VERSION "5.9")
+ELSE()
+  SET(QT_MIN_VERSION "5.12")
+ENDIF()
+
 IF(SEG3D_BUILD_INTERFACE)
   SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #SET(CMAKE_AUTOMOC ON)
-
-  IF (TRAVIS_BUILD)
-    SET(QT_MIN_VERSION "5.9")
-  ELSE()
-    SET(QT_MIN_VERSION "5.12")
-  ENDIF()
 
   FIND_PACKAGE(Qt5 COMPONENTS Core Gui OpenGL Svg REQUIRED HINTS ${Qt5_PATH})
 
