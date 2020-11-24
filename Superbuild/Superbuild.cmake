@@ -130,18 +130,7 @@ OPTION(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF
 OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
 MARK_AS_ADVANCED(TRAVIS_BUILD)
 
-IF(TRAVIS_BUILD)
-  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: Qt 5.9 packages needed, hopefully temporary
-  SET(BUILD_WITH_PYTHON OFF) # TODO: hopefully temporary etc.
-  SET(BUILD_TESTING OFF)
-  SET(BUILD_MOSAIC_TOOLS OFF)
-  SET(BUILD_LARGE_VOLUME_TOOLS OFF)
-  SET(DOWNLOAD_DATA OFF)
-  SET(DISABLED_WARNINGS_GCC "-Wno-unused-local-typedefs")
-  SET(DISABLED_WARNINGS_CLANG "-Wno-unused-local-typedef")
-ELSE()
-  SET(ENABLED_WARNINGS "-Wall")
-ENDIF()
+SET(ENABLED_WARNINGS "-Wall")
 
 ###########################################
 # Configure Qt
