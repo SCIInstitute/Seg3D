@@ -130,18 +130,7 @@ OPTION(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF
 OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
 MARK_AS_ADVANCED(TRAVIS_BUILD)
 
-IF(TRAVIS_BUILD)
-  SET(SEG3D_BUILD_INTERFACE OFF) # TODO: Qt 5.9 packages needed, hopefully temporary
-  SET(BUILD_WITH_PYTHON OFF) # TODO: hopefully temporary etc.
-  SET(BUILD_TESTING OFF)
-  SET(BUILD_MOSAIC_TOOLS OFF)
-  SET(BUILD_LARGE_VOLUME_TOOLS OFF)
-  SET(DOWNLOAD_DATA OFF)
-  SET(DISABLED_WARNINGS_GCC "-Wno-unused-local-typedefs")
-  SET(DISABLED_WARNINGS_CLANG "-Wno-unused-local-typedef")
-ELSE()
-  SET(ENABLED_WARNINGS "-Wall")
-ENDIF()
+SET(ENABLED_WARNINGS "-Wall")
 
 ###########################################
 # Configure Qt
@@ -153,16 +142,23 @@ ELSE()
   OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
 ENDIF()
 
+IF (TRAVIS_BUILD)
+  SET(QT_MIN_VERSION "5.9")
+ELSE()
+  SET(QT_MIN_VERSION "5.12")
+ENDIF()
+
 IF(SEG3D_BUILD_INTERFACE)
   SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #SET(CMAKE_AUTOMOC ON)
-  
+
   FIND_PACKAGE(Qt5 COMPONENTS Core Gui OpenGL Svg REQUIRED HINTS ${Qt5_PATH})
 
   IF(Qt5_FOUND)
     MESSAGE(STATUS "Found Qt version: ${Qt5_VERSION}")
-    IF(${Qt5_VERSION} VERSION_LESS "5.12")
-      MESSAGE(FATAL_ERROR "Qt 5.12 or greater is required for building the Seg3D GUI")
+
+    IF(${Qt5_VERSION} VERSION_LESS QT_MIN_VERSION)
+      MESSAGE(FATAL_ERROR "Qt ${QT_MIN_VERSION} or greater is required for building the Seg3D GUI")
     ENDIF()
   ELSE()
     MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI. Set Qt5_PATH to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
