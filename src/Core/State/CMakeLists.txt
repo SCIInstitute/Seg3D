@@ -1,23 +1,23 @@
 
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -90,14 +90,14 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionSetAt.cc
   )
 
-IF(BUILD_WITH_PYTHON)
+IF(BUILD_WITH_PYTHON_LEGACY)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Core_State ${CORE_STATE_ACTIONS_SRCS})
   SET(CORE_STATE_SRCS ${CORE_STATE_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
-  
-CORE_ADD_LIBRARY(Core_State 
-  ${CORE_STATE_SRCS} 
-  ${CORE_STATE_ACTIONS_SRCS} 
+ENDIF(BUILD_WITH_PYTHON_LEGACY)
+
+CORE_ADD_LIBRARY(Core_State
+  ${CORE_STATE_SRCS}
+  ${CORE_STATE_ACTIONS_SRCS}
   ${CORE_STATE_ACTIONS_XML_H_SRCS})
             
 TARGET_LINK_LIBRARIES(Core_State
@@ -111,4 +111,3 @@ TARGET_LINK_LIBRARIES(Core_State
 # Register action classes
 REGISTER_LIBRARY_AND_CLASSES(Core_State
                     ${CORE_STATE_ACTIONS_SRCS})
-                    

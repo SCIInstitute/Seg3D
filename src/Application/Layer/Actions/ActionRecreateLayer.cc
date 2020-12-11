@@ -39,7 +39,7 @@
 #include <Core/Utils/Exception.h>
 #include <Core/Utils/StringParser.h>
 #include <Core/Utils/StringContainer.h>
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Core/Python/PythonInterpreter.h>
 #endif
 
@@ -66,8 +66,8 @@ public:
   // GENERATE_SCRIPT:
   // Template function for generating a python script from the provenance trail.
   template< class LAYER_LUT_TYPE, class PROV_USE_LUT_TYPE >
-  bool generate_script( Core::ActionContextHandle context, 
-    LAYER_LUT_TYPE& prov_input_lut, PROV_USE_LUT_TYPE& prov_use_lut, 
+  bool generate_script( Core::ActionContextHandle context,
+    LAYER_LUT_TYPE& prov_input_lut, PROV_USE_LUT_TYPE& prov_use_lut,
     std::vector< LayerHandle >& input_layers, std::vector< std::string >& script );
 
   // -- Action Parameters --
@@ -88,7 +88,7 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
   boost::timer performance_timer;
 
   // == Build lookup tables for provenance IDs ==
-  // All the input IDs of a provenance step must either already exist in the layer manager, 
+  // All the input IDs of a provenance step must either already exist in the layer manager,
   // or are outputs from previous steps.
   for ( size_t i = 0; i < num_steps; ++i )
   {
@@ -109,7 +109,7 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
         }
         else
         {
-          context->report_error( "The provenance trail for provenance IDs " + 
+          context->report_error( "The provenance trail for provenance IDs " +
             Core::ExportToString( this->prov_ids_ ) + " is incomplete." );
           return false;
         }
@@ -153,7 +153,7 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
       action_name_regex, "$& " );
     std::string output_name = "output" + i_str;
     // Report script progress
-    script.push_back( "\treportscriptstatus(sandbox=0, current_step='[" + 
+    script.push_back( "\treportscriptstatus(sandbox=0, current_step='[" +
       action_display_name + "]', steps_done=" + i_str +
       ", total_steps=" + num_steps_str + ")\n" );
 
@@ -206,7 +206,7 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
     // Issue the action
     script.push_back( action_cmd );
     // Make sure that the output is a python list
-    script.push_back( "\tif type(" + output_name + ")!=list:\n" 
+    script.push_back( "\tif type(" + output_name + ")!=list:\n"
       "\t\ttmp=list()\n" + "\t\ttmp.append(" + output_name + ")\n"
       "\t\t" + output_name + "=tmp\n" );
     // Print the output
@@ -222,11 +222,11 @@ bool ActionRecreateLayerPrivate::generate_script( Core::ActionContextHandle cont
     // Get the layer ID of the desired output
     std::string layer_id = layer_lut[ this->prov_ids_[ i ] ];
     // Set the layer name
-    std::string layer_name = "Recreated_Provenance_ID_" + 
+    std::string layer_name = "Recreated_Provenance_ID_" +
       Core::ExportToString( this->prov_ids_[ i ] );
     script.push_back( "\tset(stateid=" + layer_id + "+'::name', value='" +
       layer_name + "')\n" );
-    // Move the final output layer out of the sandbox and assign the 
+    // Move the final output layer out of the sandbox and assign the
     // desired provenance ID to it.
     script.push_back( "\tmigratesandboxlayer(layerid=" + layer_id +
       ", sandbox=0, prov_id=" + Core::ExportToString( this->prov_ids_[ i ] ) + ")\n" );
@@ -260,7 +260,7 @@ ActionRecreateLayer::~ActionRecreateLayer()
 
 bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
 {
-#if !defined( BUILD_WITH_PYTHON )
+#if !defined( BUILD_WITH_PYTHON_LEGACY )
   context->report_error( "Python is required to run ActionRecreateLayer." );
   return false;
 #endif
@@ -278,7 +278,7 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
     LayerHandle layer = LayerManager::FindLayer( this->private_->prov_ids_[ i ] );
     if ( layer )
     {
-      context->report_warning( "The requested provenance ID " + 
+      context->report_warning( "The requested provenance ID " +
         Core::ExportToString( this->private_->prov_ids_[ i ] ) + " already exists as layer '" +
         layer->get_layer_name() + "'." );
     }
@@ -290,7 +290,7 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
 
   // Only keep provenance IDs that don't exist yet
   this->private_->prov_ids_ = tmp_list;
-  if ( this->private_->prov_ids_.size() == 0 ) 
+  if ( this->private_->prov_ids_.size() == 0 )
   {
     this->private_->prov_trail_.reset();
     return true;
@@ -307,7 +307,7 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
     bool trail_usable = true;
     for ( size_t i = 0; i < this->private_->prov_ids_.size(); ++i )
     {
-      if ( std::find( prov_output_ids.begin(), prov_output_ids.end(), 
+      if ( std::find( prov_output_ids.begin(), prov_output_ids.end(),
         this->private_->prov_ids_[ i ] ) == prov_output_ids.end() )
       {
         trail_usable = false;
@@ -331,7 +331,7 @@ bool ActionRecreateLayer::validate( Core::ActionContextHandle& context )
       get_provenance_trail( this->private_->prov_ids_ );
     if ( !prov_trail || prov_trail->size() == 0 )
     {
-      context->report_error( "Provenance trail for provenance IDs " + 
+      context->report_error( "Provenance trail for provenance IDs " +
         Core::ExportToString( this->private_->prov_ids_ ) + " doesn't exist." );
       return false;
     }
@@ -374,7 +374,7 @@ typedef boost::unordered_map< ProvenanceID, std::string > ProvenanceIDLayerIDMap
 typedef boost::unordered_map< ProvenanceID, size_t > ProvenanceIDStepIDMap;
 
 bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
-{ 
+{
   size_t num_steps;
 
   // If the provenance trail required to recreate the layer is empty,
@@ -429,15 +429,15 @@ bool ActionRecreateLayer::run( Core::ActionContextHandle& context, Core::ActionR
   {
     LayerManager::Instance()->insert_layer( input_layers[ i ], 0 );
   }
-  
+
   // Create undo/redo record
-  LayerRecreationUndoBufferItemHandle item( new LayerRecreationUndoBufferItem( 
+  LayerRecreationUndoBufferItemHandle item( new LayerRecreationUndoBufferItem(
     this->private_->prov_ids_, 0 ) );
   item->set_redo_action( this->shared_from_this() );
   item->add_id_count_to_restore( id_count );
   UndoBuffer::Instance()->insert_undo_item( context, item );
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   // Run the script to recreate the layer
   Core::PythonInterpreter::Instance()->run_script( script );
 
@@ -457,7 +457,7 @@ void ActionRecreateLayer::clear_cache()
   this->private_->prov_trail_.reset();
 }
 
-void ActionRecreateLayer::Dispatch( Core::ActionContextHandle context, 
+void ActionRecreateLayer::Dispatch( Core::ActionContextHandle context,
     const std::vector< ProvenanceID >& prov_ids, ProvenanceTrailHandle prov_trail )
 {
   ActionRecreateLayer* action = new ActionRecreateLayer;

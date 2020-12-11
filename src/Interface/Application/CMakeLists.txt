@@ -3,7 +3,7 @@
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
@@ -126,7 +126,7 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   SliceRangeDialog.h
 )
 
-IF(BUILD_WITH_PYTHON)
+IF(BUILD_WITH_PYTHON_LEGACY)
   SET(INTERFACE_APPLICATION_SRCS ${INTERFACE_APPLICATION_SRCS} PythonConsoleWidget.cc)
   SET(INTERFACE_APPLICATION_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS} PythonConsoleWidget.h)
 ENDIF()
@@ -247,6 +247,6 @@ ELSE()
     ${SCI_BOOST_LIBRARY})
 ENDIF()
 
-IF(BUILD_WITH_PYTHON)
+IF(BUILD_WITH_PYTHON_LEGACY)
   TARGET_LINK_LIBRARIES(Interface_Application Core_Python)
 ENDIF()

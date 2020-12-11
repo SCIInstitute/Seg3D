@@ -78,7 +78,7 @@
 #include <Interface/Application/ViewerInterface.h>
 #include <Interface/Application/SaveProjectAsWizard.h>
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Interface/Application/PythonConsoleWidget.h>
 #endif
 
@@ -99,7 +99,7 @@ public:
   QPointer< MessageWindow > message_widget_;
   QPointer< ShortcutsInterface > keyboard_shortcuts_;
   QPointer< SplashScreen > splash_screen_;
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   QPointer< PythonConsoleWidget > python_console_;
 #endif
 
@@ -164,7 +164,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   this->private_->keyboard_shortcuts_ = new ShortcutsInterface( this );
   this->private_->message_widget_ = new MessageWindow( this );
   this->private_->splash_screen_ = new SplashScreen( this );
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   this->private_->python_console_ = new PythonConsoleWidget( this );
 #endif
 
@@ -221,7 +221,7 @@ ApplicationInterface::ApplicationInterface( std::string file_to_view_on_open ) :
   QtUtils::QtBridge::Show( this->private_->keyboard_shortcuts_,
     InterfaceManager::Instance()->keyboard_shortcut_visibility_state_ );
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   QtUtils::QtBridge::Show( this->private_->python_console_,
     InterfaceManager::Instance()->python_console_visibility_state_ );
 #endif
@@ -365,7 +365,7 @@ void ApplicationInterface::closeEvent( QCloseEvent* event )
     this->private_->keyboard_shortcuts_->deleteLater();
   }
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   if ( this->private_->python_console_ )
   {
     this->private_->python_console_->close();
@@ -622,21 +622,21 @@ void ApplicationInterface::handle_osx_file_open_event (std::string filename)
     {
         new_session = false;
     }
-    
+
     if ( !new_session )
     {
         boost::filesystem::path app_filepath;
         Core::Application::Instance()->get_application_filepath( app_filepath );
-        
+
         std::string command = std::string( "" ) +
         app_filepath.parent_path().parent_path().string() + "/Contents/MacOS/Seg3D2 \"" + filename + "\" &";
-        
+
         system( command.c_str() );
     }
     else
     {
         std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
-        
+
         this->open_initial_project (filename);
     }
 }
@@ -696,7 +696,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
   }
 
   std::vector<std::string> project_file_extensions = Project::GetProjectFileExtensions();
-    
+
   if ( std::find( project_file_extensions.begin(), project_file_extensions.end(), extension ) !=
        project_file_extensions.end() )
   {
@@ -704,7 +704,7 @@ bool ApplicationInterface::open_initial_project ( std::string filename )
   }
 
   std::vector<std::string> project_folder_extensions = Project::GetProjectPathExtensions();
-    
+
   if ( std::find( project_folder_extensions.begin(), project_folder_extensions.end(), extension ) !=
        project_folder_extensions.end() )
   {

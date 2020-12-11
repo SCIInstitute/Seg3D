@@ -1,22 +1,22 @@
 #
 #  For more information, please see: http://software.sci.utah.edu
-# 
+#
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
-# 
-#  
+#
+#
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
-#  in all copies or substantial portions of the Software. 
-# 
+#  in all copies or substantial portions of the Software.
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -33,7 +33,7 @@
 SET(APPLICATION_TOOLS_SHADER_SRCS
   detail/MaskShader.frag
 )
-  
+
 CORE_IMPORT_SHADER(APPLICATION_TOOLS_SHADER_STRING_SRCS
   ${APPLICATION_TOOLS_SHADER_SRCS}
 )
@@ -70,7 +70,7 @@ SET(APPLICATION_TOOLS_SRCS
   CurvatureAnisotropicDiffusionFilter.h
   CurvatureAnisotropicDiffusionFilter.cc
   DiscreteGaussianFilter.h
-  DiscreteGaussianFilter.cc  
+  DiscreteGaussianFilter.cc
   DistanceFilter.h
   DistanceFilter.cc
   ExtractDataLayer.h
@@ -137,7 +137,7 @@ SET(APPLICATION_TOOLS_NOREGISTER_SRCS
   detail/MaskShader.h
   detail/MaskShader.cc
 )
-  
+
 SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionPaint.h
   Actions/ActionPaint.cc
@@ -154,15 +154,15 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
   Actions/ActionExtractDataLayer.h
   Actions/ActionExtractDataLayer.cc
 )
-  
-IF(BUILD_WITH_PYTHON)
+
+IF(BUILD_WITH_PYTHON_LEGACY)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Tools ${APPLICATION_TOOLS_ACTIONS_SRCS})
   SET(APPLICATION_TOOLS_NOREGISTER_SRCS ${APPLICATION_TOOLS_NOREGISTER_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+ENDIF(BUILD_WITH_PYTHON_LEGACY)
 
 ITK_MODULE_LOAD(ITKCommon)
 
-CORE_ADD_LIBRARY(Application_Tools 
+CORE_ADD_LIBRARY(Application_Tools
   ${APPLICATION_TOOLS_SRCS}
   ${APPLICATION_TOOLS_NOREGISTER_SRCS}
   ${APPLICATION_TOOLS_ACTIONS_SRCS}

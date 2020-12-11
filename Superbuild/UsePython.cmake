@@ -26,7 +26,7 @@
 
 include_directories(${SCI_PYTHON_INCLUDE})
 link_directories(${SCI_PYTHON_LINK_LIBRARY_DIRS})
-add_definitions(-DBUILD_WITH_PYTHON)
+add_definitions(-DBUILD_WITH_PYTHON_LEGACY)
 if(WIN32)
   add_definitions(-DPy_ENABLE_SHARED=1)
 

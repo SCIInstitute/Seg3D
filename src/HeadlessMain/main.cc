@@ -30,7 +30,7 @@
 #pragma warning( disable: 4244 4267 )
 #endif
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
 #include <Application/Socket/ActionSocket.h>
@@ -145,7 +145,7 @@ int main( int argc, char **argv )
 
       CORE_LOG_WARNING(warning);
   }
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   size_t name_len = strlen( argv[ 0 ] );
   std::vector< wchar_t > program_name( name_len + 1 );
   mbstowcs( &program_name[ 0 ], argv[ 0 ], name_len + 1 );

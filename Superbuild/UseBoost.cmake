@@ -27,7 +27,7 @@
 include_directories(${SCI_BOOST_INCLUDE})
 link_directories(${SCI_BOOST_LIBRARY_DIR})
 add_definitions(-DBOOST_ALL_NO_LIB)
-if(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON_LEGACY)
   add_definitions(-DBOOST_PYTHON_STATIC_LIB -DBOOST_PYTHON_STATIC_MODULE)
 endif()
 
@@ -51,7 +51,7 @@ foreach(lib ${SCI_BOOST_LIBRARY})
   elseif(CMAKE_GENERATOR MATCHES "Makefiles")
     set(FULL_LIB_NAME "${SCI_BOOST_LIBRARY_DIR}/${boost_LIB_PREFIX}${lib}${CMAKE_STATIC_LIBRARY_SUFFIX}")
   else()
-  
+
   if(${lib} MATCHES "boost_python-mt")
     if(WIN32)
 	  set(FULL_LIB_NAME_RELEASE "${SCI_BOOST_LIBRARY_DIR}/${boost_LIB_PREFIX}boost_python34-mt${CMAKE_STATIC_LIBRARY_SUFFIX}")

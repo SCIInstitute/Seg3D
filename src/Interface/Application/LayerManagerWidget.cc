@@ -29,7 +29,7 @@
 // Python includes
 // NOTE: This one has to be here: Because the Python source code is sub standard, we need to include
 // this first, to avoid trouble with the macros that Python defines.
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Python.h>
 #endif
 
@@ -45,7 +45,7 @@
 
 // Core includes
 #include <Core/Utils/Log.h>
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Core/Python/PythonInterpreter.h>
 #endif
 
@@ -589,7 +589,7 @@ void LayerManagerWidget::notify_groups_of_picked_up_layer_size( int layer_size )
 
 void LayerManagerWidget::abort_script()
 {
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   Core::PythonInterpreter::Instance()->interrupt();
 #endif
   if ( this->private_->script_sandbox_ >= 0 )

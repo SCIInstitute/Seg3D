@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -29,7 +29,7 @@
 // Python
 // NOTE: This one has to be here: Because the Python source code is sub standard, we need to include
 // this first, to avoid trouble with the macros that Python defines.
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Python.h>
 #endif
 
@@ -330,7 +330,7 @@ void PythonConsoleEdit::issue_command()
     this->command_history_.push_back( "" );
     this->command_position_ = this->command_history_.size() - 1;
   }
-  
+
   QTextCursor c( this->document() );
   c.movePosition( QTextCursor::End );
   c.insertText( "\n" );
@@ -383,7 +383,7 @@ void PythonConsoleEdit::print_output( const std::string text )
   QTextCursor text_cursor( this->document() );
   // Move the cursor to the end of the document
   text_cursor.setPosition( this->document_end() );
-  
+
   // Set the proper text color
   QTextCharFormat char_format = this->currentCharFormat();
   char_format.setForeground( Qt::black );
@@ -424,25 +424,25 @@ void PythonConsoleEdit::print_command( const std::string text )
 
 void PythonConsoleEdit::Prompt( PythonConsoleEditQWeakPointer edit, const std::string text )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit,
     boost::bind( &PythonConsoleEdit::prompt, edit.data(), text ) ) );
 }
 
 void PythonConsoleEdit::PrintOutput( PythonConsoleEditQWeakPointer edit, const std::string text )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit,
     boost::bind( &PythonConsoleEdit::print_output, edit.data(), text ) ) );
 }
 
 void PythonConsoleEdit::PrintError( PythonConsoleEditQWeakPointer edit, const std::string text )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit,
     boost::bind( &PythonConsoleEdit::print_error, edit.data(), text ) ) );
 }
 
 void PythonConsoleEdit::PrintCommand( PythonConsoleEditQWeakPointer edit, const std::string text )
 {
-  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit, 
+  Core::Interface::PostEvent( QtUtils::CheckQtPointer( edit,
     boost::bind( &PythonConsoleEdit::print_command, edit.data(), text ) ) );
 }
 
@@ -461,7 +461,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 PythonConsoleWidget::PythonConsoleWidget( QWidget* parent ) :
-  QtUtils::QtCustomDialog( parent ), 
+  QtUtils::QtCustomDialog( parent ),
   private_( new PythonConsoleWidgetPrivate )
 {
   this->private_->console_edit_ = new PythonConsoleEdit( this );

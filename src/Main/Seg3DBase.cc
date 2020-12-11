@@ -31,7 +31,7 @@
 #endif
 
 
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
 #include <Python.h>
 #include <Core/Python/PythonInterpreter.h>
 #include <Core/Python/PythonCLI.h>
@@ -253,7 +253,7 @@ void Seg3DBase::check_32_bit()
 
 void Seg3DBase::initialize_python()
 {
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   std::wstring program_name(this->program_name.begin(), this->program_name.end());
 
   Core::PythonInterpreter::module_list_type python_modules;
@@ -276,7 +276,7 @@ void Seg3DBase::initialize_sockets()
 {
   if (!this->start_sockets)
     return;
-#ifdef BUILD_WITH_PYTHON
+#ifdef BUILD_WITH_PYTHON_LEGACY
   // -- Add a socket for receiving actions --
     CORE_LOG_MESSAGE( std::string("Starting a socket on port: ") + Core::ExportToString( this->port_number ) );
     ActionSocket::Instance()->start( this->port_number );
