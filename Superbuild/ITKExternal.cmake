@@ -88,7 +88,7 @@ IF(BUILD_MOSAIC_TOOLS)
   )
 ENDIF()
 
-SET(itk_GIT_TAG "master")
+SET(itk_GIT_TAG "v5.1.2")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -103,6 +103,6 @@ ExternalProject_Add(ITK_external
 
 # hardcoded, since we need this before ITK's configure step
 ExternalProject_Get_Property(ITK_external INSTALL_DIR)
-SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.2" CACHE PATH "")
+SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.1" CACHE PATH "")
 
 MESSAGE(STATUS "ITK_DIR=${ITK_DIR}")
