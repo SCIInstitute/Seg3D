@@ -61,7 +61,7 @@
 #include <Application/Tools/Actions/ActionGrowCut.h>
 #include <Application/Tools/Actions/ActionGrowCutInitialize.h>
 #include <Application/Tools/Actions/ActionGrowCutPostProcess.h>
-#include <Application/CorBase/Algorithm/GrowCutter.h>
+#include <Application/Tools/Algorithm/GrowCutter.h>
 
 #include <Application/Layer/Actions/ActionComputeIsosurface.h>
 

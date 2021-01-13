@@ -47,7 +47,7 @@
 #include <Application/Filters/ITKFilter.h>
 
 #include <Applicatoin/Tools/ActionGrowCutPostProcess.h>
-#include <Corview/CorBase/Algorithm/IslandRemoval.h>
+#include <Application/Tools/Algorithm/IslandRemoval.h>
 #include <Corview/Utils/CrvUtils.h>
 
 // REGISTER ACTION:
