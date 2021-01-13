@@ -132,7 +132,7 @@ public:
       this->dst_layer_->update_progress_signal_( 0.33 );
 
       // step 2 : island removal
-      typedef Corview::IslandRemovalFilter< UCHAR_IMAGE_TYPE_2D, UCHAR_IMAGE_TYPE_2D > IslandRemovalFilterType;
+      typedef Seg3D::IslandRemovalFilter< UCHAR_IMAGE_TYPE_2D, UCHAR_IMAGE_TYPE_2D > IslandRemovalFilterType;
       typedef itk::SliceBySliceImageFilter< UCHAR_IMAGE_TYPE, UCHAR_IMAGE_TYPE > UcharSliceBySliceType;
 
       IslandRemovalFilterType::Pointer island_filter = IslandRemovalFilterType::New();
