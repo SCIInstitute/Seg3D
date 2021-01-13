@@ -38,11 +38,11 @@
 #include <Core/Utils/Log.h>
 
 //Qt Gui Includes
-#include <Corview/Tools/Interface/GrowCutToolInterface.h>
+#include <Interface/ToolInterface/GrowCutToolInterface.h>
 #include "ui_GrowCutToolInterface.h"
 
 //Application Includes
-#include <Corview/Tools/GrowCutTool.h>
+#include <Application/Tools/GrowCutTool.h>
 
 //QtUtils Includes
 #include <QtUtils/Bridge/QtBridge.h>
