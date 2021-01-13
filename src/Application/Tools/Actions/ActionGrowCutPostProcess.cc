@@ -45,10 +45,11 @@
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/ITKFilter.h>
-
 #include <Applicatoin/Tools/ActionGrowCutPostProcess.h>
 #include <Application/Tools/Algorithm/IslandRemoval.h>
-#include <Corview/Utils/CrvUtils.h>
+
+//Remove later if not used
+//#include <Corview/Utils/CrvUtils.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be

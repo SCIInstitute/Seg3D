@@ -28,6 +28,7 @@
 
 // Core includes
 #include <Core/Math/MathFunctions.h>
+#include <Core/Utils/TimeSince.h>
 
 // Application includes
 #include <Application/Layer/LayerManager.h>
@@ -38,7 +39,6 @@
 
 #include <Application/Tools/ActionGrowCut.h>
 #include <Application/Tools/ActionGrowCutPostProcess.h>
-#include <Corview/Utils/CrvUtils.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -126,7 +126,7 @@ public:
 
   virtual void run_filter()
   {
-    Corview::CrvUtils::start_timer( "growcut" );
+    Core::TimeSince::start_timer( "growcut" );
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
 
@@ -160,7 +160,7 @@ public:
     this->insert_itk_image_into_layer( this->output_layer_, this->grow_cutter_->get_output().GetPointer() );
 
     CORE_LOG_SUCCESS( "GrowCut duration: " +
-                      Corview::CrvUtils::format_double( Corview::CrvUtils::get_time_since( "growcut" ) / 1000, 2 ) + "s" );
+                      Core::TimeSince::format_double( Corview::CrvUtils::get_time_since( "growcut" ) / 1000, 2 ) + "s" );
 
     this->dispatch_unlock_layer( this->output_layer_ );
 
