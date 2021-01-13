@@ -46,7 +46,7 @@
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/ITKFilter.h>
 
-#include <Corview/Tools/ActionGrowCutPostProcess.h>
+#include <Applicatoin/Tools/ActionGrowCutPostProcess.h>
 #include <Corview/CorBase/Algorithm/IslandRemoval.h>
 #include <Corview/Utils/CrvUtils.h>
 

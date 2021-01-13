@@ -37,7 +37,7 @@
 #include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 
-#include <Corview/Tools/ActionGrowCutInitialize.h>
+#include <Application/Tools/ActionGrowCutInitialize.h>
 
 #include <Core/Log/LogbookManager.h>
 

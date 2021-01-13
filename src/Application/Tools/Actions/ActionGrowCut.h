@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CORVIEW_FILTERS_ACTIONS_ACTIONGrowCut_H
-#define CORVIEW_FILTERS_ACTIONS_ACTIONGrowCut_H
+#ifndef APPLICATION_FILTERS_ACTIONS_ACTIONGrowCut_H
+#define APPLICATION_FILTERS_ACTIONS_ACTIONGrowCut_H
 
 #include <Core/Action/Actions.h>
 #include <Core/Interface/Interface.h>
@@ -36,7 +36,6 @@
 #include <Application/Layer/LayerAction.h>
 
 #include <Corview/CorBase/Algorithm/GrowCutter.h>
-using namespace Corview;
 
 namespace Seg3D
 {
@@ -97,7 +96,7 @@ public:
                         std::string background_layer,
                         std::string output_layer,
                         bool run_smoothing,
-                        Corview::GrowCutterHandle grow_cutter = GrowCutterHandle() );
+                        Core::GrowCutterHandle grow_cutter = GrowCutterHandle() );
 
   static void DispatchAndWait( Core::ActionContextHandle context,
                                std::string data_layer,
@@ -105,8 +104,8 @@ public:
                                std::string background_layer,
                                std::string output_layer,
                                bool run_smoothing,
-                               Corview::GrowCutterHandle grow_cutter = GrowCutterHandle() );
+                               Core::GrowCutterHandle grow_cutter = GrowCutterHandle() );
 };
 } // end namespace Seg3D
 
-#endif // ifndef CORVIEW_FILTERS_ACTIONS_ACTIONGrowCut_H
+#endif // ifndef APPLICATION_FILTERS_ACTIONS_ACTIONGrowCut_H
