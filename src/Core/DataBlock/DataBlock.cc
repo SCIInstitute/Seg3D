@@ -513,20 +513,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::CHAR_E:
     {
       signed char* dst = reinterpret_cast<signed char*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<signed char>( src[ j ] );
-        dst[ j + 1 ] = static_cast<signed char>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<signed char>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<signed char>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<signed char>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<signed char>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<signed char>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<signed char>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<signed char>( src[ j ] );
       }
@@ -535,20 +522,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::UCHAR_E:
     {
       unsigned char* dst = reinterpret_cast<unsigned char*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<unsigned char>( src[ j ] );
-        dst[ j + 1 ] = static_cast<unsigned char>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<unsigned char>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<unsigned char>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<unsigned char>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<unsigned char>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<unsigned char>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<unsigned char>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned char>( src[ j ] );
       }
@@ -559,18 +533,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
       short* dst = reinterpret_cast<short*>( dst_data_block->get_data() );
       size_t size8 = size & ~(0x7);
       size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<short>( src[ j ] );
-        dst[ j + 1 ] = static_cast<short>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<short>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<short>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<short>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<short>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<short>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<short>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<short>( src[ j ] );
       }
@@ -579,20 +542,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::USHORT_E:
     {
       unsigned short* dst = reinterpret_cast<unsigned short*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<unsigned short>( src[ j ] );
-        dst[ j + 1 ] = static_cast<unsigned short>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<unsigned short>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<unsigned short>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<unsigned short>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<unsigned short>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<unsigned short>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<unsigned short>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned short>( src[ j ] );
       }
@@ -601,20 +551,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::INT_E:
     {
       int* dst = reinterpret_cast<int*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<int>( src[ j ] );
-        dst[ j + 1 ] = static_cast<int>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<int>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<int>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<int>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<int>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<int>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<int>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<int>( src[ j ] );
       }
@@ -623,20 +560,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::UINT_E:
     {
       unsigned int* dst = reinterpret_cast<unsigned int*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<unsigned int>( src[ j ] );
-        dst[ j + 1 ] = static_cast<unsigned int>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<unsigned int>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<unsigned int>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<unsigned int>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<unsigned int>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<unsigned int>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<unsigned int>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned int>( src[ j ] );
       }
@@ -645,20 +569,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::LONGLONG_E:
     {
       long long* dst = reinterpret_cast<long long*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<long long>( src[ j ] );
-        dst[ j + 1 ] = static_cast<long long>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<long long>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<long long>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<long long>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<long long>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<long long>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<long long>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<long long>( src[ j ] );
       }
@@ -667,20 +578,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::ULONGLONG_E:
     {
       unsigned long long* dst = reinterpret_cast<unsigned long long*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<unsigned long long>( src[ j ] );
-        dst[ j + 1 ] = static_cast<unsigned long long>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<unsigned long long>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<unsigned long long>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<unsigned long long>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<unsigned long long>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<unsigned long long>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<unsigned long long>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<unsigned long long>( src[ j ] );
       }
@@ -689,20 +587,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::FLOAT_E:
     {
       float* dst = reinterpret_cast<float*>( dst_data_block->get_data() );
-      size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<float>( src[ j ] );
-        dst[ j + 1 ] = static_cast<float>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<float>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<float>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<float>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<float>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<float>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<float>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<float>( src[ j ] );
       }
@@ -711,20 +596,7 @@ static bool ConvertDataTypeInternal( DATA* src, DataBlockHandle& dst_data_block 
     case DataType::DOUBLE_E:
     {
       double* dst = reinterpret_cast<double*>( dst_data_block->get_data() );
-            size_t size8 = size & ~(0x7);
-      size_t j = 0;
-      for ( ; j < size8; j+=8 )
-      {
-        dst[ j ] = static_cast<double>( src[ j ] );
-        dst[ j + 1 ] = static_cast<double>( src[ j + 1 ] );
-        dst[ j + 2 ] = static_cast<double>( src[ j + 2 ] );
-        dst[ j + 3 ] = static_cast<double>( src[ j + 3 ] );
-        dst[ j + 4 ] = static_cast<double>( src[ j + 4 ] );
-        dst[ j + 5 ] = static_cast<double>( src[ j + 5 ] );
-        dst[ j + 6 ] = static_cast<double>( src[ j + 6 ] );
-        dst[ j + 7 ] = static_cast<double>( src[ j + 7 ] );
-      }
-      for ( ; j < size; j++ )
+      for ( size_t j = 0; j < size; j++ )
       {
         dst[ j ] = static_cast<double>( src[ j ] );
       }
