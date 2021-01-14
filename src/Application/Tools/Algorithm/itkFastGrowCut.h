@@ -26,53 +26,43 @@
    DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef VTKFASTGROWCUT_H
-#define VTKFASTGROWCUT_H
+#ifndef ITKFASTGROWCUT_H
+#define ITKFASTGROWCUT_H
 
-//#include "vtkSlicerFastGrowCutSegmenterModuleLogicExport.h"
-#include "vtkImageData.h"
-#include "FastGrowCut.h"
+#include <FastGrowCut.h>
 
-#include "vtkObject.h"
-
-
-//#include <QProgressBar>
-//#include <QMainWindow>
-//#include <QStatusBar>
-//#include "qSlicerApplication.h"
+#include <itkObject.h>
 
 const unsigned short SrcDimension = 3;
 typedef float DistPixelType; // float type pixel for cost function
 typedef short SrcPixelType;
 typedef unsigned char LabPixelType;
 
-class vtkFastGrowCut : public vtkObject
+class itkFastGrowCut : public itkObject
 {
 public:
-  static vtkFastGrowCut* New();
-  //vtkTypeRevisionMacro( vtkFastGrowCut, vtkObject );
-  vtkTypeMacro(vtkFastGrowCut,vtkObject);
+  static itkFastGrowCut* New();
+  itkTypeMacro(itkFastGrowCut,itkObject);
 
   //set parameters of grow cut
-  vtkSetObjectMacro( SourceVol, vtkImageData );
-  vtkSetObjectMacro( SeedVol, vtkImageData );
-  //vtkSetObjectMacro(OutputVol, vtkImageData);
+  itkSetObjectMacro( SourceVol, itkImageData );
+  itkSetObjectMacro( SeedVol, itkImageData );
 
-  vtkSetMacro( InitializationFlag, bool );
+  itkSetMacro( InitializationFlag, bool );
 
   //processing functions
   void Initialization();
   void RunFGC();
-  void PrintSelf( ostream &os, vtkIndent indent );
+  void PrintSelf( ostream &os, itkIndent indent );
 
 protected:
-  vtkFastGrowCut();
-  virtual ~vtkFastGrowCut();
+  itkFastGrowCut();
+  virtual ~itkFastGrowCut();
 
 private:
-  //vtk image data (from slicer)
-  vtkImageData* SourceVol;
-  vtkImageData* SeedVol;
+  //itk image data (from slicer)
+  itkImageData* SourceVol;
+  itkImageData* SeedVol;
 
   std::vector<LabPixelType> m_imSeedVec;
   std::vector<LabPixelType> m_imLabVec;
@@ -85,4 +75,4 @@ private:
   //state variables
   bool InitializationFlag;
 };
-#endif // ifndef VTKFASTGROWCUT_H
+#endif // ifndef ITKFASTGROWCUT_H

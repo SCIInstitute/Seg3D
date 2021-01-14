@@ -30,11 +30,9 @@
 
 //itk
 #include <itkImageRegionIterator.h>
-
-//vtk
-#include <vtkImageImport.h>
-#include <vtkSmartPointer.h>
-#include "vtkImageData.h"
+#include <itkImageImport.h>
+#include <itkSmartPointer.h>
+//#include <itkImageData.h>
 
 namespace Seg3D
 {
@@ -157,7 +155,7 @@ void GrowCutter::execute()
   }
 
   // Convert the ITK label image to VTK image data
-  this->connector1_ = ConnectorType::New();
+  /*this->connector1_ = ConnectorType::New();
   this->connector1_->SetInput( this->background_image_ );
   this->connector1_->Update();
   vtkImageData* added_seeds_image = this->connector1_->GetOutput();
@@ -166,14 +164,14 @@ void GrowCutter::execute()
   this->connector2_ = DataConnectorType::New();
   this->connector2_->SetInput( this->data_image_ );
   this->connector2_->Update();
-  vtkImageData* source_image_ = this->connector2_->GetOutput();
+  vtkImageData* source_image_ = this->connector2_->GetOutput();*/
 
   // Call GrowCut
   // TODO: Add segmenter initialization flag check. See CarreraSliceEffect.py
   if ( this->initialization_flag_ == false )
   {
-    this->fast_grow_cut_->SetSourceVol( source_image_ );
-    this->fast_grow_cut_->SetSeedVol( added_seeds_image );
+    this->fast_grow_cut_->SetSourceVol( data_image_ );
+    this->fast_grow_cut_->SetSeedVol( background_image_ );
     this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->Initialization();       // This method will set grow cut initialization flag to false
     this->fast_grow_cut_->RunFGC();
@@ -181,16 +179,16 @@ void GrowCutter::execute()
   }
   else
   {
-    this->fast_grow_cut_->SetSeedVol( added_seeds_image );
+    this->fast_grow_cut_->SetSeedVol( background_image_ );
     this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->RunFGC();
   }
 
   // Convert grow cut result to ITK image for display
-  this->connector3_ = VTKConnectorType::New();
-  this->connector3_->SetInput( added_seeds_image );
+  /*this->connector3_ = VTKConnectorType::New();
+  this->connector3_->SetInput( background_image_ );
   this->connector3_->Update();
-  this->output_image_ = this->connector3_->GetOutput();
+  this->output_image_ = this->connector3_->GetOutput();*/
 }
 
 //---------------------------------------------------------------------------
@@ -202,7 +200,7 @@ itk::Image<unsigned char, 3>::Pointer GrowCutter::get_output()
 //---------------------------------------------------------------------------
 void GrowCutter::reset_growcut()
 {
-  this->fast_grow_cut_ = vtkSmartPointer<vtkFastGrowCut>::New();
+  this->fast_grow_cut_ = itkSmartPointer<itkFastGrowCut>::New();
   this->initialization_flag_ = false;
 }
 }
