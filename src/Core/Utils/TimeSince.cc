@@ -73,8 +73,6 @@
 #include <psapi.h>
 #endif
 
-using namespace Seg3D;
-
 namespace Core {
 
 class TimeSincePrivate {
