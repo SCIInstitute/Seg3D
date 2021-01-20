@@ -37,8 +37,8 @@
 #include <Application/Filters/ITKFilter.h>
 #include <Application/Layer/Actions/ActionComputeIsosurface.h>
 
-#include <Application/Tools/ActionGrowCut.h>
-#include <Application/Tools/ActionGrowCutPostProcess.h>
+#include <Application/Tools/Actions/ActionGrowCut.h>
+#include <Application/Tools/Actions/ActionGrowCutPostProcess.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -160,7 +160,7 @@ public:
     this->insert_itk_image_into_layer( this->output_layer_, this->grow_cutter_->get_output().GetPointer() );
 
     CORE_LOG_SUCCESS( "GrowCut duration: " +
-                      Core::TimeSince::format_double( Corview::CrvUtils::get_time_since( "growcut" ) / 1000, 2 ) + "s" );
+                      Core::TimeSince::format_double( Core::TimeSince::get_time_since( "growcut" ) / 1000, 2 ) + "s" );
 
     this->dispatch_unlock_layer( this->output_layer_ );
 

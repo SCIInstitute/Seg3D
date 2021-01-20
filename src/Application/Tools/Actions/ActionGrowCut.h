@@ -96,7 +96,7 @@ public:
                         std::string background_layer,
                         std::string output_layer,
                         bool run_smoothing,
-                        GrowCutterHandle grow_cutter = GrowCutterHandle() );
+                        Seg3D::GrowCutterHandle grow_cutter = GrowCutterHandle() );
 
   static void DispatchAndWait( Core::ActionContextHandle context,
                                std::string data_layer,
@@ -104,7 +104,7 @@ public:
                                std::string background_layer,
                                std::string output_layer,
                                bool run_smoothing,
-                               GrowCutterHandle grow_cutter = GrowCutterHandle() );
+                               Seg3D::GrowCutterHandle grow_cutter = GrowCutterHandle() );
 };
 } // end namespace Seg3D
 
