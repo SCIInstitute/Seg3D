@@ -31,17 +31,17 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif 
+#endif
 
 #include <string>
 #include <vector>
 
-#include <QUrl>
+//#include <QUrl>
 
 class QMainWindow;
 class QWidget;
 
-#include <Application/Layer/LayerFWD.h>
+//#include <Application/Layer/LayerFWD.h>
 
 namespace Core {
 

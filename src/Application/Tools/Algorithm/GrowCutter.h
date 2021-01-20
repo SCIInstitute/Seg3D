@@ -39,7 +39,7 @@
 
 //GrowCut
 #include <itkSmartPointer.h>
-#include <itkFastGrowCut.h>
+#include <Application/Tools/Algorithm/itkFastGrowCut.h>
 
 namespace Seg3D {
 
@@ -68,7 +68,7 @@ private:
   itk::Image<unsigned char, 3>::Pointer foreground_image_;
   itk::Image<unsigned char, 3>::Pointer background_image_;
   itk::Image<unsigned char, 3>::Pointer output_image_;
-  itkSmartPointer<itkFastGrowCut> fast_grow_cut_;
+  itk::SmartPointer<itkFastGrowCut> fast_grow_cut_;
   bool initialization_flag_;
 
   typedef itk::Image< unsigned char, 3 > ImageType;
@@ -78,8 +78,8 @@ private:
   typedef itk::ImageToVTKImageFilter<DataImageType> DataConnectorType;
   typedef itk::ImageToVTKImageFilter<ImageType> ConnectorType;*/
 
-  ConnectorType::Pointer connector1_;
-  DataConnectorType::Pointer connector2_;
+  //ConnectorType::Pointer connector1_;
+  //DataConnectorType::Pointer connector2_;
   //VTKConnectorType::Pointer connector3_;
 
   itk::Image< unsigned char, 3 >::IndexType bbox_lower_;

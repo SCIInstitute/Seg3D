@@ -35,25 +35,26 @@
 // Boost
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
 
 // Qt
 #include <QtGui>
 
 //Core Includes
-#include <Core/Interface/Interface.h>
+// #include <Core/Interface/Interface.h>
 #include <Core/Utils/TimeSince.h>
 
 //Application Includes
 //Remove what isn't needed
-#include <Application/Tool/Tool.h>
-#include <Application/Layer/Layer.h>
+//#include <Application/Tool/Tool.h>
+/*#include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/LayerIO/LayerIO.h>
 #include <Application/LayerIO/Actions/ActionExportLayer.h>
 #include <Application/LayerIO/NrrdLayerExporter.h>
 #include <Application/ProjectManager/ProjectManager.h>
-#include <Application/ScriptManager/ScriptManager.h>
+#include <Application/ScriptManager/ScriptManager.h>*/
 
 //Remove if not needed!
 /*#include <Corview/Modules/Region/RegionModule.h>
@@ -61,7 +62,7 @@
 #include <Corview/Modules/Analysis/AnalysisModule.h>
 #include <Corview/Threading/AnalysisThread.h>*/
 
-#include <tinyxml.h>
+//#include <tinyxml.h>
 
 // STL
 #include <iostream>

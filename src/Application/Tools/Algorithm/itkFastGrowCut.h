@@ -29,7 +29,7 @@
 #ifndef ITKFASTGROWCUT_H
 #define ITKFASTGROWCUT_H
 
-#include <FastGrowCut.h>
+#include <Application/Tools/Algorithm/FastGrowCut.h>
 
 #include <itkObject.h>
 
