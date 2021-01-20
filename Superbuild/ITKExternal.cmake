@@ -61,6 +61,7 @@ SET(itk_CACHE_ARGS
   "-DModule_ITKBinaryMathematicalMorphology:BOOL=ON"
   "-DModule_ITKDistanceMap:BOOL=ON"
   "-DModule_ITKLevelSets:BOOL=ON"
+  "-DModule_ITKLabelVoting:BOOL=ON"
   "-DModule_ITKWatersheds:BOOL=ON"
   "-DModule_ITKImageFusion:BOOL=ON"
   "-DModule_ITKHDF5:BOOL=ON"

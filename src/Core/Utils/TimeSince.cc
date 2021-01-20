@@ -26,45 +26,18 @@
    DEALINGS IN THE SOFTWARE.
  */
 
-//Remove if not needed!
-/*#ifdef __APPLE__
-// for Mac URL handling
-#include <CoreFoundation/CoreFoundation.h>
-#endif*/
-
-// Boost
+//Boost
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
-// Qt
+//Qt
 #include <QtGui>
 
-//Core Includes
-// #include <Core/Interface/Interface.h>
+//Core
 #include <Core/Utils/TimeSince.h>
 
-//Application Includes
-//Remove what isn't needed
-//#include <Application/Tool/Tool.h>
-/*#include <Application/Layer/Layer.h>
-#include <Application/Layer/LayerManager.h>
-#include <Application/Layer/LayerGroup.h>
-#include <Application/LayerIO/LayerIO.h>
-#include <Application/LayerIO/Actions/ActionExportLayer.h>
-#include <Application/LayerIO/NrrdLayerExporter.h>
-#include <Application/ProjectManager/ProjectManager.h>
-#include <Application/ScriptManager/ScriptManager.h>*/
-
-//Remove if not needed!
-/*#include <Corview/Modules/Region/RegionModule.h>
-#include <Corview/Modules/Region/RegionManager.h>
-#include <Corview/Modules/Analysis/AnalysisModule.h>
-#include <Corview/Threading/AnalysisThread.h>*/
-
-//#include <tinyxml.h>
-
-// STL
+//STL
 #include <iostream>
 #include <map>
 
@@ -103,6 +76,13 @@ double TimeSince::get_seconds_since( std::string name )
 {
   double ms = TimeSince::get_time_since( name );
   return ms / 1000.0;
+}
+//---------------------------------------------------------------------------
+std::string TimeSince::format_double( double value, int precision )
+{
+  std::stringstream ss;
+  ss << std::fixed << std::setprecision( precision ) << value;
+  return ss.str();
 }
 //---------------------------------------------------------------------------
 } //end namespace Core

@@ -63,6 +63,7 @@ public:
   typedef itk::Image< unsigned int, 3> UINT_IMAGE_TYPE;
   typedef itk::Image< float, 3> FLOAT_IMAGE_TYPE;
   typedef itk::Image< unsigned char, 3> UCHAR_IMAGE_TYPE;
+  typedef itk::Image< unsigned char, 2> UCHAR_IMAGE_TYPE_2D;
   typedef itk::Image< unsigned long long, 3> ULONGLONG_IMAGE_TYPE;
   typedef Core::ITKImageDataT<float> FLOAT_CONTAINER_TYPE;
   typedef Core::ITKImageDataT<unsigned int> UINT_CONTAINER_TYPE;

@@ -30,30 +30,32 @@
 #define ITKFASTGROWCUT_H
 
 #include <Application/Tools/Algorithm/FastGrowCut.h>
+#include <Core/DataBlock/ITKImageData.h>
 
 #include <itkObject.h>
+#include <itkMacro.h>
 
 const unsigned short SrcDimension = 3;
 typedef float DistPixelType; // float type pixel for cost function
 typedef short SrcPixelType;
 typedef unsigned char LabPixelType;
 
-class itkFastGrowCut : public itkObject
+class itkFastGrowCut : public itk::Object
 {
 public:
   static itkFastGrowCut* New();
-  itkTypeMacro(itkFastGrowCut,itkObject);
+  itkTypeMacro(itkFastGrowCut,itk::Object);
 
   //set parameters of grow cut
-  itkSetObjectMacro( SourceVol, itkImageData );
-  itkSetObjectMacro( SeedVol, itkImageData );
+  itkSetObjectMacro( SourceVol, Core::ITKImageData );
+  itkSetObjectMacro( SeedVol, Core::ITKImageData );
 
   itkSetMacro( InitializationFlag, bool );
 
   //processing functions
   void Initialization();
   void RunFGC();
-  void PrintSelf( ostream &os, itkIndent indent );
+  void PrintSelf( std::ostream &os, itk::Indent indent );
 
 protected:
   itkFastGrowCut();
@@ -61,8 +63,8 @@ protected:
 
 private:
   //itk image data (from slicer)
-  itkImageData* SourceVol;
-  itkImageData* SeedVol;
+  Core::ITKImageData* m_SourceVol;
+  Core::ITKImageData* m_SeedVol;
 
   std::vector<LabPixelType> m_imSeedVec;
   std::vector<LabPixelType> m_imLabVec;
@@ -73,6 +75,6 @@ private:
   FGC::FastGrowCut<SrcPixelType, LabPixelType>* m_fastGC;
 
   //state variables
-  bool InitializationFlag;
+  bool m_InitializationFlag;
 };
 #endif // ifndef ITKFASTGROWCUT_H

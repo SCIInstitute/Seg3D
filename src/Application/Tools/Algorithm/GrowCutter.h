@@ -33,10 +33,6 @@
 
 #include <itkImage.h>
 
-//???
-//#include <Application/Tools/Algorithm/itkImageToVTKImageFilter.h>
-//#include <Application/Tools/Algorithm/itkVTKImageToImageFilter.h>
-
 //GrowCut
 #include <itkSmartPointer.h>
 #include <Application/Tools/Algorithm/itkFastGrowCut.h>
@@ -73,14 +69,6 @@ private:
 
   typedef itk::Image< unsigned char, 3 > ImageType;
   typedef itk::Image< short, 3 > DataImageType;
-
-  /*typedef itk::VTKImageToImageFilter<ImageType> VTKConnectorType;
-  typedef itk::ImageToVTKImageFilter<DataImageType> DataConnectorType;
-  typedef itk::ImageToVTKImageFilter<ImageType> ConnectorType;*/
-
-  //ConnectorType::Pointer connector1_;
-  //DataConnectorType::Pointer connector2_;
-  //VTKConnectorType::Pointer connector3_;
 
   itk::Image< unsigned char, 3 >::IndexType bbox_lower_;
   itk::Image< unsigned char, 3 >::IndexType bbox_upper_;

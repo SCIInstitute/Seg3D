@@ -31,25 +31,21 @@
 #include <itkSliceBySliceImageFilter.h>
 #include <itkInvertIntensityImageFilter.h>
 #include <itkBinaryMedianImageFilter.h>
-#include <Application/Layer/Actions/ActionComputeIsosurface.h>
 
 // Core includes
 #include <Core/DataBlock/MaskDataBlockManager.h>
 #include <Core/DataBlock/StdDataBlock.h>
 #include <Core/Utils/Log.h>
-#include <Core/Log/LogbookManager.h>
 
 // Application includes
+#include <Application/Layer/Actions/ActionComputeIsosurface.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/Layer/LayerGroup.h>
 #include <Application/StatusBar/StatusBar.h>
 #include <Application/Filters/LayerFilter.h>
 #include <Application/Filters/ITKFilter.h>
-#include <Applicatoin/Tools/ActionGrowCutPostProcess.h>
+#include <Application/Tools/Actions/ActionGrowCutPostProcess.h>
 #include <Application/Tools/Algorithm/IslandRemoval.h>
-
-//Remove later if not used
-//#include <Corview/Utils/CrvUtils.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -133,7 +129,7 @@ public:
       this->dst_layer_->update_progress_signal_( 0.33 );
 
       // step 2 : island removal
-      typedef Seg3D::IslandRemovalFilter< UCHAR_IMAGE_TYPE_2D, UCHAR_IMAGE_TYPE_2D > IslandRemovalFilterType;
+      typedef IslandRemovalFilter< UCHAR_IMAGE_TYPE_2D, UCHAR_IMAGE_TYPE_2D > IslandRemovalFilterType;
       typedef itk::SliceBySliceImageFilter< UCHAR_IMAGE_TYPE, UCHAR_IMAGE_TYPE > UcharSliceBySliceType;
 
       IslandRemovalFilterType::Pointer island_filter = IslandRemovalFilterType::New();

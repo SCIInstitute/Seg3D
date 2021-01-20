@@ -31,8 +31,6 @@
 //itk
 #include <itkImageRegionIterator.h>
 #include <itkImageImport.h>
-#include <itkSmartPointer.h>
-//#include <itkImageData.h>
 
 namespace Seg3D
 {
@@ -154,18 +152,6 @@ void GrowCutter::execute()
     std::cerr << "Bounding box changed, resetting growcut\n";
   }
 
-  // Convert the ITK label image to VTK image data
-  /*this->connector1_ = ConnectorType::New();
-  this->connector1_->SetInput( this->background_image_ );
-  this->connector1_->Update();
-  vtkImageData* added_seeds_image = this->connector1_->GetOutput();
-
-  // Convert the ITK source image to VTK image data
-  this->connector2_ = DataConnectorType::New();
-  this->connector2_->SetInput( this->data_image_ );
-  this->connector2_->Update();
-  vtkImageData* source_image_ = this->connector2_->GetOutput();*/
-
   // Call GrowCut
   // TODO: Add segmenter initialization flag check. See CarreraSliceEffect.py
   if ( this->initialization_flag_ == false )
@@ -183,12 +169,6 @@ void GrowCutter::execute()
     this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->RunFGC();
   }
-
-  // Convert grow cut result to ITK image for display
-  /*this->connector3_ = VTKConnectorType::New();
-  this->connector3_->SetInput( background_image_ );
-  this->connector3_->Update();
-  this->output_image_ = this->connector3_->GetOutput();*/
 }
 
 //---------------------------------------------------------------------------

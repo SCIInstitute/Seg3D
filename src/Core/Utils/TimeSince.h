@@ -36,12 +36,8 @@
 #include <string>
 #include <vector>
 
-//#include <QUrl>
-
 class QMainWindow;
 class QWidget;
-
-//#include <Application/Layer/LayerFWD.h>
 
 namespace Core {
 
@@ -50,6 +46,7 @@ public:
   static void start_timer( std::string name );
   static double get_time_since( std::string name );
   static double get_seconds_since( std::string name );
+  static std::string format_double( double value, int precision );
 };
 }
 

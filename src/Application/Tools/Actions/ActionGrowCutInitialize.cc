@@ -37,9 +37,9 @@
 #include <Application/Layer/LayerUndoBufferItem.h>
 #include <Application/UndoBuffer/UndoBuffer.h>
 
-#include <Application/Tools/ActionGrowCutInitialize.h>
+#include <Application/Tools/Actions/ActionGrowCutInitialize.h>
 
-#include <Core/Log/LogbookManager.h>
+//#include <Core/Log/LogbookManager.h>
 
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
@@ -104,7 +104,7 @@ bool ActionGrowCutInitialize::validate( Core::ActionContextHandle& context )
 
 bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  LOGBOOK_EVENT("GrowCut Initialize Layers");
+  //LOGBOOK_EVENT("GrowCut Initialize Layers");
 
   std::vector< std::string > names;
   names.push_back( "foreground" );
