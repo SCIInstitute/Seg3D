@@ -30,7 +30,6 @@
 #define ITKFASTGROWCUT_H
 
 #include <Application/Tools/Algorithm/FastGrowCut.h>
-#include <Core/DataBlock/ITKImageData.h>
 
 #include <itkObject.h>
 #include <itkMacro.h>
@@ -40,6 +39,7 @@ typedef float DistPixelType; // float type pixel for cost function
 typedef short SrcPixelType;
 typedef unsigned char LabPixelType;
 
+template <class TInputImage>
 class itkFastGrowCut : public itk::Object
 {
 public:
@@ -47,8 +47,8 @@ public:
   itkTypeMacro(itkFastGrowCut,itk::Object);
 
   //set parameters of grow cut
-  itkSetObjectMacro( SourceVol, Core::ITKImageData );
-  itkSetObjectMacro( SeedVol, Core::ITKImageData );
+  itkSetObjectMacro( SourceVol, TInputImage );
+  itkSetObjectMacro( SeedVol, TInputImage );
 
   itkSetMacro( InitializationFlag, bool );
 
@@ -63,8 +63,8 @@ protected:
 
 private:
   //itk image data (from slicer)
-  Core::ITKImageData* m_SourceVol;
-  Core::ITKImageData* m_SeedVol;
+  TInputImage* m_SourceVol;
+  TInputImage* m_SeedVol;
 
   std::vector<LabPixelType> m_imSeedVec;
   std::vector<LabPixelType> m_imLabVec;
