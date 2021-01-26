@@ -41,10 +41,10 @@ macro(CORE_ADD_LIBRARY name)
       XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${CMAKE_SOURCE_DIR}/Configuration/PrefixHeader.h
       XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES
       XCODE_ATTRIBUTE_PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR NO)
-    endif(${CMAKE_GENERATOR} MATCHES "Xcode")
-  endif(USE_PRECOMPILED_HEADERS)
+    endif()
+  endif()
 
-endmacro(CORE_ADD_LIBRARY)
+endmacro()
 
 macro (CORE_WRAP_XML outfiles )
 
@@ -60,8 +60,8 @@ foreach (it ${ARGN})
   ARGS ${it} ${outfile}
   DEPENDS ${it} XmlConverter)
   set(${outfiles} ${${outfiles}} ${outfile})
-endforeach(it)
-endmacro (CORE_WRAP_XML)
+endforeach()
+endmacro ()
 
 # A macro for importing GLSL shaders
 macro (CORE_IMPORT_SHADER outfiles )
@@ -81,5 +81,5 @@ macro (CORE_IMPORT_SHADER outfiles )
     ARGS ${it} ${outfile}
     DEPENDS ${it} ShaderImporter)
     set(${outfiles} ${${outfiles}} ${outfile})
-  endforeach(it)
-endmacro (CORE_IMPORT_SHADER)
+  endforeach()
+endmacro ()

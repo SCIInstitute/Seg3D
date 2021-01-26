@@ -59,5 +59,5 @@ if(WIN32)
 #                            PROPERTIES
 #                            COMPILE_FLAGS "/Ob1 /Gy /GF -W3 -wd4267 -wd4244"
 #                            LINK_FLAGS "/DYNAMICBASE:NO")
-  endif(NOT UNIX AND NOT BORLAND AND NOT MINGW)
-endif(WIN32)
+  endif()
+endif()

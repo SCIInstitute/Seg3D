@@ -73,7 +73,7 @@ if(WIN32)
   set_target_properties(${APPLICATION_NAME}
     PROPERTIES
     LINK_FLAGS "/INCREMENTAL:NO")
-endif(WIN32)
+endif()
 
 if(APPLE)
   set_target_properties(${APPLICATION_NAME}

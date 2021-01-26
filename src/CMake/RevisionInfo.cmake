@@ -58,7 +58,7 @@ function( GENERATE_REVISION_INFO )
   set( INFO_STRING "${INFO_STRING}#define GIT_${PROJECT_UPPERCASE_NAME}_REVISIONINFO \"${PROJECT_NAME} ${GIT_BUILD_INFO}\"\n\n" )
 
   #if( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
-  #else( Subversion_FOUND AND EXISTS ${PROJECT_BINARY_DIR}/.svn )
+  #else()
   #  set( INFO_STRING "#define ${PROJECT_UPPERCASE_NAME}_REVISION \"unknown\"\n" )
   #  set( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_DATE \"unknown\"\n" )
   #  set( INFO_STRING "${INFO_STRING}#define ${PROJECT_UPPERCASE_NAME}_REVISIONINFO \"${PROJECT_NAME} Revision:unknown\"\n\n" )

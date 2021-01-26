@@ -37,7 +37,7 @@ macro(REGISTER_LIBRARY_AND_CLASSES library)
   set(CLASS_REGISTRATION_LIST_TEMP ${CLASS_REGISTRATION_LIST} ${ARGN})
   set(CLASS_REGISTRATION_LIST ${CLASS_REGISTRATION_LIST_TEMP} CACHE INTERNAL "list of classes that need to be registered")
   
-endmacro(REGISTER_LIBRARY_AND_CLASSES)
+endmacro()
 
 
 macro(GENERATE_REGISTRATION_FILES)
@@ -46,7 +46,7 @@ macro(GENERATE_REGISTRATION_FILES)
   foreach(CLASS ${CLASS_REGISTRATION_LIST})
     get_filename_component(CLASSFILE ${CLASS} NAME_WE)
     set(CLASSLIST ${CLASSLIST} ${CLASSFILE})
-  endforeach(CLASS ${CLASS_REGISTRATION_LIST})
+  endforeach()
 
   list(REMOVE_DUPLICATES CLASSLIST)
 
@@ -59,15 +59,15 @@ macro(GENERATE_REGISTRATION_FILES)
 
     string(CONFIGURE "  register_@CLASS@();\n" IMPLEMENTATION)
     set(IMPLEMENTATIONS "${IMPLEMENTATIONS} ${IMPLEMENTATION}")
-  endforeach(CLASS ${CLASSLIST})
+  endforeach()
   
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Configuration/ClassRegistration.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/ClassRegistration.h
                  @ONLY)
                  
-endmacro(GENERATE_REGISTRATION_FILES)
+endmacro()
 
 macro(REGISTERED_TARGET_LINK_LIBRARIES library)
 target_link_libraries(${library} ${CLASS_REGISTRATION_LIBRARY_LIST})
 
-endmacro(REGISTERED_TARGET_LINK_LIBRARIES)
+endmacro()

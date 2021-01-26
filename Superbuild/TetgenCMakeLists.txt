@@ -73,7 +73,7 @@
 cmake_minimum_required(VERSION 2.6)
 if(COMMAND CMAKE_POLICY)
   cmake_policy(VERSION 2.6)
-endif(COMMAND CMAKE_POLICY)
+endif()
 
 project(tetgen)
 
@@ -93,9 +93,9 @@ if(WIN32 AND MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W1"
       CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  else(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+  else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1")
-  endif(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+  endif()
 
   set_source_files_properties(predicates.cxx
                               PROPERTIES

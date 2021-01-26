@@ -105,14 +105,14 @@ macro(ADD_PDF_DOCUMENT document)
     get_filename_component(png_name ${png_figure} NAME)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/${png_name}
       ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures/${png_name} COPYONLY)
-  endforeach(png_figure ${png_figures})
+  endforeach()
 
   file(GLOB_RECURSE pdf_figures "${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/*.pdf")
   foreach(pdf_figure ${pdf_figures})
     get_filename_component(pdf_name ${pdf_figure} NAME)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/${pdf_name}
       ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures/${pdf_name} COPYONLY)
-  endforeach(pdf_figure ${pdf_figures})
+  endforeach()
 
   if(APPLE)
     install(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf

@@ -62,7 +62,7 @@ target_link_libraries(Application_Project
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY}
             /System/Library/Frameworks/CoreServices.framework)
-else(APPLE)
+else()
 target_link_libraries(Application_Project
                       Core_Action
                       Core_State
@@ -75,5 +75,5 @@ target_link_libraries(Application_Project
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY})
 
-endif(APPLE)
+endif()
           

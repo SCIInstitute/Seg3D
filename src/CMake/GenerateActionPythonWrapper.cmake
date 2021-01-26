@@ -33,7 +33,7 @@ set(ACTION_PYTHON_WRAPPER_TEMPLATE "" CACHE INTERNAL "String template for genera
 file(STRINGS ${CMAKE_SOURCE_DIR}/Configuration/ActionPythonWrapperFunctionSource.in ACTION_PYTHON_TEMPLATE_STRINGS)
 foreach(LINE ${ACTION_PYTHON_TEMPLATE_STRINGS})
   set(ACTION_PYTHON_WRAPPER_TEMPLATE "${ACTION_PYTHON_WRAPPER_TEMPLATE}${LINE}\n")
-endforeach(LINE ${ACTION_PYTHON_TEMPLATE_STRINGS})
+endforeach()
 
 macro(GENERATE_ACTION_PYTHON_WRAPPER wrapper_file proj)
   set(ACTION_LIST "")
@@ -44,7 +44,7 @@ macro(GENERATE_ACTION_PYTHON_WRAPPER wrapper_file proj)
   string(SUBSTRING ${ACTIONFILE} 6 ${ACTION_NAME_LENGTH} ACTION_NAME)
   string(TOLOWER ${ACTION_NAME} ACTION_NAME)
     set(ACTION_LIST ${ACTION_LIST} ${ACTION_NAME})
-  endforeach(ACTION ${ARGN})
+  endforeach()
 
   list(REMOVE_DUPLICATES ACTION_LIST)
   set(ACTION_PYTHON_WRAPPER_REGISTRATION_LIST ${ACTION_PYTHON_WRAPPER_REGISTRATION_LIST} ${ACTION_LIST} CACHE INTERNAL "")
@@ -59,13 +59,13 @@ macro(GENERATE_ACTION_PYTHON_WRAPPER wrapper_file proj)
   string(CONFIGURE "void register_action_@ACTION@_python_wrapper()\n{\n\tboost::python::def(\"@ACTION@\", boost::python::raw_function(action_@ACTION@_python_wrapper));\n}\n" 
        WRAPPER_REGISTRATION @ONLY)
   set(WRAPPER_REGISTRATIONS "${WRAPPER_REGISTRATIONS}${WRAPPER_REGISTRATION}")
-  endforeach(ACTION ${ACTION_LIST})
+  endforeach()
   
   set(${wrapper_file} ${CMAKE_CURRENT_BINARY_DIR}/${proj}_ActionPythonWrapper.cc)
   configure_file(${CMAKE_SOURCE_DIR}/Configuration/ActionPythonWrapper.cc.in
                  ${${wrapper_file}}
                  @ONLY)
-endmacro(GENERATE_ACTION_PYTHON_WRAPPER)
+endmacro()
 
 macro(GENERATE_ACTION_PYTHON_WRAPPER_REGISTRATION_FILE)
   set(DECLARATIONS "")
@@ -77,9 +77,9 @@ macro(GENERATE_ACTION_PYTHON_WRAPPER_REGISTRATION_FILE)
   
   string(CONFIGURE "\tregister_action_@ACTION@_python_wrapper();\n" IMPLEMENTATION)
   set(IMPLEMENTATIONS "${IMPLEMENTATIONS}${IMPLEMENTATION}")
-  endforeach(ACTION ${ACTION_PYTHON_WRAPPER_REGISTRATION_LIST})
+  endforeach()
   
   configure_file(${CMAKE_SOURCE_DIR}/Configuration/ActionPythonWrapperRegistration.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/ActionPythonWrapperRegistration.h
                  @ONLY)
-endmacro(GENERATE_ACTION_PYTHON_WRAPPER_REGISTRATION_FILE)
+endmacro()
