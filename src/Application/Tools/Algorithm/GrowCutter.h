@@ -48,10 +48,13 @@ public:
   GrowCutter();
   ~GrowCutter();
 
-  void set_data_image( itk::Image<short, 3>::Pointer data_image );
-  void set_foreground_image( itk::Image<unsigned char, 3>::Pointer foreground_image );
-  void set_background_image( itk::Image<unsigned char, 3>::Pointer background_image );
-  void set_output_image( itk::Image<unsigned char, 3>::Pointer output_image_ );
+  typedef itk::Image< unsigned char, 3 > ImageType;
+  typedef itk::Image< short, 3 > DataImageType;
+
+  void set_data_image( typename DataImageType::Pointer data_image );
+  void set_foreground_image( typename ImageType::Pointer foreground_image );
+  void set_background_image( typename ImageType::Pointer background_image );
+  void set_output_image( typename ImageType::Pointer output_image_ );
   void execute();
 
   itk::Image<unsigned char, 3>::Pointer get_output();
@@ -60,18 +63,15 @@ private:
 
   void reset_growcut();
 
-  itk::Image<short, 3>::Pointer data_image_;
-  itk::Image<unsigned char, 3>::Pointer foreground_image_;
-  itk::Image<unsigned char, 3>::Pointer background_image_;
-  itk::Image<unsigned char, 3>::Pointer output_image_;
+  typename DataImageType::Pointer data_image_;
+  typename ImageType::Pointer foreground_image_;
+  typename ImageType::Pointer background_image_;
+  typename ImageType::Pointer output_image_;
   itk::SmartPointer<itkFastGrowCut> fast_grow_cut_;
   bool initialization_flag_;
 
-  typedef itk::Image< unsigned char, 3 > ImageType;
-  typedef itk::Image< short, 3 > DataImageType;
-
-  itk::Image< unsigned char, 3 >::IndexType bbox_lower_;
-  itk::Image< unsigned char, 3 >::IndexType bbox_upper_;
+  typename ImageType::IndexType bbox_lower_;
+  typename ImageType::IndexType bbox_upper_;
 };
 }
 

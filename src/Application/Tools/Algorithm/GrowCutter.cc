@@ -51,25 +51,25 @@ GrowCutter::~GrowCutter()
 {}
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_data_image( itk::Image<short, 3>::Pointer data_image )
+void GrowCutter::set_data_image( typename DataImageType::Pointer data_image )
 {
   this->data_image_ = data_image;
 }
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_foreground_image( itk::Image<unsigned char, 3>::Pointer foreground_image )
+void GrowCutter::set_foreground_image( typename ImageType::Pointer foreground_image )
 {
   this->foreground_image_ = foreground_image;
 }
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_background_image( itk::Image<unsigned char, 3>::Pointer background_image )
+void GrowCutter::set_background_image( typename ImageType::Pointer background_image )
 {
   this->background_image_ = background_image;
 }
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_output_image( itk::Image<unsigned char, 3>::Pointer output_image )
+void GrowCutter::set_output_image( typename ImageType::Pointer output_image )
 {
   this->output_image_ = output_image;
 }
@@ -172,7 +172,7 @@ void GrowCutter::execute()
 }
 
 //---------------------------------------------------------------------------
-itk::Image<unsigned char, 3>::Pointer GrowCutter::get_output()
+typename GrowCutter::ImageType::Pointer GrowCutter::get_output()
 {
   return this->output_image_;
 }
