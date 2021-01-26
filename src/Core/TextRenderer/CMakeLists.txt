@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_TEXTRENDERER_SRCS
+set(CORE_TEXTRENDERER_SRCS
   FreeTypeLibrary.h
   FreeTypeLibrary.cc
   FreeTypeFace.h
@@ -45,7 +45,7 @@ SET(CORE_TEXTRENDERER_SRCS
   
 CORE_ADD_LIBRARY(Core_TextRenderer ${CORE_TEXTRENDERER_SRCS})
       
-TARGET_LINK_LIBRARIES(Core_TextRenderer
+target_link_libraries(Core_TextRenderer
             Core_Utils
             ${SCI_FREETYPE_LIBRARY}
             ${SCI_BOOST_LIBRARY})

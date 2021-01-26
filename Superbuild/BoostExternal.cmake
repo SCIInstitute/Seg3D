@@ -28,22 +28,22 @@
 # found at https://github.com/maidsafe/MaidSafe/blob/master/cmake_modules/add_boost.cmake
 # and code borrowed from ITK4 HDFMacros.cmake
 
-SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # disable auto linking
 # also set in Seg3D?
-SET(boost_CXX_Flags "-DBOOST_ALL_NO_LIB=1")
-IF(APPLE)
-  LIST(APPEND boost_CXX_Flag "-DBOOST_LCAST_NO_WCHAR_T" "-DBOOST_THREAD_DONT_USE_ATOMIC")
-ENDIF()
-IF(WIN32)
-  LIST(APPEND boost_CXX_Flag "-DBOOST_BIND_ENABLE_STDCALL")
-ENDIF()
+set(boost_CXX_Flags "-DBOOST_ALL_NO_LIB=1")
+if(APPLE)
+  list(APPEND boost_CXX_Flag "-DBOOST_LCAST_NO_WCHAR_T" "-DBOOST_THREAD_DONT_USE_ATOMIC")
+endif()
+if(WIN32)
+  list(APPEND boost_CXX_Flag "-DBOOST_BIND_ENABLE_STDCALL")
+endif()
 
-SET( boost_DEPENDENCIES )
+set( boost_DEPENDENCIES )
 
 # explicitly set library list
-SET(boost_Libraries
+set(boost_Libraries
   "atomic"
   "date_time"
   "exception"
@@ -53,27 +53,27 @@ SET(boost_Libraries
   "thread"
   CACHE INTERNAL "Boost library name.")
 
-IF(BUILD_WITH_PYTHON)
-  ADD_DEFINITIONS(-DBOOST_PYTHON_STATIC_LIB=1)
-  LIST(APPEND boost_Libraries python)
-  LIST(APPEND boost_DEPENDENCIES Python_external)
-  LIST(APPEND boost_CXX_Flag "-DBOOST_PYTHON_STATIC_MODULE" "-DBOOST_PYTHON_STATIC_LIB")
-ENDIF()
+if(BUILD_WITH_PYTHON)
+  add_definitions(-DBOOST_PYTHON_STATIC_LIB=1)
+  list(APPEND boost_Libraries python)
+  list(APPEND boost_DEPENDENCIES Python_external)
+  list(APPEND boost_CXX_Flag "-DBOOST_PYTHON_STATIC_MODULE" "-DBOOST_PYTHON_STATIC_LIB")
+endif()
 
 # TODO: set up 64-bit build detection
 # Boost Jam needs to have 64-bit build explicitly configured
-IF(WIN32)
-  SET(FORCE_64BIT_BUILD ON)
-  SET(boost_GIT_TAG "origin/v1.67.0")
-ELSE()
-    SET(boost_GIT_TAG "origin/v1.58.0")
-ENDIF()
+if(WIN32)
+  set(FORCE_64BIT_BUILD ON)
+  set(boost_GIT_TAG "origin/v1.67.0")
+else()
+    set(boost_GIT_TAG "origin/v1.58.0")
+endif()
 
-SET(boost_GIT_URL "https://github.com/CIBC-Internal/boost.git")
+set(boost_GIT_URL "https://github.com/CIBC-Internal/boost.git")
 
-IF(TRAVIS_BUILD)
-  LIST(APPEND boost_CXX_Flag "-w")
-ENDIF()
+if(TRAVIS_BUILD)
+  list(APPEND boost_CXX_Flag "-w")
+endif()
 
 # TODO: fix install step
 #
@@ -99,24 +99,24 @@ ExternalProject_Add(Boost_external
 
 ExternalProject_Get_Property(Boost_external INSTALL_DIR)
 ExternalProject_Get_Property(Boost_external SOURCE_DIR)
-SET(SCI_BOOST_INCLUDE ${SOURCE_DIR})
-SET(SCI_BOOST_LIBRARY_DIR ${SOURCE_DIR}/lib)
-SET(SCI_BOOST_USE_FILE ${INSTALL_DIR}/UseBoost.cmake)
+set(SCI_BOOST_INCLUDE ${SOURCE_DIR})
+set(SCI_BOOST_LIBRARY_DIR ${SOURCE_DIR}/lib)
+set(SCI_BOOST_USE_FILE ${INSTALL_DIR}/UseBoost.cmake)
 
-SET(BOOST_PREFIX "boost_")
-SET(THREAD_POSTFIX "-mt")
+set(BOOST_PREFIX "boost_")
+set(THREAD_POSTFIX "-mt")
 
-SET(SCI_BOOST_LIBRARY)
+set(SCI_BOOST_LIBRARY)
 
-FOREACH(lib ${boost_Libraries})
-  SET(LIB_NAME "${BOOST_PREFIX}${lib}${THREAD_POSTFIX}")
-  LIST(APPEND SCI_BOOST_LIBRARY ${LIB_NAME})
-ENDFOREACH()
+foreach(lib ${boost_Libraries})
+  set(LIB_NAME "${BOOST_PREFIX}${lib}${THREAD_POSTFIX}")
+  list(APPEND SCI_BOOST_LIBRARY ${LIB_NAME})
+endforeach()
 
 # Boost is special case - normally this should be handled in external library repo
-CONFIGURE_FILE(${SUPERBUILD_DIR}/BoostConfig.cmake.in ${INSTALL_DIR}/BoostConfig.cmake @ONLY)
-CONFIGURE_FILE(${SUPERBUILD_DIR}/UseBoost.cmake ${SCI_BOOST_USE_FILE} COPYONLY)
+configure_file(${SUPERBUILD_DIR}/BoostConfig.cmake.in ${INSTALL_DIR}/BoostConfig.cmake @ONLY)
+configure_file(${SUPERBUILD_DIR}/UseBoost.cmake ${SCI_BOOST_USE_FILE} COPYONLY)
 
-SET(Boost_DIR ${INSTALL_DIR} CACHE PATH "")
+set(Boost_DIR ${INSTALL_DIR} CACHE PATH "")
 
-MESSAGE(STATUS "Boost_DIR: ${Boost_DIR}")
+message(STATUS "Boost_DIR: ${Boost_DIR}")

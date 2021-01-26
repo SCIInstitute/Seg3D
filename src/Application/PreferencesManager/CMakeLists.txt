@@ -30,12 +30,12 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_PREFERENCESMANAGER_SRCS
+set(APPLICATION_PREFERENCESMANAGER_SRCS
   PreferencesManager.h
   PreferencesManager.cc
 )
 
-SET(APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS
+set(APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS
   Actions/ActionSavePreferences.h
   Actions/ActionSavePreferences.cc
 )
@@ -44,7 +44,7 @@ CORE_ADD_LIBRARY(Application_PreferencesManager ${APPLICATION_PREFERENCESMANAGER
   ${APPLICATION_PREFERENCESMANAGER_ACTIONS_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_PreferencesManager
+target_link_libraries(Application_PreferencesManager
   Core_Utils
   Core_EventHandler
   Core_Application

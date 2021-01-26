@@ -26,4 +26,4 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(ShaderImporter)
+add_subdirectory(ShaderImporter)

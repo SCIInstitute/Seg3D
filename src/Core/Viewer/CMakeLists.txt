@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_VIEWER_SRCS
+set(CORE_VIEWER_SRCS
   AbstractViewer.h
   AbstractViewer.cc
   Mouse.h
@@ -44,7 +44,7 @@ SET(CORE_VIEWER_SRCS
 
 CORE_ADD_LIBRARY(Core_Viewer ${CORE_VIEWER_SRCS})
 
-TARGET_LINK_LIBRARIES(Core_Viewer 
+target_link_libraries(Core_Viewer
   Core_State
   Core_Utils
   Core_Renderer 

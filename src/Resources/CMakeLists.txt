@@ -31,21 +31,21 @@
 # Set sources
 ##################################################
 
-SET(RESOURCES_QTRESOURCES_SRCS
+set(RESOURCES_QTRESOURCES_SRCS
   QtResources.cc
 )
 
-SET(RESOURCES_QTRESOURCES_MOC_SRCS
+set(RESOURCES_QTRESOURCES_MOC_SRCS
 )
 
-SET(RESOURCES_QTRESOURCES_NO_MOC_SRCS
+set(RESOURCES_QTRESOURCES_NO_MOC_SRCS
   QtResources.h
 )
 
-SET(RESOURCES_QTRESOURCES_UI_SRCS
+set(RESOURCES_QTRESOURCES_UI_SRCS
 )
 
-SET(RESOURCES_QTRESOURCES_RCC_SRCS
+set(RESOURCES_QTRESOURCES_RCC_SRCS
   QtResources.qrc
 )
 
@@ -72,7 +72,7 @@ QT5_WRAP_CPP(RESOURCES_QTRESOURCES_QT_MOC_SRCS ${RESOURCES_QTRESOURCES_MOC_SRCS}
 # by the moc and ui builder
 ##################################################
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
 # Build the Components library
@@ -87,9 +87,9 @@ CORE_ADD_LIBRARY(Resources_QtResources
   ${RESOURCES_QTRESOURCES_QT_RCC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Resources_QtResources
+target_link_libraries(Resources_QtResources
 )
 
 target_link_libraries(Resources_QtResources Qt5::Core)
 
-SET(RESOURCES_LIBRARY Resources_QtResources CACHE INTERNAL "Resources library." FORCE)
+set(RESOURCES_LIBRARY Resources_QtResources CACHE INTERNAL "Resources library." FORCE)

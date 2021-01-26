@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_PROJECT_SRCS
+set(APPLICATION_PROJECT_SRCS
   DataManager.h
   DataManager.cc
   InputFilesImporter.h
@@ -43,14 +43,14 @@ SET(APPLICATION_PROJECT_SRCS
   ProjectNote.h
 )
 
-SET(APPLICATION_PROJECT_ACTIONS_SRCS
+set(APPLICATION_PROJECT_ACTIONS_SRCS
 )
 
 CORE_ADD_LIBRARY(Application_Project ${APPLICATION_PROJECT_SRCS}
             ${APPLICATION_PROJECT_ACTIONS_SRCS} )
             
-IF(APPLE)
-TARGET_LINK_LIBRARIES(Application_Project
+if(APPLE)
+target_link_libraries(Application_Project
                       Core_Action
                       Core_State
                       Core_Utils
@@ -62,8 +62,8 @@ TARGET_LINK_LIBRARIES(Application_Project
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY}
             /System/Library/Frameworks/CoreServices.framework)
-ELSE(APPLE)                    
-TARGET_LINK_LIBRARIES(Application_Project
+else(APPLE)
+target_link_libraries(Application_Project
                       Core_Action
                       Core_State
                       Core_Utils
@@ -75,5 +75,5 @@ TARGET_LINK_LIBRARIES(Application_Project
                       ${SCI_BOOST_LIBRARY}
                       ${SCI_SQLITE_LIBRARY})
 
-ENDIF(APPLE)          
+endif(APPLE)
           

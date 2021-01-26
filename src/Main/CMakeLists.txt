@@ -30,7 +30,7 @@
 # Set Seg3D main sources
 ###########################################
 
-SET(MAIN_SRCS
+set(MAIN_SRCS
   main.cc
   Seg3DBase.h
   Seg3DBase.cc
@@ -44,34 +44,34 @@ SET(MAIN_SRCS
 # Build the Seg3D executable
 ###########################################
 
-IF(NOT BUILD_STANDALONE_LIBRARY)
-  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
-  ADD_DEFINITIONS(-DAPPLICATION_NAME=${APPLICATION_NAME})
-  IF(APPLE)
-    LIST(APPEND MAIN_SRCS ${APPLICATION_OSX_ICON_FULL_PATH})
-    SET_SOURCE_FILES_PROPERTIES(${APPLICATION_OSX_ICON_FULL_PATH}
+if(NOT BUILD_STANDALONE_LIBRARY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
+  add_definitions(-DAPPLICATION_NAME=${APPLICATION_NAME})
+  if(APPLE)
+    list(APPEND MAIN_SRCS ${APPLICATION_OSX_ICON_FULL_PATH})
+    set_source_files_properties(${APPLICATION_OSX_ICON_FULL_PATH}
       PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
-    ADD_EXECUTABLE(${APPLICATION_NAME} MACOSX_BUNDLE ${MAIN_SRCS})
-    SET_TARGET_PROPERTIES(${APPLICATION_NAME}
+    add_executable(${APPLICATION_NAME} MACOSX_BUNDLE ${MAIN_SRCS})
+    set_target_properties(${APPLICATION_NAME}
       PROPERTIES
       MACOSX_BUNDLE_INFO_PLIST ${SEG3D_SOURCE_DIR}/Resources/info.plist
       MACOSX_BUNDLE_ICON_FILE ${APPLICATION_OSX_ICON}
     )
-  ELSE()
-    IF(WIN32)
-      LIST(APPEND MAIN_SRCS ${APPLICATION_WINDOWS_RC})
-      IF(SEG3D_SHOW_CONSOLE)
-        ADD_EXECUTABLE(${APPLICATION_NAME} ${MAIN_SRCS})
-      ELSE()
-        ADD_EXECUTABLE(${APPLICATION_NAME} WIN32 ${MAIN_SRCS})
-      ENDIF()
-    ELSE()
-      ADD_EXECUTABLE(${APPLICATION_NAME} ${MAIN_SRCS})
-    ENDIF()
-  ENDIF()
+  else()
+    if(WIN32)
+      list(APPEND MAIN_SRCS ${APPLICATION_WINDOWS_RC})
+      if(SEG3D_SHOW_CONSOLE)
+        add_executable(${APPLICATION_NAME} ${MAIN_SRCS})
+      else()
+        add_executable(${APPLICATION_NAME} WIN32 ${MAIN_SRCS})
+      endif()
+    else()
+      add_executable(${APPLICATION_NAME} ${MAIN_SRCS})
+    endif()
+  endif()
 
-TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
+target_link_libraries(${APPLICATION_NAME}
   ${SCI_BOOST_LIBRARY}
   Core_Utils
   Core_DataBlock
@@ -96,26 +96,26 @@ TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
   ${RESOURCES_LIBRARY}
 )
 
-IF(WIN32)
-  TARGET_LINK_LIBRARIES(${APPLICATION_NAME} ${Qt5Core_QTMAIN_LIBRARIES} )
-  SET_TARGET_PROPERTIES(${APPLICATION_NAME}
+if(WIN32)
+  target_link_libraries(${APPLICATION_NAME} ${Qt5Core_QTMAIN_LIBRARIES} )
+  set_target_properties(${APPLICATION_NAME}
     PROPERTIES
     LINK_FLAGS "/INCREMENTAL:NO")
-ENDIF()
+endif()
 
-IF(APPLE)
-  SET_TARGET_PROPERTIES(${APPLICATION_NAME}
+if(APPLE)
+  set_target_properties(${APPLICATION_NAME}
     PROPERTIES
     LINK_FLAGS "-framework CoreGraphics"
   )
-ENDIF()
+endif()
 
-IF(BUILD_WITH_PYTHON)
-  TARGET_LINK_LIBRARIES(${APPLICATION_NAME}
+if(BUILD_WITH_PYTHON)
+  target_link_libraries(${APPLICATION_NAME}
     Core_Python
     Application_Socket
   )
-ENDIF()
+endif()
 
 # add libraries with plug-ins and extensions
 REGISTERED_TARGET_LINK_LIBRARIES(${APPLICATION_NAME})
@@ -130,18 +130,18 @@ REGISTERED_TARGET_LINK_LIBRARIES(${APPLICATION_NAME})
 # operating system
 ###########################################
 
-IF(APPLE)
+if(APPLE)
   # set up app bundle
-  ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+  add_custom_command(TARGET ${APPLICATION_NAME}
     POST_BUILD
     # configure Qt libs
     COMMAND ${MACDEPLOYQT} ${APPLICATION_NAME}.app -verbose=${MACDEPLOYQT_OUTPUT_LEVEL}
     WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
-  IF(BUILD_WITH_PYTHON)
-    SET(VERSION_PATH Versions/${SCI_PYTHON_VERSION_SHORT})
-    SET(FRAMEWORK_PATH Frameworks/Python.framework)
-    SET(PYTHON_PATH ${APPLICATION_NAME}.app/Contents/${FRAMEWORK_PATH}/${VERSION_PATH})
-      ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+  if(BUILD_WITH_PYTHON)
+    set(VERSION_PATH Versions/${SCI_PYTHON_VERSION_SHORT})
+    set(FRAMEWORK_PATH Frameworks/Python.framework)
+    set(PYTHON_PATH ${APPLICATION_NAME}.app/Contents/${FRAMEWORK_PATH}/${VERSION_PATH})
+      add_custom_command(TARGET ${APPLICATION_NAME}
       POST_BUILD
       # macdeployqt puts frameworks in app/Content/Frameworks
       COMMAND ${CMAKE_COMMAND} ARGS -E chdir ${APPLICATION_NAME}.app/Contents/Frameworks tar xf ${SCI_PYTHON_FRAMEWORK_ARCHIVE}
@@ -151,58 +151,58 @@ IF(APPLE)
       # TODO: other executables...
       COMMAND  install_name_tool -change ${SCI_PYTHON_FRAMEWORK}/${VERSION_PATH}/Python @executable_path/../Python ${PYTHON_PATH}/bin/python${SCI_PYTHON_VERSION_SHORT}
       WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
-  ENDIF()
-ELSEIF(WIN32)
-  MESSAGE(STATUS "Setting ${WINDEPLOYQT} Command for path ${SEG3D_BINARY_DIR}/$<CONFIG>")
-  ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+  endif()
+elseif(WIN32)
+  message(STATUS "Setting ${WINDEPLOYQT} Command for path ${SEG3D_BINARY_DIR}/$<CONFIG>")
+  add_custom_command(TARGET ${APPLICATION_NAME}
   POST_BUILD
   # copy Qt libs
   COMMAND ${WINDEPLOYQT} ARGS --verbose 5 -core -widgets -gui -opengl --libdir ${SEG3D_BINARY_DIR}/$<CONFIG> ${SEG3D_BINARY_DIR}/$<CONFIG>/${APPLICATION_NAME}.exe
   )
 
-  IF(BUILD_WITH_PYTHON)
+  if(BUILD_WITH_PYTHON)
     # TODO: change $<CONFIGURATION> to $<CONFIG> when upgrading to cmake 3
     # TODO: copy python dll
-    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+    add_custom_command(TARGET ${APPLICATION_NAME}
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} ARGS -E make_directory $<CONFIG>/${PYTHON_MODULE_SEARCH_PATH}
       COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${SCI_PYTHON_MODULE_LIBRARY_PATH} $<CONFIG>/${PYTHON_MODULE_SEARCH_PATH}
       WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
-  ENDIF()
-ELSE()
-  IF(BUILD_WITH_PYTHON)
-    ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+  endif()
+else()
+  if(BUILD_WITH_PYTHON)
+    add_custom_command(TARGET ${APPLICATION_NAME}
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${PYTHON_MODULE_SEARCH_PATH}
       COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${SCI_PYTHON_MODULE_LIBRARY_PATH} ${PYTHON_MODULE_SEARCH_PATH}
       WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
-    IF(SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH AND EXISTS ${SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH})
-      ADD_CUSTOM_COMMAND(TARGET ${APPLICATION_NAME}
+    if(SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH AND EXISTS ${SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH})
+      add_custom_command(TARGET ${APPLICATION_NAME}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory  ${SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH} ${PYTHON_MODULE_SEARCH_PATH}
         WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
-    ENDIF()
-  ENDIF()
-ENDIF()
+    endif()
+  endif()
+endif()
 
-IF(APPLE)
-  INSTALL(TARGETS ${APPLICATION_NAME}
+if(APPLE)
+  install(TARGETS ${APPLICATION_NAME}
         RUNTIME DESTINATION .
         BUNDLE DESTINATION .
   )
-ELSE()
-  GET_FILENAME_COMPONENT(QTCORENAME ${QtCore_location_Release} NAME_WE)
-  GET_FILENAME_COMPONENT(QTGUINAME ${QtGui_location_Release} NAME_WE)
-  GET_FILENAME_COMPONENT(QTOPENGLNAME ${QtOpenGL_location_Release} NAME_WE)
-  GET_FILENAME_COMPONENT(QTWIDGETSNAME ${QtWidgets_location_Release} NAME_WE)
-  GET_FILENAME_COMPONENT(QTSVGNAME ${QtSvg_location_Release} NAME_WE)
+else()
+  get_filename_component(QTCORENAME ${QtCore_location_Release} NAME_WE)
+  get_filename_component(QTGUINAME ${QtGui_location_Release} NAME_WE)
+  get_filename_component(QTOPENGLNAME ${QtOpenGL_location_Release} NAME_WE)
+  get_filename_component(QTWIDGETSNAME ${QtWidgets_location_Release} NAME_WE)
+  get_filename_component(QTSVGNAME ${QtSvg_location_Release} NAME_WE)
 
-  IF(WIN32)
-    INSTALL(TARGETS ${APPLICATION_NAME}
+  if(WIN32)
+    install(TARGETS ${APPLICATION_NAME}
       RUNTIME DESTINATION bin
     )
 
-    INSTALL(PROGRAMS
+    install(PROGRAMS
       ${SEG3D_BINARY_DIR}/$<CONFIG>/${QTCORENAME}.dll
       ${SEG3D_BINARY_DIR}/$<CONFIG>/${QTGUINAME}.dll
       ${SEG3D_BINARY_DIR}/$<CONFIG>/${QTOPENGLNAME}.dll
@@ -211,68 +211,68 @@ ELSE()
         DESTINATION bin
     )
 
-    INSTALL(DIRECTORY
+    install(DIRECTORY
       ${SEG3D_BINARY_DIR}/\${CMAKE_INSTALL_CONFIG_NAME}/platforms/
         DESTINATION bin/platforms
     )
 
-    INSTALL(DIRECTORY
+    install(DIRECTORY
       ${SEG3D_BINARY_DIR}/\${CMAKE_INSTALL_CONFIG_NAME}/translations/
         DESTINATION bin/translations
     )
 
-    INSTALL(DIRECTORY
+    install(DIRECTORY
       ${SEG3D_BINARY_DIR}/\${CMAKE_INSTALL_CONFIG_NAME}/imageformats/
         DESTINATION bin/imageformats
     )
 
-    INSTALL(FILES
+    install(FILES
       ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt
         DESTINATION bin
     )
 
-    IF(BUILD_WITH_PYTHON)
-      INSTALL(PROGRAMS
+    if(BUILD_WITH_PYTHON)
+      install(PROGRAMS
         ${SCI_PYTHON_DLL_PATH}
           DESTINATION bin
       )
 
-      INSTALL(DIRECTORY
+      install(DIRECTORY
         "${SCI_PYTHON_MODULE_LIBRARY_PATH}/"
           DESTINATION bin/${PYTHON_MODULE_SEARCH_PATH}
       )
-    ENDIF()
-#  ELSE()
-#    INSTALL(TARGETS ${APPLICATION_NAME}
+    endif()
+#  else()
+#    install(TARGETS ${APPLICATION_NAME}
 #      RUNTIME DESTINATION bin
 #    )
 #
-#    INSTALL(FILES
+#    install(FILES
 #      ${QT_QTCORE_LIBRARY_RELEASE}.${QT_VERSION}
 #      ${QT_QTGUI_LIBRARY_RELEASE}.${QT_VERSION}
 #      ${QT_QTOPENGL_LIBRARY_RELEASE}.${QT_VERSION}
 #      DESTINATION lib
 #    )
 #
-#    INSTALL(FILES
+#    install(FILES
 #      ${CMAKE_SOURCE_DIR}/ReleaseNotes.txt
 #      DESTINATION bin
 #    )
 #
-#    IF(BUILD_WITH_PYTHON)
-#      INSTALL(FILES
+#    if(BUILD_WITH_PYTHON)
+#      install(FILES
 #        ${SCI_PYTHON_DLL_PATH}
 #        DESTINATION bin
 #      )
-#      INSTALL(DIRECTORY
+#      install(DIRECTORY
 #        ${SCI_PYTHON_MODULE_LIBRARY_PATH}
 #        DESTINATION bin/${PYTHON_MODULE_SEARCH_PATH}
 #      )
-#    ENDIF()
-  ENDIF()
-ENDIF()
-ENDIF()
+#    endif()
+  endif()
+endif()
+endif()
 
-IF(BUILD_STANDALONE_LIBRARY)
-  ADD_SUBDIRECTORY(Seg3DLib)
-ENDIF()
+if(BUILD_STANDALONE_LIBRARY)
+  add_subdirectory(Seg3DLib)
+endif()

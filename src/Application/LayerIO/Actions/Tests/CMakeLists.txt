@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Application_LayerIO_Tests_SRCS
+set(Application_LayerIO_Tests_SRCS
   ActionExportVectorTests.cc
 )
 
@@ -33,7 +33,7 @@ REGISTER_UNIT_TEST(Application_LayerIO_Tests
   ${Application_LayerIO_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_LayerIO_Tests
+target_link_libraries(Application_LayerIO_Tests
   Application_LayerIO
   Testing_Utils
   gtest

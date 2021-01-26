@@ -26,60 +26,60 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-OPTION(USE_PRECOMPILED_HEADERS "Use precompiled headers to speed up compilation" OFF)
+option(USE_PRECOMPILED_HEADERS "Use precompiled headers to speed up compilation" OFF)
 
-MACRO(CORE_ADD_LIBRARY name)
+macro(CORE_ADD_LIBRARY name)
 
-  ADD_LIBRARY( ${name} STATIC ${ARGN})
+  add_library( ${name} STATIC ${ARGN})
 
-  IF(USE_PRECOMPILED_HEADERS)
-    IF(${CMAKE_GENERATOR} MATCHES "Xcode")
-    FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Precompiled )
+  if(USE_PRECOMPILED_HEADERS)
+    if(${CMAKE_GENERATOR} MATCHES "Xcode")
+    file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Precompiled )
   
-      SET_TARGET_PROPERTIES( ${name} PROPERTIES 
+      set_target_properties( ${name} PROPERTIES 
       XCODE_ATTRIBUTE_SHARED_PRECOMPS_DIR ${CMAKE_BINARY_DIR}/Precompiled
       XCODE_ATTRIBUTE_GCC_PREFIX_HEADER ${CMAKE_SOURCE_DIR}/Configuration/PrefixHeader.h
       XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER YES
       XCODE_ATTRIBUTE_PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR NO)
-    ENDIF(${CMAKE_GENERATOR} MATCHES "Xcode")
-  ENDIF(USE_PRECOMPILED_HEADERS)
+    endif(${CMAKE_GENERATOR} MATCHES "Xcode")
+  endif(USE_PRECOMPILED_HEADERS)
 
-ENDMACRO(CORE_ADD_LIBRARY)
+endmacro(CORE_ADD_LIBRARY)
 
-MACRO (CORE_WRAP_XML outfiles )
+macro (CORE_WRAP_XML outfiles )
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-FOREACH (it ${ARGN})
-  GET_FILENAME_COMPONENT(it ${it} ABSOLUTE)
-  GET_FILENAME_COMPONENT(outfile ${it} NAME_WE)
+foreach (it ${ARGN})
+  get_filename_component(it ${it} ABSOLUTE)
+  get_filename_component(outfile ${it} NAME_WE)
 
-  SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile}.xml.h)
-  ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
+  set(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile}.xml.h)
+  add_custom_command(OUTPUT ${outfile}
   COMMAND XmlConverter
   ARGS ${it} ${outfile}
   DEPENDS ${it} XmlConverter)
-  SET(${outfiles} ${${outfiles}} ${outfile})
-ENDFOREACH(it)
-ENDMACRO (CORE_WRAP_XML)
+  set(${outfiles} ${${outfiles}} ${outfile})
+endforeach(it)
+endmacro (CORE_WRAP_XML)
 
 # A macro for importing GLSL shaders
-MACRO (CORE_IMPORT_SHADER outfiles )
-  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+macro (CORE_IMPORT_SHADER outfiles )
+  include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-  FOREACH (it ${ARGN})
-    GET_FILENAME_COMPONENT(it ${it} ABSOLUTE)
-    GET_FILENAME_COMPONENT(outfile ${it} NAME_WE)
-    GET_FILENAME_COMPONENT(ext ${it} EXT)
+  foreach (it ${ARGN})
+    get_filename_component(it ${it} ABSOLUTE)
+    get_filename_component(outfile ${it} NAME_WE)
+    get_filename_component(ext ${it} EXT)
     
-    STRING(LENGTH ${ext} ext_len)
-    MATH(EXPR ext_len ${ext_len}-1)
-    STRING(SUBSTRING ${ext} 1 ${ext_len} ext)
-    SET(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile}_${ext})
-    ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
+    string(LENGTH ${ext} ext_len)
+    math(EXPR ext_len ${ext_len}-1)
+    string(SUBSTRING ${ext} 1 ${ext_len} ext)
+    set(outfile ${CMAKE_CURRENT_BINARY_DIR}/${outfile}_${ext})
+    add_custom_command(OUTPUT ${outfile}
     COMMAND ShaderImporter
     ARGS ${it} ${outfile}
     DEPENDS ${it} ShaderImporter)
-    SET(${outfiles} ${${outfiles}} ${outfile})
-  ENDFOREACH(it)
-ENDMACRO (CORE_IMPORT_SHADER)
+    set(${outfiles} ${${outfiles}} ${outfile})
+  endforeach(it)
+endmacro (CORE_IMPORT_SHADER)

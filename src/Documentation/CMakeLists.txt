@@ -29,15 +29,15 @@
 # Define macros for adding documentation
 # Migrated from the SCIRun documentation build
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/seg3d.sty.in  ${CMAKE_CURRENT_BINARY_DIR}/seg3d.sty)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/seg3d.sty.in  ${CMAKE_CURRENT_BINARY_DIR}/seg3d.sty)
 
-MESSAGE(STATUS "Setting up documentation")
+message(STATUS "Setting up documentation")
 
-MACRO(ADD_PDF_DOCUMENT document)
+macro(ADD_PDF_DOCUMENT document)
 
-  MESSAGE(STATUS "Create ${document} Document")
+  message(STATUS "Create ${document} Document")
 
-  ADD_CUSTOM_COMMAND(
+  add_custom_command(
       OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${document}.aux
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.tex
       COMMAND ${PDFLATEX_COMPILER}
@@ -45,11 +45,11 @@ MACRO(ADD_PDF_DOCUMENT document)
       COMMENT "PDFLatex ${document} (first pass)"
     )
 
-  FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/${document}.tex tex_file)
-  STRING(REGEX MATCH "bibliography" NEED_BIBTEX ${tex_file})
+  file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${document}.tex tex_file)
+  string(REGEX MATCH "bibliography" NEED_BIBTEX ${tex_file})
 
-  IF(NEED_BIBTEX)
-    ADD_CUSTOM_COMMAND(
+  if(NEED_BIBTEX)
+    add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${document}.bbl
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.aux
         COMMAND ${BIBTEX_COMPILER}
@@ -57,7 +57,7 @@ MACRO(ADD_PDF_DOCUMENT document)
         COMMENT "Bibtex ${document}"
       )
 
-    ADD_CUSTOM_COMMAND(
+    add_custom_command(
         OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${document}.pdf
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.bbl
         COMMAND ${PDFLATEX_COMPILER}
@@ -65,7 +65,7 @@ MACRO(ADD_PDF_DOCUMENT document)
         COMMENT "PDFLatex ${document} (second pass)"
       )
 
-    ADD_CUSTOM_COMMAND(
+    add_custom_command(
         OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${document}.log
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.bbl
                 ${CMAKE_CURRENT_BINARY_DIR}/${document}.pdf
@@ -73,8 +73,8 @@ MACRO(ADD_PDF_DOCUMENT document)
         ARGS    -interaction=batchmode ${CMAKE_CURRENT_BINARY_DIR}/${document}.tex
         COMMENT "PDFLatex ${document} (third pass)"
       )
-  ELSE()
-    ADD_CUSTOM_COMMAND(
+  else()
+    add_custom_command(
         OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${document}.pdf
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.aux
         COMMAND ${PDFLATEX_COMPILER}
@@ -82,7 +82,7 @@ MACRO(ADD_PDF_DOCUMENT document)
         COMMENT "PDFLatex ${document} (second pass)"
       )
 
-    ADD_CUSTOM_COMMAND(
+    add_custom_command(
         OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${document}.log
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.pdf
         COMMAND ${PDFLATEX_COMPILER}
@@ -90,37 +90,37 @@ MACRO(ADD_PDF_DOCUMENT document)
         COMMENT "PDFLatex ${document} (third pass)"
       )
 
-  ENDIF()
+  endif()
 
-  ADD_CUSTOM_TARGET(${document} ALL
+  add_custom_target(${document} ALL
                       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${document}.log)
 
-  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${document}.tex  ${CMAKE_CURRENT_BINARY_DIR}/${document}.tex COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${document}.tex  ${CMAKE_CURRENT_BINARY_DIR}/${document}.tex COPYONLY)
 
-  FILE(GLOB_RECURSE png_figures "${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/*.png")
+  file(GLOB_RECURSE png_figures "${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/*.png")
 
-  FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures)
-  FOREACH(png_figure ${png_figures})
-    MESSAGE(STATUS "copying ${png_figure}")
-    GET_FILENAME_COMPONENT(png_name ${png_figure} NAME)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/${png_name}
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures)
+  foreach(png_figure ${png_figures})
+    message(STATUS "copying ${png_figure}")
+    get_filename_component(png_name ${png_figure} NAME)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/${png_name}
       ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures/${png_name} COPYONLY)
-  ENDFOREACH(png_figure ${png_figures})
+  endforeach(png_figure ${png_figures})
 
-  FILE(GLOB_RECURSE pdf_figures "${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/*.pdf")
-  FOREACH(pdf_figure ${pdf_figures})
-    GET_FILENAME_COMPONENT(pdf_name ${pdf_figure} NAME)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/${pdf_name}
+  file(GLOB_RECURSE pdf_figures "${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/*.pdf")
+  foreach(pdf_figure ${pdf_figures})
+    get_filename_component(pdf_name ${pdf_figure} NAME)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${document}_figures/${pdf_name}
       ${CMAKE_CURRENT_BINARY_DIR}/${document}_figures/${pdf_name} COPYONLY)
-  ENDFOREACH(pdf_figure ${pdf_figures})
+  endforeach(pdf_figure ${pdf_figures})
 
-  IF(APPLE)
-    INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf
+  if(APPLE)
+    install(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf
       DESTINATION ${OSX_UTILS_DIR})
-  ELSE()
-    INSTALL(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION Documentation)
-  ENDIF()
-ENDMACRO()
+  else()
+    install(FILES ${SEG3D_BINARY_DIR}/Documentation/${document}.pdf DESTINATION Documentation)
+  endif()
+endmacro()
 
 # ADD DOCUMENTS
 

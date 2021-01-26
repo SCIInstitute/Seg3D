@@ -31,30 +31,30 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_UNDOBUFFER_SRCS
+set(APPLICATION_UNDOBUFFER_SRCS
   UndoBuffer.h
   UndoBuffer.cc
   UndoBufferItem.h
   UndoBufferItem.cc
 )
 
-SET(APPLICATION_UNDOBUFFER_ACTIONS_SRCS
+set(APPLICATION_UNDOBUFFER_ACTIONS_SRCS
   Actions/ActionRedo.h
   Actions/ActionRedo.cc
   Actions/ActionUndo.h
   Actions/ActionUndo.cc
 )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_UndoBuffer ${APPLICATION_UNDOBUFFER_ACTIONS_SRCS})
-  SET(APPLICATION_UNDOBUFFER_SRCS ${APPLICATION_UNDOBUFFER_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+  set(APPLICATION_UNDOBUFFER_SRCS ${APPLICATION_UNDOBUFFER_SRCS} ${PYTHON_WRAPPER})
+endif(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_UndoBuffer 
       ${APPLICATION_UNDOBUFFER_SRCS}
             ${APPLICATION_UNDOBUFFER_ACTIONS_SRCS})
             
-TARGET_LINK_LIBRARIES(Application_UndoBuffer
+target_link_libraries(Application_UndoBuffer
                       Core_Utils
                       Core_Action
                       ${SCI_BOOST_LIBRARY})

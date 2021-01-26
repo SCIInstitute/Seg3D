@@ -26,7 +26,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(APPLICATION_IRTOOLS_SRCS
+set(APPLICATION_IRTOOLS_SRCS
   AssembleFilter.cc
   AssembleFilter.h
   BlobFeatureEnhancementFilter.cc
@@ -49,7 +49,7 @@ SET(APPLICATION_IRTOOLS_SRCS
   SliceToVolumeFilter.h
 )
 
-SET(APPLICATION_IRTOOLS_ACTIONS_SRCS
+set(APPLICATION_IRTOOLS_ACTIONS_SRCS
   Actions/ActionAddTransformsFilter.cc
   Actions/ActionAddTransformsFilter.h
   Actions/ActionAssembleFilter.cc
@@ -74,10 +74,10 @@ SET(APPLICATION_IRTOOLS_ACTIONS_SRCS
   Actions/ActionSliceToVolumeFilter.h
 )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
  GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_ImageRegistrationTools ${APPLICATION_IRTOOLS_ACTIONS_SRCS})
- SET(APPLICATION_IRTOOLS_NOREGISTER_SRCS ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+ set(APPLICATION_IRTOOLS_NOREGISTER_SRCS ${PYTHON_WRAPPER})
+endif(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_ImageRegistrationTools
   ${APPLICATION_IRTOOLS_NOREGISTER_SRCS}
@@ -85,7 +85,7 @@ CORE_ADD_LIBRARY(Application_ImageRegistrationTools
   ${APPLICATION_IRTOOLS_ACTIONS_SRCS}
 )
             
-TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools
+target_link_libraries(Application_ImageRegistrationTools
   Core_Utils
   Core_Application
   Core_Interface

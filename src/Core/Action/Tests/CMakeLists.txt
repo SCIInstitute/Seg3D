@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Core_Action_Tests_SRCS
+set(Core_Action_Tests_SRCS
   ActionTests.cc
 )
 
@@ -33,7 +33,7 @@ REGISTER_UNIT_TEST(Core_Action_Tests
   ${Core_Action_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_Action_Tests
+target_link_libraries(Core_Action_Tests
   Core_Action
   Testing_Utils
   ${SCI_TINYXML_LIBRARY}

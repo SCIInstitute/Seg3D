@@ -31,14 +31,14 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_STATUSBAR_SRCS
+set(APPLICATION_STATUSBAR_SRCS
   StatusBar.h
   StatusBar.cc
   )
 
 CORE_ADD_LIBRARY(Application_StatusBar ${APPLICATION_STATUSBAR_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_StatusBar
+target_link_libraries(Application_StatusBar
                       Core_Interface
                       Core_Utils
                       ${SCI_BOOST_LIBRARY})

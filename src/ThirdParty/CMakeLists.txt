@@ -29,31 +29,31 @@
 # ADDING TINYXML
 ##################################################
 
-MESSAGE(STATUS "Configuring tinyxml")
-ADD_SUBDIRECTORY(tinyxml)
+message(STATUS "Configuring tinyxml")
+add_subdirectory(tinyxml)
 
 
 ##################################################
 # ADDING MATLABIO
 ##################################################
 
-MESSAGE(STATUS "Configuring MatlabIO")
-ADD_SUBDIRECTORY(MatlabIO)
+message(STATUS "Configuring MatlabIO")
+add_subdirectory(MatlabIO)
 
 
 ##################################################
 # ADDING MRC2000
 ##################################################
 
-MESSAGE(STATUS "Configuring MRC2000")
-ADD_SUBDIRECTORY(MRC2000IO)
+message(STATUS "Configuring MRC2000")
+add_subdirectory(MRC2000IO)
 
 
 ##################################################
 # ADD GOOGLETEST
 ##################################################
 
-IF(BUILD_TESTING)
-  MESSAGE(STATUS "Configuring Google Test")
-  ADD_SUBDIRECTORY(submodules)
-ENDIF()
+if(BUILD_TESTING)
+  message(STATUS "Configuring Google Test")
+  add_subdirectory(submodules)
+endif()

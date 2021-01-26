@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Core_Application_Tests_SRCS
+set(Core_Application_Tests_SRCS
   CommandLineTests.cc
 )
 
@@ -33,7 +33,7 @@ REGISTER_UNIT_TEST(Core_Application_Tests
   ${Core_Application_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_Application_Tests
+target_link_libraries(Core_Application_Tests
   Core_Application
   Core_Utils
   Core_Geometry

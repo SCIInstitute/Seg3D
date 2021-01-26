@@ -26,7 +26,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(CORE_SEG3D_ITKCOMMON_TRANSFORM_TESTS_SRCS
+set(CORE_SEG3D_ITKCOMMON_TRANSFORM_TESTS_SRCS
   ITKTransformTests.cc
 )
 
@@ -34,7 +34,7 @@ REGISTER_UNIT_TEST(Core_Seg3D_ITKCommon_Transform_Tests
   ${CORE_SEG3D_ITKCOMMON_TRANSFORM_TESTS_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_Seg3D_ITKCommon_Transform_Tests
+target_link_libraries(Core_Seg3D_ITKCommon_Transform_Tests
   Core_Utils
   Core_ITKCommon
   ${ITKCommon_LIBRARIES}

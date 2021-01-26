@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_VOLUMERENDERER_SHADER_SRCS
+set(CORE_VOLUMERENDERER_SHADER_SRCS
   VolumeShaderSimple.frag
   VolumeShaderSimple.vert
   VolumeShaderOcclusion.frag
@@ -41,7 +41,7 @@ SET(CORE_VOLUMERENDERER_SHADER_SRCS
 CORE_IMPORT_SHADER(CORE_VOLUMERENDERER_SHADER_STRING_SRCS
           ${CORE_VOLUMERENDERER_SHADER_SRCS})
 
-SET(CORE_VOLUMERENDERER_SRCS
+set(CORE_VOLUMERENDERER_SRCS
   VolumeRendererBase.h
   VolumeRendererBase.cc
   VolumeRendererSimple.h
@@ -65,7 +65,7 @@ CORE_ADD_LIBRARY(Core_VolumeRenderer
         ${CORE_VOLUMERENDERER_SHADER_SRCS}
         ${CORE_VOLUMERENDERER_SHADER_STRING_SRCS})
             
-TARGET_LINK_LIBRARIES(Core_VolumeRenderer
+target_link_libraries(Core_VolumeRenderer
                       Core_Utils
                       Core_Geometry
             Core_Graphics

@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_LARGEVOLUME_SRCS
+set(CORE_LARGEVOLUME_SRCS
   LargeVolumeSchema.h
   LargeVolumeSchema.cc
   LargeVolumeConverter.h
@@ -46,7 +46,7 @@ SET(CORE_LARGEVOLUME_SRCS
 
 CORE_ADD_LIBRARY(Core_LargeVolume ${CORE_LARGEVOLUME_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_LargeVolume
+target_link_libraries(Core_LargeVolume
   Core_Utils
   Core_Geometry
   Core_DataBlock

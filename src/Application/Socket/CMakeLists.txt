@@ -31,14 +31,14 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_SOCKET_SRCS
+set(APPLICATION_SOCKET_SRCS
   ActionSocket.h
   ActionSocket.cc
 )
 
 CORE_ADD_LIBRARY(Application_Socket ${APPLICATION_SOCKET_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Socket
+target_link_libraries(Application_Socket
   Core_Python)
 
 ADD_TEST_DIR(Tests)

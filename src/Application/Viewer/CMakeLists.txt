@@ -31,14 +31,14 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_VIEW_SRCS
+set(APPLICATION_VIEW_SRCS
   Viewer.h
   Viewer.cc
   ViewManipulator.h
   ViewManipulator.cc
   )
 
-SET(APPLICATION_VIEW_ACTIONS_SRCS
+set(APPLICATION_VIEW_ACTIONS_SRCS
   Actions/ActionAutoView.h
   Actions/ActionAutoView.cc
   Actions/ActionOffsetSlice.h
@@ -47,15 +47,15 @@ SET(APPLICATION_VIEW_ACTIONS_SRCS
   Actions/ActionSnap.cc
   )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Viewer ${APPLICATION_VIEW_ACTIONS_SRCS})
-  SET(APPLICATION_VIEW_SRCS ${APPLICATION_VIEW_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+  set(APPLICATION_VIEW_SRCS ${APPLICATION_VIEW_SRCS} ${PYTHON_WRAPPER})
+endif(BUILD_WITH_PYTHON)
   
 CORE_ADD_LIBRARY(Application_Viewer ${APPLICATION_VIEW_SRCS}
             ${APPLICATION_VIEW_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Viewer
+target_link_libraries(Application_Viewer
                       Core_Utils
             Core_DataBlock
             Core_Volume

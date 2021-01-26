@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_LAYER_SRCS
+set(APPLICATION_LAYER_SRCS
   LayerFWD.h
   LayerGroup.h
   LayerGroup.cc
@@ -64,7 +64,7 @@ SET(APPLICATION_LAYER_SRCS
   LargeVolumeLayer.cc
 )
 
-SET(APPLICATION_LAYER_ACTIONS_SRCS
+set(APPLICATION_LAYER_ACTIONS_SRCS
   Actions/ActionActivateLayer.h
   Actions/ActionActivateLayer.cc
   Actions/ActionShiftActiveLayer.h
@@ -103,16 +103,16 @@ SET(APPLICATION_LAYER_ACTIONS_SRCS
   Actions/ActionReportScriptStatus.cc
 )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Layer ${APPLICATION_LAYER_ACTIONS_SRCS})
-  SET(APPLICATION_LAYER_SRCS ${APPLICATION_LAYER_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+  set(APPLICATION_LAYER_SRCS ${APPLICATION_LAYER_SRCS} ${PYTHON_WRAPPER})
+endif(BUILD_WITH_PYTHON)
 
 CORE_ADD_LIBRARY(Application_Layer ${APPLICATION_LAYER_SRCS}
   ${APPLICATION_LAYER_ACTIONS_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_Layer
+target_link_libraries(Application_Layer
   Core_Action
   Core_Application
   Core_Interface
