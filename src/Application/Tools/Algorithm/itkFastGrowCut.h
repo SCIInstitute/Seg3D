@@ -61,8 +61,8 @@ public:
   using IndexType = typename InputImageType::IndexType;
   using SizeType = typename InputImageType::SizeType;
 
-  using LabelPixelType = LabelImageType::PixelType;
   using LabelImageType = TLabelImage;
+  using LabelPixelType = typename LabelImageType::PixelType;
   using LabelImagePointer = typename LabelImageType::Pointer;
   using LabelImageRegionType = typename LabelImageType::RegionType;
   using LabelImagePixelType = typename LabelImageType::PixelType;
@@ -95,8 +95,8 @@ public:
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   // Begin concept checking
-  static_assert(TInputImage::VImageDimension == 3, "FastGrowCut only works with 3D images");
-  static_assert(TLabelImage::VImageDimension == 3, "FastGrowCut only works with 3D images");
+  static_assert(TInputImage::ImageDimension == 3, "FastGrowCut only works with 3D images");
+  static_assert(TLabelImage::ImageDimension == 3, "FastGrowCut only works with 3D images");
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputImagePixelType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<LabelImagePixelType>));
   // End concept checking
@@ -120,11 +120,11 @@ protected:
 private:
   std::vector<LabelPixelType> m_imSeedVec;
   std::vector<LabelPixelType> m_imLabVec;
-  std::vector<SrcPixelType> m_imSrcVec;
+  std::vector<short> m_imSrcVec;
   std::vector<long> m_imROI;
 
   //logic code
-  FGC::FastGrowCut<SrcPixelType, LabelPixelType>* m_fastGC = new FGC::FastGrowCut<short, LabelImageType::PixelType>();
+  FGC::FastGrowCut<short, LabelPixelType>* m_fastGC = new FGC::FastGrowCut<short, LabelImageType::PixelType>();
 
   //state variables
   bool m_InitializationFlag = false;

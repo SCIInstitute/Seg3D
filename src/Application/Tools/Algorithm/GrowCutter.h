@@ -35,7 +35,7 @@
 
 //GrowCut
 #include <itkSmartPointer.h>
-#include <Application/Tools/Algorithm/itkFastGrowCut.h>
+#include "itkFastGrowCut.h"
 
 namespace Seg3D {
 
@@ -67,8 +67,10 @@ private:
   typename ImageType::Pointer foreground_image_;
   typename ImageType::Pointer background_image_;
   typename ImageType::Pointer output_image_;
-  itk::SmartPointer<itkFastGrowCut> fast_grow_cut_;
   bool initialization_flag_;
+
+  using FastGrowCutType = itk::FastGrowCut< DataImageType, ImageType>;
+  typename FastGrowCutType::Pointer fast_grow_cut_;
 
   typename ImageType::IndexType bbox_lower_;
   typename ImageType::IndexType bbox_upper_;

@@ -39,7 +39,7 @@
 namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
-FastGrowCut::~FastGrowCut()
+FastGrowCut<TInputImage, TOutputImage>::~FastGrowCut()
 {
   if ( this->m_fastGC != nullptr )
   {
@@ -135,4 +135,6 @@ void
 FastGrowCut<TInputImage, TOutputImage>::PrintSelf(std::ostream& os, Indent indent) const
 {
   std::cout << "This function has been found." << std::endl; // TODO: add printing of ivars
+}
+
 }

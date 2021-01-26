@@ -35,7 +35,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerAction.h>
 
-#include <Application/Tools/Algorithm/GrowCutter.h>
+#include "../Algorithm/GrowCutter.h"
 
 namespace Seg3D
 {
