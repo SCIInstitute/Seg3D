@@ -28,7 +28,7 @@
 
 #include <iostream>
 
-#include <itkFastGrowCut.h>
+#include "itkFastGrowCut.h"
 
 #include <itkObjectFactory.h>
 #include <itkSmartPointer.h>

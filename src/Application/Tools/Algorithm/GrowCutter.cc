@@ -30,7 +30,6 @@
 
 //itk
 #include <itkImageRegionIterator.h>
-#include <itkImageImport.h>
 
 namespace Seg3D
 {
