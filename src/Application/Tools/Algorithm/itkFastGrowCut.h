@@ -34,47 +34,100 @@
 #include <itkObject.h>
 #include <itkMacro.h>
 
-const unsigned short SrcDimension = 3;
-typedef float DistPixelType; // float type pixel for cost function
-typedef short SrcPixelType;
-typedef unsigned char LabPixelType;
-
-template <class TInputImage>
-class itkFastGrowCut : public itk::Object
+namespace itk
+{
+template <typename TInputImage, typename TLabelImage>
+class ITK_TEMPLATE_EXPORT FastGrowCut : public ImageToImageFilter<TInputImage, TLabelImage>
 {
 public:
-  static itkFastGrowCut* New();
-  itkTypeMacro(itkFastGrowCut,itk::Object);
+  ITK_DISALLOW_COPY_AND_MOVE(FastGrowCut);
 
-  //set parameters of grow cut
-  itkSetObjectMacro( SourceVol, TInputImage );
-  itkSetObjectMacro( SeedVol, TInputImage );
+  /** Standard class type aliases. */
+  using Self = FastGrowCut;
+  using Superclass = ImageToImageFilter<TInputImage, TLabelImage>;
+  using Pointer = SmartPointer<Self>;
+  using ConstPointer = SmartPointer<const Self>;
 
-  itkSetMacro( InitializationFlag, bool );
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
+
+  /** Run-time type information (and related methods).  */
+  itkTypeMacro(FastGrowCut, ImageToImageFilter);
+
+  using InputImageType = TInputImage;
+  using InputImagePointer = typename InputImageType::Pointer;
+  using InputImageRegionType = typename InputImageType::RegionType;
+  using InputImagePixelType = typename InputImageType::PixelType;
+  using IndexType = typename InputImageType::IndexType;
+  using SizeType = typename InputImageType::SizeType;
+
+  using LabelImageType = TLabelImage;
+  using LabelPixelType = typename LabelImageType::PixelType;
+  using LabelImagePointer = typename LabelImageType::Pointer;
+  using LabelImageRegionType = typename LabelImageType::RegionType;
+  using LabelImagePixelType = typename LabelImageType::PixelType;
+
+  using SeedsContainerType = std::vector<IndexType>;
+
+  using InputRealType = typename NumericTraits<InputImagePixelType>::RealType;
+
+  itkSetMacro(InitializationFlag, bool);
 
   //processing functions
   void Initialization();
   void RunFGC();
-  void PrintSelf( std::ostream &os, itk::Indent indent );
+
+  void
+  PrintSelf(std::ostream & os, Indent indent) const override;
+
+  void
+  SetSeedImage(const LabelImageType* seedImage)
+  {
+    // Process object is not const-correct so the const casting is required.
+    this->SetNthInput(1, const_cast<LabelImageType*>(seedImage));
+  }
+  const LabelImageType*
+  GetSeedImage()
+  {
+    return static_cast<const LabelImageType*>(this->ProcessObject::GetInput(1));
+  }
+
+
+#ifdef ITK_USE_CONCEPT_CHECKING
+  // Begin concept checking
+  static_assert(TInputImage::ImageDimension == 3, "FastGrowCut only works with 3D images");
+  static_assert(TLabelImage::ImageDimension == 3, "FastGrowCut only works with 3D images");
+  itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputImagePixelType>));
+  itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<LabelImagePixelType>));
+  // End concept checking
+#endif
 
 protected:
-  itkFastGrowCut();
-  virtual ~itkFastGrowCut();
+  FastGrowCut() = default;
+  ~FastGrowCut() override;
+
+  // Override since the filter needs all the data for the algorithm
+  void
+  GenerateInputRequestedRegion() override;
+
+  // Override since the filter produces the entire dataset
+  void
+  EnlargeOutputRequestedRegion(DataObject * output) override;
+
+  void
+  GenerateData() override;
 
 private:
-  //itk image data (from slicer)
-  TInputImage* m_SourceVol;
-  TInputImage* m_SeedVol;
-
-  std::vector<LabPixelType> m_imSeedVec;
-  std::vector<LabPixelType> m_imLabVec;
-  std::vector<SrcPixelType> m_imSrcVec;
+  std::vector<LabelPixelType> m_imSeedVec;
+  std::vector<LabelPixelType> m_imLabVec;
+  std::vector<short> m_imSrcVec;
   std::vector<long> m_imROI;
 
   //logic code
-  FGC::FastGrowCut<SrcPixelType, LabPixelType>* m_fastGC;
+  FGC::FastGrowCut<short, LabelPixelType>* m_fastGC = new FGC::FastGrowCut<short, LabelImageType::PixelType>();
 
   //state variables
-  bool m_InitializationFlag;
+  bool m_InitializationFlag = false;
 };
+}
 #endif // ifndef ITKFASTGROWCUT_H

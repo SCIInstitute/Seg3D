@@ -30,7 +30,6 @@
 
 //itk
 #include <itkImageRegionIterator.h>
-#include <itkImageImport.h>
 
 namespace Seg3D
 {
@@ -51,25 +50,25 @@ GrowCutter::~GrowCutter()
 {}
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_data_image( itk::Image<short, 3>::Pointer data_image )
+void GrowCutter::set_data_image( typename DataImageType::Pointer data_image )
 {
   this->data_image_ = data_image;
 }
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_foreground_image( itk::Image<unsigned char, 3>::Pointer foreground_image )
+void GrowCutter::set_foreground_image( typename ImageType::Pointer foreground_image )
 {
   this->foreground_image_ = foreground_image;
 }
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_background_image( itk::Image<unsigned char, 3>::Pointer background_image )
+void GrowCutter::set_background_image( typename ImageType::Pointer background_image )
 {
   this->background_image_ = background_image;
 }
 
 //---------------------------------------------------------------------------
-void GrowCutter::set_output_image( itk::Image<unsigned char, 3>::Pointer output_image )
+void GrowCutter::set_output_image( typename ImageType::Pointer output_image )
 {
   this->output_image_ = output_image;
 }
@@ -156,8 +155,8 @@ void GrowCutter::execute()
   // TODO: Add segmenter initialization flag check. See CarreraSliceEffect.py
   if ( this->initialization_flag_ == false )
   {
-    this->fast_grow_cut_->SetSourceVol( data_image_ );
-    this->fast_grow_cut_->SetSeedVol( background_image_ );
+    this->fast_grow_cut_->SetInput( data_image_ );
+    this->fast_grow_cut_->SetSeedImage( background_image_ );
     this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->Initialization();       // This method will set grow cut initialization flag to false
     this->fast_grow_cut_->RunFGC();
@@ -165,14 +164,15 @@ void GrowCutter::execute()
   }
   else
   {
-    this->fast_grow_cut_->SetSeedVol( background_image_ );
+    this->fast_grow_cut_->SetSeedImage( background_image_ );
     this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->RunFGC();
   }
+  background_image_ = this->fast_grow_cut_->GetOutput();
 }
 
 //---------------------------------------------------------------------------
-itk::Image<unsigned char, 3>::Pointer GrowCutter::get_output()
+typename GrowCutter::ImageType::Pointer GrowCutter::get_output()
 {
   return this->output_image_;
 }
@@ -180,7 +180,7 @@ itk::Image<unsigned char, 3>::Pointer GrowCutter::get_output()
 //---------------------------------------------------------------------------
 void GrowCutter::reset_growcut()
 {
-  this->fast_grow_cut_ = itkSmartPointer<itkFastGrowCut>::New();
+  this->fast_grow_cut_ = FastGrowCutType::New();
   this->initialization_flag_ = false;
 }
 }

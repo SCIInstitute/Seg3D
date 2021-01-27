@@ -28,57 +28,40 @@
 
 #include <iostream>
 
-#include <itkFastGrowCut.h>
+#include "itkFastGrowCut.h"
+#include "FastGrowCut.h"
 
 #include <itkObjectFactory.h>
 #include <itkSmartPointer.h>
 #include <itkImage.h>
 #include <itkTimeProbe.h>
 
-itkStandardNewMacro( itkFastGrowCut ); //for the new() macro
-
-//----------------------------------------------------------------------------
-
-itkFastGrowCut::itkFastGrowCut()
+namespace itk
 {
-
-  SourceVol = NULL;
-  SeedVol = NULL;
-  m_fastGC = NULL;
-}
-
-itkFastGrowCut::~itkFastGrowCut()
+template <typename TInputImage, typename TOutputImage>
+FastGrowCut<TInputImage, TOutputImage>::~FastGrowCut()
 {
-
-  //these functions decrement reference count on the vtkImageData's (incremented by the SetMacros)
-  if ( this->SourceVol )
-  {
-    this->SetSourceVol( NULL );
-  }
-
-  if ( this->SeedVol )
-  {
-    this->SetSeedVol( NULL );
-  }
-
-  if ( m_fastGC != NULL )
+  if ( this->m_fastGC != nullptr )
   {
     delete m_fastGC;
   }
 }
 
-void itkFastGrowCut::Initialization()
+template <typename TInputImage, typename TOutputImage>
+void
+FastGrowCut<TInputImage, TOutputImage>::GenerateData()
 {
+  InputImagePointer inputImage = this->GetInput();
+  LabelImagePointer seedImage = this->GetSeedImage();
+  LabelImagePointer outputImage = this->GetOutput();
 
-  InitializationFlag = false;
-  if ( m_fastGC == NULL )
-  {
-    m_fastGC = new FGC::FastGrowCut<SrcPixelType, LabPixelType>();
-  }
-}
+  // Copy seedImage into the output
+  OutputImageRegionType region = outputImage->GetRequestedRegion();
+  outputImage->SetBufferedRegion(region);
+  outputImage->Allocate();
+  ImageAlgorithm::Copy(seedImage,outputImage,region,region);
 
-void itkFastGrowCut::RunFGC()
-{
+
 
   itk::TimeProbe timer;
 
@@ -88,14 +71,14 @@ void itkFastGrowCut::RunFGC()
   // Find ROI
   if ( !InitializationFlag )
   {
-    FGC::FindITKImageROI<LabPixelType>( SeedVol, m_imROI );
+    FGC::FindITKImageROI<LabelPixelType>( outputImage, m_imROI );
     std::cerr << "image ROI = [" << m_imROI[0] << "," << m_imROI[1] << "," << m_imROI[2] << ";"  \
               << m_imROI[3] << "," << m_imROI[4] << "," << m_imROI[5] << "]" << std::endl;
     // SB: Find the ROI from the seed volume in the source volume and store it in m_imSrcVec
-    FGC::ExtractITKImageROI<SrcPixelType>( SourceVol, m_imROI, m_imSrcVec );
+    FGC::ExtractITKImageROI<short>( inputImage, m_imROI, m_imSrcVec );
   }
   // SB: Store the ROI from the seed volume in m_imSeedVec
-  FGC::ExtractITKImageROI<LabPixelType>( SeedVol, m_imROI, m_imSeedVec );
+  FGC::ExtractITKImageROI<LabelPixelType>( outputImage, m_imROI, m_imSeedVec );
 
   // Initialize FastGrowCut
   std::vector<long> imSize( 3 );
@@ -113,7 +96,7 @@ void itkFastGrowCut::RunFGC()
   m_fastGC->GetForegroundmage( m_imLabVec );
 
   // Update result. SB: Seed volume is replaced with grow cut result
-  FGC::UpdateITKImageROI<LabPixelType>( m_imLabVec, m_imROI, SeedVol );
+  FGC::UpdateITKImageROI<LabelPixelType>( m_imLabVec, m_imROI, outputImage );
 
   timer.Stop();
 
@@ -127,7 +110,31 @@ void itkFastGrowCut::RunFGC()
   }
 }
 
-void itkFastGrowCut::PrintSelf( ostream &os, itkIndent indent )
+template <typename TInputImage, typename TOutputImage>
+void
+FastGrowCut<TInputImage, TOutputImage>::EnlargeOutputRequestedRegion(DataObject * output)
 {
-  std::cout << "This function has been found." << std::endl;
+  Superclass::EnlargeOutputRequestedRegion(output);
+  output->SetRequestedRegionToLargestPossibleRegion();
+}
+
+template <typename TInputImage, typename TOutputImage>
+void
+FastGrowCut<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
+{
+  Superclass::GenerateInputRequestedRegion();
+  if (this->GetInput())
+  {
+    InputImagePointer input = const_cast<TInputImage *>(this->GetInput());
+    input->SetRequestedRegionToLargestPossibleRegion();
+  }
+}
+
+template <typename TInputImage, typename TOutputImage>
+void
+FastGrowCut<TInputImage, TOutputImage>::PrintSelf(std::ostream& os, Indent indent) const
+{
+  std::cout << "This function has been found." << std::endl; // TODO: add printing of ivars
+}
+
 }
