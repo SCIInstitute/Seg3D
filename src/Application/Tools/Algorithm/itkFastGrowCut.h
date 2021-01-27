@@ -33,6 +33,7 @@
 
 #include <itkObject.h>
 #include <itkMacro.h>
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
@@ -72,10 +73,6 @@ public:
   using InputRealType = typename NumericTraits<InputImagePixelType>::RealType;
 
   itkSetMacro(InitializationFlag, bool);
-
-  //processing functions
-  void Initialization();
-  void RunFGC();
 
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
@@ -124,7 +121,7 @@ private:
   std::vector<long> m_imROI;
 
   //logic code
-  FGC::FastGrowCut<short, LabelPixelType>* m_fastGC = new FGC::FastGrowCut<short, LabelImageType::PixelType>();
+  FGC::FastGrowCut<short, LabelPixelType>* m_fastGC = new FGC::FastGrowCut<short, typename LabelImageType::PixelType>();
 
   //state variables
   bool m_InitializationFlag = false;

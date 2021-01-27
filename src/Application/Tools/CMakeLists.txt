@@ -175,7 +175,8 @@ SET(APPLICATION_TOOLS_ALGORITHM_SRCS
   Algorithm/IslandRemoval.h
   Algorithm/itkFastGrowCut.h
   Algorithm/itkFastGrowCut.cc
-  Algorithm/utilities.h)
+  Algorithm/utilities.h
+  )
 
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Tools ${APPLICATION_TOOLS_ACTIONS_SRCS})

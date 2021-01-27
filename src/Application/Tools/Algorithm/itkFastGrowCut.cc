@@ -51,6 +51,9 @@ template <typename TInputImage, typename TOutputImage>
 void
 FastGrowCut<TInputImage, TOutputImage>::GenerateData()
 {
+  using OutputImageType = TOutputImage;
+  using OutputImageRegionType = typename OutputImageType::RegionType;
+
   InputImagePointer inputImage = this->GetInput();
   LabelImagePointer seedImage = this->GetSeedImage();
   LabelImagePointer outputImage = this->GetOutput();
@@ -61,15 +64,13 @@ FastGrowCut<TInputImage, TOutputImage>::GenerateData()
   outputImage->Allocate();
   ImageAlgorithm::Copy(seedImage,outputImage,region,region);
 
-
-
   itk::TimeProbe timer;
 
   timer.Start();
 
-  std::cerr << "InitializationFlag: " << InitializationFlag << std::endl;
+  std::cerr << "InitializationFlag: " << m_InitializationFlag << std::endl;
   // Find ROI
-  if ( !InitializationFlag )
+  if ( !m_InitializationFlag )
   {
     FGC::FindITKImageROI<LabelPixelType>( outputImage, m_imROI );
     std::cerr << "image ROI = [" << m_imROI[0] << "," << m_imROI[1] << "," << m_imROI[2] << ";"  \
@@ -89,7 +90,7 @@ FastGrowCut<TInputImage, TOutputImage>::GenerateData()
   m_fastGC->SetSourceImage( m_imSrcVec );
   m_fastGC->SetSeedlImage( m_imSeedVec );
   m_fastGC->SetImageSize( imSize );
-  m_fastGC->SetWorkMode( InitializationFlag );
+  m_fastGC->SetWorkMode( m_InitializationFlag );
 
   // Do Segmentation
   m_fastGC->DoSegmentation();
@@ -100,13 +101,13 @@ FastGrowCut<TInputImage, TOutputImage>::GenerateData()
 
   timer.Stop();
 
-  if ( !InitializationFlag )
+  if ( !m_InitializationFlag )
   {
-    std::cout << "Initial fast GrowCut segmentation time: " << timer.GetMeanTime() << " seconds\n";
+    std::cout << "Initial fast GrowCut segmentation time: " << timer.GetMean() << " seconds\n";
   }
   else
   {
-    std::cout << "Adaptive fast GrowCut segmentation time: " << timer.GetMeanTime() << " seconds\n";
+    std::cout << "Adaptive fast GrowCut segmentation time: " << timer.GetMean() << " seconds\n";
   }
 }
 
