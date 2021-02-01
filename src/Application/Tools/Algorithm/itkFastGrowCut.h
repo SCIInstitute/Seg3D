@@ -41,7 +41,7 @@ template <typename TInputImage, typename TLabelImage>
 class ITK_TEMPLATE_EXPORT FastGrowCut : public ImageToImageFilter<TInputImage, TLabelImage>
 {
 public:
-  ITK_DISALLOW_COPY_AND_MOVE(FastGrowCut);
+  //ITK_DISALLOW_COPY_AND_MOVE(FastGrowCut);
 
   /** Standard class type aliases. */
   using Self = FastGrowCut;

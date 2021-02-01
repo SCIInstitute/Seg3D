@@ -79,7 +79,7 @@ namespace FGC
 	}
 
 template<typename ITKImageType>
-void FindITKImageROI(typename ITKImageType::Pointer im, std::vector<long>& imROI) {
+void FindITKImageROI(ITKImageType* im, std::vector<long>& imROI) {
 
     typename ITKImageType::IndexType roiStart;
     typename ITKImageType::IndexType roiEnd;
@@ -143,7 +143,7 @@ void FindITKImageROI(typename ITKImageType::Pointer im, std::vector<long>& imROI
 }
 
 template<typename PixelType>
-void ExtractITKImageROI(typename itk::Image<PixelType, 3>::Pointer  im, const std::vector<long>& imROI, \
+void ExtractITKImageROI(const itk::Image<PixelType, 3>*  im, const std::vector<long>& imROI, \
                         std::vector<PixelType>& imROIVec) {
 
     // Copy itk image ROI to vector

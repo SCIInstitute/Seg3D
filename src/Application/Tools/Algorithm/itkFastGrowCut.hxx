@@ -73,7 +73,7 @@ FastGrowCut<TInputImage, TOutputImage>::GenerateData()
   // Find ROI
   if ( !m_InitializationFlag )
   {
-    FGC::FindITKImageROI<LabelPixelType>( outputImage, m_imROI );
+    FGC::FindITKImageROI( outputImage, m_imROI );
     std::cerr << "image ROI = [" << m_imROI[0] << "," << m_imROI[1] << "," << m_imROI[2] << ";"  \
               << m_imROI[3] << "," << m_imROI[4] << "," << m_imROI[5] << "]" << std::endl;
     // SB: Find the ROI from the seed volume in the source volume and store it in m_imSrcVec
