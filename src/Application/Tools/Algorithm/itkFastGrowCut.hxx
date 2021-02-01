@@ -38,6 +38,7 @@
 
 namespace itk
 {
+  //if using smart pointer, don't need this destructor
 template <typename TInputImage, typename TOutputImage>
 FastGrowCut<TInputImage, TOutputImage>::~FastGrowCut()
 {
@@ -54,9 +55,9 @@ FastGrowCut<TInputImage, TOutputImage>::GenerateData()
   using OutputImageType = TOutputImage;
   using OutputImageRegionType = typename OutputImageType::RegionType;
 
-  InputImagePointer inputImage = this->GetInput();
-  LabelImagePointer seedImage = this->GetSeedImage();
-  LabelImagePointer outputImage = this->GetOutput();
+  auto inputImage = this->GetInput();
+  auto seedImage = this->GetSeedImage();
+  auto outputImage = this->GetOutput();
 
   // Copy seedImage into the output
   OutputImageRegionType region = outputImage->GetRequestedRegion();

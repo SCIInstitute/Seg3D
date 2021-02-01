@@ -174,7 +174,7 @@ SET(APPLICATION_TOOLS_ALGORITHM_SRCS
   Algorithm/HeapNode.cc
   Algorithm/IslandRemoval.h
   Algorithm/itkFastGrowCut.h
-  Algorithm/itkFastGrowCut.cc
+  Algorithm/itkFastGrowCut.hxx
   Algorithm/utilities.h
   )
 

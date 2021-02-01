@@ -35,7 +35,7 @@
 
 //GrowCut
 #include <itkSmartPointer.h>
-#include "itkFastGrowCut.h"
+#include "itkFastGrowCut.hxx"
 
 namespace Seg3D {
 

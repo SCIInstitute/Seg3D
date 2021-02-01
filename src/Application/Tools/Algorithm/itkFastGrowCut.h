@@ -121,6 +121,7 @@ private:
   std::vector<long> m_imROI;
 
   //logic code
+  //Make smart pointer
   FGC::FastGrowCut<short, LabelPixelType>* m_fastGC = new FGC::FastGrowCut<short, typename LabelImageType::PixelType>();
 
   //state variables
