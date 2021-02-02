@@ -26,8 +26,8 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(DOXYFILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-CONFIGURE_FILE(Doxyfile.in ${DOXYFILE} @ONLY NEWLINE_STYLE UNIX)
+set(DOXYFILE ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+configure_file(Doxyfile.in ${DOXYFILE} @ONLY NEWLINE_STYLE UNIX)
 
 # TODO: if generating documentation every time project is built is onerous, remove the ALL keyword
-ADD_CUSTOM_TARGET(Doxygen ALL COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE} SOURCES ${DOXYFILE})
+add_custom_target(Doxygen ALL COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE} SOURCES ${DOXYFILE})

@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Core_Utils_Tests_SRCS
+set(Core_Utils_Tests_SRCS
   SingletonTests.cc
   LogTests.cc
 )
@@ -34,7 +34,7 @@ REGISTER_UNIT_TEST(Core_Utils_Tests
   ${Core_Utils_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_Utils_Tests
+target_link_libraries(Core_Utils_Tests
   Core_Utils
   gtest_main
   gtest

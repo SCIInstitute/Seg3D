@@ -25,7 +25,7 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
-SET(TESTING_UTILS_SRCS
+set(TESTING_UTILS_SRCS
   DataBlockSource.h
   DataBlockSource.cc
   FilesystemPaths.h
@@ -35,7 +35,7 @@ SET(TESTING_UTILS_SRCS
 
 CORE_ADD_LIBRARY(Testing_Utils ${TESTING_UTILS_SRCS} )
 
-TARGET_LINK_LIBRARIES(Testing_Utils
+target_link_libraries(Testing_Utils
   Core_DataBlock
   Core_Geometry
   ${SCI_BOOST_LIBRARY}

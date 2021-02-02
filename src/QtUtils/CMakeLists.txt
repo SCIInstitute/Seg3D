@@ -27,6 +27,6 @@
 #
 
 
-ADD_SUBDIRECTORY(Utils)
-ADD_SUBDIRECTORY(Widgets)
-ADD_SUBDIRECTORY(Bridge)
+add_subdirectory(Utils)
+add_subdirectory(Widgets)
+add_subdirectory(Bridge)

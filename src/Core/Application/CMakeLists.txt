@@ -30,14 +30,14 @@
 # Set sources
 ##################################################
 
-SET(CORE_APPLICATION_SRCS
+set(CORE_APPLICATION_SRCS
   Application.h
   Application.cc
 )
 
 CORE_ADD_LIBRARY(Core_Application ${CORE_APPLICATION_SRCS})
             
-TARGET_LINK_LIBRARIES(Core_Application
+target_link_libraries(Core_Application
   Core_Utils
   Core_EventHandler
   ${SCI_BOOST_LIBRARY}

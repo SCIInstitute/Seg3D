@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_EVENTHANDLER_SRCS
+set(CORE_EVENTHANDLER_SRCS
   Event.h
   EventFWD.h
   Event.cc
@@ -45,7 +45,7 @@ SET(CORE_EVENTHANDLER_SRCS
 
 CORE_ADD_LIBRARY(Core_EventHandler ${CORE_EVENTHANDLER_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_EventHandler
+target_link_libraries(Core_EventHandler
                       Core_Utils
                       ${SCI_BOOST_LIBRARY})
 

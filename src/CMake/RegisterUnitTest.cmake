@@ -27,14 +27,14 @@
 #
 
 
-MACRO(REGISTER_UNIT_TEST test)
-  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
-  ADD_EXECUTABLE(${test} ${ARGN})
-  ADD_TEST(${test} ${SEG3D_BINARY_DIR}/${test})
-ENDMACRO()
+macro(REGISTER_UNIT_TEST test)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
+  add_executable(${test} ${ARGN})
+  add_test(${test} ${SEG3D_BINARY_DIR}/${test})
+endmacro()
 
-MACRO(ADD_TEST_DIR directory)
-  IF(BUILD_TESTING)
-    ADD_SUBDIRECTORY(${directory})
-  ENDIF()
-ENDMACRO()
+macro(ADD_TEST_DIR directory)
+  if(BUILD_TESTING)
+    add_subdirectory(${directory})
+  endif()
+endmacro()

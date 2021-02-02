@@ -32,7 +32,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_ITKCOMMON_SRCS
+set(CORE_ITKCOMMON_SRCS
   AsyncMosiacSave.h
   IRImageLoader.cxx
   IRImageLoader.hxx
@@ -72,14 +72,14 @@ SET(CORE_ITKCOMMON_SRCS
   visualize.hxx
 )
 
-SET(CORE_ITKCOMMON_FILTERING_SRCS
+set(CORE_ITKCOMMON_FILTERING_SRCS
   Filtering/itkNormalizeImageFilterWithMask.h
   Filtering/itkNormalizeImageFilterWithMask.txx
   Filtering/itkStatisticsImageFilterWithMask.h
   Filtering/itkStatisticsImageFilterWithMask.txx
 )
 
-SET(CORE_ITKCOMMON_TRANSFORM_SRCS
+set(CORE_ITKCOMMON_TRANSFORM_SRCS
   Transform/IRConnection.cxx
   Transform/IRConnection.hxx
   Transform/IRRefineTranslateCanvas.hxx
@@ -103,7 +103,7 @@ SET(CORE_ITKCOMMON_TRANSFORM_SRCS
   Transform/the_grid_transform.hxx
 )
 
-SET(CORE_ITKCOMMON_OPTIMIZERS_SRCS
+set(CORE_ITKCOMMON_OPTIMIZERS_SRCS
   Optimizers/itkImageMosaicVarianceMetric.h
   Optimizers/itkImageMosaicVarianceMetric.txx
   Optimizers/itkRegularStepGradientDescentOptimizer2.cxx
@@ -111,7 +111,7 @@ SET(CORE_ITKCOMMON_OPTIMIZERS_SRCS
   Optimizers/optimizer_observer.hxx
 )
 
-SET(CORE_ITKCOMMON_THREADUTILS_SRCS
+set(CORE_ITKCOMMON_THREADUTILS_SRCS
   ThreadUtils/itk_terminator.hxx
   ThreadUtils/the_boost_mutex.cxx
   ThreadUtils/the_boost_mutex.hxx
@@ -132,20 +132,20 @@ SET(CORE_ITKCOMMON_THREADUTILS_SRCS
   ThreadUtils/the_transaction.hxx
 )
 
-SET(CORE_ITKCOMMON_FFT_SRCS
+set(CORE_ITKCOMMON_FFT_SRCS
   FFT/fft.cxx
   FFT/fft.hxx
   FFT/fft_common.cxx
   FFT/fft_common.hxx
 )
 
-SET(CORE_ITKCOMMON_STOS_SRCS
+set(CORE_ITKCOMMON_STOS_SRCS
   STOS/stos.hxx
   STOS/stos_common.cxx
   STOS/stos_common.hxx
 )
 
-SET(FFTW_LIBS "fftw3;fftw3f;fftw3f_threads")
+set(FFTW_LIBS "fftw3;fftw3f;fftw3f_threads")
 
 CORE_ADD_LIBRARY(Core_ITKCommon
   ${CORE_ITKCOMMON_SRCS}
@@ -157,7 +157,7 @@ CORE_ADD_LIBRARY(Core_ITKCommon
   ${CORE_ITKCOMMON_STOS_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_ITKCommon
+target_link_libraries(Core_ITKCommon
   Core_Utils
   ${ITKCommon_LIBRARIES}
   ${ITKIOTransformBase_LIBRARIES}

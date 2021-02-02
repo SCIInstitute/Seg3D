@@ -24,7 +24,7 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
-SET(Core_Geometry_Tests_SRCS
+set(Core_Geometry_Tests_SRCS
   GridTransformTests.cc
   MatrixTests.cc
   PointTests.cc
@@ -36,7 +36,7 @@ REGISTER_UNIT_TEST(Core_Geometry_Tests
   ${Core_Geometry_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_Geometry_Tests
+target_link_libraries(Core_Geometry_Tests
   Core_Geometry
   Testing_Utils
   gtest
