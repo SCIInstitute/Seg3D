@@ -130,13 +130,16 @@ public:
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
 
-    Core::ITKShortImageDataHandle data_image;
+    //Core::ITKShortImageDataHandle data_image;
+    Core::ITKImageDataT<short>::Handle data_image;
     this->get_itk_image_from_layer<short>( this->data_layer_, data_image );
 
-    Core::ITKUCharImageDataHandle foreground_image;
+    //Core::ITKUCharImageDataHandle foreground_image;
+    Core::ITKImageDataT<unsigned char>::Handle foreground_image;
     this->get_itk_image_from_layer<unsigned char>( this->foreground_layer_, foreground_image );
 
-    Core::ITKUCharImageDataHandle background_image;
+    //Core::ITKUCharImageDataHandle background_image;
+    Core::ITKImageDataT<unsigned char>::Handle background_image;
     this->get_itk_image_from_layer<unsigned char>( this->background_layer_, background_image );
 
     if ( !this->grow_cutter_ )

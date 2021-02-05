@@ -55,12 +55,16 @@ FastGrowCut<TInputImage, TOutputImage>::GenerateData()
   using OutputImageType = TOutputImage;
   using OutputImageRegionType = typename OutputImageType::RegionType;
 
+  using InputImageType = TInputImage;
+  using InputImageRegionType = typename InputImageType::RegionType;
+
   auto inputImage = this->GetInput();
   auto seedImage = this->GetSeedImage();
   auto outputImage = this->GetOutput();
 
   // Copy seedImage into the output
-  OutputImageRegionType region = outputImage->GetRequestedRegion();
+  InputImageRegionType region = inputImage->GetRequestedRegion();
+  outputImage->SetLargestPossibleRegion(region);
   outputImage->SetBufferedRegion(region);
   outputImage->Allocate();
   ImageAlgorithm::Copy(seedImage,outputImage,region,region);

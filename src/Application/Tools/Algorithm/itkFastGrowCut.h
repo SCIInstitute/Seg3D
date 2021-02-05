@@ -89,6 +89,8 @@ public:
     return static_cast<const LabelImageType*>(this->ProcessObject::GetInput(1));
   }
 
+  void GenerateData() override;
+
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   // Begin concept checking
@@ -110,9 +112,6 @@ protected:
   // Override since the filter produces the entire dataset
   void
   EnlargeOutputRequestedRegion(DataObject * output) override;
-
-  void
-  GenerateData() override;
 
 private:
   std::vector<LabelPixelType> m_imSeedVec;
