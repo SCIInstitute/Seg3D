@@ -143,7 +143,7 @@ bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::Act
       //LayerManager::Instance()->set_active_layer( new_mask_layer );
 
       // Set a new provenance ID for the output
-      new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( 0 ) );
+      new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( i ) );
 
       // Create a provenance record
       ProvenanceStepHandle provenance_step( new ProvenanceStep );
@@ -152,7 +152,7 @@ bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::Act
       provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
 
       // Get the output and replace provenance ids from the analysis above
-      provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
+      provenance_step->set_output_provenance_ids( this->get_output_provenance_ids( i ) );
 
       // Get the action and turn it into provenance
       provenance_step->set_action_name( this->get_type() );
