@@ -144,9 +144,6 @@ bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::Act
 
       // Set a new provenance ID for the output
       new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( i ) );
-      CORE_LOG_ERROR("Line 146: " + std::to_string(this->get_output_provenance_id( 0 )));
-      CORE_LOG_ERROR("Line 146: " + std::to_string(this->get_output_provenance_id( 1 )));
-      CORE_LOG_ERROR("Line 146: " + std::to_string(this->get_output_provenance_id( i )));
 
       // Create a provenance record
       ProvenanceStepHandle provenance_step( new ProvenanceStep );
@@ -155,7 +152,10 @@ bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::Act
       provenance_step->set_input_provenance_ids( this->get_input_provenance_ids() );
 
       // Get the output and replace provenance ids from the analysis above
-      provenance_step->set_output_provenance_ids( this->get_output_provenance_ids() );
+      ProvenanceIDList output_ids_list;
+      auto output_ids = this->get_output_provenance_ids();
+      output_ids_list.push_back(output_ids[i]);
+      provenance_step->set_output_provenance_ids( output_ids_list );
 
       // Get the action and turn it into provenance
       provenance_step->set_action_name( this->get_type() );
