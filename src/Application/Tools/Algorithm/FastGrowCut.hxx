@@ -231,9 +231,6 @@ void FastGrowCut<SrcPixelType, LabPixelType>
         }
         std::copy(m_imLabPre.begin(), m_imLabPre.end(), m_imLab.begin());
         std::copy(m_imDistPre.begin(), m_imDistPre.end(), m_imDist.begin());
-
-//        m_imLab = m_imLabPre;
-//        m_imDist = m_imDistPre;
     }
      // Normal Dijkstra to be used in initializing the segmenter for the current image
     else {

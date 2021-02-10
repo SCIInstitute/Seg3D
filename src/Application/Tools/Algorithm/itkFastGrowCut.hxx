@@ -38,7 +38,7 @@
 
 namespace itk
 {
-  //if using smart pointer, don't need this destructor
+//if using smart pointer, don't need this destructor
 template <typename TInputImage, typename TOutputImage>
 FastGrowCut<TInputImage, TOutputImage>::~FastGrowCut()
 {

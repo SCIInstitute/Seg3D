@@ -104,7 +104,6 @@ bool ActionGrowCutInitialize::validate( Core::ActionContextHandle& context )
 
 bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::ActionResultHandle& result )
 {
-  //LOGBOOK_EVENT("GrowCut Initialize Layers");
 
   std::vector< std::string > names;
   names.push_back( "foreground" );
@@ -139,9 +138,6 @@ bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::Act
     // The following steps are only needed if not running in a sandbox
     if ( this->private_->sandbox_ == -1 )
     {
-      // Now we make it active
-      //LayerManager::Instance()->set_active_layer( new_mask_layer );
-
       // Set a new provenance ID for the output
       new_mask_layer->provenance_id_state_->set( this->get_output_provenance_id( i ) );
 
@@ -184,8 +180,6 @@ bool ActionGrowCutInitialize::run( Core::ActionContextHandle& context, Core::Act
   {
     Core::Application::PostEvent( boost::bind( this->private_->callback_, ids[0], ids[1], ids[2] ) );
   }
-
-  //LOGBOOK_EVENT("New mask layer");
   return true;
 }
 
