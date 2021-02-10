@@ -73,8 +73,8 @@ bool GrowCutToolInterface::build_widget( QFrame* frame )
   //Step 1 - build the Qt GUI Widget
   this->private_->ui_.setupUi( frame );
 
-  this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
-  this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
+  //this->private_->ui_.horizontalLayout->setAlignment( Qt::AlignHCenter );
+  //this->private_->ui_.horizontalLayout_3->setAlignment( Qt::AlignHCenter );
 
   //Step 2 - get a pointer to the tool
   ToolHandle base_tool_ = tool();
@@ -116,7 +116,7 @@ bool GrowCutToolInterface::build_widget( QFrame* frame )
                                 &GrowCutTool::run_smoothing, tool, Core::Interface::GetWidgetActionContext() ) );
 
 #if defined ( __APPLE__ )
-  this->private_->ui_.verticalLayout_8->setSpacing( 8 );
+  //this->private_->ui_.verticalLayout_8->setSpacing( 8 );
 #endif
 
   return true;
