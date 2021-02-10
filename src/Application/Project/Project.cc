@@ -2978,22 +2978,6 @@ ProvenanceStepID Project::add_provenance_record( const ProvenanceStepHandle& ste
     }
   }
 
-  {
-    ResultSet rs;  std::string e;
-    auto sql_str = std::string("SELECT * FROM provenance_output");
-    if (!this->private_->provenance_database_.run_sql_statement(sql_str, rs, e))
-    {
-      CORE_LOG_ERROR(e);
-    }
-    for (const auto& r : rs)
-    {
-      std::ostringstream ostr;
-      std::for_each(r.begin(), r.end(),
-        [&ostr](const std::pair<std::string, boost::any>& p) { ostr << p.first << ": " << boost::any_cast<int64_t>(p.second); });
-        CORE_LOG_ERROR(ostr.str());
-    }
-  }
-
   for ( size_t i = 0; i < output_list.size(); ++i )
   {
     sql_str = "INSERT INTO provenance_output (prov_step_id,prov_id) VALUES(" + Core::ExportToString( step_id ) + ", " +
