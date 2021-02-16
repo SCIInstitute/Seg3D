@@ -94,7 +94,6 @@ bool GrowCutToolInterface::build_widget( QFrame* frame )
   this->private_->ui_.brush_radius_->set_description( "Radius" );
 
   QtUtils::QtBridge::Show( this->private_->ui_.message_alert_, tool->valid_target_state_, true );
-  QtUtils::QtBridge::Show( this->private_->ui_.message_warning_, tool->registration_warning_state_, false );
 
   QtUtils::QtBridge::Enable( this->private_->ui_.run_growcut_, tool->valid_target_state_ );
 

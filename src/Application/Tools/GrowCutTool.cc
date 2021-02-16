@@ -525,24 +525,6 @@ void GrowCutToolPrivate::handle_layers_changed()
     this->connection_handler_.add_connection( layer->layer_updated_signal_.connect(
                                                 boost::bind( &GrowCutTool::handle_layer_data_changed, this->tool_ ) ) );
   }
-
-  if ( this->tool_->target_layer_state_->get() == Tool::NONE_OPTION_C )
-  {
-    this->tool_->registration_warning_state_->set( false );
-  }
-  else
-  {
-    LayerHandle target_layer_ = LayerManager::FindLayer( this->tool_->target_layer_state_->get() );
-
-    if ( boost::starts_with( target_layer_->get_layer_name(), "Registered_" ) )
-    {
-      this->tool_->registration_warning_state_->set( false );
-    }
-    else
-    {
-      this->tool_->registration_warning_state_->set( true );
-    }
-  }
 }
 
 GrowCutToolPrivate::~GrowCutToolPrivate()
@@ -583,8 +565,6 @@ GrowCutTool::GrowCutTool( const std::string& toolid ) :
   this->add_state( "brush_radius", this->brush_radius_state_, 3, 0, 150, 1 );
   double inf = std::numeric_limits< double >::infinity();
   this->add_state( "erase", this->erase_state_, false );
-
-  this->add_state( "registration_warning", this->registration_warning_state_, false );
 
   this->private_->build_brush_mask();
 

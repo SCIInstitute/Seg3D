@@ -155,9 +155,6 @@ public:
 
   // -- state --
 public:
-
-  Core::StateBoolHandle registration_warning_state_;
-
   Core::StateLabeledOptionHandle foreground_layer_state_;
   Core::StateLabeledOptionHandle background_layer_state_;
   Core::StateLabeledOptionHandle output_layer_state_;
