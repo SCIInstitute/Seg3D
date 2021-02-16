@@ -26,6 +26,6 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-ADD_SUBDIRECTORY(Application)
-ADD_SUBDIRECTORY(ToolInterface)
-#ADD_SUBDIRECTORY(ImageRegistrationInterface)
+add_subdirectory(Application)
+add_subdirectory(ToolInterface)
+#add_subdirectory(ImageRegistrationInterface)

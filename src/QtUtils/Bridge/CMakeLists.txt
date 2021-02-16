@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(QTUTILS_BRIDGE_SRCS
+set(QTUTILS_BRIDGE_SRCS
   QtBridge.cc
   QtConnection.cc
   detail/QtGroupBoxConnector.cc
@@ -60,7 +60,7 @@ SET(QTUTILS_BRIDGE_SRCS
   detail/QtTextMatrixConnector.cc
 )
 
-SET(QTUTILS_BRIDGE_MOC_SRCS
+set(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtConnectorBase.h
   detail/QtGroupBoxConnector.h
   detail/QtComboBoxConnector.h
@@ -88,7 +88,7 @@ SET(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtTextMatrixConnector.h
 )
 
-SET(QTUTILS_BRIDGE_NO_MOC_SRCS
+set(QTUTILS_BRIDGE_NO_MOC_SRCS
   QtBridge.h
   QtConnection.h
 )
@@ -105,7 +105,7 @@ QT5_WRAP_CPP(QTUTILS_BRIDGE_QT_MOC_SRCS ${QTUTILS_BRIDGE_MOC_SRCS})
 # by the moc and ui builder
 ##################################################
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
 # Build the Components library
@@ -118,7 +118,7 @@ CORE_ADD_LIBRARY(QtUtils_Bridge
   ${QTUTILS_BRIDGE_NO_MOC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(QtUtils_Bridge
+target_link_libraries(QtUtils_Bridge
   Core_Utils
   Core_Interface
   QtUtils_Widgets

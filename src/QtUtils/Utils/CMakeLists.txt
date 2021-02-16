@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(QTUTILS_UTILS_SRCS
+set(QTUTILS_UTILS_SRCS
   QtApplication.cc
   QtEventHandler.cc
   QtRenderResources.cc
@@ -39,18 +39,18 @@ SET(QTUTILS_UTILS_SRCS
   QtTransferFunctionWidget.cc
 )
 
-SET(QTUTILS_UTILS_MOC_SRCS
+set(QTUTILS_UTILS_MOC_SRCS
   QtEventHandler.h
   QtRenderWidget.h
   QtTransferFunctionWidget.h
 )
 
-SET(QTUTILS_UTILS_NO_MOC_SRCS
+set(QTUTILS_UTILS_NO_MOC_SRCS
   QtApplication.h
   QtRenderResources.h
 )
 
-SET(QTUTILS_UTILS_UI_SRCS
+set(QTUTILS_UTILS_UI_SRCS
 )
 
 ##################################################
@@ -71,7 +71,7 @@ QT5_WRAP_CPP(QTUTILS_UTILS_QT_MOC_SRCS ${QTUTILS_UTILS_MOC_SRCS})
 # by the moc and ui builder
 ##################################################
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
 # Build the Components library
@@ -85,7 +85,7 @@ CORE_ADD_LIBRARY(QtUtils_Utils
   ${QTUTILS_UTILS_NO_MOC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(QtUtils_Utils
+target_link_libraries(QtUtils_Utils
   Core_Utils
   Core_EventHandler
   Core_Graphics

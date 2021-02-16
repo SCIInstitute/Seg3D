@@ -30,7 +30,7 @@
 # Set sources
 ##################################################
 
-SET(INTERFACE_TOOLINTERFACE_SRCS
+set(INTERFACE_TOOLINTERFACE_SRCS
   CropToolInterface.cc
   PaintToolInterface.cc
   PolylineToolInterface.cc
@@ -77,7 +77,7 @@ SET(INTERFACE_TOOLINTERFACE_SRCS
   WatershedFilterInterface.cc
 )
 
-SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
+set(INTERFACE_TOOLINTERFACE_MOC_SRCS
   CropToolInterface.h
   InvertToolInterface.h
   PaintToolInterface.h
@@ -128,14 +128,14 @@ SET(INTERFACE_TOOLINTERFACE_MOC_SRCS
   WatershedFilterInterface.h
 )
 
-SET(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
+set(INTERFACE_TOOLINTERFACE_NO_MOC_SRCS
   detail/MeasurementTableView.cc
   detail/MeasurementTableModel.cc
   detail/MeasurementItemDelegate.cc
   detail/MeasurementTextEdit.cc
 )
 
-SET(INTERFACE_TOOLINTERFACE_UI_SRCS
+set(INTERFACE_TOOLINTERFACE_UI_SRCS
   CropToolInterface.ui
   InvertToolInterface.ui
   PaintToolInterface.ui
@@ -205,7 +205,7 @@ QT5_WRAP_CPP(INTERFACE_TOOLINTERFACE_QT_MOC_SRCS ${INTERFACE_TOOLINTERFACE_MOC_S
 # by the moc and ui builder
 ##################################################
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
 # Build the Components library
@@ -219,7 +219,7 @@ CORE_ADD_LIBRARY(Interface_ToolInterface
   ${INTERFACE_TOOLINTERFACE_MOC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Interface_ToolInterface
+target_link_libraries(Interface_ToolInterface
   Core_Utils
   Core_EventHandler
   Core_Application

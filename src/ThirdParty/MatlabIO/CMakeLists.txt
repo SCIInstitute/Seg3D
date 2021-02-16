@@ -31,10 +31,10 @@
 ###########################################
 # ZLib project
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-PROJECT(MATLABIO)
+cmake_minimum_required(VERSION 2.6)
+project(MATLABIO)
 
-SET(MatlabIO_SRCS
+set(MatlabIO_SRCS
   matfile.h
   matfilebase.h
   matfiledefs.h
@@ -47,20 +47,20 @@ SET(MatlabIO_SRCS
   matlabfile.cc
 )
 
-FIND_PACKAGE(Zlib CONFIGS ZlibConfig.cmake HINTS ${Zlib_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
-IF(NOT Zlib_FOUND)
-  MESSAGE(FATAL_ERROR "Zlib library not found in ${Zlib_DIR}")
-ENDIF()
-INCLUDE(${ZLIB_USE_FILE})
+find_package(Zlib CONFIGS ZlibConfig.cmake HINTS ${Zlib_DIR} NO_SYSTEM_ENVIRONMENT_PATH)
+if(NOT Zlib_FOUND)
+  message(FATAL_ERROR "Zlib library not found in ${Zlib_DIR}")
+endif()
+include(${ZLIB_USE_FILE})
 
-ADD_LIBRARY(MatlabIO STATIC ${MatlabIO_SRCS})
+add_library(MatlabIO STATIC ${MatlabIO_SRCS})
 
-TARGET_LINK_LIBRARIES(MatlabIO
+target_link_libraries(MatlabIO
   ${SCI_ZLIB_LIBRARY}
 )
 
 ###########################################
 # Set the name of the library
 
-SET(SCI_MATLABIO_LIBRARY MatlabIO CACHE INTERNAL "MatlabIO library name." FORCE)
-SET(SCI_MATLABIO_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "MatlabIO include directories." FORCE)
+set(SCI_MATLABIO_LIBRARY MatlabIO CACHE INTERNAL "MatlabIO library name." FORCE)
+set(SCI_MATLABIO_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "MatlabIO include directories." FORCE)

@@ -30,7 +30,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_UTILS_SRCS
+set(CORE_UTILS_SRCS
   AtomicCounter.h
   ConnectionHandler.h
   ConnectionHandler.cc
@@ -80,6 +80,6 @@ SET(CORE_UTILS_SRCS
 ##################################################
 
 CORE_ADD_LIBRARY(Core_Utils ${CORE_UTILS_SRCS})
-TARGET_LINK_LIBRARIES(Core_Utils ${SCI_BOOST_LIBRARY})
+target_link_libraries(Core_Utils ${SCI_BOOST_LIBRARY})
 
 ADD_TEST_DIR(Tests)

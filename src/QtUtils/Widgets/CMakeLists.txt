@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(QTUTILS_WIDGETS_SRCS
+set(QTUTILS_WIDGETS_SRCS
   QtColorBarWidget.cc
   QtColorButton.cc
   QtCustomDialog.cc
@@ -55,7 +55,7 @@ SET(QTUTILS_WIDGETS_SRCS
   QtTransferFunctionView.cc
 )
 
-SET(QTUTILS_WIDGETS_MOC_SRCS
+set(QTUTILS_WIDGETS_MOC_SRCS
   QtColorBarWidget.h
   QtColorButton.h
   QtCustomDialog.h
@@ -79,10 +79,10 @@ SET(QTUTILS_WIDGETS_MOC_SRCS
   QtTransferFunctionView.h
 )
 
-SET(QTUTILS_WIDGETS_NO_MOC_SRCS
+set(QTUTILS_WIDGETS_NO_MOC_SRCS
 )
 
-SET(QTUTILS_WIDGETS_UI_SRCS
+set(QTUTILS_WIDGETS_UI_SRCS
   QtColorBarWidget.ui
   QtHistogramWidget.ui
   QtSliderDoubleCombo.ui
@@ -107,7 +107,7 @@ QT5_WRAP_CPP(QTUTILS_WIDGETS_QT_MOC_SRCS ${QTUTILS_WIDGETS_MOC_SRCS})
 # by the moc and ui builder
 ##################################################
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
 # Build the Components library
@@ -121,7 +121,7 @@ CORE_ADD_LIBRARY( QtUtils_Widgets
   ${QTUTILS_WIDGETS_NO_MOC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES( QtUtils_Widgets
+target_link_libraries( QtUtils_Widgets
   Core_Utils
   Core_Geometry
   ${Qt5Core_LIBRARIES}

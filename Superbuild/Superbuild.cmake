@@ -28,39 +28,39 @@
 # TODO: build from archive - Git not used
 ###########################################
 
-SET(compress_type "GIT" CACHE INTERNAL "")
-SET(ep_base "${CMAKE_BINARY_DIR}/Externals" CACHE INTERNAL "")
+set(compress_type "GIT" CACHE INTERNAL "")
+set(ep_base "${CMAKE_BINARY_DIR}/Externals" CACHE INTERNAL "")
 
 ###########################################
 # DETERMINE ARCHITECTURE
 # In order for the code to depend on the architecture settings
 ###########################################
 
-IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
-  SET(SEG3D_BITS 64)
-ELSE()
-  SET(SEG3D_BITS 32)
-ENDIF()
+if(CMAKE_SIZEOF_VOID_P MATCHES 8)
+  set(SEG3D_BITS 64)
+else()
+  set(SEG3D_BITS 32)
+endif()
 
 # Hardcode (unfortunately) minumum OS X version for
 # productbuild's Distribution.xml
-SET(OSX_MINIMUM_OS_VERSION "10.12" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
-MARK_AS_ADVANCED(OSX_MINIMUM_OS_VERSION)
+set(OSX_MINIMUM_OS_VERSION "10.12" CACHE STRING "Set the minimum Mac OS X version for the installer package XML configuration file.")
+mark_as_advanced(OSX_MINIMUM_OS_VERSION)
 
 ###########################################
 # Set default CMAKE_BUILD_TYPE
 # if empty for Unix Makefile builds
 ###########################################
 
-IF(CMAKE_GENERATOR MATCHES "Unix Makefiles" OR CMAKE_GENERATOR MATCHES "Ninja" AND NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ENDIF()
+if(CMAKE_GENERATOR MATCHES "Unix Makefiles" OR CMAKE_GENERATOR MATCHES "Ninja" AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
 
-FIND_PACKAGE(Git)
+find_package(Git)
 
-IF(NOT GIT_FOUND)
-  MESSAGE(ERROR "Cannot find Git. Git is required for Seg3D's Superbuild")
-ENDIF()
+if(NOT GIT_FOUND)
+  message(ERROR "Cannot find Git. Git is required for Seg3D's Superbuild")
+endif()
 
 
 ###########################################
@@ -69,15 +69,15 @@ ENDIF()
 #   * mosaicing tools
 ###########################################
 
-OPTION(BUILD_LARGE_VOLUME_TOOLS "Build with large volume (bricked) dataset support." ON)
-SET(DEFAULT_MOSAIC_SETTING ON)
-IF(WIN32)
+option(BUILD_LARGE_VOLUME_TOOLS "Build with large volume (bricked) dataset support." ON)
+set(DEFAULT_MOSAIC_SETTING ON)
+if(WIN32)
   # still highly experimental on Windows...
-  SET(DEFAULT_MOSAIC_SETTING OFF)
-ENDIF()
-OPTION(BUILD_MOSAIC_TOOLS "Build with mosaicing tool support." ${DEFAULT_MOSAIC_SETTING})
+  set(DEFAULT_MOSAIC_SETTING OFF)
+endif()
+option(BUILD_MOSAIC_TOOLS "Build with mosaicing tool support." ${DEFAULT_MOSAIC_SETTING})
 
-INCLUDE( ExternalProject )
+include( ExternalProject )
 
 # Compute -G arg for configuring external projects with the same CMake generator:
 #if(CMAKE_EXTRA_GENERATOR)
@@ -91,166 +91,166 @@ INCLUDE( ExternalProject )
 # Options for console, headless mode
 ###########################################
 
-OPTION(BUILD_TESTING "Build with tests." OFF)
+option(BUILD_TESTING "Build with tests." OFF)
 
-OPTION(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
-IF(WIN32)
-  OPTION(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows GUI build only)" OFF)
-ENDIF()
+option(SEG3D_BUILD_INTERFACE "Build the GUI interface to Seg3D" ON)
+if(WIN32)
+  option(SEG3D_SHOW_CONSOLE "Show console for debugging (Windows GUI build only)" OFF)
+endif()
 
 
 ###########################################
 # Configure python
 ###########################################
 
-OPTION(BUILD_WITH_PYTHON "Build with python support." ON)
+option(BUILD_WITH_PYTHON "Build with python support." ON)
 
 ###########################################
 # Configure Seg3D library build
 ###########################################
 
-IF((WIN32) AND (MSVC_VERSION GREATER 1900))
+if((WIN32) AND (MSVC_VERSION GREATER 1900))
 
-  OPTION(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
+  option(BUILD_STANDALONE_LIBRARY "Build with a Seg3D library build." OFF)
 
-  IF(BUILD_STANDALONE_LIBRARY)
-    SET(BUILD_TESTING OFF)
-    SET(BUILD_WITH_PYTHON OFF)
-    SET(SUPERBUILD_LIBS_SOURCE_DIR ${CMAKE_BINARY_DIR})
-  ENDIF()
+  if(BUILD_STANDALONE_LIBRARY)
+    set(BUILD_TESTING OFF)
+    set(BUILD_WITH_PYTHON OFF)
+    set(SUPERBUILD_LIBS_SOURCE_DIR ${CMAKE_BINARY_DIR})
+  endif()
 
-ENDIF()
+endif()
 
-OPTION(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
+option(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
 
 ###########################################ß
 # Travis CI build needs to be as slim as possible
 ###########################################
 
-OPTION(TRAVIS_BUILD "Slim build for Travis CI" OFF)
-MARK_AS_ADVANCED(TRAVIS_BUILD)
+option(TRAVIS_BUILD "Slim build for Travis CI" OFF)
+mark_as_advanced(TRAVIS_BUILD)
 
-SET(ENABLED_WARNINGS "-Wall")
+set(ENABLED_WARNINGS "-Wall")
 
 ###########################################
 # Configure Qt
 ###########################################
 
-IF(WIN32)
-  OPTION(DO_ZLIB_MANGLE "Mangle Zlib names" OFF)
-ELSE()
-  OPTION(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
-ENDIF()
+if(WIN32)
+  option(DO_ZLIB_MANGLE "Mangle Zlib names" OFF)
+else()
+  option(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
+endif()
 
-IF (TRAVIS_BUILD)
-  SET(QT_MIN_VERSION "5.9")
-ELSE()
-  SET(QT_MIN_VERSION "5.12")
-ENDIF()
+if (TRAVIS_BUILD)
+  set(QT_MIN_VERSION "5.9")
+else()
+  set(QT_MIN_VERSION "5.12")
+endif()
 
-IF(SEG3D_BUILD_INTERFACE)
-  SET(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
-  #SET(CMAKE_AUTOMOC ON)
+if(SEG3D_BUILD_INTERFACE)
+  set(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
+  #set(CMAKE_AUTOMOC ON)
 
-  FIND_PACKAGE(Qt5 COMPONENTS Core Gui OpenGL Svg REQUIRED HINTS ${Qt5_PATH})
+  find_package(Qt5 COMPONENTS Core Gui OpenGL Svg REQUIRED HINTS ${Qt5_PATH})
 
-  IF(Qt5_FOUND)
-    MESSAGE(STATUS "Found Qt version: ${Qt5_VERSION}")
+  if(Qt5_FOUND)
+    message(STATUS "Found Qt version: ${Qt5_VERSION}")
 
-    IF(${Qt5_VERSION} VERSION_LESS QT_MIN_VERSION)
-      MESSAGE(FATAL_ERROR "Qt ${QT_MIN_VERSION} or greater is required for building the Seg3D GUI")
-    ENDIF()
-  ELSE()
-    MESSAGE(FATAL_ERROR "Qt5 is required for building the Seg3D GUI. Set Qt5_PATH to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
-  ENDIF()
+    if(${Qt5_VERSION} VERSION_LESS QT_MIN_VERSION)
+      message(FATAL_ERROR "Qt ${QT_MIN_VERSION} or greater is required for building the Seg3D GUI")
+    endif()
+  else()
+    message(FATAL_ERROR "Qt5 is required for building the Seg3D GUI. Set Qt5_PATH to directory where Qt 5 is installed (containing lib and bin subdirectories) or set SEG3D_BUILD_INTERFACE to OFF.")
+  endif()
 
-  IF(APPLE)
-    SET(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
-    MARK_AS_ADVANCED(MACDEPLOYQT_OUTPUT_LEVEL)
-  ENDIF()
+  if(APPLE)
+    set(MACDEPLOYQT_OUTPUT_LEVEL 0 CACHE STRING "Set macdeployqt output level (0-3)")
+    mark_as_advanced(MACDEPLOYQT_OUTPUT_LEVEL)
+  endif()
 
-ENDIF()
+endif()
 
 ###########################################
 # Configure sample data download
 ###########################################
 
-OPTION(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
+option(DOWNLOAD_DATA "Download Seg3D sample and test data repository." ON)
 
 ###########################################
 # *Nix C++ compiler flags
 ###########################################
 
-IF(UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${ENABLED_WARNINGS}")
-  IF(APPLE)
-    SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-    SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256 ${DISABLED_WARNINGS_CLANG}")
-    SET(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
-  ELSE()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive ${DISABLED_WARNINGS_GCC}")
-    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed -ldl -lrt")
-  ENDIF()
-ENDIF()
+if(UNIX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${ENABLED_WARNINGS}")
+  if(APPLE)
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -ftemplate-depth=256 ${DISABLED_WARNINGS_CLANG}")
+    set(CMAKE_CXX_FLAGS_DEBUG "-Wshorten-64-to-32 ${CMAKE_CXX_FLAGS_DEBUG}")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive ${DISABLED_WARNINGS_GCC}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed -ldl -lrt")
+  endif()
+endif()
 
 ###########################################
 # Microsoft VC compiler flags
 ###########################################
 
-IF(WIN32 AND MSVC)
+if(WIN32 AND MSVC)
   # Enable Intrinsic Functions
-  SET(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS "/Oi ${CMAKE_CXX_FLAGS}")
   # Build with multiple processes -- speeds up compilation on multi-processor machines.
-  SET(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}")
-ENDIF()
+  set(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}")
+endif()
 
 ###########################################
 # Configure LaTeX and Doxygen documentation
 ###########################################
 
-OPTION(BUILD_DOCUMENTATION "Build documentation" OFF)
-MARK_AS_ADVANCED(BUILD_DOCUMENTATION)
+option(BUILD_DOCUMENTATION "Build documentation" OFF)
+mark_as_advanced(BUILD_DOCUMENTATION)
 
-FIND_PACKAGE(LATEX)
+find_package(LATEX)
 
-IF(BUILD_DOCUMENTATION AND NOT PDFLATEX_COMPILER)
-  MESSAGE(WARNING "LaTeX compiler not found. Disabling documentation build.")
-  SET(BUILD_DOCUMENTATION OFF)
-ENDIF()
+if(BUILD_DOCUMENTATION AND NOT PDFLATEX_COMPILER)
+  message(WARNING "LaTeX compiler not found. Disabling documentation build.")
+  set(BUILD_DOCUMENTATION OFF)
+endif()
 
-IF(BUILD_DOCUMENTATION)
-  OPTION(BUILD_DOXYGEN_DOCUMENTATION "Generate doxygen-based documentation." OFF)
-  MARK_AS_ADVANCED(BUILD_DOXYGEN_DOCUMENTATION)
+if(BUILD_DOCUMENTATION)
+  option(BUILD_DOXYGEN_DOCUMENTATION "Generate doxygen-based documentation." OFF)
+  mark_as_advanced(BUILD_DOXYGEN_DOCUMENTATION)
 
-  IF(BUILD_DOXYGEN_DOCUMENTATION)
-    FIND_PACKAGE(Doxygen)
+  if(BUILD_DOXYGEN_DOCUMENTATION)
+    find_package(Doxygen)
 
-    IF(NOT DOXYGEN_FOUND)
-      MESSAGE(WARNING "Doxygen not found. Disabling Doxygen documentation build.")
-      SET(BUILD_DOXYGEN_DOCUMENTATION OFF CACHE BOOL "Generate doxygen-based documentation." FORCE)
-    ENDIF()
-  ENDIF()
-ENDIF()
+    if(NOT DOXYGEN_FOUND)
+      message(WARNING "Doxygen not found. Disabling Doxygen documentation build.")
+      set(BUILD_DOXYGEN_DOCUMENTATION OFF CACHE BOOL "Generate doxygen-based documentation." FORCE)
+    endif()
+  endif()
+endif()
 
 ###########################################
 # Configure externals
 ###########################################
 
-SET( Seg3D_DEPENDENCIES )
+set( Seg3D_DEPENDENCIES )
 
-MACRO(ADD_EXTERNAL cmake_file external)
-  INCLUDE( ${cmake_file} )
-  LIST(APPEND Seg3D_DEPENDENCIES ${external})
-ENDMACRO()
+macro(ADD_EXTERNAL cmake_file external)
+  include( ${cmake_file} )
+  list(APPEND Seg3D_DEPENDENCIES ${external})
+endmacro()
 
-SET(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
-SET(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
-SET(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
+set(SUPERBUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "" FORCE)
+set(SEG3D_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src CACHE INTERNAL "" FORCE)
+set(SEG3D_BINARY_DIR ${CMAKE_BINARY_DIR}/Seg3D CACHE INTERNAL "" FORCE)
 
-IF(DOWNLOAD_DATA)
+if(DOWNLOAD_DATA)
   ADD_EXTERNAL( ${SUPERBUILD_DIR}/DataExternal.cmake Data_external )
-ENDIF()
+endif()
 
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ZlibExternal.cmake Zlib_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/GlewExternal.cmake Glew_external )
@@ -263,13 +263,13 @@ ADD_EXTERNAL( ${SUPERBUILD_DIR}/TetgenExternal.cmake Tetgen_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/EigenExternal.cmake Eigen_external )
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/ImplicitFunctionExternal.cmake ImplicitFunction_external )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   ADD_EXTERNAL( ${SUPERBUILD_DIR}/PythonExternal.cmake Python_external )
-ENDIF()
+endif()
 
 ADD_EXTERNAL( ${SUPERBUILD_DIR}/BoostExternal.cmake Boost_external )
 
-SET(SEG3D_CACHE_ARGS
+set(SEG3D_CACHE_ARGS
     "-DCMAKE_VERBOSE_MAKEFILE:BOOL=${CMAKE_VERBOSE_MAKEFILE}"
     "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
     "-DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}"
@@ -308,27 +308,27 @@ SET(SEG3D_CACHE_ARGS
     "-DTetgen_DIR:PATH=${Tetgen_DIR}"
 )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   # python executable will be release version in IDE builds
-  LIST(APPEND SEG3D_CACHE_ARGS
+  list(APPEND SEG3D_CACHE_ARGS
     "-DPython_DIR:PATH=${Python_DIR}"
     "-DPYTHON_EXECUTABLE:FILEPATH=${SCI_PYTHON_EXE}"
   )
-ENDIF()
+endif()
 
-IF(BUILD_DOCUMENTATION)
-  LIST(APPEND SEG3D_CACHE_ARGS
+if(BUILD_DOCUMENTATION)
+  list(APPEND SEG3D_CACHE_ARGS
     "-DBUILD_DOCUMENTATION:BOOL=${BUILD_DOCUMENTATION}"
     "-DBUILD_DOXYGEN_DOCUMENTATION:BOOL=${BUILD_DOXYGEN_DOCUMENTATION}"
     "-DPDFLATEX_COMPILER:FILEPATH=${PDFLATEX_COMPILER}"
     "-DBIBTEX_COMPILER:FILEPATH=${BIBTEX_COMPILER}"
     "-DDOXYGEN_EXECUTABLE:FILEPATH=${DOXYGEN_EXECUTABLE}"
   )
-ENDIF()
+endif()
 
 
-IF(SEG3D_BUILD_INTERFACE)
-  LIST(APPEND SEG3D_CACHE_ARGS
+if(SEG3D_BUILD_INTERFACE)
+  list(APPEND SEG3D_CACHE_ARGS
     "-DQt5_PATH:PATH=${Qt5_PATH}"
     "-DQt5Core_DIR:PATH=${Qt5Core_DIR}"
     "-DQt5Gui_DIR:PATH=${Qt5Gui_DIR}"
@@ -336,7 +336,7 @@ IF(SEG3D_BUILD_INTERFACE)
     "-DQt5Svg_DIR:PATH=${Qt5Svg_DIR}"
     "-DMACDEPLOYQT_OUTPUT_LEVEL:STRING=${MACDEPLOYQT_OUTPUT_LEVEL}"
   )
-ENDIF()
+endif()
 
 ExternalProject_Add( Seg3D_external
   DEPENDS ${Seg3D_DEPENDENCIES}

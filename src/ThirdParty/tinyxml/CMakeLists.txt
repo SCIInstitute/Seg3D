@@ -2,18 +2,18 @@
 ###########################################
 # TinyXML project
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-PROJECT(TinyXML)
+cmake_minimum_required(VERSION 2.6)
+project(TinyXML)
 
 ###########################################
 # Test for some required system information.
 
-INCLUDE (CMakeBackwardCompatibilityC)
+include (CMakeBackwardCompatibilityC)
 
 ###########################################
 # Source files for zlib
 
-SET(TINYXML_SRCS
+set(TINYXML_SRCS
   tinystr.cpp
   tinystr.h
   tinyxml.cpp
@@ -25,24 +25,24 @@ SET(TINYXML_SRCS
 ###########################################
 # Set the name of the library
 
-SET(SCI_TINYXML_LIBRARY tinyxml CACHE INTERNAL "TinyXML library name." FORCE)
+set(SCI_TINYXML_LIBRARY tinyxml CACHE INTERNAL "TinyXML library name." FORCE)
 
 ###########################################
 # Include directory of tinyxml
 
-SET(SCI_TINYXML_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR} 
+set(SCI_TINYXML_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}
     CACHE INTERNAL "TinyXML include directories." FORCE)
-INCLUDE_DIRECTORIES(${SCI_TINYXML_INCLUDE})
+include_directories(${SCI_TINYXML_INCLUDE})
 
 ###########################################
 # Ensure it uses STL
 
-ADD_DEFINITIONS(-DTIXML_USE_STL)
+add_definitions(-DTIXML_USE_STL)
 
 ###########################################
 # Add the library
 
-ADD_LIBRARY(${SCI_TINYXML_LIBRARY} STATIC ${TINYXML_SRCS})
+add_library(${SCI_TINYXML_LIBRARY} STATIC ${TINYXML_SRCS})
 
 ###########################################
 # Set Windows options (Visual Studio)
@@ -51,13 +51,13 @@ ADD_LIBRARY(${SCI_TINYXML_LIBRARY} STATIC ${TINYXML_SRCS})
 # Options for Visual Studio to limit 
 # the number of warnings.
 
-IF(WIN32)
-  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+if(WIN32)
+  add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
-  IF(NOT UNIX AND NOT BORLAND AND NOT MINGW)
-#    SET_TARGET_PROPERTIES(${SCI_TINYXML_LIBRARY}
+  if(NOT UNIX AND NOT BORLAND AND NOT MINGW)
+#    set_target_properties(${SCI_TINYXML_LIBRARY}
 #                            PROPERTIES
 #                            COMPILE_FLAGS "/Ob1 /Gy /GF -W3 -wd4267 -wd4244"
 #                            LINK_FLAGS "/DYNAMICBASE:NO")
-  ENDIF(NOT UNIX AND NOT BORLAND AND NOT MINGW)
-ENDIF(WIN32)
+  endif()
+endif()

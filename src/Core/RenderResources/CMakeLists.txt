@@ -30,7 +30,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_RENDERRESOURCES_SRCS
+set(CORE_RENDERRESOURCES_SRCS
   RenderResources.h
   RenderResources.cc
   RenderResourcesContext.h
@@ -43,7 +43,7 @@ SET(CORE_RENDERRESOURCES_SRCS
 
 CORE_ADD_LIBRARY(Core_RenderResources ${CORE_RENDERRESOURCES_SRCS})
             
-TARGET_LINK_LIBRARIES(Core_RenderResources
+target_link_libraries(Core_RenderResources
   ${SCI_GLEW_LIBRARY}
   ${SCI_BOOST_LIBRARY}
 )

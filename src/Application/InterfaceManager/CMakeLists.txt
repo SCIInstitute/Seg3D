@@ -31,17 +31,17 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_INTERFACEMANAGER_SRCS
+set(APPLICATION_INTERFACEMANAGER_SRCS
   InterfaceManager.h
   InterfaceManager.cc
   )
 
-SET(APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS)
+set(APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS)
 
 CORE_ADD_LIBRARY(Application_InterfaceManager ${APPLICATION_INTERFACEMANAGER_SRCS}
             ${APPLICATION_INTERFACEMANAGER_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_InterfaceManager
+target_link_libraries(Application_InterfaceManager
                       Core_Utils
                       Core_Application
                       Core_Interface

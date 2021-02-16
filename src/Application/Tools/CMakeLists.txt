@@ -30,7 +30,7 @@
 # Import shaders into source files
 ##################################################
 
-SET(APPLICATION_TOOLS_SHADER_SRCS
+set(APPLICATION_TOOLS_SHADER_SRCS
   detail/MaskShader.frag
 )
 
@@ -42,7 +42,7 @@ CORE_IMPORT_SHADER(APPLICATION_TOOLS_SHADER_STRING_SRCS
 # Set sources
 ##################################################
 
-SET(APPLICATION_TOOLS_SRCS
+set(APPLICATION_TOOLS_SRCS
   PaintTool.h
   PaintTool.cc
   InvertTool.h
@@ -133,7 +133,7 @@ SET(APPLICATION_TOOLS_SRCS
   WatershedFilter.cc
 )
 
-SET(APPLICATION_TOOLS_NOREGISTER_SRCS
+set(APPLICATION_TOOLS_NOREGISTER_SRCS
   SliceRange.h
   SliceRange.cc
   detail/MaskShader.h
@@ -180,8 +180,8 @@ SET(APPLICATION_TOOLS_ALGORITHM_SRCS
 
 IF(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Tools ${APPLICATION_TOOLS_ACTIONS_SRCS})
-  SET(APPLICATION_TOOLS_NOREGISTER_SRCS ${APPLICATION_TOOLS_NOREGISTER_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+  set(APPLICATION_TOOLS_NOREGISTER_SRCS ${APPLICATION_TOOLS_NOREGISTER_SRCS} ${PYTHON_WRAPPER})
+endif()
 
 ITK_MODULE_LOAD(ITKCommon)
 
@@ -194,7 +194,7 @@ CORE_ADD_LIBRARY(Application_Tools
   ${APPLICATION_TOOLS_SHADER_STRING_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_Tools
+target_link_libraries(Application_Tools
   Core_Utils
   Core_Application
   Core_Interface

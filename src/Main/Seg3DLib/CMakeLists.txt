@@ -30,7 +30,7 @@
 # Set Seg3D main sources
 ###########################################
 
-SET(SEG3DLIB_MAIN_SRCS
+set(SEG3DLIB_MAIN_SRCS
   Seg3DLib_example_main.cc
 )
 
@@ -38,10 +38,10 @@ SET(SEG3DLIB_MAIN_SRCS
 # Build the Seg3D executable
 ###########################################
 
-ADD_EXECUTABLE(Seg3DLib ${SEG3DLIB_MAIN_SRCS})
+add_executable(Seg3DLib ${SEG3DLIB_MAIN_SRCS})
 
-TARGET_LINK_LIBRARIES(Seg3DLib
+target_link_libraries(Seg3DLib
   Seg3D_lib
 )
 
-ADD_SUBDIRECTORY(Lib)
+add_subdirectory(Lib)

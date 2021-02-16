@@ -70,49 +70,49 @@
 # Copyright (c) 2009 Scientific Computing and Imaging Institute, University of Utah.
 
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-IF(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(VERSION 2.6)
-ENDIF(COMMAND CMAKE_POLICY)
+cmake_minimum_required(VERSION 2.6)
+if(COMMAND CMAKE_POLICY)
+  cmake_policy(VERSION 2.6)
+endif()
 
-PROJECT(tetgen)
+project(tetgen)
 
-SET(TETGEN_SRCS
+set(TETGEN_SRCS
   tetgen.cxx
   predicates.cxx
 )
 
-ADD_DEFINITIONS(-DSELF_CHECK)
+add_definitions(-DSELF_CHECK)
 
-IF(WIN32 AND MSVC)
+if(WIN32 AND MSVC)
   # Bind application to the current version of the VC libraries
-  ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION)
+  add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION)
 
   # MSVC level 3 warnings are a little ridiculous
-  SET(CMAKE_CXX_WARNING_LEVEL 1)
-  IF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    STRING(REGEX REPLACE "/W[0-4]" "/W1"
+  set(CMAKE_CXX_WARNING_LEVEL 1)
+  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W1"
       CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  ELSE(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1")
-  ENDIF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1")
+  endif()
 
-  SET_SOURCE_FILES_PROPERTIES(predicates.cxx
+  set_source_files_properties(predicates.cxx
                               PROPERTIES
                                 COMPILE_FLAGS "/Od"
   )
-ELSE()
+else()
   # Usually we support GCC and MSVC, so we're not likely to run
   # into trouble with this.
-  SET_SOURCE_FILES_PROPERTIES(predicates.cxx
+  set_source_files_properties(predicates.cxx
                               PROPERTIES
                                 COMPILE_FLAGS "-O0"
   )
-ENDIF()
+endif()
 
 # Tetgen is meant to be built as a static library
-ADD_LIBRARY(${TETGEN_LIBRARY} STATIC ${TETGEN_SRCS})
-SET_TARGET_PROPERTIES(${TETGEN_LIBRARY}
+add_library(${TETGEN_LIBRARY} STATIC ${TETGEN_SRCS})
+set_target_properties(${TETGEN_LIBRARY}
                       PROPERTIES
                         COMPILE_DEFINITIONS "TETLIBRARY"
 )

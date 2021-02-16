@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Core_Python_Tests_SRCS
+set(Core_Python_Tests_SRCS
   PythonInterpreterTests.cc
 )
 
@@ -33,7 +33,7 @@ REGISTER_UNIT_TEST(Core_Python_Tests
   ${Core_Python_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_Python_Tests
+target_link_libraries(Core_Python_Tests
   Core_Python
   Testing_Utils
   ${SCI_PYTHON_LIBRARY}
