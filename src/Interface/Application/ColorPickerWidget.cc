@@ -31,6 +31,7 @@
 
 // QtUtils includes
 #include <QtUtils/Bridge/QtBridge.h>
+#include <QColorDialog>
 
 // Interface includes
 #include <Interface/Application/ColorPickerWidget.h>
@@ -88,9 +89,9 @@ ColorPickerWidget::ColorPickerWidget( QWidget *parent ) :
   connect( this->private_->g_adjuster_, SIGNAL( valueAdjusted( int ) ),
     this, SLOT( set_g( int ) ) );
   connect( this->private_->b_adjuster_, SIGNAL( valueAdjusted( int ) ),
-    this, SLOT( set_b( int ) ) );
+    this, SLOT( set_b( int ) ) );*/
   connect( this->private_->ui_.set_color_button_, SIGNAL( clicked() ),
-    this, SLOT( signal_color_set() ) );*/
+    this, SLOT( signal_color_set() ) );
 
 
 }
@@ -133,27 +134,38 @@ void ColorPickerWidget::hide_show( Core::Color color, bool show )
 
 }
 
-void ColorPickerWidget::set_r( int r )
-{
-  this->r_ = r;
-  Q_EMIT color_changed();
-}
-
-void ColorPickerWidget::set_g( int g )
-{
-  this->g_ = g;
-  Q_EMIT color_changed();
-}
-
-void ColorPickerWidget::set_b( int b )
-{
-  this->b_ = b;
-  Q_EMIT color_changed();
-}
+//void ColorPickerWidget::set_r( int r )
+//{
+//  this->r_ = r;
+//  Q_EMIT color_changed();
+//}
+//
+//void ColorPickerWidget::set_g( int g )
+//{
+//  this->g_ = g;
+//  Q_EMIT color_changed();
+//}
+//
+//void ColorPickerWidget::set_b( int b )
+//{
+//  this->b_ = b;
+//  Q_EMIT color_changed();
+//}
 
 void ColorPickerWidget::signal_color_set()
 {
-  Q_EMIT color_set( Core::Color( this->r_, this->g_, this->b_ ) );
+  Core::StateEngine::lock_type lock(Core::StateEngine::GetMutex());
+
+  QColor color = QColorDialog::getColor(QColor(159, 185, 255), this);
+
+  if (color.isValid())
+  {
+    this->r_ = static_cast<int>(color.red());
+    this->g_ = static_cast<int>(color.green());
+    this->b_ = static_cast<int>(color.blue());
+    Q_EMIT color_set(Core::Color(this->r_, this->g_, this->b_));
+  }
+
 }
 
 } // end namespace Seg3D
