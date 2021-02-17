@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -60,7 +60,7 @@ class PreferencesInterface : public QtUtils::QtCustomDialog, public Core::Connec
 public:
     PreferencesInterface( QWidget *parent = 0 );
     virtual ~PreferencesInterface();
-  
+
 private:
   /// SETUP_GENERAL_PREFS:
   /// This function will initialize all the preferences contained within the general tab
@@ -83,14 +83,16 @@ private:
   // (NOTE: not implemented)
 //  void setup_interface_controls_prefs();
 
-  void setup_large_volume_prefs();
-  
+  /// SETUP_ADVANCED_PREFS:
+  /// This function will initialize all the preferences contained within the advanced tab
+  void setup_advanced_prefs();
+
   void set_autosave_checkbox( bool state );
-  
+
   typedef QPointer< PreferencesInterface > qpointer_type;
-  
+
   static void HandleAutosaveStateChanged( qpointer_type qpointer, bool state );
-  
+
 private Q_SLOTS:
   /// HIDE_THE_OTHERS
   /// This function will hide the inactive colorpickers
@@ -104,14 +106,14 @@ private Q_SLOTS:
   /// this function will be called when the user clicks the button to change the default location
   /// of the project
   void change_project_directory();
-  
+
   void set_autosave_checked_state( bool state );
 
 private:
   boost::shared_ptr< PreferencesInterfacePrivate > private_;
   ColorPickerWidget* active_picker_;
   QDir project_directory_;
-  
+
 };
 
 } // end namespace Seg3D
