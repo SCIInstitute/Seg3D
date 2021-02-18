@@ -63,6 +63,7 @@ public:
     Ui::PreferencesInterface ui_;
   QButtonGroup* color_button_group_;
   QVector< ColorPickerWidget* > color_pickers_;
+  ColorPickerWidget* seed_point_color_picker_;
 };
 
 PreferencesInterface::PreferencesInterface( QWidget *parent ) :
@@ -90,7 +91,6 @@ PreferencesInterface::PreferencesInterface( QWidget *parent ) :
   this->setup_general_prefs();
   this->setup_viewer_prefs();
   this->setup_sidebar_prefs();
-  //this->setup_interface_controls_prefs();
   this->setup_advanced_prefs();
 
   //Hide the interface controls since they arent connected yet
@@ -300,11 +300,6 @@ void PreferencesInterface::setup_sidebar_prefs()
   this->private_->ui_.provenance_checkbox_->setChecked(
     PreferencesManager::Instance()->show_provenance_bar_state_->get() );
 
-
-
-//  this->private_->ui_.history_checkbox_->setChecked(
-//    PreferencesManager::Instance()->show_history_bar_state_->get() );
-
   // Connect Sidebars Preferences
   QtUtils::QtBridge::Connect( this->private_->ui_.tools_filters_checkbox_,
     PreferencesManager::Instance()->show_tools_bar_state_ );
@@ -316,10 +311,6 @@ void PreferencesInterface::setup_sidebar_prefs()
     PreferencesManager::Instance()->show_rendering_bar_state_ );
   QtUtils::QtBridge::Connect( this->private_->ui_.provenance_checkbox_,
     PreferencesManager::Instance()->show_provenance_bar_state_ );
-
-//  QtUtils::QtBridge::Connect( this->private_->ui_.history_checkbox_,
-//    PreferencesManager::Instance()->show_history_bar_state_ );
-
 
   ToolMenuList tool_menus;
   ToolFactory::Instance()->list_menus( tool_menus );
@@ -360,12 +351,6 @@ void PreferencesInterface::setup_sidebar_prefs()
 
 }
 
-// TODO: feasible to set up?
-//void PreferencesInterface::setup_interface_controls_prefs()
-//{
-//  //Interface Controls Preferences
-//}
-
 void PreferencesInterface::setup_advanced_prefs()
 {
   //Large Volume setup
@@ -373,7 +358,7 @@ void PreferencesInterface::setup_advanced_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.large_volume_checkbox_, PreferencesManager::Instance()->enable_large_volume_state_ );
 
   //Seed Points setup
-  
+  //this->private_;
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )
