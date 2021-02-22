@@ -37,31 +37,6 @@
 
 namespace FGC {
 
-
-template<typename SrcPixelType, typename LabPixelType>
-FastGrowCut<SrcPixelType, LabPixelType>
-::FastGrowCut() {
-    m_heap = NULL;
-    m_hpNodes = NULL;
-    m_bSegInitialized = false;
-
-}
-
-template<typename SrcPixelType, typename LabPixelType>
-FastGrowCut<SrcPixelType, LabPixelType>
-::~FastGrowCut() {
-    if(m_heap != NULL) {
-        delete m_heap;
-        m_heap = NULL;
-    }
-    if(m_hpNodes != NULL) {
-        delete []m_hpNodes;
-        m_hpNodes = NULL;
-    }
-
-    std::cout << "FastGrowCut destroyed\n";
-}
-
 template<typename SrcPixelType, typename LabPixelType>
 void FastGrowCut<SrcPixelType, LabPixelType>
 ::SetSourceImage(const std::vector<SrcPixelType>& imSrc) {
@@ -99,11 +74,8 @@ void FastGrowCut<SrcPixelType, LabPixelType>
      m_DIMXY = m_DIMX*m_DIMY;
      m_DIMXYZ = m_DIMXY*m_DIMZ;
 
-    if((m_heap = new FibHeap) == NULL || (m_hpNodes = new HeapNode[m_DIMXYZ+1]) == NULL) {
-        std::cerr << "Memory allocation failed-- ABORTING.\n";
-        raise(SIGABRT);
-    }
-    m_heap->ClearHeapOwnership();
+     m_hpNodes.resize(m_DIMXYZ+1);
+    m_heap.ClearHeapOwnership();
 
     long  i,j,k, index;
      if(!m_bSegInitialized) {
@@ -142,7 +114,7 @@ void FastGrowCut<SrcPixelType, LabPixelType>
                  m_imDist[index] = DIST_EPSION;
               }
 
-              m_heap->Insert(&m_hpNodes[index]);
+              m_heap.Insert(&m_hpNodes[index]);
               m_hpNodes[index].SetIndexValue(index);
          }
      }
@@ -161,7 +133,7 @@ void FastGrowCut<SrcPixelType, LabPixelType>
                  m_imDist[index] = DIST_INF;
                  m_imLab[index] = 0;
              }
-             m_heap->Insert(&m_hpNodes[index]);
+             m_heap.Insert(&m_hpNodes[index]);
              m_hpNodes[index].SetIndexValue(index);
          }
      }
@@ -178,14 +150,14 @@ void FastGrowCut<SrcPixelType, LabPixelType>
     SrcPixelType pixCenter;
 
     // Insert 0 then extract it, which will balance heap
-    m_heap->Insert(&hnTmp); m_heap->ExtractMin();
+    m_heap.Insert(&hnTmp); m_heap.ExtractMin();
 
     long k = 0;
 
     // Adpative Dijkstra if already initialized
     if(m_bSegInitialized) {
-        while(!m_heap->IsEmpty()) {
-            hnMin = (HeapNode *) m_heap->ExtractMin();
+        while(!m_heap.IsEmpty()) {
+            hnMin = (HeapNode *) m_heap.ExtractMin();
             index = hnMin->GetIndexValue();
             tSrc = hnMin->GetKeyValue();
 
@@ -213,7 +185,7 @@ void FastGrowCut<SrcPixelType, LabPixelType>
 
                         hnTmp = m_hpNodes[indexNgbh];
                         hnTmp.SetKeyValue(t);
-                        m_heap->DecreaseKey(&m_hpNodes[indexNgbh], hnTmp);
+                        m_heap.DecreaseKey(&m_hpNodes[indexNgbh], hnTmp);
                     }
 
             }
@@ -234,8 +206,8 @@ void FastGrowCut<SrcPixelType, LabPixelType>
     }
      // Normal Dijkstra to be used in initializing the segmenter for the current image
     else {
-        while(!m_heap->IsEmpty()) {
-            hnMin = (HeapNode *) m_heap->ExtractMin();
+        while(!m_heap.IsEmpty()) {
+            hnMin = (HeapNode *) m_heap.ExtractMin();
             index = hnMin->GetIndexValue();
             tSrc = hnMin->GetKeyValue();
             labSrc = m_imLab[index];
@@ -254,7 +226,7 @@ void FastGrowCut<SrcPixelType, LabPixelType>
 
                         hnTmp = m_hpNodes[indexNgbh];
                         hnTmp.SetKeyValue(t);
-                        m_heap->DecreaseKey(&m_hpNodes[indexNgbh], hnTmp);
+                        m_heap.DecreaseKey(&m_hpNodes[indexNgbh], hnTmp);
                     }
 
             }
@@ -267,15 +239,7 @@ void FastGrowCut<SrcPixelType, LabPixelType>
     std::copy(m_imLab.begin(), m_imLab.end(), m_imLabPre.begin());
     std::copy(m_imDist.begin(), m_imDist.end(), m_imDistPre.begin());
 
-    // Release memory
-    if(m_heap != NULL) {
-        delete m_heap;
-        m_heap = NULL;
-    }
-    if(m_hpNodes != NULL) {
-        delete []m_hpNodes;
-        m_hpNodes = NULL;
-    }
+    m_hpNodes.clear();
 }
 
 template<typename SrcPixelType, typename LabPixelType>

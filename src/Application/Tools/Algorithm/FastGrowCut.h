@@ -51,9 +51,6 @@ typedef float FPixelType;
 template<typename SrcPixelType, typename LabPixelType>
 class FastGrowCut {
 public:
-  FastGrowCut();
-  ~FastGrowCut();
-
   void SetSourceImage( const std::vector<SrcPixelType>& imSrc );
   void SetSeedlImage( std::vector<LabPixelType>& imSeed );
   void SetWorkMode( bool bSegInitialized = false );
@@ -74,13 +71,13 @@ private:
   std::vector<FPixelType> m_imDist;
 
   std::vector<long> m_imSize;
-  long m_DIMX, m_DIMY, m_DIMZ, m_DIMXY, m_DIMXYZ;
+  long m_DIMX{0}, m_DIMY{0}, m_DIMZ{0}, m_DIMXY{0}, m_DIMXYZ{0};
   std::vector<int> m_indOff;
   std::vector<unsigned char>  m_NBSIZE;
 
-  FibHeap* m_heap;
-  HeapNode* m_hpNodes;
-  bool m_bSegInitialized;
+  FibHeap m_heap;
+  std::vector<HeapNode> m_hpNodes;
+  bool m_bSegInitialized {false};
 };
 } // end namespace FGC
 
