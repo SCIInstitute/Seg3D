@@ -26,6 +26,9 @@
    DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef itkFastGrowCut_hxx
+#define itkFastGrowCut_hxx
+
 #include <iostream>
 
 #include "itkFastGrowCut.h"
@@ -35,6 +38,7 @@
 #include <itkSmartPointer.h>
 #include <itkImage.h>
 #include <itkTimeProbe.h>
+#include <itkPrintHelper.h>
 
 namespace itk
 {
@@ -140,7 +144,15 @@ template <typename TInputImage, typename TOutputImage>
 void
 FastGrowCut<TInputImage, TOutputImage>::PrintSelf(std::ostream& os, Indent indent) const
 {
-  std::cout << "This function has been found." << std::endl; // TODO: add printing of ivars
+  Superclass::PrintSelf(os, indent);
+  using namespace itk::print_helper;
+  os << indent << "InitializationFlag: " << m_InitializationFlag << std::endl;
+  os << indent << "imSeedVec: " << m_imSeedVec << std::endl;
+  os << indent << "imLabVec: " << m_imLabVec << std::endl;
+  os << indent << "imSrcVec: " << m_imSrcVec << std::endl;
+  os << indent << "imROI: " << m_imROI << std::endl;
+  os << indent << "FastGC: " << m_fastGC << std::endl;
 }
 
 }
+#endif // ifndef itkFastGrowCut_hxx

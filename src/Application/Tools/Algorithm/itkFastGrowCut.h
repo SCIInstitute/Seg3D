@@ -26,8 +26,8 @@
    DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef ITKFASTGROWCUT_H
-#define ITKFASTGROWCUT_H
+#ifndef itkFastGrowCut_h
+#define itkFastGrowCut_h
 
 #include <Application/Tools/Algorithm/FastGrowCut.h>
 
@@ -41,6 +41,7 @@ template <typename TInputImage, typename TLabelImage>
 class ITK_TEMPLATE_EXPORT FastGrowCut : public ImageToImageFilter<TInputImage, TLabelImage>
 {
 public:
+  ITK_DISALLOW_COPY_AND_MOVE(FastGrowCut);
 
   /** Standard class type aliases. */
   using Self = FastGrowCut;
@@ -126,4 +127,9 @@ private:
   bool m_InitializationFlag = false;
 };
 }
-#endif // ifndef ITKFASTGROWCUT_H
+
+#ifndef ITK_MANUAL_INSTANTIATION
+#  include "itkFastGrowCut.hxx"
+#endif
+
+#endif // ifndef itkFastGrowCut_h
