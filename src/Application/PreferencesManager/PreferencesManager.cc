@@ -218,8 +218,6 @@ void PreferencesManager::initialize_states()
     this->add_state( stateid, this->color_states_[ j ], this->private_->default_colors_[ j ] );
   }
   
-  //Interface Controls Preferences
-  
   //Sidebars Preferences
   this->add_state( "show_tools_bar", this->show_tools_bar_state_, true );
   this->add_state( "show_layermanager_bar", this->show_layermanager_bar_state_, true );
@@ -227,11 +225,14 @@ void PreferencesManager::initialize_states()
   this->add_state( "show_provenance_bar", this->show_provenance_bar_state_, false );
   this->add_state( "show_rendering_bar", this->show_rendering_bar_state_, false );
 
+  //Advanced Preferences
   this->add_state( "enable_large_volume", this->enable_large_volume_state_, false );
 
   this->add_connection( this->axis_labels_option_state_->value_changed_signal_.connect(
     boost::bind( &PreferencesManagerPrivate::handle_axis_labels_option_changed, 
     this->private_, _2 ) ) );
+
+  this->add_state( "seed_points_color", this->seed_points_color_state_, Core::Color(185, 66, 245));
 }
 
 

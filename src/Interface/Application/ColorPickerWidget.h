@@ -59,6 +59,7 @@ Q_SIGNALS:
   
 public Q_SLOTS:
   void set_color();
+  void set_color(Core::Color color);
   void hide_show( Core::Color color, bool show );
 
   

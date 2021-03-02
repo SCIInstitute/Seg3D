@@ -104,7 +104,6 @@ public:
 #endif
 
   // The dock widgets
-  //QPointer< HistoryDockWidget > history_dock_window_;
   QPointer< ProjectDockWidget > project_dock_window_;
   QPointer< ToolsDockWidget > tools_dock_window_;
   QPointer< LayerManagerDockWidget > layer_manager_dock_window_;

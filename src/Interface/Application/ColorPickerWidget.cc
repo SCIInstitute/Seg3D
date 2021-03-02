@@ -77,6 +77,11 @@ void ColorPickerWidget::set_color()
   this->private_->ui_.color_sample_->repaint();
 }
 
+void ColorPickerWidget::set_color(Core::Color color)
+{
+  hide_show(color, true);
+}
+
 void ColorPickerWidget::hide_show( Core::Color color, bool show )
 {
   if ( !show )
@@ -106,6 +111,7 @@ void ColorPickerWidget::signal_color_set()
     this->r_ = static_cast<int>(color.red());
     this->g_ = static_cast<int>(color.green());
     this->b_ = static_cast<int>(color.blue());
+
     Q_EMIT color_set(Core::Color(this->r_, this->g_, this->b_));
   }
 

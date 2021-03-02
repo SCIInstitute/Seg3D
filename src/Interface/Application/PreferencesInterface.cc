@@ -60,10 +60,10 @@ namespace Seg3D
 class PreferencesInterfacePrivate
 {
 public:
-    Ui::PreferencesInterface ui_;
+  Ui::PreferencesInterface ui_;
   QButtonGroup* color_button_group_;
   QVector< ColorPickerWidget* > color_pickers_;
-  ColorPickerWidget* seed_point_color_picker_;
+  ColorPickerWidget* seed_points_color_picker_;
 };
 
 PreferencesInterface::PreferencesInterface( QWidget *parent ) :
@@ -358,7 +358,16 @@ void PreferencesInterface::setup_advanced_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.large_volume_checkbox_, PreferencesManager::Instance()->enable_large_volume_state_ );
 
   //Seed Points setup
-  //this->private_;
+  this->private_->seed_points_color_picker_ = new ColorPickerWidget(this);
+  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 0 , 2 );
+
+  //QtUtils::QtBridge::Connect(this->private_->ui_.gradient_,
+    //PreferencesManager::Instance()->seed_points_color_state_);
+
+  connect(this->private_->seed_points_color_picker_, SIGNAL(color_set(Core::Color)),
+    this->private_->seed_points_color_picker_, SLOT(set_color(Core::Color)));
+
+  //this->private_->seed_points_color_picker_->color_set(Core::Color(185, 66, 245));
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )

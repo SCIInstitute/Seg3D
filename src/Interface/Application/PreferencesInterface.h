@@ -113,7 +113,6 @@ private:
   boost::shared_ptr< PreferencesInterfacePrivate > private_;
   ColorPickerWidget* active_picker_;
   QDir project_directory_;
-
 };
 
 } // end namespace Seg3D

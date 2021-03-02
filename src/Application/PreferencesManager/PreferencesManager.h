@@ -115,8 +115,9 @@ public:
   Core::StateBoolHandle show_provenance_bar_state_;
   Core::StateBoolHandle show_rendering_bar_state_;
 
-  // Large volume preferences
+  // Advanced preferences
   Core::StateBoolHandle enable_large_volume_state_;
+  Core::StateColorHandle seed_points_color_state_;
   
 public:
   /// GET_DEFAULT_COLORS:

@@ -1710,54 +1710,65 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </widget>
-         <widget class="QGroupBox" name="groupBox_5">
+         <widget class="QGroupBox" name="seed_points_groupbox_">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>200</y>
-            <width>676</width>
-            <height>202</height>
+            <width>671</width>
+            <height>201</height>
            </rect>
           </property>
           <property name="title">
            <string>Seed Points</string>
           </property>
-          <widget class="QLabel" name="seed_point_color_label_">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>30</y>
-             <width>161</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Change Seed Point Color</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="seed_point_size_label_">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>110</y>
-             <width>151</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Change Seed Point Size</string>
-           </property>
-          </widget>
-          <widget class="QSpinBox" name="seed_point_size_">
-           <property name="geometry">
-            <rect>
-             <x>180</x>
-             <y>110</y>
-             <width>48</width>
-             <height>25</height>
-            </rect>
-           </property>
-          </widget>
+          <layout class="QGridLayout" name="seed_points_layout_">
+           <item row="0" column="1">
+            <widget class="QLabel" name="seed_point_color_label_">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Change Seed Point Color</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QSpinBox" name="seed_point_size_"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="seed_point_size_label_">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Change Seed Point Size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2" colspan="2">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>200</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
