@@ -359,15 +359,13 @@ void PreferencesInterface::setup_advanced_prefs()
 
   //Seed Points setup
   this->private_->seed_points_color_picker_ = new ColorPickerWidget(this);
-  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 0 , 2 );
+  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 0 , 4 );
 
   //QtUtils::QtBridge::Connect(this->private_->ui_.gradient_,
     //PreferencesManager::Instance()->seed_points_color_state_);
 
   connect(this->private_->seed_points_color_picker_, SIGNAL(color_set(Core::Color)),
     this->private_->seed_points_color_picker_, SLOT(set_color(Core::Color)));
-
-  //this->private_->seed_points_color_picker_->color_set(Core::Color(185, 66, 245));
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )

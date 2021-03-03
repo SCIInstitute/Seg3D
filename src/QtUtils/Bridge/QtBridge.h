@@ -47,6 +47,7 @@
 #include <QtUtils/Widgets/QtLogSliderIntCombo.h>
 #include <QtUtils/Widgets/QtSliderDoubleCombo.h>
 #include <QtUtils/Widgets/QtColorButton.h>
+#include <QtUtils/Widgets/QtColorPicker.h>
 #include <QtUtils/Widgets/QtColorBarWidget.h>
 #include <QtUtils/Widgets/QtTristateToolButton.h>
 #include <QtUtils/Widgets/QtCustomDockWidget.h>
@@ -151,6 +152,9 @@ public:
     Core::StateLabeledOptionHandle& state );
   
   static Core::ConnectionHandle Connect( QtColorButton* colorbutton, 
+    Core::StateColorHandle& state_handle );
+
+  static Core::ConnectionHandle Connect( QtColorPicker* colorpicker,
     Core::StateColorHandle& state_handle );
   
   /// Connect QLineEdits

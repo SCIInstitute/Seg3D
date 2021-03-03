@@ -49,6 +49,7 @@
 #include <QtUtils/Bridge/detail/QtActionGroupConnector.h>
 #include <QtUtils/Bridge/detail/QtButtonGroupConnector.h>
 #include <QtUtils/Bridge/detail/QtColorButtonConnector.h>
+#include <QtUtils/Bridge/detail/QtColorPickerConnector.h>
 #include <QtUtils/Bridge/detail/QtColorBarWidgetConnector.h>
 #include <QtUtils/Bridge/detail/QtComboBoxConnector.h>
 #include <QtUtils/Bridge/detail/QtLineEditConnector.h>
@@ -195,6 +196,12 @@ Core::ConnectionHandle QtBridge::Connect( QtColorButton* colorbutton, Core::Stat
 {
   return Core::ConnectionHandle( new QtConnection(
     new QtColorButtonConnector( colorbutton, state ) ) ); 
+}
+
+Core::ConnectionHandle QtBridge::Connect( QtColorPicker* colorpicker, Core::StateColorHandle& state)
+{
+  return Core::ConnectionHandle(new QtConnection(
+    new QtColorPickerConnector( colorpicker, state) ));
 }
 
 Core::ConnectionHandle QtBridge::Connect( QAction* qaction, boost::function< void() > function )
