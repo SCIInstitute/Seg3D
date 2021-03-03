@@ -63,6 +63,7 @@ public:
   Ui::PreferencesInterface ui_;
   QButtonGroup* color_button_group_;
   QVector< ColorPickerWidget* > color_pickers_;
+  QButtonGroup* seed_points_button_group_;
   ColorPickerWidget* seed_points_color_picker_;
 };
 
@@ -358,14 +359,32 @@ void PreferencesInterface::setup_advanced_prefs()
   QtUtils::QtBridge::Connect( this->private_->ui_.large_volume_checkbox_, PreferencesManager::Instance()->enable_large_volume_state_ );
 
   //Seed Points setup
-  this->private_->seed_points_color_picker_ = new ColorPickerWidget(this);
-  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 0 , 4 );
+  
+  //Seed points color
+  // Initialize the QButtonGroup
+  this->private_->seed_points_button_group_ = new QButtonGroup(this);
 
-  //QtUtils::QtBridge::Connect(this->private_->ui_.gradient_,
-    //PreferencesManager::Instance()->seed_points_color_state_);
+  // Step 1: create new buttons and add them to the button group
+  this->private_->seed_points_button_group_->addButton(new QtUtils::QtColorButton(
+    this, 0, PreferencesManager::Instance()->seed_points_color_state_->get()), 0);
+  this->private_->seed_points_button_group_->button(0)->hide();
+
+  // Step 2: create new ColorPickerWidgets, hide them, and add them to the appropriate layout
+  this->private_->seed_points_color_picker_ = new ColorPickerWidget(this);
+  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 0, 4);
+
+  // Step 3: Connect the ColorPickerWidgets and the ColorButtons to each other and the state engine
+  QtUtils::QtBridge::Connect(dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0)),
+    PreferencesManager::Instance()->seed_points_color_state_);
 
   connect(this->private_->seed_points_color_picker_, SIGNAL(color_set(Core::Color)),
     this->private_->seed_points_color_picker_, SLOT(set_color(Core::Color)));
+  connect(this->private_->seed_points_button_group_->button(0),
+    SIGNAL(button_clicked(Core::Color, bool)), this->private_->seed_points_color_picker_,
+    SLOT(hide_show(Core::Color, bool)));
+
+  // setting an arbitrary picker as the default active picker to deal with the first case
+  this->private_->seed_points_button_group_->button(0)->click();
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )
