@@ -69,7 +69,7 @@ void QtColorPickerConnector::SetColorPickerColor( QPointer< QtColorPickerConnect
 
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( &QtColorColorPickerConnector::SetColorPickerColor,
+    Core::Interface::PostEvent( boost::bind( &QtColorPickerConnector::SetColorPickerColor,
       qpointer, val, source ) );
     return;
   }
