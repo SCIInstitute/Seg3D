@@ -48,7 +48,6 @@ set(QTUTILS_BRIDGE_SRCS
   detail/QtActionGroupConnector.cc
   detail/QtColorButtonConnector.cc
   detail/QtColorBarWidgetConnector.cc
-  detail/QtColorPickerConnector.cc
   detail/QtEnableConnector.cc
   detail/QtButtonGroupConnector.cc
   detail/QtListWidgetConnector.cc
@@ -77,7 +76,6 @@ set(QTUTILS_BRIDGE_MOC_SRCS
   detail/QtActionGroupConnector.h
   detail/QtColorButtonConnector.h
   detail/QtColorBarWidgetConnector.h
-  detail/QtColorPickerConnector.h
   detail/QtEnableConnector.h
   detail/QtButtonGroupConnector.h
   detail/QtListWidgetConnector.h
