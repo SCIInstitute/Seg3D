@@ -31,6 +31,7 @@
 
 // STL includes
 #include <string>
+#include <math.h>
 
 namespace Core
 {
@@ -80,6 +81,11 @@ public:
   inline Color operator*( float alpha ) const
   {
     return Color( this->data_[ 0 ] * alpha, this->data_[ 1 ] * alpha, this->data_[ 2 ] * alpha );
+  }
+
+  inline Color operator/( float alpha ) const
+  {
+    return Color(this->data_[0] / alpha, this->data_[1] / alpha, this->data_[2] / alpha );
   }
 
   Color operator+( const Color& rhs ) const

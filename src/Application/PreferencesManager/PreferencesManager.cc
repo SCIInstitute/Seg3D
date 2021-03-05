@@ -53,6 +53,7 @@ public:
   std::vector< Core::Color > default_colors_;
   boost::filesystem::path local_config_path_;
   PreferencesManager* pm_;
+  Core::Color default_seed_points_color_ = Core::Color(255, 255, 0);
 };
 
 void PreferencesManagerPrivate::handle_axis_labels_option_changed( std::string option )
@@ -232,7 +233,7 @@ void PreferencesManager::initialize_states()
     boost::bind( &PreferencesManagerPrivate::handle_axis_labels_option_changed, 
     this->private_, _2 ) ) );
 
-  this->add_state( "seed_points_color", this->seed_points_color_state_, Core::Color(185, 66, 245));
+  this->add_state( "seed_points_color", this->seed_points_color_state_, this->private_->default_seed_points_color_);
 }
 
 
@@ -273,6 +274,11 @@ Core::Color PreferencesManager::get_background_color() const
 const std::vector< Core::Color >& PreferencesManager::get_default_colors() const
 {
   return this->private_->default_colors_;
+}
+
+const Core::Color PreferencesManager::get_seed_points_default_color() const
+{
+  return this->private_->default_seed_points_color_;
 }
 
 } // end namespace seg3D

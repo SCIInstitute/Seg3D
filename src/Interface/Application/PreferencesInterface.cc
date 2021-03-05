@@ -385,6 +385,9 @@ void PreferencesInterface::setup_advanced_prefs()
 
   // setting an arbitrary picker as the default active picker to deal with the first case
   this->private_->seed_points_button_group_->button(0)->click();
+
+  this->connect(this->private_->ui_.seed_points_revert_button_, SIGNAL(clicked()),
+    this, SLOT(revert_seed_points()));
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )
@@ -415,6 +418,14 @@ void PreferencesInterface::set_buttons_to_default_colors()
     dynamic_cast< QtUtils::QtColorButton* >( this->private_->color_button_group_->button( i ) )->
     set_color( temp_color_list[ i ] );
   }
+}
+
+void PreferencesInterface::revert_seed_points()
+{
+  Core::Color curr_seed_points_color = PreferencesManager::Instance()->get_seed_points_default_color();
+  dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0))->
+    set_color(curr_seed_points_color);
+  this->private_->seed_points_color_picker_->set_color(curr_seed_points_color);
 }
 
 void PreferencesInterface::hide_the_others( int active )

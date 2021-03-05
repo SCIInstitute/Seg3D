@@ -124,6 +124,8 @@ public:
   /// This function returns a vector of the default colors
   const std::vector< Core::Color >& get_default_colors() const;
 
+  const Core::Color get_seed_points_default_color() const;
+
   /// GET_COLOR:
   /// Get the color at the index.
   Core::Color get_color( int index ) const;

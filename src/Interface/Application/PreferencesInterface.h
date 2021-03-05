@@ -102,6 +102,10 @@ private Q_SLOTS:
   /// this function will set all the buttons colors back to default
   void set_buttons_to_default_colors();
 
+  /// REVERT_SEED_POINTS:
+  /// this function will set the seed point color and size back to default
+  void revert_seed_points();
+
   /// CHANGE_PROJECT_DIRECTORY:
   /// this function will be called when the user clicks the button to change the default location
   /// of the project

@@ -1644,19 +1644,6 @@
           <string>Seed Points</string>
          </property>
          <layout class="QGridLayout" name="seed_points_layout_">
-          <item row="0" column="1">
-           <widget class="QLabel" name="seed_point_color_label_">
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Change Seed Point Color</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QLabel" name="seed_point_size_label_">
             <property name="minimumSize">
@@ -1683,6 +1670,19 @@
               <width>16777215</width>
               <height>16777215</height>
              </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="seed_point_color_label_">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Change Seed Point Color</string>
             </property>
            </widget>
           </item>
@@ -1717,6 +1717,16 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="seed_points_revert_button_">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Revert to Defaults</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

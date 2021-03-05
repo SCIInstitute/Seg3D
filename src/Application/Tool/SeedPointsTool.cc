@@ -39,6 +39,7 @@
 #include <Application/Tool/SeedPointsTool.h>
 #include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>
+#include <Application/PreferencesManager/PreferencesManager.h>
 
 namespace Seg3D
 {
@@ -84,6 +85,9 @@ SeedPointsTool::SeedPointsTool( Core::VolumeType target_volume_type, const std::
   this->private_->tool_ = this;
 
   this->add_state( "seed_points", this->seed_points_state_ );
+
+  this->add_state("seed_color", this->color_state_, PreferencesManager::Instance()->
+    seed_points_color_state_->get());
 
   this->add_connection( this->seed_points_state_->state_changed_signal_.connect( 
     boost::bind( &SeedPointsTool::handle_seed_points_changed, this ) ) );
@@ -196,6 +200,12 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     seed_points = this->seed_points_state_->get();
   }
 
+  Core::Color in_slice_color = this->color_state_->get();
+  in_slice_color = in_slice_color / 255;
+  Core::Color out_slice_color = in_slice_color * 0.6; 
+
+  int line_size = 5;
+
   size_t num_of_pts = seed_points.size();
   if ( num_of_pts == 0 )
   {
@@ -217,13 +227,13 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     bool in_slice = ( ! vol_slice->out_of_boundary() &&
                       static_cast< int >( vol_slice->get_slice_number() ) == slice_num );
 
-    Core::Color color = in_slice ? yellow : dark_yellow;
+    Core::Color color = in_slice ? in_slice_color : out_slice_color;
     glColor3f( color.r(), color.g(), color.b() );
     glBegin( GL_LINES );
-      glVertex2i( x - 5, y );
-      glVertex2i( x + 5, y );
-      glVertex2i( x, y - 5 );
-      glVertex2i( x, y + 5 );
+      glVertex2i( x - line_size, y );
+      glVertex2i( x + line_size, y );
+      glVertex2i( x, y - line_size);
+      glVertex2i( x, y + line_size);
     glEnd();
   }
   

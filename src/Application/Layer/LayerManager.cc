@@ -793,7 +793,7 @@ LayerSceneHandle LayerManager::compose_layer_scene( size_t viewer_id )
           data_layer_scene_item->data_max_ = data_layer->max_value_state_->get();
           data_layer_scene_item->display_min_ = data_layer->display_min_value_state_->get();
           data_layer_scene_item->display_max_ = data_layer->display_max_value_state_->get();
-		  data_layer_scene_item->colormap_ = data_layer->colormap_state_->index();
+		      data_layer_scene_item->colormap_ = data_layer->colormap_state_->index();
           data_layer_scene_item->color_ = data_layer->color_state_->get();
           if ( data_layer_scene_item->display_min_ > data_layer_scene_item->display_max_ )
           {

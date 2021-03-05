@@ -96,6 +96,7 @@ public:
 
 public:
   Core::StatePointVectorHandle seed_points_state_;
+  Core::StateColorHandle color_state_;
 
 public:
   static const Core::Color yellow;
