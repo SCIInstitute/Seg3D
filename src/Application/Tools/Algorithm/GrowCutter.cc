@@ -25,6 +25,7 @@
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
    DEALINGS IN THE SOFTWARE.
  */
+ // Adapted from: https://github.com/ljzhu/FastGrowCut
 
 #include <Application/Tools/Algorithm/GrowCutter.h>
 

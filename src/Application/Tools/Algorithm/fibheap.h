@@ -18,6 +18,7 @@
 // software or has any feedback about it.
 // Email: jboyer@gulf.csc.uvic.ca
 //***************************************************************************
+//https://github.com/ljzhu/FastGrowCut
 
 #define OK      0
 #define NOTOK   -1

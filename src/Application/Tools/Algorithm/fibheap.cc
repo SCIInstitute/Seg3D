@@ -4,6 +4,7 @@
 // This Fibonacci heap implementation is Copyright (c) 1996 by John Boyer.
 // See the header file for free usage information.
 //***************************************************************************
+//https://github.com/ljzhu/FastGrowCut
 
 //***************************************************************************
 // The classes in this package are designed to allow the package user
