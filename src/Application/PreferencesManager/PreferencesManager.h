@@ -118,6 +118,8 @@ public:
   // Advanced preferences
   Core::StateBoolHandle enable_large_volume_state_;
   Core::StateColorHandle seed_points_color_state_;
+  Core::StateIntHandle seed_points_size_state_;
+  Core::StateDoubleHandle seed_points_thickness_state_;
   
 public:
   /// GET_DEFAULT_COLORS:
@@ -125,6 +127,8 @@ public:
   const std::vector< Core::Color >& get_default_colors() const;
 
   const Core::Color get_seed_points_default_color() const;
+
+  void set_seed_points_size(int size) const;
 
   /// GET_COLOR:
   /// Get the color at the index.

@@ -234,6 +234,8 @@ void PreferencesManager::initialize_states()
     this->private_, _2 ) ) );
 
   this->add_state( "seed_points_color", this->seed_points_color_state_, this->private_->default_seed_points_color_);
+  this->add_state( "seed_points_size", this->seed_points_size_state_, 5 );
+  this->add_state( "seed_points_thickness", this->seed_points_thickness_state_, 1.0 );
 }
 
 
@@ -281,6 +283,11 @@ const std::vector< Core::Color >& PreferencesManager::get_default_colors() const
 const Core::Color PreferencesManager::get_seed_points_default_color() const
 {
   return this->private_->default_seed_points_color_;
+}
+
+void PreferencesManager::set_seed_points_size(int size) const
+{
+  //this->seed_points_size_state_;
 }
 
 } // end namespace seg3D

@@ -44,9 +44,6 @@
 namespace Seg3D
 {
 
-const Core::Color SeedPointsTool::yellow( 1.0f, 1.0f, 0.0f );
-const Core::Color SeedPointsTool::dark_yellow( 0.6f, 0.6f, 0.0f );
-
 //////////////////////////////////////////////////////////////////////////
 // Implementation of class  SeedPointsToolPrivate
 //////////////////////////////////////////////////////////////////////////
@@ -86,8 +83,14 @@ SeedPointsTool::SeedPointsTool( Core::VolumeType target_volume_type, const std::
 
   this->add_state( "seed_points", this->seed_points_state_ );
 
-  this->add_state("seed_color", this->color_state_, PreferencesManager::Instance()->
-    seed_points_color_state_->get());
+  this->add_state( "seed_color", this->color_state_, PreferencesManager::Instance()->
+    seed_points_color_state_->get() );
+
+  this->add_state( "seed_size", this->size_state_, PreferencesManager::Instance()->
+    seed_points_size_state_->get() );
+
+  this->add_state( "seed_thickness", this->thickness_state_, PreferencesManager::Instance()->
+    seed_points_thickness_state_->get() );
 
   this->add_connection( this->seed_points_state_->state_changed_signal_.connect( 
     boost::bind( &SeedPointsTool::handle_seed_points_changed, this ) ) );
@@ -204,7 +207,8 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   in_slice_color = in_slice_color / 255;
   Core::Color out_slice_color = in_slice_color * 0.6; 
 
-  int line_size = 5;
+  int line_size = this->size_state_->get();
+  double line_thickness = this->thickness_state_->get();
 
   size_t num_of_pts = seed_points.size();
   if ( num_of_pts == 0 )
@@ -213,7 +217,7 @@ void SeedPointsTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   }
   
   glPushAttrib( GL_LINE_BIT );
-  glLineWidth( 1.0f );
+  glLineWidth( line_thickness );
 
   for ( auto &seed_point : seed_points )
   {

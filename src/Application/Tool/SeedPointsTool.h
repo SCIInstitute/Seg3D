@@ -97,10 +97,8 @@ public:
 public:
   Core::StatePointVectorHandle seed_points_state_;
   Core::StateColorHandle color_state_;
-
-public:
-  static const Core::Color yellow;
-  static const Core::Color dark_yellow;
+  Core::StateIntHandle size_state_;
+  Core::StateDoubleHandle thickness_state_;
 
 private:
   SeedPointsToolPrivateHandle private_;

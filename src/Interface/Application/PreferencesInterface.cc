@@ -390,6 +390,14 @@ void PreferencesInterface::setup_advanced_prefs()
 
   this->connect(this->private_->ui_.seed_points_revert_button_, SIGNAL(clicked()),
     this, SLOT(revert_seed_points()));
+
+  //Seed points size and thickness
+  QtUtils::QtBridge::Connect(this->private_->ui_.seed_points_size_spinbox_,
+    PreferencesManager::Instance()->seed_points_size_state_);
+
+  QtUtils::QtBridge::Connect(this->private_->ui_.seed_points_thickness_spinbox_,
+    PreferencesManager::Instance()->seed_points_thickness_state_);
+
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )
@@ -428,6 +436,9 @@ void PreferencesInterface::revert_seed_points()
   dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0))->
     set_color(seed_points_default_color);
   this->private_->seed_points_color_picker_->set_color(seed_points_default_color);
+  
+  //set seed points size back to 5 
+  PreferencesManager::Instance()->set_seed_points_size(5);
 }
 
 void PreferencesInterface::hide_the_others( int active )
