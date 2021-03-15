@@ -378,6 +378,8 @@ void PreferencesInterface::setup_advanced_prefs()
     PreferencesManager::Instance()->seed_points_color_state_);
 
   connect(this->private_->seed_points_color_picker_, SIGNAL(color_set(Core::Color)),
+    this->private_->seed_points_button_group_->button(0), SLOT(set_color(Core::Color)));
+  connect(this->private_->seed_points_color_picker_, SIGNAL(color_set(Core::Color)),
     this->private_->seed_points_color_picker_, SLOT(set_color(Core::Color)));
   connect(this->private_->seed_points_button_group_->button(0),
     SIGNAL(button_clicked(Core::Color, bool)), this->private_->seed_points_color_picker_,
@@ -422,10 +424,10 @@ void PreferencesInterface::set_buttons_to_default_colors()
 
 void PreferencesInterface::revert_seed_points()
 {
-  Core::Color curr_seed_points_color = PreferencesManager::Instance()->get_seed_points_default_color();
+  Core::Color seed_points_default_color = PreferencesManager::Instance()->get_seed_points_default_color();
   dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0))->
-    set_color(curr_seed_points_color);
-  this->private_->seed_points_color_picker_->set_color(curr_seed_points_color);
+    set_color(seed_points_default_color);
+  this->private_->seed_points_color_picker_->set_color(seed_points_default_color);
 }
 
 void PreferencesInterface::hide_the_others( int active )

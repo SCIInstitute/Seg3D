@@ -53,7 +53,7 @@ public:
   std::vector< Core::Color > default_colors_;
   boost::filesystem::path local_config_path_;
   PreferencesManager* pm_;
-  Core::Color default_seed_points_color_ = Core::Color(255, 255, 0);
+  Core::Color default_seed_points_color_;
 };
 
 void PreferencesManagerPrivate::handle_axis_labels_option_changed( std::string option )
@@ -254,6 +254,8 @@ bool PreferencesManager::initialize_default_colors()
   this->private_->default_colors_.push_back( Core::Color( 108, 0, 212 ) );
   this->private_->default_colors_.push_back( Core::Color( 194, 118, 0 ) );
   this->private_->default_colors_.push_back( Core::Color( 159, 143, 255 ) );
+
+  this->private_->default_seed_points_color_ = Core::Color(255, 255, 0);
   
   return true;
 }
