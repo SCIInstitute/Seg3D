@@ -285,9 +285,4 @@ const Core::Color PreferencesManager::get_seed_points_default_color() const
   return this->private_->default_seed_points_color_;
 }
 
-void PreferencesManager::set_seed_points_size(int size) const
-{
-  //this->seed_points_size_state_;
-}
-
 } // end namespace seg3D

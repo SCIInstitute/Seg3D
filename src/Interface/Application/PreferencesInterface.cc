@@ -371,7 +371,7 @@ void PreferencesInterface::setup_advanced_prefs()
 
   // Step 2: create new ColorPickerWidgets, hide them, and add them to the appropriate layout
   this->private_->seed_points_color_picker_ = new ColorPickerWidget(this);
-  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 0, 4);
+  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 2, 4);
 
   // Step 3: Connect the ColorPickerWidgets and the ColorButtons to each other and the state engine
   QtUtils::QtBridge::Connect(dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0)),
@@ -437,8 +437,8 @@ void PreferencesInterface::revert_seed_points()
     set_color(seed_points_default_color);
   this->private_->seed_points_color_picker_->set_color(seed_points_default_color);
   
-  //set seed points size back to 5 
-  PreferencesManager::Instance()->set_seed_points_size(5);
+  //this->private_->seed_points_size_->set_size(5);
+  //this->private_->seed_points_thickness->set_thickness(1.0);
 }
 
 void PreferencesInterface::hide_the_others( int active )
