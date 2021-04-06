@@ -65,6 +65,7 @@ public:
   QVector< ColorPickerWidget* > color_pickers_;
   QButtonGroup* seed_points_button_group_;
   ColorPickerWidget* seed_points_color_picker_;
+  SeedPointsPreferencesWidget* seed_points_preferences_;
 };
 
 PreferencesInterface::PreferencesInterface( QWidget *parent ) :
@@ -372,10 +373,15 @@ void PreferencesInterface::setup_advanced_prefs()
   // Step 2: create new ColorPickerWidgets, hide them, and add them to the appropriate layout
   this->private_->seed_points_color_picker_ = new ColorPickerWidget(this);
   this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_color_picker_, 2, 4);
+  this->private_->seed_points_preferences_ = new SeedPointsPreferencesWidget(this);
+  this->private_->ui_.seed_points_layout_->addWidget(this->private_->seed_points_preferences_, 0, 4);
 
   // Step 3: Connect the ColorPickerWidgets and the ColorButtons to each other and the state engine
   QtUtils::QtBridge::Connect(dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0)),
     PreferencesManager::Instance()->seed_points_color_state_);
+
+  //QtUtils::QtBridge::Connect(this->private_->seed_points_preferences_, 
+    //PreferencesManager::Instance()->seed_points_size_state_);
 
   connect(this->private_->seed_points_color_picker_, SIGNAL(color_set(Core::Color)),
     this->private_->seed_points_button_group_->button(0), SLOT(set_color(Core::Color)));
@@ -390,14 +396,6 @@ void PreferencesInterface::setup_advanced_prefs()
 
   this->connect(this->private_->ui_.seed_points_revert_button_, SIGNAL(clicked()),
     this, SLOT(revert_seed_points()));
-
-  //Seed points size and thickness
-  QtUtils::QtBridge::Connect(this->private_->ui_.seed_points_size_spinbox_,
-    PreferencesManager::Instance()->seed_points_size_state_);
-
-  QtUtils::QtBridge::Connect(this->private_->ui_.seed_points_thickness_spinbox_,
-    PreferencesManager::Instance()->seed_points_thickness_state_);
-
 }
 
 void PreferencesInterface::set_autosave_checked_state( bool state )
@@ -436,9 +434,8 @@ void PreferencesInterface::revert_seed_points()
   dynamic_cast<QtUtils::QtColorButton*>(this->private_->seed_points_button_group_->button(0))->
     set_color(seed_points_default_color);
   this->private_->seed_points_color_picker_->set_color(seed_points_default_color);
-  
-  //this->private_->seed_points_size_->set_size(5);
-  //this->private_->seed_points_thickness->set_thickness(1.0);
+  this->private_->seed_points_preferences_->set_size(5);
+  this->private_->seed_points_preferences_->set_thickness(1.0);
 }
 
 void PreferencesInterface::hide_the_others( int active )

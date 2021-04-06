@@ -43,6 +43,7 @@
 
 // Interface includes
 #include <Interface/Application/ColorPickerWidget.h>
+#include <Interface/Application/SeedPointsPreferencesWidget.h>
 
 // QtUtils includes
 #include <QtUtils/Widgets/QtCustomDialog.h>
