@@ -63,6 +63,7 @@ set(INTERFACE_APPLICATION_SRCS
   QtLayerListWidget.cc
   SaveProjectAsWizard.cc
   SegmentationExportWizard.cc
+  SeedPointsPreferencesWidget.cc
   ShortcutsInterface.cc
   SplashScreen.cc
   StatusBarWidget.cc
@@ -109,6 +110,7 @@ set(INTERFACE_APPLICATION_MOC_SRCS
   PushDragButton.h
   QtLayerListWidget.h
   SaveProjectAsWizard.h
+  SeedPointsPreferencesWidget.h
   SegmentationExportWizard.h
   ShortcutsInterface.h
   SplashScreen.h
@@ -155,6 +157,7 @@ set(INTERFACE_APPLICATION_UI_SRCS
   ProgressWidget.ui
   ProvenanceDockWidget.ui
   QtLayerListWidget.ui
+  SeedPointsPreferencesWidget.ui
   StatusBarWidget.ui
   ShortcutsInterface.ui
   SplashScreen.ui

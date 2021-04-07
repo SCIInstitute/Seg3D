@@ -54,7 +54,9 @@ Q_SIGNALS:
 
   
 public Q_SLOTS:
+  void set_size();
   void set_size(int size);
+  void set_thickness();
   void set_thickness(double thickness);
   
 private:

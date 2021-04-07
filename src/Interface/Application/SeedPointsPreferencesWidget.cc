@@ -70,24 +70,22 @@ SeedPointsPreferencesWidget::~SeedPointsPreferencesWidget()
 
 void SeedPointsPreferencesWidget::set_size(int size)
 {
-  this->private_->ui_.size_spinbox_->setValue(size);
+  private_->ui_.size_spinbox_->setValue(size);
 }
 
 void SeedPointsPreferencesWidget::set_thickness(double thickness)
 {
-  this->private_->ui_.thickness_spinbox_->setValue(thickness);
+  private_->ui_.thickness_spinbox_->setValue(thickness);
 }
 
 void SeedPointsPreferencesWidget::set_size()
 {
-  this->private_->ui_.size_spinbox_->setValue(this->size_);
+  private_->ui_.size_spinbox_->setValue(this->size_);
 }
 
 void SeedPointsPreferencesWidget::set_thickness()
 {
-  this->private_->ui_.thickness_spinbox_->setValue(this->thickness_);
-}
-
+  private_->ui_.thickness_spinbox_->setValue(this->thickness_);
 }
 
 } // end namespace Seg3D
