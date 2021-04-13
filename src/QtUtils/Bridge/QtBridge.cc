@@ -197,6 +197,12 @@ Core::ConnectionHandle QtBridge::Connect( QtColorButton* colorbutton, Core::Stat
     new QtColorButtonConnector( colorbutton, state ) ) ); 
 }
 
+/*Core::ConnectionHandle QtBridge::Connect()
+{
+  return Core::ConnectionHandle( new QtConnection(
+    new QtSeedPointsConnector( seedpoints, state));
+}*/
+
 Core::ConnectionHandle QtBridge::Connect( QAction* qaction, boost::function< void() > function )
 {
   return Core::ConnectionHandle( new QtConnection(
