@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_GRAPHICS_SRCS
+set(CORE_GRAPHICS_SRCS
   Texture.h
   Texture.cc
   Renderbuffer.h
@@ -60,7 +60,7 @@ SET(CORE_GRAPHICS_SRCS
 
 CORE_ADD_LIBRARY(Core_Graphics ${CORE_GRAPHICS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Graphics
+target_link_libraries(Core_Graphics
             Core_RenderResources
                       ${SCI_GLEW_LIBRARY}
                       ${SCI_BOOST_LIBRARY})

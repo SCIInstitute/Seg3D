@@ -30,7 +30,7 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_TOOL_SRCS
+set(APPLICATION_TOOL_SRCS
   GroupTargetTool.h
   GroupTargetTool.cc
   SeedPointsTool.h
@@ -49,14 +49,14 @@ SET(APPLICATION_TOOL_SRCS
   ToolInterface.cc
 )
 
-SET(APPLICATION_TOOL_ACTIONS_SRCS
+set(APPLICATION_TOOL_ACTIONS_SRCS
   Actions/ActionSaveToolPreferences.h
   Actions/ActionSaveToolPreferences.cc
 )
 
 CORE_ADD_LIBRARY(Application_Tool ${APPLICATION_TOOL_SRCS} ${APPLICATION_TOOL_ACTIONS_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Tool
+target_link_libraries(Application_Tool
   Core_Utils
   Core_Application
   Core_Interface

@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_PROVENANCE_SRCS
+set(APPLICATION_PROVENANCE_SRCS
   Provenance.h
   Provenance.cc
   ProvenanceStep.h
@@ -40,7 +40,7 @@ SET(APPLICATION_PROVENANCE_SRCS
 
 CORE_ADD_LIBRARY(Application_Provenance ${APPLICATION_PROVENANCE_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Provenance
+target_link_libraries(Application_Provenance
                       Core_Application
                       Core_Utils
                       ${SCI_BOOST_LIBRARY})

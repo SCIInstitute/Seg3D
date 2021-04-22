@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(INTERFACE_APPLICATION_SRCS
+set(INTERFACE_APPLICATION_SRCS
   ApplicationInterface.cc
   ColorPickerWidget.cc
   ControllerInterface.cc
@@ -79,7 +79,7 @@ SET(INTERFACE_APPLICATION_SRCS
   SliceRangeDialog.cc
 )
 
-SET(INTERFACE_APPLICATION_MOC_SRCS
+set(INTERFACE_APPLICATION_MOC_SRCS
   ApplicationInterface.h
   ColorPickerWidget.h
   ControllerInterface.h
@@ -126,12 +126,12 @@ SET(INTERFACE_APPLICATION_MOC_SRCS
   SliceRangeDialog.h
 )
 
-IF(BUILD_WITH_PYTHON)
-  SET(INTERFACE_APPLICATION_SRCS ${INTERFACE_APPLICATION_SRCS} PythonConsoleWidget.cc)
-  SET(INTERFACE_APPLICATION_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS} PythonConsoleWidget.h)
-ENDIF()
+if(BUILD_WITH_PYTHON)
+  set(INTERFACE_APPLICATION_SRCS ${INTERFACE_APPLICATION_SRCS} PythonConsoleWidget.cc)
+  set(INTERFACE_APPLICATION_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS} PythonConsoleWidget.h)
+endif()
 
-SET(INTERFACE_APPLICATION_NO_MOC_SRCS
+set(INTERFACE_APPLICATION_NO_MOC_SRCS
   ControllerContext.h
   LayerIOFunctions.h
   LayerIOFunctions.cc
@@ -139,7 +139,7 @@ SET(INTERFACE_APPLICATION_NO_MOC_SRCS
   StyleSheet.cc
 )
 
-SET(INTERFACE_APPLICATION_UI_SRCS
+set(INTERFACE_APPLICATION_UI_SRCS
   ColorPickerWidget.ui
   ControllerInterface.ui
   GroupButtonMenu.ui
@@ -166,7 +166,7 @@ SET(INTERFACE_APPLICATION_UI_SRCS
   SliceRangeDialog.ui
 )
 
-SET(INTERFACE_APPLICATION_RCC_SRCS
+set(INTERFACE_APPLICATION_RCC_SRCS
 )
 
 
@@ -194,7 +194,7 @@ QT5_WRAP_CPP(INTERFACE_APPLICATION_QT_MOC_SRCS ${INTERFACE_APPLICATION_MOC_SRCS}
 # by the moc and ui builder
 ##################################################
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ##################################################
 # Build the Components library
@@ -208,8 +208,8 @@ CORE_ADD_LIBRARY(Interface_Application
   ${INTERFACE_APPLICATION_MOC_SRCS}
   ${INTERFACE_APPLICATION_QT_RCC_SRCS})
 
-IF(APPLE)
-  TARGET_LINK_LIBRARIES(Interface_Application
+if(APPLE)
+  target_link_libraries(Interface_Application
     Core_Utils
     Core_EventHandler
     Core_Action
@@ -227,8 +227,8 @@ IF(APPLE)
     QtUtils_Bridge
     ${SCI_BOOST_LIBRARY}
     /System/Library/Frameworks/CoreServices.framework)
-ELSE()
-  TARGET_LINK_LIBRARIES(Interface_Application
+else()
+  target_link_libraries(Interface_Application
     Core_Utils
     Core_EventHandler
     Core_Action
@@ -245,8 +245,8 @@ ELSE()
     QtUtils_Widgets
     QtUtils_Bridge
     ${SCI_BOOST_LIBRARY})
-ENDIF()
+endif()
 
-IF(BUILD_WITH_PYTHON)
-  TARGET_LINK_LIBRARIES(Interface_Application Core_Python)
-ENDIF()
+if(BUILD_WITH_PYTHON)
+  target_link_libraries(Interface_Application Core_Python)
+endif()

@@ -24,14 +24,14 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
-SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
-SET(teem_GIT_TAG "origin/master")
-SET(teem_DEPENDENCIES "Zlib_external;LibPNG_external")
+set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+set(teem_GIT_TAG "origin/master")
+set(teem_DEPENDENCIES "Zlib_external;LibPNG_external")
 
-IF(TRAVIS_BUILD)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-ENDIF()
+if(TRAVIS_BUILD)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+endif()
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -55,6 +55,6 @@ ExternalProject_Add(Teem_external
 )
 
 ExternalProject_Get_Property(Teem_external BINARY_DIR)
-SET(Teem_DIR ${BINARY_DIR} CACHE PATH "")
+set(Teem_DIR ${BINARY_DIR} CACHE PATH "")
 
-MESSAGE(STATUS "Teem_DIR: ${Teem_DIR}")
+message(STATUS "Teem_DIR: ${Teem_DIR}")

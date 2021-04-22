@@ -119,7 +119,7 @@ bool FramebufferObject::check_status( GLenum* status )
   this->safe_bind();
   GLenum result = glCheckFramebufferStatusEXT( TARGET_C );
   this->safe_unbind();
-  if ( status != NULL )
+  if ( status != nullptr )
   {
     *status = result;
   }

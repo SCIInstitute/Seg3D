@@ -30,7 +30,7 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_FILTERS_SRCS
+set(APPLICATION_FILTERS_SRCS
   LayerFilter.h
   LayerFilter.cc
   LayerFilterLock.h
@@ -55,14 +55,14 @@ SET(APPLICATION_FILTERS_SRCS
   SingleThresholdFilter.cc
 )
 
-SET(APPLICATION_FILTERS_UTILS_SRCS
+set(APPLICATION_FILTERS_UTILS_SRCS
   Utils/PadFilterInternals.h
   Utils/PadFilterInternals.cc
   Utils/PadValues.h
   Utils/PadValues.cc
 )
 
-SET(APPLICATION_FILTERS_ACTIONS_SRCS
+set(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionResample.h
   Actions/ActionResample.cc
   Actions/ActionCannyEdgeDetectionFilter.h
@@ -153,10 +153,10 @@ SET(APPLICATION_FILTERS_ACTIONS_SRCS
   Actions/ActionWatershedFilter.cc
 )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Application_Filters ${APPLICATION_FILTERS_ACTIONS_SRCS})
-  SET(APPLICATION_FILTERS_SRCS ${APPLICATION_FILTERS_SRCS} ${PYTHON_WRAPPER})
-ENDIF()
+  set(APPLICATION_FILTERS_SRCS ${APPLICATION_FILTERS_SRCS} ${PYTHON_WRAPPER})
+endif()
 
 CORE_ADD_LIBRARY(Application_Filters
   ${APPLICATION_FILTERS_SRCS}
@@ -164,7 +164,7 @@ CORE_ADD_LIBRARY(Application_Filters
   ${APPLICATION_FILTERS_UTILS_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_Filters
+target_link_libraries(Application_Filters
   Core_Utils
   Core_Action
   Core_State

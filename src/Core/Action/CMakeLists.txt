@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_ACTION_SRCS
+set(CORE_ACTION_SRCS
   Action.h
   Action.cc
   ActionContext.h
@@ -55,7 +55,7 @@ SET(CORE_ACTION_SRCS
 
 CORE_ADD_LIBRARY(Core_Action ${CORE_ACTION_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Action
+target_link_libraries(Core_Action
   Core_Utils
   Core_EventHandler
   Core_Application

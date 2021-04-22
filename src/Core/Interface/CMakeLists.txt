@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_INTERFACE_SRCS
+set(CORE_INTERFACE_SRCS
   InterfaceActionContext.h
   InterfaceActionContext.cc
   Interface.h
@@ -40,7 +40,7 @@ SET(CORE_INTERFACE_SRCS
 
 CORE_ADD_LIBRARY(Core_Interface ${CORE_INTERFACE_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Interface
+target_link_libraries(Core_Interface
                       Core_Application
                       Core_Action
                       Core_Utils

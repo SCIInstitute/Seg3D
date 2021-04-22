@@ -30,7 +30,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_DATABLOCK_SRCS
+set(CORE_DATABLOCK_SRCS
   DataBlock.h
   DataBlockFWD.h
   DataBlock.cc
@@ -67,9 +67,9 @@ CORE_ADD_LIBRARY(Core_DataBlock ${CORE_DATABLOCK_SRCS})
 
 ITK_MODULE_LOAD(ITKCommon)
 
-INCLUDE_DIRECTORIES(${ITKCommon_INCLUDE_DIRS})
+include_directories(${ITKCommon_INCLUDE_DIRS})
 
-TARGET_LINK_LIBRARIES(Core_DataBlock
+target_link_libraries(Core_DataBlock
   Core_Utils
   Core_Geometry
   ${ITKCommon_LIBRARIES}
@@ -79,7 +79,7 @@ TARGET_LINK_LIBRARIES(Core_DataBlock
   ${SCI_BOOST_LIBRARY}
 )
 
-#SET_TARGET_PROPERTIES(Core_DataBlock
+#set_target_properties(Core_DataBlock
 #  PROPERTIES
 #  INCLUDE_DIRECTORIES "${ITKCommon_INCLUDE_DIRS}"
 #)

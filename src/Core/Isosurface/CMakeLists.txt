@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_ISOSURFACE_SRCS
+set(CORE_ISOSURFACE_SRCS
   Isosurface.h
   Isosurface.cc
   IsosurfaceExporter.h
@@ -44,7 +44,7 @@ SET(CORE_ISOSURFACE_SRCS
 
 CORE_ADD_LIBRARY(Core_Isosurface ${CORE_ISOSURFACE_SRCS})
             
-TARGET_LINK_LIBRARIES(Core_Isosurface 
+target_link_libraries(Core_Isosurface
   Core_Utils
   Core_Graphics
   ${SCI_BOOST_LIBRARY}

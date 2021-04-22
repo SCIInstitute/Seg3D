@@ -102,9 +102,9 @@ void Timer::start()
     {
       delete this->private_->timer_thread_;
     }
-    
+
     this->private_->running_ = true;
-    this->private_->timer_thread_ = new boost::thread( boost::bind( 
+    this->private_->timer_thread_ = new boost::thread( boost::bind(
       &TimerPrivate::run, this->private_ ) );
     this->private_->timer_condition_.wait( lock );
   }

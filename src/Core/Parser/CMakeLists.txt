@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_PARSER_SRCS
+set(CORE_PARSER_SRCS
   ArrayMathEngine.h
   ArrayMathEngine.cc
   ArrayMathFunction.h
@@ -79,7 +79,7 @@ SET(CORE_PARSER_SRCS
 
 CORE_ADD_LIBRARY(Core_Parser ${CORE_PARSER_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Parser 
+target_link_libraries(Core_Parser
   ${SCI_BOOST_LIBRARY}
   Core_Utils 
   Core_DataBlock)

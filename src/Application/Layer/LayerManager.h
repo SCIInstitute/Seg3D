@@ -31,7 +31,7 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif 
+#endif
 
 // Boost includes
 #include <boost/shared_ptr.hpp>
@@ -69,7 +69,7 @@ class LayerManager : public Core::StateHandler
 private:
   LayerManager();
   virtual ~LayerManager();
-  
+
   // -- Set up StateHandler priority --
 public:
   // TODO: Fix this and put this in a macro definition
@@ -82,11 +82,11 @@ public:
   /// GET_GROUPS:
   /// this function copies the groups into the vector that is passed
   void get_groups( std::vector< LayerGroupHandle >& groups );
-  
+
   /// GET_LAYERS:
   /// Get all layers in top to bottom order.
   void get_layers( std::vector< LayerHandle >& layers );
-    
+
   /// FIND_GROUP:
   /// this function returns the group with the id that is passed.
   LayerGroupHandle find_group( const std::string& group_id );
@@ -94,12 +94,12 @@ public:
   /// FIND_GROUP:
   /// this function returns the group with the provenance id that is passed.
   LayerGroupHandle find_group( ProvenanceID provenance_id );
-  
+
   /// FIND_LAYER_BY_ID:
   /// Find the layer with the given ID.
   /// If a sandbox number is given, it searches in that sandbox instead.
   LayerHandle find_layer_by_id( const std::string& layer_id, SandboxID sandbox = -1 );
-  
+
   /// FIND_LAYER_BY_NAME:
   /// This function returns a handle to a layer with the name that is passed.
   /// If a sandbox number is given, it searches in that sandbox instead.
@@ -124,10 +124,10 @@ public:
   /// This function returns a handle to the active layer
   /// Locks: StateEngine
   LayerHandle get_active_layer();
-  
+
   /// GET_LAYER_NAMES:
   /// This function returns a vector of layer ID and name pairs of the specified layer type.
-  void get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+  void get_layer_names( std::vector< LayerIDNamePair >& layer_names,
     int type = Core::VolumeType::ALL_E );
 
   /// GET_GROUP_POSITION:
@@ -145,6 +145,7 @@ private:
   friend class ActionImportLayer;
   friend class ActionImportSeries;
   friend class ActionNewMaskLayer;
+  friend class ActionGrowCutInitialize;
   friend class ActionDuplicateLayer;
   friend class ActionMoveLayer;
   friend class ActionDeleteLayers;
@@ -197,17 +198,17 @@ private:
   /// the original position of the group that contained the layer, the third parameter
   /// contains the original position of the layer within its group.
   /// NOTE: The three parameters must have the same number of elements.
-  void undelete_layers( const std::vector< LayerHandle >& layers, 
+  void undelete_layers( const std::vector< LayerHandle >& layers,
     const std::vector< size_t >& group_pos, const std::vector< size_t >& layer_pos );
 
   /// CREATE_SANDBOX:
   /// Create a sandbox and return the sandbox ID.
-  /// The returned ID starts from 1 and increases. 
+  /// The returned ID starts from 1 and increases.
   /// NOTE: Sandbox 0 is reserved for provenance playback.
   SandboxID create_sandbox();
 
   /// CREATE_SANDBOX:
-  /// Try to create a sandbox with the specified ID. 
+  /// Try to create a sandbox with the specified ID.
   /// Fails if the sandbox ID is negative, or if the sandbox already exists.
   /// Returns true on success, otherwise false.
   bool create_sandbox( SandboxID sandbox );
@@ -225,15 +226,15 @@ public:
   Core::BBox get_layers_bbox();
 
   // -- locking --
-public: 
+public:
   typedef Core::StateEngine::mutex_type mutex_type;
   typedef Core::StateEngine::lock_type lock_type;
-  
+
   /// GET_MUTEX:
   /// Get the mutex, so it can be locked by the interface that is built
   /// on top of this
   mutex_type& get_mutex();
-  
+
   // state variables
 public:
   Core::StateLabeledOptionHandle active_layer_state_;
@@ -249,10 +250,10 @@ public:
   /// LAYERS_DELETED_SIGNAL:
   /// Triggered after layers have been deleted.
   /// The first parameter is a vector of deleted layer IDs.
-  /// The second parameter is a vector of group IDs from 
+  /// The second parameter is a vector of group IDs from
   /// which the layers have been deleted.
   /// The third parameter indicates whether any group has been deleted.
-  boost::signals2::signal< void ( std::vector< std::string >, 
+  boost::signals2::signal< void ( std::vector< std::string >,
     std::vector< std::string >, bool ) > layers_deleted_signal_;
 
   /// LAYERS_REORDERED_SIGNAL:
@@ -265,7 +266,7 @@ public:
   boost::signals2::signal< void () > groups_reordered_signal_;
 
   /// LAYERS_CHANGED_SIGNAL:
-  /// Triggered when layers are inserted, deleted, or reordered. 
+  /// Triggered when layers are inserted, deleted, or reordered.
   /// It is a combination of layer_inserted_signal_, layers_deleted_signal_,
   /// layers_reordered_signal_, and groups_reordered_signal_.
   /// NOTE: It is always triggered after the individual ones.
@@ -281,7 +282,7 @@ public:
 
   /// ACTIVE_LAYER_CHANGED_SIGNAL:
   /// This signal is triggered after the active layer is changed
-  boost::signals2::signal< void ( LayerHandle ) > active_layer_changed_signal_; 
+  boost::signals2::signal< void ( LayerHandle ) > active_layer_changed_signal_;
 
   /// LAYER_NAME_CHANGED_SIGNAL:
   /// Triggered when the name of a layer has changed.
@@ -292,7 +293,7 @@ public:
   /// Triggered when the volume of a layer has changed.
   /// The first parameter is the layer handle.
   boost::signals2::signal< void ( LayerHandle ) > layer_volume_changed_signal_;
-  
+
   /// LAYER_DATA_CHANGED_SIGNAL:
   /// Triggered when the layer data state is changed. This tracks whether layers
   /// are being locked for processing and when new data will be available
@@ -310,7 +311,7 @@ public:
 public:
   /// SCRIPT_BEGIN_SIGNAL:
   /// Indicate the beginning of a script.
-  /// The first parameter is sandbox in which the script is running, 
+  /// The first parameter is sandbox in which the script is running,
   /// the second parameter is the the script name.
   /// NOTE: The sandbox can be used to uniquely identify a running script.
   boost::signals2::signal< void ( SandboxID, std::string ) > script_begin_signal_;
@@ -342,20 +343,20 @@ protected:
   /// this function creates the layers who's information was saved to file, and then tells them
   /// to populate their state variables from file
   virtual bool post_load_states( const Core::StateIO& state_io );
-  
+
   /// PRE_LOAD_STATES:
   /// this function clears out all existing layers before we load a project from file
   virtual bool pre_load_states( const Core::StateIO& state_io );
-  
+
 private:
   friend class LayerManagerPrivate;
   LayerManagerPrivateHandle private_;
 
   // -- static functions --
 public:
-  
+
   // == functions for validation of an action ==
-  
+
   /// FINDLAYER:
   /// Find a layer inside the layer manager
   static LayerHandle FindLayer( const std::string& layer_id, SandboxID sandbox = -1 );
@@ -371,7 +372,7 @@ public:
   /// FINDGROUP:
   /// Find a layer inside the layer manager
   static LayerGroupHandle FindGroup( ProvenanceID prov_id );
-  
+
   /// FINDMASKLAYER:
   /// Find a mask layer inside the layer manager
   static MaskLayerHandle FindMaskLayer( const std::string& layer_id, SandboxID sandbox = -1 );
@@ -398,38 +399,38 @@ public:
 
   /// CHECKLAYEREXISTENCE:
   /// Check whether a layer exists.
-  /// If it does not exist, the function returns and reports the error in the context 
-  static bool CheckLayerExistence( const std::string& layer_id, 
+  /// If it does not exist, the function returns and reports the error in the context
+  static bool CheckLayerExistence( const std::string& layer_id,
     Core::ActionContextHandle context, SandboxID sandbox = -1 );
-  
+
   /// Check whether a layer exists.
   /// If it does not exist, the function returns false.
-  static bool CheckLayerExistence( const std::string& layer_id, SandboxID sandbox = -1 ); 
-  
+  static bool CheckLayerExistence( const std::string& layer_id, SandboxID sandbox = -1 );
+
   /// CHECKLAYEREXISTENCEANDTYPE:
   /// Check whether a layer exists and whether it is of the right type.
   /// If it does not exist or is not of the right type, the function returns the error in the
   /// context.
-  static bool CheckLayerExistenceAndType( const std::string& layer_id, Core::VolumeType type, 
+  static bool CheckLayerExistenceAndType( const std::string& layer_id, Core::VolumeType type,
     Core::ActionContextHandle context, SandboxID sandbox = -1 );
 
   /// CHECKLAYERSIZE:
   /// Check whether a layer has the right size.
-  /// If it does not have the right size, the function returns false and returns the error in 
-  /// the context.  
+  /// If it does not have the right size, the function returns false and returns the error in
+  /// the context.
   static bool CheckLayerSize( const std::string& layer_id1, const std::string& layer_id2,
     Core::ActionContextHandle context, SandboxID sandbox = -1 );
-      
+
   /// CHECKLAYERAVAILABILITYFORPROCESSING:
   /// Check whether a layer is available for processing, at the end of the filter the data will
   /// be replaced with new data. Hence this is write access.
   /// If a layer is not available a notifier is returned that tells can be used to assess when to
   /// check for availability again. Even though the notifier may return another process may have
   /// grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
-  /// availability. 
+  /// availability.
   /// NOTE: Availability needs to be tested to ensure that another process is not working on this
-  /// this layer. 
-  static bool CheckLayerAvailabilityForProcessing( const std::string& layer_id, 
+  /// this layer.
+  static bool CheckLayerAvailabilityForProcessing( const std::string& layer_id,
     Core::ActionContextHandle context, SandboxID sandbox = -1 );
 
   /// CHECKLAYERAVAILABILITYFORUSE:
@@ -438,27 +439,27 @@ public:
   /// If a layer is not available a notifier is returned that tells can be used to assess when to
   /// check for availability again. Even though the notifier may return another process may have
   /// grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
-  /// availability. 
+  /// availability.
   /// NOTE: Availability needs to be tested to ensure that another process is not working on this
-  /// this layer. 
-  static bool CheckLayerAvailabilityForUse( const std::string& layer_id, 
+  /// this layer.
+  static bool CheckLayerAvailabilityForUse( const std::string& layer_id,
     Core::ActionContextHandle context, SandboxID sandbox = -1 );
-    
+
   /// CHECKLAYERAVAILABILITY:
   /// Check whether a layer is available for use. This case processes both of the above cases:
-  /// if replace is true, it will check for processing (write) access, if it is not replaced, it 
+  /// if replace is true, it will check for processing (write) access, if it is not replaced, it
   /// will look for use (read) access
   /// If a layer is not available a notifier is returned that tells can be used to assess when to
   /// check for availability again. Even though the notifier may return another process may have
   /// grabbed it in the mean time. In that case a new notifier will need to be issued by rechecking
   /// availability.
   /// NOTE: Availability needs to be tested to ensure that another process is not working on this
-  /// this layer. 
+  /// this layer.
   static bool CheckLayerAvailability( const std::string& layer_id, bool replace,
-    Core::ActionContextHandle context, SandboxID sandbox = -1 );  
-    
+    Core::ActionContextHandle context, SandboxID sandbox = -1 );
+
   // == functions for creating and locking layers ==
-public: 
+public:
   /// KEY_TYPE:
   /// When locking a layer a key is returned. This key keeps track of the asynchronous process
   /// and is needed to reinsert a volume into layer. The purpose of the key is to ensure that
@@ -467,29 +468,29 @@ public:
   typedef Layer::filter_key_type filter_key_type;
 
   // These functions can only be called from the application thread
-  
+
   /// LOCKFORUSE:
   /// Change the layer data_state to IN_USE_C.
   /// NOTE: This function can *only* be called from the Application thread.
   static bool LockForUse( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
-  
+
   /// LOCKFORPROCESSING:
   /// Change the layer data_state to PROCESSING_C.
   /// NOTE: This function can *only* be called from the Application thread.
   static bool LockForProcessing( LayerHandle layer, filter_key_type key = filter_key_type( 0 ) );
-  
+
   /// CREATEANDLOCKMASKLAYER:
   /// Create a new mask layer and lock it into the CREATING_C mode.
   /// NOTE: This function can *only* be called from the Application thread.
-  static bool CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name, 
-    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = filter_key_type( 0 ), 
+  static bool CreateAndLockMaskLayer( Core::GridTransform transform, const std::string& name,
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = filter_key_type( 0 ),
     SandboxID sandbox = -1 );
-  
+
   /// CREATEANDLOCKDATALAYER:
   /// Create a new data layer and lock it into the CREATING_C mode.
   /// NOTE: This function can *only* be called from the Application thread.
   static bool CreateAndLockDataLayer( Core::GridTransform, const std::string& name,
-    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = filter_key_type( 0 ), 
+    LayerHandle& layer, const LayerMetaData& meta_data, filter_key_type key = filter_key_type( 0 ),
     SandboxID sandbox = -1 );
 
   /// Create a cropped version of a large volume.
@@ -497,77 +498,77 @@ public:
   static bool CreateCroppedLargeVolumeLayer( Core::LargeVolumeSchemaHandle schema,
     const Core::GridTransform& crop_trans, const std::string& name,
     LayerHandle& layer, const LayerMetaData& meta_data, SandboxID sandbox = -1 );
-  
+
   // == functions for setting data and unlocking layers ==
 
   // These functions can be called from the filter thread
-  
+
   /// DISPATCHUNLOCKLAYER:
-  /// Change the layer data_state back to available. This function will relay a call to the 
+  /// Change the layer data_state back to available. This function will relay a call to the
   /// Application thread if needed.
   static void DispatchUnlockLayer( LayerHandle layer, filter_key_type key = filter_key_type( 0 ),
     SandboxID sandbox = -1 );
 
   /// DISPATCHDELETELAYER:
-  /// Delete the layer. This function will relay a call to the 
+  /// Delete the layer. This function will relay a call to the
   /// Application thread if needed.
   static void DispatchDeleteLayer( LayerHandle layer, filter_key_type key = filter_key_type( 0 ),
     SandboxID sandbox = -1 );
-  
+
   /// DISPATCHUNLOCKORDELETELAYER:
-  /// Unlock layer if valid, delete otherwise. This function will relay a call to the 
+  /// Unlock layer if valid, delete otherwise. This function will relay a call to the
   /// Application thread if needed.
-  static void DispatchUnlockOrDeleteLayer( LayerHandle layer, 
+  static void DispatchUnlockOrDeleteLayer( LayerHandle layer,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTDATAVOLUMEINTOLAYER:
-  /// Insert a data volume into a data layer. This function will relay a call to the 
+  /// Insert a data volume into a data layer. This function will relay a call to the
   /// Application thread if needed.
-  static void DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer, 
-    Core::DataVolumeHandle data, ProvenanceID provid, 
+  static void DispatchInsertDataVolumeIntoLayer( DataLayerHandle layer,
+    Core::DataVolumeHandle data, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTMASKVOLUMEINTOLAYER:
-  /// Insert a mask volume into a mask layer. This function will relay a call to the 
+  /// Insert a mask volume into a mask layer. This function will relay a call to the
   /// Application thread if needed.
-  static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer, 
-    Core::MaskVolumeHandle mask, ProvenanceID provid, 
+  static void DispatchInsertMaskVolumeIntoLayer( MaskLayerHandle layer,
+    Core::MaskVolumeHandle mask, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTVOLUMEINTOLAYER:
-  /// Insert a mask or data volume into a layer. This function will relay a call to the 
+  /// Insert a mask or data volume into a layer. This function will relay a call to the
   /// Application thread if needed.
-  static void DispatchInsertVolumeIntoLayer( LayerHandle layer, 
-    Core::VolumeHandle mask, ProvenanceID provid, 
+  static void DispatchInsertVolumeIntoLayer( LayerHandle layer,
+    Core::VolumeHandle mask, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTDATASLICEINTOLAYER:
-  /// Insert a data slice into a data layer. 
+  /// Insert a data slice into a data layer.
   static void DispatchInsertDataSliceIntoLayer( DataLayerHandle layer,
-    Core::DataSliceHandle data, ProvenanceID provid, 
+    Core::DataSliceHandle data, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTDATASLICEINTOLAYER:
-  /// Insert a data slice into a data layer. 
+  /// Insert a data slice into a data layer.
   static void DispatchInsertDataSlicesIntoLayer( DataLayerHandle layer,
-    std::vector<Core::DataSliceHandle> data, ProvenanceID provid, 
+    std::vector<Core::DataSliceHandle> data, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTMASKSLICEINTOLAYER:
-  /// Insert a data slice into a data layer. 
+  /// Insert a data slice into a data layer.
   static void DispatchInsertMaskSliceIntoLayer( MaskLayerHandle layer,
     Core::MaskDataSliceHandle mask, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   /// DISPATCHINSERTMASKSLICESINTOLAYER:
-  /// Insert a data slice into a data layer. 
+  /// Insert a data slice into a data layer.
   static void DispatchInsertMaskSlicesIntoLayer( MaskLayerHandle layer,
-    std::vector<Core::MaskDataSliceHandle> mask, ProvenanceID provid, 
+    std::vector<Core::MaskDataSliceHandle> mask, ProvenanceID provid,
     filter_key_type key = filter_key_type( 0 ), SandboxID sandbox = -1 );
 
   // -- functions for obtaining the current layer and group id counters --
   typedef std::vector<int> id_count_type;
-  
+
   /// GETLAYERIDCOUNT:
   /// Get the current count of the group and layer ids
   static id_count_type GetLayerIdCount();
@@ -575,7 +576,7 @@ public:
   /// GETLAYERINVALIDIDCOUNT:
   /// Get a default id count that has no valid ids.
   static id_count_type GetLayerInvalidIdCount();
-  
+
   /// SETLAYERIDCOUNT:
   /// Set the current count of group and layer
   /// NOTE: This function should only be called by the undo buffer

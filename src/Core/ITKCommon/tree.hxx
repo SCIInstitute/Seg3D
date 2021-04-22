@@ -74,11 +74,11 @@ public:
   m_(data_t(0)),
   min_(data_t(0)),
   max_(data_t(0)),
-  points_(NULL),
+  points_(nullptr),
   num_pts_(0),
-  parent_(NULL),
-  a_(NULL),
-  b_(NULL)
+  parent_(nullptr),
+  a_(nullptr),
+  b_(nullptr)
   {}
   
   // copy constructor:
@@ -87,21 +87,21 @@ public:
   m_(data_t(0)),
   min_(data_t(0)),
   max_(data_t(0)),
-  points_(NULL),
+  points_(nullptr),
   num_pts_(0),
-  parent_(NULL),
-  a_(NULL),
-  b_(NULL)
+  parent_(nullptr),
+  a_(nullptr),
+  b_(nullptr)
   { *this = node; }
   
   // destructor:
   ~node_t()
   {
     delete a_;
-    a_ = NULL;
+    a_ = nullptr;
     
     delete b_;
-    b_ = NULL;
+    b_ = nullptr;
   }
   
   //----------------------------------------------------------------
@@ -117,11 +117,11 @@ public:
   m_(data_t(0)),
   min_(data_t(0)),
   max_(data_t(0)),
-  points_(NULL),
+  points_(nullptr),
   num_pts_(0),
   parent_(parent),
-  a_(NULL),
-  b_(NULL)
+  a_(nullptr),
+  b_(nullptr)
   {
     // first, find the mean point value for each dimension:
     data_t mean[kd] = { data_t(0) };
@@ -239,18 +239,18 @@ public:
     parent_ = node.parent_;
     
     delete a_;
-    a_ = NULL;
+    a_ = nullptr;
     
     delete b_;
-    b_ = NULL;
+    b_ = nullptr;
     
-    if (node.a_ != NULL)
+    if (node.a_ != nullptr)
     {
       a_ = new node_t<kd, point_t, data_t>(*node.a_);
       a_->parent_ = this;
     }
     
-    if (node.b_ != NULL)
+    if (node.b_ != nullptr)
     {
       b_ = new node_t<kd, point_t, data_t>(*node.b_);
       b_->parent_ = this;
@@ -292,8 +292,8 @@ public:
     const data_t da = std::min(std::max(min_ - p, 0.0), std::max(p - m_, 0.0));
     const data_t db = std::min(std::max(m_ - p, 0.0), std::max(p - max_, 0.0));
     
-    if (da > best_distance && db > best_distance) return NULL;
-    if (points_ != NULL) return this;
+    if (da > best_distance && db > best_distance) return nullptr;
+    if (points_ != nullptr) return this;
     
     if (da < db)
     {
@@ -314,7 +314,7 @@ public:
   data_t
   euclidian_distance(const point_t & query) const
   {
-    assert(points_ != NULL);
+    assert(points_ != nullptr);
     
     const point_t & point = points_[0];
     data_t distance = 0.0;
@@ -330,7 +330,7 @@ public:
   // FIXME: this is for debugging:
   void dump(std::ostream & so) const
   {
-    if (points_ != NULL)
+    if (points_ != nullptr)
     {
       for (unsigned int i = 0; i < num_pts_; i++)
       {
@@ -347,8 +347,8 @@ public:
     }
     else
     {
-      if (a_ != NULL) a_->dump(so);
-      if (b_ != NULL) b_->dump(so);
+      if (a_ != nullptr) a_->dump(so);
+      if (b_ != nullptr) b_->dump(so);
     }
   }
   
@@ -402,12 +402,12 @@ public:
   
   // default constructor:
   tree_t():
-  root_(NULL)
+  root_(nullptr)
   {}
   
   // copy constructor:
   tree_t(const tree_t<kd, point_t, data_t> & tree):
-  root_(NULL)
+  root_(nullptr)
   {
     *this = tree;
   }
@@ -416,7 +416,7 @@ public:
   ~tree_t()
   {
     delete root_;
-    root_ = NULL;
+    root_ = nullptr;
   }
   
   // assignment operator:
@@ -424,8 +424,8 @@ public:
   operator = (const tree_t<kd, point_t, data_t> & tree)
   {
     delete root_;
-    root_ = NULL;
-    if (tree.root_ != NULL)
+    root_ = nullptr;
+    if (tree.root_ != nullptr)
     {
       root_ = new node_t<kd, point_t, data_t>(*(tree.root_));
     }
@@ -437,11 +437,11 @@ public:
   void setup(point_t * points, const unsigned int num_pts)
   {
     delete root_;
-    root_ = NULL;
+    root_ = nullptr;
     
     if (num_pts != 0)
     {
-      root_ = new node_t<kd, point_t, data_t>(NULL, points, num_pts);
+      root_ = new node_t<kd, point_t, data_t>(nullptr, points, num_pts);
     }
   }
   
@@ -474,10 +474,10 @@ public:
      const unsigned int max_traversals = 200,
      const unsigned int max_nn = 3) const
   {
-    if (root_ == NULL) return 0;
+    if (root_ == nullptr) return 0;
     
     // the results:
-    const node_t<kd, point_t, data_t> * best_match = NULL;
+    const node_t<kd, point_t, data_t> * best_match = nullptr;
     best_distance = std::numeric_limits<data_t>::max();
     
     // bootstrap the search by starting at the root:
@@ -494,7 +494,7 @@ public:
       // find a matching point in the tree:
       const node_t<kd, point_t, data_t> * match =
       start_here->leaf(unexplored, query, best_distance);
-      if (match == NULL) continue;
+      if (match == nullptr) continue;
       
       // find the distance to the matching point:
       data_t distance = match->euclidian_distance(query);
@@ -552,7 +552,7 @@ public:
     std::list<nn_t> nn_sorted;
     if (nn(query, best_distance, nn_sorted, max_traversals, 1) == 0)
     {
-      return NULL;
+      return nullptr;
     }
     
     return nn_sorted.front().node_;
@@ -565,7 +565,7 @@ public:
             std::list<nn_t> & nn_sorted,
             const unsigned int max_traversals = 200) const
   {
-    if (root_ == NULL) return 0;
+    if (root_ == nullptr) return 0;
     
     // bootstrap the search by starting at the root:
     std::list<unexplored_branch_t> unexplored;
@@ -581,7 +581,7 @@ public:
       // find a matching point in the tree:
       const node_t<kd, point_t, data_t> * match =
       start_here->leaf(unexplored, query, radius);
-      if (match == NULL) continue;
+      if (match == nullptr) continue;
       
       // find the distance to the matching point:
       data_t distance = match->euclidian_distance(query);
@@ -601,8 +601,8 @@ public:
   // dump the leaf nodes into the stream:
   void dump(std::ostream & so) const
   {
-    if (root_ != NULL) root_->dump(so);
-    else so << "NULL";
+    if (root_ != nullptr) root_->dump(so);
+    else so << "nullptr";
   }
   
   node_t<kd, point_t, data_t> * root_;

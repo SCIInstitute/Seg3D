@@ -24,13 +24,13 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
-SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
-SET(data_GIT_URL "https://github.com/CIBC-Internal/Seg3DData.git")
+set(data_GIT_URL "https://github.com/CIBC-Internal/Seg3DData.git")
 # master should be always be publicly released version
-SET(data_GIT_TAG "origin/master")
+set(data_GIT_TAG "origin/master")
 
-SET(data_DIR "${SEG3D_BINARY_DIR}/Seg3DData")
+set(data_DIR "${SEG3D_BINARY_DIR}/Seg3DData")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -45,6 +45,6 @@ ExternalProject_Add(Data_external
 )
 
 # test data location for tests
-SET(TEST_INPUT_PATH ${data_DIR} CACHE PATH "Root for all github-based data files")
+set(TEST_INPUT_PATH ${data_DIR} CACHE PATH "Root for all github-based data files")
 
-MESSAGE(STATUS "TEST_INPUT_PATH: ${TEST_INPUT_PATH}")
+message(STATUS "TEST_INPUT_PATH: ${TEST_INPUT_PATH}")

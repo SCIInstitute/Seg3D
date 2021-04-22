@@ -254,7 +254,7 @@ bool VFFLayerImporterPrivate::read_data()
   
 #ifdef _WIN32
   HANDLE file_desc = CreateFileA( this->importer_->get_filename().c_str(), GENERIC_READ,
-    FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
   if ( file_desc == INVALID_HANDLE_VALUE ) 
   {
     this->importer_->set_error( "Could not open file." );
@@ -273,7 +273,7 @@ bool VFFLayerImporterPrivate::read_data()
   // We start by getting the length of the entire file
 #ifdef _WIN32
   LARGE_INTEGER offset; offset.QuadPart = 0;
-    SetFilePointerEx( file_desc, offset, NULL, FILE_END);
+    SetFilePointerEx( file_desc, offset, nullptr, FILE_END);
 #else
   data_file.seekg( 0, std::ios::end );
 #endif
@@ -303,7 +303,7 @@ bool VFFLayerImporterPrivate::read_data()
 
 #ifdef _WIN32
   offset.QuadPart = this->vff_end_of_header_;
-    SetFilePointerEx( file_desc, offset, NULL, FILE_BEGIN );
+    SetFilePointerEx( file_desc, offset, nullptr, FILE_BEGIN );
 #else
   data_file.seekg( this->vff_end_of_header_, std::ios::beg );
 #endif
@@ -319,11 +319,11 @@ bool VFFLayerImporterPrivate::read_data()
   
   while ( read_length > chunk )
   {
-    ReadFile( file_desc, data_ptr, DWORD(chunk), &dwReadBytes, NULL );
+    ReadFile( file_desc, data_ptr, DWORD(chunk), &dwReadBytes, nullptr );
     read_length -= static_cast<size_t>( dwReadBytes );
     data_ptr += static_cast<size_t>( dwReadBytes );
   }
-  ReadFile( file_desc, data_ptr, DWORD( read_length ), &dwReadBytes, NULL );
+  ReadFile( file_desc, data_ptr, DWORD( read_length ), &dwReadBytes, nullptr );
 
 #else
   data_file.read( data, length );

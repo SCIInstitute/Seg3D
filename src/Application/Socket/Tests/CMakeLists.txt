@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Application_Socket_Tests_SRCS
+set(Application_Socket_Tests_SRCS
   ActionSocketTests.cc
 )
 
@@ -33,7 +33,7 @@ REGISTER_UNIT_TEST(Application_Socket_Tests
   ${Application_Socket_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_Socket_Tests
+target_link_libraries(Application_Socket_Tests
   Application_Socket
   Testing_Utils
   gtest

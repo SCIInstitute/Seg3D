@@ -29,7 +29,7 @@
 // STL includes
 #include <limits>
 
-// Boost includes 
+// Boost includes
 #include <boost/filesystem.hpp>
 
 // Core includes
@@ -71,7 +71,7 @@ void DataLayer::initialize_states()
 
 	{
 		boost::mutex::scoped_lock lock(data_ColorCountMutex);
-		this->private_->layer_->add_state("color", this->private_->layer_->color_state_, 
+		this->private_->layer_->add_state("color", this->private_->layer_->color_state_,
 			static_cast<int>(data_ColorCount % PreferencesManager::Instance()->color_states_.size()));
 
 		data_ColorCount++;
@@ -131,8 +131,8 @@ void DataLayerPrivate::update_data_info()
     this->layer_->max_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
     return;
   }
-  
-  this->layer_->centering_state_->set( 
+
+  this->layer_->centering_state_->set(
     this->layer_->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
 
   switch ( this->layer_->get_data_type() )
@@ -155,6 +155,12 @@ void DataLayerPrivate::update_data_info()
   case Core::DataType::UINT_E:
     this->layer_->data_type_state_->set( "unsigned int" );
     break;
+  case Core::DataType::LONGLONG_E:
+    this->layer_->data_type_state_->set( "long long" );
+    break;
+  case Core::DataType::ULONGLONG_E:
+    this->layer_->data_type_state_->set( "unsigned long long" );
+    break;
   case Core::DataType::FLOAT_E:
     this->layer_->data_type_state_->set( "float" );
     break;
@@ -162,7 +168,7 @@ void DataLayerPrivate::update_data_info()
     this->layer_->data_type_state_->set( "double" );
     break;
   }
-  
+
   this->layer_->min_value_state_->set( this->layer_->data_volume_->get_min() );
   this->layer_->max_value_state_->set( this->layer_->data_volume_->get_max() );
 }
@@ -170,7 +176,7 @@ void DataLayerPrivate::update_data_info()
 void DataLayerPrivate::update_display_value_range()
 {
   if ( !this->layer_->has_valid_data() )  return;
-  
+
   {
     Core::ScopedCounter signal_block( this->signal_block_count_ );
     double min_val = this->layer_->get_data_volume()->get_min();
@@ -188,7 +194,7 @@ void DataLayerPrivate::handle_contrast_brightness_changed()
   {
     return;
   }
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
   // Convert contrast to range ( 0, 1 ] and brightness to [ 0, 2 ]
@@ -220,7 +226,7 @@ void DataLayerPrivate::handle_display_value_range_changed()
   {
     std::swap( display_min, display_max );
   }
-  
+
   double contrast = 1.0 - ( display_max - display_min ) / ( max_val - min_val );
   double brightness = ( max_val * 2 - display_min - display_max ) / ( max_val - min_val );
   this->layer_->contrast_state_->set( contrast * 100 );
@@ -239,7 +245,7 @@ DataLayer::DataLayer( const std::string& name, const Core::DataVolumeHandle& vol
   this->initialize_states();
   this->private_->update_display_value_range();
 }
-  
+
 DataLayer::DataLayer( const std::string& state_id ) :
   Layer( "not initialized", state_id ),
   private_( new DataLayerPrivate )
@@ -259,13 +265,13 @@ DataLayer::~DataLayer()
   }
 }
 
-Core::GridTransform DataLayer::get_grid_transform() const 
-{ 
+Core::GridTransform DataLayer::get_grid_transform() const
+{
   Layer::lock_type lock( Layer::GetMutex() );
 
   if ( this->data_volume_ )
   {
-    return this->data_volume_->get_grid_transform(); 
+    return this->data_volume_->get_grid_transform();
   }
   else
   {
@@ -273,14 +279,14 @@ Core::GridTransform DataLayer::get_grid_transform() const
   }
 }
 
-void DataLayer::set_grid_transform( const Core::GridTransform& grid_transform, 
+void DataLayer::set_grid_transform( const Core::GridTransform& grid_transform,
   bool preserve_centering )
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
   if ( this->data_volume_ )
   {
-    this->data_volume_->set_grid_transform( grid_transform, preserve_centering ); 
+    this->data_volume_->set_grid_transform( grid_transform, preserve_centering );
   }
 }
 
@@ -292,7 +298,7 @@ Core::DataType DataLayer::get_data_type() const
   {
     return this->data_volume_->get_data_type();
   }
-  
+
   return Core::DataType::UNKNOWN_E;
 }
 
@@ -333,12 +339,12 @@ Core::VolumeHandle DataLayer::get_volume() const
 }
 
 bool DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
-{ 
+{
   ASSERT_IS_APPLICATION_THREAD();
 
   // Only insert the volume if the layer is still valid
   if ( !this->is_valid() )  return false;
-  
+
   {
     Layer::lock_type lock( Layer::GetMutex() );
 
@@ -347,8 +353,8 @@ bool DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
       // Unregister the old volume
       this->data_volume_->unregister_data();
     }
-    
-    this->data_volume_ = data_volume; 
+
+    this->data_volume_ = data_volume;
 
     if ( this->data_volume_ )
     {
@@ -362,7 +368,7 @@ bool DataLayer::set_data_volume( Core::DataVolumeHandle data_volume )
   }
 
   return true;
-} 
+}
 
 bool DataLayer::pre_save_states( Core::StateIO& state_io )
 {
@@ -373,31 +379,31 @@ bool DataLayer::pre_save_states( Core::StateIO& state_io )
 
     // Add the number to the project so it can be recorded into the session database
     ProjectManager::Instance()->get_current_project()->add_generation_number( generation_number );
-    
+
     std::string data_file_name = this->generation_state_->export_to_string() + ".nrrd";
     boost::filesystem::path full_data_file_name = ProjectManager::Instance()->
       get_current_project()->get_project_data_path() / data_file_name;
-    
+
     if ( boost::filesystem::exists( full_data_file_name ) )
     {
       // File has already been saved
       return true;
     }
-      
+
     bool compress = PreferencesManager::Instance()->compression_state_->get();
     int level = PreferencesManager::Instance()->compression_level_state_->get();
-    
+
     std::string error;
-    if ( ! Core::DataVolume::SaveDataVolume( full_data_file_name.string(), this->data_volume_, 
+    if ( ! Core::DataVolume::SaveDataVolume( full_data_file_name.string(), this->data_volume_,
       error, compress, level ) )
     {
       CORE_LOG_ERROR( error );
-      return false;   
+      return false;
     }
 
     return true;
   }
-  
+
   return true;
 }
 
@@ -409,7 +415,7 @@ bool DataLayer::post_load_states( const Core::StateIO& state_io )
     boost::filesystem::path volume_path = ProjectManager::Instance()->get_current_project()->
       get_project_data_path() / generation;
     std::string error;
-    
+
     if( Core::DataVolume::LoadDataVolume( volume_path, this->data_volume_, error ) )
     {
       this->data_volume_->register_data( this->generation_state_->get() );
@@ -429,25 +435,25 @@ bool DataLayer::post_load_states( const Core::StateIO& state_io )
 
   return false;
 }
-  
+
 void DataLayer::clean_up()
 {
   // Abort any filter still using this layer
   this->abort_signal_();
-  
+
   // Clean up the data that is still associated with this layer
   {
     Layer::lock_type lock( Layer::GetMutex() );
-    if ( this->data_volume_ ) 
+    if ( this->data_volume_ )
     {
       this->data_volume_->unregister_data();
-      Core::DataVolume::CreateInvalidData( this->data_volume_->get_grid_transform(), 
+      Core::DataVolume::CreateInvalidData( this->data_volume_->get_grid_transform(),
         this->data_volume_ );
     }
   }
-  
+
   // Remove all the connections
-  this->disconnect_all();   
+  this->disconnect_all();
 }
 
 LayerHandle DataLayer::duplicate() const
@@ -460,7 +466,7 @@ LayerHandle DataLayer::duplicate() const
     // NOTE: return an empty handle
     return layer;
   }
-  
+
   return DataLayerHandle( new DataLayer( "Copy_" + this->get_layer_name(), data_volume ) );
 
 }
@@ -478,4 +484,3 @@ void DataLayer::SetColorCount(size_t count)
 }
 
 } // end namespace Seg3D
-

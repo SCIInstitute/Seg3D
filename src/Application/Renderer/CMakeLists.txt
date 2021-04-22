@@ -30,7 +30,7 @@
 # Import shaders into source files
 ##################################################
 
-SET(APPLICATION_RENDERER_SHADER_SRCS
+set(APPLICATION_RENDERER_SHADER_SRCS
   Lighting.vert
   Lighting.frag
   Fog.vert
@@ -51,7 +51,7 @@ CORE_IMPORT_SHADER(APPLICATION_RENDERER_SHADER_STRING_SRCS
 # Set sources
 ##################################################
 
-SET(APPLICATION_RENDERER_SRCS
+set(APPLICATION_RENDERER_SRCS
   Renderer.h
   Renderer.cc
   SliceShader.h
@@ -69,7 +69,7 @@ CORE_ADD_LIBRARY(Application_Renderer ${APPLICATION_RENDERER_SRCS}
   ${APPLICATION_RENDERER_SHADER_STRING_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_Renderer
+target_link_libraries(Application_Renderer
   Core_Utils
   Core_EventHandler
   Core_TextRenderer

@@ -26,7 +26,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-MESSAGE(STATUS "Configuring Submodules")
+message(STATUS "Configuring Submodules")
 
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/../.git")
@@ -47,5 +47,5 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/submodules/googletest/CMakeLists
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
-SET(gtest_force_shared_crt ON)
-ADD_SUBDIRECTORY(googletest)
+set(gtest_force_shared_crt ON)
+add_subdirectory(googletest)

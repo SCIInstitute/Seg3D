@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_CLIPBOARD_SRCS
+set(APPLICATION_CLIPBOARD_SRCS
   Clipboard.h
   Clipboard.cc
   ClipboardItem.h
@@ -42,7 +42,7 @@ SET(APPLICATION_CLIPBOARD_SRCS
 
 CORE_ADD_LIBRARY(Application_Clipboard ${APPLICATION_CLIPBOARD_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_Clipboard
+target_link_libraries(Application_Clipboard
                       Core_Application
                       Core_Utils
                       ${SCI_BOOST_LIBRARY})

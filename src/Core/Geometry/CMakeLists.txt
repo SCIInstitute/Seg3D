@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_GEOMETRY_SRCS
+set(CORE_GEOMETRY_SRCS
   BBox.h
   BBox.cc
   Color.h
@@ -71,6 +71,6 @@ SET(CORE_GEOMETRY_SRCS
 
 CORE_ADD_LIBRARY(Core_Geometry ${CORE_GEOMETRY_SRCS})
 
-TARGET_LINK_LIBRARIES(Core_Geometry ${SCI_BOOST_LIBRARY})
+target_link_libraries(Core_Geometry ${SCI_BOOST_LIBRARY})
 
 ADD_TEST_DIR(Tests)

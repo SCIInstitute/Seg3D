@@ -25,7 +25,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(Core_DataBlock_Tests_SRCS
+set(Core_DataBlock_Tests_SRCS
   DataBlockTests.cc
   NrrdDataTests.cc
 )
@@ -34,7 +34,7 @@ REGISTER_UNIT_TEST(Core_DataBlock_Tests
   ${Core_DataBlock_Tests_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Core_DataBlock_Tests
+target_link_libraries(Core_DataBlock_Tests
   Core_DataBlock
   Testing_Utils
   ${SCI_ZLIB_LIBRARY}

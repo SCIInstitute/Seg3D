@@ -29,7 +29,7 @@
 // STL includes
 #include <limits>
 
-// Boost includes 
+// Boost includes
 #include <boost/filesystem.hpp>
 
 // Core includes
@@ -71,8 +71,8 @@ void LargeVolumeLayerPrivate::update_data_info()
     this->layer_->max_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
     return;
   }
-  
-  this->layer_->centering_state_->set( 
+
+  this->layer_->centering_state_->set(
     this->layer_->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
 
   switch ( this->layer_->get_data_type() )
@@ -95,6 +95,12 @@ void LargeVolumeLayerPrivate::update_data_info()
   case Core::DataType::UINT_E:
     this->layer_->data_type_state_->set( "unsigned int" );
     break;
+  case Core::DataType::LONGLONG_E:
+    this->layer_->data_type_state_->set( "long long" );
+    break;
+  case Core::DataType::ULONGLONG_E:
+    this->layer_->data_type_state_->set( "unsigned long long" );
+    break;
   case Core::DataType::FLOAT_E:
     this->layer_->data_type_state_->set( "float" );
     break;
@@ -102,7 +108,7 @@ void LargeVolumeLayerPrivate::update_data_info()
     this->layer_->data_type_state_->set( "double" );
     break;
   }
-  
+
   this->layer_->min_value_state_->set( this->volume_->get_min() );
   this->layer_->max_value_state_->set( this->volume_->get_max() );
 }
@@ -110,7 +116,7 @@ void LargeVolumeLayerPrivate::update_data_info()
 void LargeVolumeLayerPrivate::update_display_value_range()
 {
   if ( !this->layer_->has_valid_data() )  return;
-  
+
   {
     Core::ScopedCounter signal_block( this->signal_block_count_ );
     double min_val = this->volume_->get_min();
@@ -128,7 +134,7 @@ void LargeVolumeLayerPrivate::handle_contrast_brightness_changed()
   {
     return;
   }
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
   // Convert contrast to range ( 0, 1 ] and brightness to [ 0, 2 ]
@@ -160,7 +166,7 @@ void LargeVolumeLayerPrivate::handle_display_value_range_changed()
   {
     std::swap( display_min, display_max );
   }
-  
+
   double contrast = 1.0 - ( display_max - display_min ) / ( max_val - min_val );
   double brightness = ( max_val * 2 - display_min - display_max ) / ( max_val - min_val );
   this->layer_->contrast_state_->set( contrast * 100 );
@@ -180,7 +186,7 @@ LargeVolumeLayer::LargeVolumeLayer( const std::string& name, Core::LargeVolumeSc
   this->private_->update_display_value_range();
 }
 
-LargeVolumeLayer::LargeVolumeLayer( const std::string& name, Core::LargeVolumeSchemaHandle schema, 
+LargeVolumeLayer::LargeVolumeLayer( const std::string& name, Core::LargeVolumeSchemaHandle schema,
   const Core::GridTransform& crop_trans ) :
   Layer( name ),
   private_( new LargeVolumeLayerPrivate )
@@ -217,7 +223,7 @@ boost::mutex lv_ColorCountMutex;
 void LargeVolumeLayer::initialize_states()
 {
   // NOTE: This function allows setting of state variables outside of application thread
-  this->set_initializing( true ); 
+  this->set_initializing( true );
 
   this->add_state( "dir_name", this->dir_name_state_, "" );
 
@@ -235,7 +241,7 @@ void LargeVolumeLayer::initialize_states()
   this->add_state("colormap", this->colormap_state_, PreferencesManager::Instance()->
 	  default_colormap_state_->export_to_string(), PreferencesManager::Instance()->
 	  default_colormap_state_->export_list_to_string());
-     
+
   // == The brightness of the layer ==
   this->add_state( "brightness", brightness_state_, 50.0, 0.0, 100.0, 0.1 );
 
@@ -272,8 +278,8 @@ void LargeVolumeLayer::initialize_states()
   this->set_initializing( false );
 }
 
-Core::GridTransform LargeVolumeLayer::get_grid_transform() const 
-{ 
+Core::GridTransform LargeVolumeLayer::get_grid_transform() const
+{
   Layer::lock_type lock( Layer::GetMutex() );
 
   if ( this->private_->volume_ )
@@ -286,7 +292,7 @@ Core::GridTransform LargeVolumeLayer::get_grid_transform() const
   }
 }
 
-void LargeVolumeLayer::set_grid_transform( const Core::GridTransform& grid_transform, 
+void LargeVolumeLayer::set_grid_transform( const Core::GridTransform& grid_transform,
   bool preserve_centering )
 {
   Layer::lock_type lock( Layer::GetMutex() );
@@ -305,7 +311,7 @@ Core::DataType LargeVolumeLayer::get_data_type() const
   {
     return this->private_->volume_->get_data_type();
   }
-  
+
   return Core::DataType::UNKNOWN_E;
 }
 
@@ -328,7 +334,7 @@ Core::VolumeHandle LargeVolumeLayer::get_volume() const
 }
 
 bool LargeVolumeLayer::pre_save_states( Core::StateIO& state_io )
-{ 
+{
   return true;
 }
 
@@ -337,7 +343,7 @@ bool LargeVolumeLayer::post_load_states( const Core::StateIO& state_io )
   Core::LargeVolumeSchemaHandle schema( new Core::LargeVolumeSchema);
   schema->set_dir( this->dir_name_state_->get() );
   std::string error;
-  
+
   if (! schema->load( error) )
   {
     CORE_LOG_ERROR( error );
@@ -358,14 +364,14 @@ bool LargeVolumeLayer::post_load_states( const Core::StateIO& state_io )
 
   return true;
 }
-  
+
 void LargeVolumeLayer::clean_up()
 {
   // Abort any filter still using this layer
   this->abort_signal_();
-    
+
   // Remove all the connections
-  this->disconnect_all();   
+  this->disconnect_all();
 }
 
 LayerHandle LargeVolumeLayer::duplicate() const
@@ -379,4 +385,3 @@ Core::LargeVolumeSchemaHandle LargeVolumeLayer::get_schema() const
 }
 
 } // end namespace Seg3D
-

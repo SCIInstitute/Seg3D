@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -86,7 +86,7 @@ int main( int argc, char **argv )
 {
   // -- Parse the command line parameters --
   Core::Application::Instance()->parse_command_line_parameters( argc, argv );
-  
+
   // -- Check whether the user requested a version / revision number
   if ( Core::Application::Instance()->is_command_line_parameter( "revision") )
   {
@@ -99,12 +99,12 @@ int main( int argc, char **argv )
   if ( Core::Application::Instance()->is_command_line_parameter( "version") )
   {
     // NOTE: This information is gathered by cmake from the main cmake file.
-    std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<  
+    std::cout << Core::Application::Instance()->GetApplicationName() << " version: " <<
       Core::Application::Instance()->GetVersion() << std::endl;
     return 0;
   }
 
-  // -- Send message to revolving log file -- 
+  // -- Send message to revolving log file --
   // Logs messages in response to Log::Instance()->post_log_signal_
   Core::RolloverLogFile event_log( Core::LogMessageType::ALL_E );
 
@@ -116,7 +116,7 @@ int main( int argc, char **argv )
   // -- Log application information --
   Core::Application::Instance()->log_start();
 
-  // -- Add plugins into the architecture  
+  // -- Add plugins into the architecture
   Core::RegisterClasses();
 
   // -- Start the application event handler --
@@ -124,10 +124,10 @@ int main( int argc, char **argv )
 
   // Initialize the startup tools list
   ToolFactory::Instance()->initialize_states();
-  
+
   // Trigger the application start signal
   Core::Application::Instance()->application_start_signal_();
-  
+
   // -- Warn user about being an alpha/beta version --
   std::string file_to_view = "";
   Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
@@ -135,7 +135,7 @@ int main( int argc, char **argv )
   if ( sizeof( void * ) == 4 )
   {
     std::string warning = std::string( "<h3>" ) +
-      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + " 32BIT" 
+      Core::Application::GetApplicationName() + " " + Core::Application::GetVersion() + " 32BIT"
       "</h3><h6><p align=\"justify\">Please note: " + Core::Application::GetApplicationName()
       + " is meant to run in 64-bit mode. "
       "In 32-bit mode the size of volumes that can be processed are limited, as "
@@ -152,7 +152,7 @@ int main( int argc, char **argv )
 
   Core::PythonInterpreter::module_list_type python_modules;
   std::string module_name = Core::StringToLower( BOOST_PP_STRINGIZE( APPLICATION_NAME ) );
-  python_modules.push_back( Core::PythonInterpreter::module_entry_type( module_name, 
+  python_modules.push_back( Core::PythonInterpreter::module_entry_type( module_name,
     BOOST_PP_CAT( PyInit_, APPLICATION_NAME ) ) );
   Core::PythonInterpreter::Instance()->initialize( &program_name[ 0 ], python_modules );
   Core::PythonInterpreter::Instance()->run_string( "import " + module_name + "\n" );
@@ -168,7 +168,7 @@ int main( int argc, char **argv )
     {
       // -- Add a socket for receiving actions --
       CORE_LOG_MESSAGE( std::string("Starting a socket on port: ") + Core::ExportToString( port_number ) );
-      Seg3D::ActionSocket::Instance()->start( port_number );
+      ActionSocket::Instance()->start( port_number );
       InterfaceManager::Instance()->set_initializing( true );
       InterfaceManager::Instance()->splash_screen_visibility_state_->set( false );
       InterfaceManager::Instance()->set_initializing( false );
@@ -186,7 +186,7 @@ int main( int argc, char **argv )
   // -- Setup Application Interface Window --
 //  std::string file_to_view = "";
 //  Core::Application::Instance()->check_command_line_parameter( "file_to_open_on_start", file_to_view );
-  
+
 
   signal(SIGABRT, &sighandler);
   signal(SIGTERM, &sighandler);

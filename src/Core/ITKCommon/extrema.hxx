@@ -82,7 +82,7 @@ public:
 class descriptor_t
 {
 public:
-  descriptor_t(extrema_t * extrema = NULL):
+  descriptor_t(extrema_t * extrema = nullptr):
     extrema_(extrema)
   {}
   
@@ -121,7 +121,7 @@ class ext_wrapper_t
 {
 public:
   ext_wrapper_t():
-    key_(NULL)
+    key_(nullptr)
   {}
   
   // vector-like accessor to the extrema target space coordinates:
@@ -139,7 +139,7 @@ class key_wrapper_t
 {
 public:
   key_wrapper_t():
-    key_(NULL)
+    key_(nullptr)
   {}
   
   // vector-like accessor to the key descriptor:

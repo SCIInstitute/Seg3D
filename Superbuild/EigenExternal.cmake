@@ -24,7 +24,7 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
-SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # TODO: test on Windows
 ExternalProject_Add(Eigen_external
@@ -37,6 +37,6 @@ ExternalProject_Add(Eigen_external
 )
 
 ExternalProject_Get_Property(Eigen_external SOURCE_DIR)
-SET(Eigen_DIR ${SOURCE_DIR} CACHE PATH "")
+set(Eigen_DIR ${SOURCE_DIR} CACHE PATH "")
 
-MESSAGE(STATUS "Eigen_DIR: ${Eigen_DIR}")
+message(STATUS "Eigen_DIR: ${Eigen_DIR}")

@@ -547,7 +547,7 @@ long long Application::get_total_physical_memory()
   name[ 0 ] = CTL_HW;
   name[ 1 ] = HW_MEMSIZE;
   size_t length = sizeof( unsigned long long );
-  sysctl( name, 2, &total_physical_memory, &length, NULL, 0);
+  sysctl( name, 2, &total_physical_memory, &length, nullptr, 0);
   return total_physical_memory;
 #else
   struct sysinfo info;
