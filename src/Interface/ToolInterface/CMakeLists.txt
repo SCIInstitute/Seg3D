@@ -2,7 +2,7 @@
 #  For more information, please see: http://software.sci.utah.edu
 #
 #  The MIT License
-# 
+#
 #  Copyright (c) 2016 Scientific Computing and Imaging Institute,
 #  University of Utah.
 #
@@ -52,6 +52,7 @@ set(INTERFACE_TOOLINTERFACE_SRCS
   FillHolesFilterInterface.cc
   GradientAnisotropicDiffusionFilterInterface.cc
   GradientMagnitudeFilterInterface.cc
+  GrowCutToolInterface.cc
   HistogramEqualizationFilterInterface.cc
   IntensityCorrectionFilterInterface.cc
   MaskDataFilterInterface.cc
@@ -98,6 +99,7 @@ set(INTERFACE_TOOLINTERFACE_MOC_SRCS
   FillHolesFilterInterface.h
   GradientAnisotropicDiffusionFilterInterface.h
   GradientMagnitudeFilterInterface.h
+  GrowCutToolInterface.h
   HistogramEqualizationFilterInterface.h
   IntensityCorrectionFilterInterface.h
   MaskDataFilterInterface.h
@@ -155,6 +157,7 @@ set(INTERFACE_TOOLINTERFACE_UI_SRCS
   FillHolesFilterInterface.ui
   GradientAnisotropicDiffusionFilterInterface.ui
   GradientMagnitudeFilterInterface.ui
+  GrowCutToolInterface.ui
   HistogramEqualizationFilterInterface.ui
   IntensityCorrectionFilterInterface.ui
   MaskDataFilterInterface.ui

@@ -33,7 +33,7 @@
 # pragma once
 #endif
 
-// Boost includes 
+// Boost includes
 #include <boost/smart_ptr.hpp>
 
 // Core includes
@@ -43,7 +43,7 @@ namespace Core
 {
 
 // CLASS MouseButton:
-/// Enums for mouse buttons 
+/// Enums for mouse buttons
 /// they have the same values as corresponding Qt ones
 CORE_ENUM_CLASS
 (
@@ -72,18 +72,18 @@ CORE_ENUM_CLASS
 CORE_ENUM_CLASS
 (
   Key,
-  KEY_LEFT_E = 0x01000012,   
-  KEY_UP_E = 0x01000013,   
-  KEY_RIGHT_E = 0x01000014,  
+  KEY_LEFT_E = 0x01000012,
+  KEY_UP_E = 0x01000013,
+  KEY_RIGHT_E = 0x01000014,
   KEY_DOWN_E = 0x01000015,
   KEY_SHIFT_E = 0x01000020,
   KEY_CONTROL_E = 0x01000021,
   KEY_META_E = 0x01000022,
-  
+
   KEY_SPACE_E = 0x20,
-  KEY_EXCLAM_E = 0x21, 
-  KEY_QUOTE_E = 0x22, 
-  KEY_NUMBER_E = 0x23, 
+  KEY_EXCLAM_E = 0x21,
+  KEY_QUOTE_E = 0x22,
+  KEY_NUMBER_E = 0x23,
   KEY_DOLLAR_E = 0x24,
   KEY_PERCENT_E = 0x25,
   KEY_AMPERSAND_E = 0x26,
@@ -96,16 +96,16 @@ CORE_ENUM_CLASS
   KEY_MINUS_E = 0x2d,
   KEY_PERIOD_E = 0x2e,
   KEY_SLASH_E = 0x2f,
-  KEY_0_E = 0x30,  
-  KEY_1_E = 0x31,  
-  KEY_2_E = 0x32,  
-  KEY_3_E = 0x33,  
-  KEY_4_E = 0x34,  
-  KEY_5_E = 0x35,  
-  KEY_6_E = 0x36,  
-  KEY_7_E = 0x37,  
-  KEY_8_E = 0x38,  
-  KEY_9_E = 0x39,  
+  KEY_0_E = 0x30,
+  KEY_1_E = 0x31,
+  KEY_2_E = 0x32,
+  KEY_3_E = 0x33,
+  KEY_4_E = 0x34,
+  KEY_5_E = 0x35,
+  KEY_6_E = 0x36,
+  KEY_7_E = 0x37,
+  KEY_8_E = 0x38,
+  KEY_9_E = 0x39,
   KEY_COLON_E = 0x3a,
   KEY_SEMICOLON_E = 0x3b,
   KEY_LESS_E = 0x3c,
@@ -138,7 +138,9 @@ CORE_ENUM_CLASS
   KEY_W_E = 0x57,
   KEY_X_E = 0x58,
   KEY_Y_E = 0x59,
-  KEY_Z_E = 0x5a
+  KEY_Z_E = 0x5a,
+  KEY_BRACKETLEFT_E = 0x5b,
+  KEY_BRACKETRIGHT_E = 0x5d
 )
 
 // CLASS HitPosition:
@@ -165,7 +167,7 @@ class MousePosition
 {
 public:
   MousePosition( int x_in = 0, int y_in = 0 ) :
-    x_( x_in ), 
+    x_( x_in ),
     y_( y_in )
   {
   }

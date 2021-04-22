@@ -61,6 +61,7 @@ set(itk_CACHE_ARGS
   "-DModule_ITKBinaryMathematicalMorphology:BOOL=ON"
   "-DModule_ITKDistanceMap:BOOL=ON"
   "-DModule_ITKLevelSets:BOOL=ON"
+  "-DModule_ITKLabelVoting:BOOL=ON"
   "-DModule_ITKWatersheds:BOOL=ON"
   "-DModule_ITKImageFusion:BOOL=ON"
   "-DModule_ITKHDF5:BOOL=ON"
@@ -88,7 +89,7 @@ if(BUILD_MOSAIC_TOOLS)
   )
 endif()
 
-set(itk_GIT_TAG "v5.1.2")
+SET(itk_GIT_TAG "v5.2rc01")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -103,6 +104,6 @@ ExternalProject_Add(ITK_external
 
 # hardcoded, since we need this before ITK's configure step
 ExternalProject_Get_Property(ITK_external INSTALL_DIR)
-set(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.1" CACHE PATH "")
+SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.2" CACHE PATH "")
 
 message(STATUS "ITK_DIR=${ITK_DIR}")
