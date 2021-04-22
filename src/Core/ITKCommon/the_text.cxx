@@ -50,7 +50,7 @@
 // the_text_t::the_text_t
 // 
 the_text_t::the_text_t(const char * text):
-  text_(NULL),
+  text_(nullptr),
   size_(0)
 {
   assign(text);
@@ -60,7 +60,7 @@ the_text_t::the_text_t(const char * text):
 // the_text_t::the_text_t
 // 
 the_text_t::the_text_t(const char * text, const size_t & size):
-  text_(NULL),
+  text_(nullptr),
   size_(0)
 {
   assign(text, size);
@@ -70,7 +70,7 @@ the_text_t::the_text_t(const char * text, const size_t & size):
 // the_text_t::the_text_t
 // 
 the_text_t::the_text_t(const the_text_t & text):
-  text_(NULL),
+  text_(nullptr),
   size_(0)
 {
   assign(text.text_, text.size_);
@@ -80,7 +80,7 @@ the_text_t::the_text_t(const the_text_t & text):
 // the_text_t::the_text_t
 // 
 the_text_t::the_text_t(const std::list<char> & text):
-  text_(NULL),
+  text_(nullptr),
   size_(text.size())
 {
   text_ = new char [size_ + 1];

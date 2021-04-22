@@ -59,8 +59,8 @@ using std::endl;
 // 
 static the_mutex_interface_t * MUTEX()
 {
-  static the_mutex_interface_t * mutex_ = NULL;
-  if (mutex_ == NULL)
+  static the_mutex_interface_t * mutex_ = nullptr;
+  if (mutex_ == nullptr)
   {
     mutex_ = the_mutex_interface_t::create();
   }
@@ -73,7 +73,7 @@ static the_mutex_interface_t * MUTEX()
 // the_thread_interface_t::creator_
 // 
 the_thread_interface_t::creator_t
-the_thread_interface_t::creator_ = NULL;
+the_thread_interface_t::creator_ = nullptr;
 
 //----------------------------------------------------------------
 // the_thread_interface_t::the_thread_interface_t
@@ -83,9 +83,9 @@ the_thread_interface_t::the_thread_interface_t(the_mutex_interface_t * mutex):
   stopped_(true),
   sleep_when_idle_(false),
   sleep_microsec_(10000),
-  active_transaction_(NULL),
-  thread_pool_(NULL),
-  thread_pool_cb_data_(NULL)
+  active_transaction_(nullptr),
+  thread_pool_(nullptr),
+  thread_pool_cb_data_(nullptr)
 {
   the_lock_t<the_mutex_interface_t> locker(MUTEX());
   static unsigned int counter = 0;
@@ -115,7 +115,7 @@ the_thread_interface_t::set_creator(the_thread_interface_t::creator_t creator)
 the_thread_interface_t *
 the_thread_interface_t::create()
 {
-  if (creator_ == NULL) return NULL;
+  if (creator_ == nullptr) return nullptr;
   return creator_();
 }
 
@@ -176,7 +176,7 @@ the_thread_interface_t::push_back(std::list<the_transaction_t *> & schedule)
 bool
 the_thread_interface_t::has_work() const
 {
-  return (active_transaction_ != NULL) || !transactions_.empty();
+  return (active_transaction_ != nullptr) || !transactions_.empty();
 }
 
 //----------------------------------------------------------------
@@ -359,19 +359,19 @@ the_thread_interface_t::work()
 {
   the_lock_t<the_mutex_interface_t> lock_this(mutex_, false);
   the_lock_t<the_mutex_interface_t> lock_pool(thread_pool_ ?
-                thread_pool_->mutex_ : NULL,
+                thread_pool_->mutex_ : nullptr,
                 false);
   bool all_transactions_completed = true;
   
   while (!stopped_)
   {
     // get the next transaction:
-    the_transaction_t * t = NULL;
+    the_transaction_t * t = nullptr;
     {
       lock_pool.arm();
       lock_this.arm();
       
-      if (thread_pool_ != NULL)
+      if (thread_pool_ != nullptr)
       {
   // call back the thread pool:
 #ifdef DEBUG_THREAD
@@ -418,12 +418,12 @@ the_thread_interface_t::work()
       t->notify(this, the_transaction_t::STARTED_E);
       t->execute(this);
       all_transactions_completed = (all_transactions_completed && true);
-      active_transaction_ = NULL;
+      active_transaction_ = nullptr;
       t->notify(this, the_transaction_t::DONE_E);
     }
     catch (std::exception & e)
     {
-      active_transaction_ = NULL;
+      active_transaction_ = nullptr;
 #ifdef DEBUG_THREAD
       cerr << "FIXME: caught exception: " << e.what() << endl;
 #endif
@@ -433,7 +433,7 @@ the_thread_interface_t::work()
     }
     catch (...)
     {
-      active_transaction_ = NULL;
+      active_transaction_ = nullptr;
 #ifdef DEBUG_THREAD
       cerr << "FIXME: caught unknonwn exception" << endl;
 #endif
@@ -468,7 +468,7 @@ the_thread_interface_t::work()
   cerr << "thread " << this << " is finished" << endl;
 #endif
   
-  if (thread_pool_ != NULL)
+  if (thread_pool_ != nullptr)
   {
     lock_pool.arm();
     lock_this.arm();
@@ -504,7 +504,7 @@ the_thread_interface_t::handle(the_transaction_t * transaction,
 void
 the_thread_interface_t::blab(const char * message) const
 {
-  if (thread_pool_ == NULL)
+  if (thread_pool_ == nullptr)
   {
     cerr << message << endl;
   }

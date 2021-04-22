@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_STATE_SRCS
+set(CORE_STATE_SRCS
   StateBase.cc
   StateBase.h
   StateEngine.h
@@ -63,7 +63,7 @@ SET(CORE_STATE_SRCS
   BooleanStateGroup.cc
   )
 
-SET(CORE_STATE_ACTIONS_SRCS
+set(CORE_STATE_ACTIONS_SRCS
   Actions/ActionAdd.h
   Actions/ActionAdd.cc
   Actions/ActionClear.h
@@ -90,17 +90,17 @@ SET(CORE_STATE_ACTIONS_SRCS
   Actions/ActionSetAt.cc
   )
 
-IF(BUILD_WITH_PYTHON)
+if(BUILD_WITH_PYTHON)
   GENERATE_ACTION_PYTHON_WRAPPER(PYTHON_WRAPPER Core_State ${CORE_STATE_ACTIONS_SRCS})
-  SET(CORE_STATE_SRCS ${CORE_STATE_SRCS} ${PYTHON_WRAPPER})
-ENDIF(BUILD_WITH_PYTHON)
+  set(CORE_STATE_SRCS ${CORE_STATE_SRCS} ${PYTHON_WRAPPER})
+endif()
   
 CORE_ADD_LIBRARY(Core_State 
   ${CORE_STATE_SRCS} 
   ${CORE_STATE_ACTIONS_SRCS} 
   ${CORE_STATE_ACTIONS_XML_H_SRCS})
             
-TARGET_LINK_LIBRARIES(Core_State
+target_link_libraries(Core_State
                       Core_Utils
                       Core_Application
                       Core_Interface

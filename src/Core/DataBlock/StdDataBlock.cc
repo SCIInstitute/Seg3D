@@ -53,19 +53,25 @@ StdDataBlock::StdDataBlock( size_t nx, size_t ny, size_t nz, DataType dtype )
     set_data( reinterpret_cast< void* > ( new char[ get_size() ] ) );
     break;
   case DataType::UCHAR_E:
-    set_data( reinterpret_cast<void*>( new unsigned char[ get_size() ] ) ); 
+    set_data( reinterpret_cast<void*>( new unsigned char[ get_size() ] ) );
     break;
   case DataType::SHORT_E:
     set_data( reinterpret_cast< void* > ( new short[ get_size() ] ) );
     break;
   case DataType::USHORT_E:
-    set_data(reinterpret_cast<void*>( new unsigned short[ get_size() ] ) ); 
+    set_data(reinterpret_cast<void*>( new unsigned short[ get_size() ] ) );
     break;
   case DataType::INT_E:
     set_data( reinterpret_cast< void* > ( new int[ get_size() ] ) );
     break;
   case DataType::UINT_E:
-    set_data( reinterpret_cast<void*>( new unsigned int[ get_size() ] ) ); 
+    set_data( reinterpret_cast<void*>( new unsigned int[ get_size() ] ) );
+    break;
+  case DataType::LONGLONG_E:
+    set_data( reinterpret_cast< void* > ( new long long[ get_size() ] ) );
+    break;
+  case DataType::ULONGLONG_E:
+    set_data(reinterpret_cast<void*>( new unsigned long long[ get_size() ] ) );
     break;
   case DataType::FLOAT_E:
     set_data( reinterpret_cast< void* > ( new float[ get_size() ] ) );
@@ -88,19 +94,25 @@ StdDataBlock::~StdDataBlock()
       delete[] reinterpret_cast< char* > ( get_data() );
       break;
     case DataType::UCHAR_E:
-      delete[] reinterpret_cast<unsigned char*>( get_data() ); 
+      delete[] reinterpret_cast<unsigned char*>( get_data() );
       break;
     case DataType::SHORT_E:
       delete[] reinterpret_cast< short* > ( get_data() );
       break;
     case DataType::USHORT_E:
-      delete[] reinterpret_cast<unsigned short*>( get_data() ); 
+      delete[] reinterpret_cast<unsigned short*>( get_data() );
       break;
     case DataType::INT_E:
       delete[] reinterpret_cast< int* > ( get_data() );
       break;
     case DataType::UINT_E:
-      delete[] reinterpret_cast<unsigned int*>( get_data() ); 
+      delete[] reinterpret_cast<unsigned int*>( get_data() );
+      break;
+    case DataType::LONGLONG_E:
+      delete[] reinterpret_cast< long long* > ( get_data() );
+      break;
+    case DataType::ULONGLONG_E:
+      delete[] reinterpret_cast<unsigned long long*>( get_data() );
       break;
     case DataType::FLOAT_E:
       delete[] reinterpret_cast< float* > ( get_data() );
@@ -131,7 +143,7 @@ DataBlockHandle StdDataBlock::New( GridTransform transform, DataType type )
 {
   try
   {
-    DataBlockHandle data_block( new StdDataBlock( transform.get_nx(), 
+    DataBlockHandle data_block( new StdDataBlock( transform.get_nx(),
       transform.get_ny(), transform.get_nz(), type ) );
     return data_block;
   }

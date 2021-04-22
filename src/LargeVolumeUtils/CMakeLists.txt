@@ -31,11 +31,11 @@
 # Set Utils main sources
 ###########################################
 
-SET(LV_UTILS_SRCS
+set(LV_UTILS_SRCS
   CreateLargeVolume
 )
 
-SET(UTILS_LIBS
+set(UTILS_LIBS
   ${SCI_BOOST_LIBRARY}
   ${SCI_ZLIB_LIBRARY}
   ${ITKIOJPEG_LIBRARIES}
@@ -57,36 +57,36 @@ SET(UTILS_LIBS
   Application_Filters
 )
 
-IF(BUILD_WITH_PYTHON)
-  LIST(APPEND UTILS_LIBS Application_Socket)
-ENDIF()
+if(BUILD_WITH_PYTHON)
+  list(APPEND UTILS_LIBS Application_Socket)
+endif()
 
 ###########################################
 # Build the Seg3D utilities
 ###########################################
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SEG3D_BINARY_DIR})
 
-SET(LV_UTILS_TARGETS "" CACHE INTERNAL "Large volume utilities." FORCE)
+set(LV_UTILS_TARGETS "" CACHE INTERNAL "Large volume utilities." FORCE)
 
-FOREACH(UTIL ${LV_UTILS_SRCS})
-  ADD_DEFINITIONS(-DAPPLICATION_NAME=${UTIL})
-  ADD_EXECUTABLE(${UTIL} ${UTIL}.cc)
-  TARGET_LINK_LIBRARIES(${UTIL} ${UTILS_LIBS})
-  LIST(APPEND LV_UTILS_TARGETS ${UTIL})
+foreach(UTIL ${LV_UTILS_SRCS})
+  add_definitions(-DAPPLICATION_NAME=${UTIL})
+  add_executable(${UTIL} ${UTIL}.cc)
+  target_link_libraries(${UTIL} ${UTILS_LIBS})
+  list(APPEND LV_UTILS_TARGETS ${UTIL})
 
   # add libraries with plug-ins and extensions
   REGISTERED_TARGET_LINK_LIBRARIES(${UTIL})
 
-  IF(APPLE)
-    INSTALL(TARGETS ${UTIL}
+  if(APPLE)
+    install(TARGETS ${UTIL}
       RUNTIME DESTINATION ${OSX_UTILS_DIR}
       BUNDLE DESTINATION ${OSX_UTILS_DIR})
-    IF(BUILD_WITH_PYTHON)
-      SET(VERSION_PATH Versions/${SCI_PYTHON_VERSION_SHORT})
-      SET(PYTHON_PATH .libs/Python.framework/${VERSION_PATH})
+    if(BUILD_WITH_PYTHON)
+      set(VERSION_PATH Versions/${SCI_PYTHON_VERSION_SHORT})
+      set(PYTHON_PATH .libs/Python.framework/${VERSION_PATH})
 
-      ADD_CUSTOM_COMMAND(TARGET ${UTIL}
+      add_custom_command(TARGET ${UTIL}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${PYTHON_PATH}
         # only need python library
@@ -96,13 +96,13 @@ FOREACH(UTIL ${LV_UTILS_SRCS})
         COMMAND  install_name_tool -change ${SCI_PYTHON_FRAMEWORK}/${VERSION_PATH}/Python @executable_path/${PYTHON_PATH}/Python ${UTIL}
        WORKING_DIRECTORY ${SEG3D_BINARY_DIR})
 
-      INSTALL(DIRECTORY ${SEG3D_BINARY_DIR}/.libs
+      install(DIRECTORY ${SEG3D_BINARY_DIR}/.libs
         DESTINATION Seg3DUtils
         PATTERN *
         PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE)
-    ENDIF()
-  ELSEIF(WIN32)
-    INSTALL(TARGETS ${UTIL} RUNTIME DESTINATION bin)
-  ENDIF()
+    endif()
+  elseif(WIN32)
+    install(TARGETS ${UTIL} RUNTIME DESTINATION bin)
+  endif()
 
-ENDFOREACH()
+endforeach()

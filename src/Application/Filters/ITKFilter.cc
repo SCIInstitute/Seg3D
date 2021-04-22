@@ -243,7 +243,7 @@ void ITKFilter::limit_number_of_itk_threads_internal( itk::ProcessObject::Pointe
   unsigned int max_threads = boost::thread::hardware_concurrency();
   if ( max_threads < 2 ) max_threads = 2;
   
-  filter->GetMultiThreader()->SetNumberOfThreads( max_threads - 1 );
+  filter->GetMultiThreader()->SetMaximumNumberOfThreads( max_threads - 1 );
 }
 
 } // end namespace Core

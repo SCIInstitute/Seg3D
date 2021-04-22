@@ -253,7 +253,7 @@ void
 StatisticsImageFilterWithMask<TInputImage>
 ::BeforeThreadedGenerateData()
 {
-  int numberOfThreads = this->GetNumberOfThreads();
+  int numberOfThreads = this->GetNumberOfWorkUnits();
 
   // Resize the thread temporaries
   m_Count.SetSize(numberOfThreads);
@@ -279,7 +279,7 @@ StatisticsImageFilterWithMask<TInputImage>
   long count;
   RealType sumOfSquares;
     
-  int numberOfThreads = this->GetNumberOfThreads();
+  int numberOfThreads = m_Count.size();
 
   PixelType minimum;
   PixelType maximum;
@@ -351,7 +351,7 @@ StatisticsImageFilterWithMask<TInputImage>
       // test the mask:
       PointType point;
       image->TransformIndexToPhysicalPoint( it.GetIndex(), point );
-      skip = !m_ImageMask->IsInside( point );
+      skip = !m_ImageMask->IsInsideInWorldSpace( point );
     }
 
     if (!skip)

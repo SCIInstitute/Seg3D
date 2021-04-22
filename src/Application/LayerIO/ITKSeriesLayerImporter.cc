@@ -69,24 +69,20 @@ public:
   // Pointer back to the main class
   ITKSeriesLayerImporter* importer_;
 
-public: 
+public:
   // READ_HEADER
   // Read the header of the file
   bool read_header();
-  
+
   // READ_DATA
   // Read the data from the file
   bool read_data();
-  
-  // CONVERT_DATA_TYPE:
-  // Copy the data type we get from itk and convert to a Seg3D enum type
-  Core::DataType convert_data_type( std::string& type );
 
   // SCAN_SIMPLE_SERIES:
   // Scan the data file
   template< class ItkImporterType >
   bool scan_simple_series();
-  
+
   // IMPORT_SIMPLE_TYPED_SERIES:
   // Read the data in its final format
   template< class DataType, class ItkImporterType >
@@ -95,7 +91,7 @@ public:
   // IMPORT_SIMPLE_SERIES:
   // Import the series in its final format by choosing the right format
   template< class ItkImporterType >
-  bool import_simple_series();  
+  bool import_simple_series();
 
 public:
   // File type that we are importing
@@ -109,47 +105,54 @@ public:
 
   // The data that was read from the file
   Core::DataBlockHandle data_block_;
-  
+
   // Whether the header was read
   bool read_header_;
-  
+
   // Whether the data was read
   bool read_data_;
 };
 
-
-Core::DataType ITKSeriesLayerImporterPrivate::convert_data_type( std::string& type )
+Core::DataType convert_data_type(itk::CommonEnums::IOComponent type )
 {
   // Convert ITK types into our enum
-  if ( type == "unsigned_char" )
+  if ( type == itk::CommonEnums::IOComponent::UCHAR)
   {
     return Core::DataType::UCHAR_E;
   }
-  else if ( type == "char" )
+  else if ( type == itk::CommonEnums::IOComponent::CHAR )
   {
     return Core::DataType::CHAR_E;
   }
-  else if ( type == "unsigned_short" )
+  else if ( type == itk::CommonEnums::IOComponent::USHORT )
   {
     return Core::DataType::USHORT_E;
   }
-  else if ( type == "short" )
+  else if ( type == itk::CommonEnums::IOComponent::SHORT )
   {
     return Core::DataType::SHORT_E;
   }
-  else if ( type == "unsigned_int" )
+  else if ( type == itk::CommonEnums::IOComponent::UINT)
   {
     return Core::DataType::UINT_E;
   }
-  else if ( type == "int" )
+  else if ( type == itk::CommonEnums::IOComponent::INT)
   {
     return Core::DataType::INT_E;
   }
-  else if ( type == "float" )
+  else if ( type == itk::CommonEnums::IOComponent::ULONGLONG )
+  {
+    return Core::DataType::ULONGLONG_E;
+  }
+  else if ( type == itk::CommonEnums::IOComponent::LONGLONG )
+  {
+    return Core::DataType::LONGLONG_E;
+  }
+  else if ( type == itk::CommonEnums::IOComponent::FLOAT)
   {
     return Core::DataType::FLOAT_E;
   }
-  else if ( type == "double" )
+  else if ( type == itk::CommonEnums::IOComponent::DOUBLE)
   {
     return Core::DataType::DOUBLE_E;
   }
@@ -164,13 +167,13 @@ bool ITKSeriesLayerImporterPrivate::read_header()
 {
   // If importing already succeeded, don't do it again
   if ( this->read_header_ ) return true;
-  
+
   // Extract the extension from the file name and use this to define
   // which importer to use.
   boost::filesystem::path full_filename( this->importer_->get_filename() );
   std::string extension, base;
   std::tie( extension, base ) = Core::GetFullExtension( full_filename );
-  
+
   if ( extension == ".png" )
   {
     this->file_type_ = "png";
@@ -196,7 +199,7 @@ bool ITKSeriesLayerImporterPrivate::read_header()
     this->file_type_ = "VTK";
     return this->scan_simple_series< itk::VTKImageIO >();
   }
-  else 
+  else
   {
     // Assume it is DICOM
     return this->scan_simple_series< itk::GDCMImageIO >();
@@ -236,24 +239,21 @@ bool ITKSeriesLayerImporterPrivate::scan_simple_series()
     return false;
   }
 
-  // Grab the information on the data type from the ITK image
-  std::string type_string = IO->GetComponentTypeAsString( IO->GetComponentType() );
-  
   // Grab the image from the output so we can read its transform
   Core::ITKUCharImage2DDataHandle image_data;
   try
   {
-    image_data =  Core::ITKUCharImage2DDataHandle( 
-        new typename Core::ITKUCharImage2DData( reader->GetOutput() ) );  
+    image_data =  Core::ITKUCharImage2DDataHandle(
+        new typename Core::ITKUCharImage2DData( reader->GetOutput() ) );
   }
   catch ( ... )
   {
     this->importer_->set_error( "Importer could not unwrap itk object." );
     return false;
-  } 
-  
+  }
+
   // Store the information we just extracted from the file in this private class
-  this->data_type_ = this->convert_data_type( type_string );
+  this->data_type_ = convert_data_type(IO->GetComponentType());
   this->grid_transform_ = image_data->get_grid_transform();
 
   this->read_header_ = true;
@@ -272,7 +272,7 @@ bool ITKSeriesLayerImporterPrivate::import_simple_typed_series()
   // levels. However converting everything to float is inefficient. Hence we prefer actual
   // datatypes if we can obtain them. Hence this class is templated with the right type in
   // mind.
-  
+
   typedef itk::Image< DataType, 3 > ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
@@ -304,15 +304,15 @@ bool ITKSeriesLayerImporterPrivate::import_simple_typed_series()
   typename Core::ITKImageDataT< DataType >::Handle image_data;
   try
   {
-     image_data = typename Core::ITKImageDataT< DataType >::Handle( 
-        new typename Core::ITKImageDataT< DataType >( reader->GetOutput() ) );  
+     image_data = typename Core::ITKImageDataT< DataType >::Handle(
+        new typename Core::ITKImageDataT< DataType >( reader->GetOutput() ) );
   }
   catch ( ... )
   {
     this->importer_->set_error( "Importer could not unwrap itk object." );
     return false;
   }
-  
+
 
   // Get grid transform and data block from the wrapped itk object
   this->data_block_ = Core::ITKDataBlock::New( image_data );
@@ -346,12 +346,16 @@ bool ITKSeriesLayerImporterPrivate::import_simple_series()
       return this->import_simple_typed_series< unsigned int, ItkImporterType >();
     case Core::DataType::INT_E:
       return this->import_simple_typed_series< int, ItkImporterType >();
+    case Core::DataType::ULONGLONG_E:
+      return this->import_simple_typed_series< unsigned long long, ItkImporterType >();
+    case Core::DataType::LONGLONG_E:
+      return this->import_simple_typed_series< signed long long, ItkImporterType >();
     case Core::DataType::FLOAT_E:
       return this->import_simple_typed_series< float, ItkImporterType >();
     case Core::DataType::DOUBLE_E:
       return this->import_simple_typed_series< double, ItkImporterType >();
     default:
-      return false;   
+      return false;
   }
 }
 
@@ -359,12 +363,12 @@ bool ITKSeriesLayerImporterPrivate::read_data()
 {
   // If importing already succeeded, don't do it again
   if ( this->read_data_ ) return true;
-  
+
   // Extract the extension from the file name and use this to define
   // which importer to use.
   boost::filesystem::path full_filename( this->importer_->get_filename() );
   std::string extension = boost::to_lower_copy( boost::filesystem::extension( full_filename ) );
-  
+
   if( extension == ".png" )
   {
     return this->import_simple_series< itk::PNGImageIO >();
@@ -385,7 +389,7 @@ bool ITKSeriesLayerImporterPrivate::read_data()
   {
     return this->import_simple_series< itk::VTKImageIO >();
   }
-  else // assume it is dicom 
+  else // assume it is dicom
   {
     return this->import_simple_series< itk::GDCMImageIO >();
   }
@@ -400,43 +404,43 @@ ITKSeriesLayerImporter::ITKSeriesLayerImporter() :
   this->private_->importer_ = this;
 }
 
-ITKSeriesLayerImporter::~ITKSeriesLayerImporter() 
+ITKSeriesLayerImporter::~ITKSeriesLayerImporter()
 {
 }
 
 bool ITKSeriesLayerImporter::get_file_info( LayerImporterFileInfoHandle& info )
 {
   try
-  { 
+  {
     // Try to read the header
     if ( ! this->private_->read_header() ) return false;
-  
+
     // Generate an information structure with the information.
     info = LayerImporterFileInfoHandle( new LayerImporterFileInfo );
     info->set_data_type( this->private_->data_type_ );
     info->set_grid_transform( this->private_->grid_transform_ );
-    info->set_file_type( this->private_->file_type_ ); 
+    info->set_file_type( this->private_->file_type_ );
     info->set_mask_compatible( true );
   }
   catch ( ... )
   {
     // In case something failed, recover from here and let the user
-    // deal with the error. 
+    // deal with the error.
     this->set_error( "ITK Series Importer crashed while reading file." );
     return false;
   }
-    
+
   return true;
 }
 
 bool ITKSeriesLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
 {
   try
-  { 
+  {
     // Read the data from the file
     if ( ! this->private_->read_data() ) return false;
-  
-    // Create a data structure with handles to the actual data in this file 
+
+    // Create a data structure with handles to the actual data in this file
     data = LayerImporterFileDataHandle( new LayerImporterFileData );
     data->set_data_block( this->private_->data_block_ );
     data->set_grid_transform( this->private_->grid_transform_ );
@@ -445,7 +449,7 @@ bool ITKSeriesLayerImporter::get_file_data( LayerImporterFileDataHandle& data )
   catch ( ... )
   {
     // In case something failed, recover from here and let the user
-    // deal with the error. 
+    // deal with the error.
     this->set_error( "ITK Series Importer crashed when reading file." );
     return false;
   }

@@ -1626,7 +1626,7 @@ octave_t::setup(const unsigned int & octave,
   mask_ = mask;
   
   mask_eroded_ = mask;
-  if (mask != NULL)
+  if (mask != nullptr)
   {
     mask_eroded_ = erode(mask_, static_cast<int>(r0_));
   }
@@ -2153,7 +2153,7 @@ pyramid_t::setup(const image_t * initial_image,
     
     // downsample the image:
     L0 = resize<image_t>(octave_[i].L_[s], 0.5);
-    if (mask != NULL)
+    if (mask != nullptr)
     {
       M0 = cast<image_t, mask_t>(resize<image_t>
                                  (cast<mask_t, image_t>(M0), 0.5));
@@ -2165,7 +2165,7 @@ pyramid_t::setup(const image_t * initial_image,
     spacing[1] *= 2.0;
     L0->SetSpacing(spacing);
     
-    if (mask != NULL)
+    if (mask != nullptr)
     {
       M0->SetSpacing(spacing);
     }

@@ -232,7 +232,7 @@ ITKImageDataT<T>::ITKImageDataT( typename image_type::Pointer itk_image ) :
 
 template<class T>
 ITKImageDataT<T>::ITKImageDataT( DataBlockHandle data_block ) :
-  itk_image_( 0 )
+  itk_image_( nullptr )
 {
   Transform transform;
   initialize( data_block, transform );
@@ -240,7 +240,7 @@ ITKImageDataT<T>::ITKImageDataT( DataBlockHandle data_block ) :
 
 template<class T>
 ITKImageDataT<T>::ITKImageDataT( DataBlockHandle data_block, Transform transform ) :
-  itk_image_( 0 )
+  itk_image_( nullptr )
 {
   initialize( data_block, transform );
 }
@@ -248,7 +248,7 @@ ITKImageDataT<T>::ITKImageDataT( DataBlockHandle data_block, Transform transform
 template<class T>
 ITKImageDataT<T>::~ITKImageDataT()
 {
-  itk_image_ = 0;
+  itk_image_ = nullptr;
   this->data_block_.reset();
 }
 

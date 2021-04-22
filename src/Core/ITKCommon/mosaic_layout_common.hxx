@@ -87,7 +87,7 @@ template <typename TImage>
 affine_transform_t::Pointer
 setup_transform(const TImage * image,
     const base_transform_t * t0,
-    const base_transform_t * t1 = NULL,
+    const base_transform_t * t1 = nullptr,
     const unsigned int samples = 16)
 {
   // shortcuts:
@@ -140,9 +140,9 @@ setup_transform(const TImage * image,
   fwd_cascade[1] = t1;
 
   inv_cascade[0] = t0->GetInverseTransform();
-  inv_cascade[1] = (t1 == NULL) ? NULL : t1->GetInverseTransform();
+  inv_cascade[1] = (t1 == nullptr) ? nullptr : t1->GetInverseTransform();
 
-  const unsigned int cascade_len = (t1 == NULL) ? 1 : 2;
+  const unsigned int cascade_len = (t1 == nullptr) ? 1 : 2;
 
   // calculate the shift:
   pnt2d_t center = pnt2d(tile_min[0] + (tile_max[0] - tile_min[0]) / 2.0,
@@ -308,7 +308,7 @@ refine_one_pair(const TImage * i0,
   // setup the masks:
   typedef itk::ImageMaskSpatialObject<2> mask_so_t;
   typename TMask::ConstPointer fi_mask = m0;
-  if (m0 != NULL)
+  if (m0 != nullptr)
   {
     mask_so_t::Pointer fi_mask_so = mask_so_t::New();
     fi_mask_so->SetImage(fi_mask);
@@ -316,7 +316,7 @@ refine_one_pair(const TImage * i0,
   }
 
   typename TMask::ConstPointer mi_mask = m1;
-  if (m1 != NULL)
+  if (m1 != nullptr)
   {
     mask_so_t::Pointer mi_mask_so = mask_so_t::New();
     mi_mask_so->SetImage(mi_mask);
@@ -342,7 +342,7 @@ refine_one_pair(const TImage * i0,
   // perform the registration:
   try
   {
-    registration->StartRegistration();
+    registration->Update();
   }
   catch (itk::ExceptionObject & exception)
   {
@@ -481,7 +481,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
 
       if (overlap < overlap_min || overlap > overlap_max)
       {
-        path[i][j] = NULL;
+        path[i][j] = nullptr;
         cost[i][j] = std::numeric_limits<double>::max();
       }
       else
@@ -510,7 +510,7 @@ refine_pairs(const std::vector<typename TImage::Pointer> & image,
     oss << i << "\t| ";
     for (unsigned int j = 0; j < num_images; j++)
     {
-      if (path[i][j].GetPointer() != NULL)
+      if (path[i][j].GetPointer() != nullptr)
       {
         oss << ' ' << cost[i][j];
       }
@@ -594,7 +594,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
 
       if (overlap < overlap_min || overlap > overlap_max)
       {
-        path[i][j] = NULL;
+        path[i][j] = nullptr;
         cost[i][j] = std::numeric_limits<double>::max();
       }
       else
@@ -623,7 +623,7 @@ refine_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
     oss << i << "\t| ";
     for (unsigned int j = 0; j < num_images; j++)
     {
-      if (path[i][j].GetPointer() != NULL)
+      if (path[i][j].GetPointer() != nullptr)
       {
         oss << ' ' << cost[i][j];
       }
@@ -820,7 +820,7 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
 
       if (overlap < overlap_min || overlap > overlap_max)
       {
-        path[i][j] = NULL;
+        path[i][j] = nullptr;
         cost[i][j] = std::numeric_limits<double>::max();
       }
       else
@@ -849,7 +849,7 @@ brute_force_pairs(const std::vector<typename TImage::Pointer> & image,
     oss << i << "\t| ";
     for (unsigned int j = 0; j < num_images; j++)
     {
-      if (path[i][j].GetPointer() != NULL)
+      if (path[i][j].GetPointer() != nullptr)
       {
         oss << ' ' << cost[i][j];
       }
@@ -935,7 +935,7 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
 
       if (overlap < overlap_min || overlap > overlap_max)
       {
-        path[i][j] = NULL;
+        path[i][j] = nullptr;
         cost[i][j] = std::numeric_limits<double>::max();
       }
       else
@@ -964,7 +964,7 @@ brute_force_pairs(const array2d(typename TImage::Pointer) & tile_pyramid,
     oss << i << "\t| ";
     for (unsigned int j = 0; j < num_images; j++)
     {
-      if (path[i][j].GetPointer() != NULL)
+      if (path[i][j].GetPointer() != nullptr)
       {
         oss << ' ' << cost[i][j];
       }
@@ -1010,7 +1010,7 @@ dump_neighbors(const std::vector<typename TImage::Pointer> & image,
     for (unsigned int j = 0; j < num_images; j++)
     {
       if (i == j) continue;
-      if (path[i][j].GetPointer() == NULL) continue;
+      if (path[i][j].GetPointer() == nullptr) continue;
 
       oss << "found a mapping: " << std::setw(2) << j << " -> "
         << std::setw(2) << i << std::endl;
@@ -1065,7 +1065,7 @@ calc_area_and_dist(const std::vector<typename TImage::Pointer> & image,
 
   for (unsigned int i = 0; i < num_images; i++)
   {
-    if (image[i].GetPointer() == NULL) continue;
+    if (image[i].GetPointer() == nullptr) continue;
 
     // calculate the tile center:
     pnt2d_t ci;
@@ -1090,7 +1090,7 @@ calc_area_and_dist(const std::vector<typename TImage::Pointer> & image,
 
     for (unsigned int j = i + 1; j < num_images; j++)
     {
-      if (mapping[i][j].GetPointer() == NULL) continue;
+      if (mapping[i][j].GetPointer() == nullptr) continue;
       overlap[i][j] = overlap_ratio<TImage>(image[i], image[j],
           mapping[i][j]);
       overlap[j][i] = overlap[i][j];
@@ -1214,7 +1214,7 @@ match_pairs(std::vector<typename TImage::Pointer> & image,
     matched[i] = false;
     for (unsigned int j = 0; j < num_images; j++)
     {
-      path[i][j] = NULL;
+      path[i][j] = nullptr;
       cost[i][j] = std::numeric_limits<double>::max();
     }
   }
@@ -1466,10 +1466,10 @@ else
               i + row < 0 || i + row >= edgeLen ||
               j + column < 0 || j + column >= edgeLen)
             continue;
-          
+
           //forget the diagonal neighbors
           if (i && j) continue;
-          
+
           //get the neighbor
           int neighbor = seed + edgeLen * i + j;
           if (strategy == TOP_LEFT_SNAKE)
@@ -1480,10 +1480,10 @@ else
               col = edgeLen - col - 1;
             neighbor = col + rw * edgeLen;
           }
-          
+
           if (neighbor > num_images || neighbor < 0)
             continue;
-          
+
           std::cout << "matching image " <<
             seed << " to " << neighbor << ". " << std::endl;
           //oss << "matching image " <<
@@ -1788,7 +1788,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
   for (unsigned int i = 0; i < num_tiles; i++)
   {
     if (i == best_target) continue;
-    if (tile_pyramid[high_res_level][i].GetPointer() == NULL) continue;
+    if (tile_pyramid[high_res_level][i].GetPointer() == nullptr) continue;
 
     tiles.push_back(i);
   }
@@ -1825,7 +1825,7 @@ layout_mosaic(// multi-resolution image tiles and tile masks,
           jter != tiles.end(); ++jter)
       {
         const unsigned int j = *jter;
-        if (path[0][i][j].GetPointer() == NULL) continue;
+        if (path[0][i][j].GetPointer() == nullptr) continue;
 
         local_mapping_t m(i, j, cost[0][i][j]);
         candidates.push_back(m);

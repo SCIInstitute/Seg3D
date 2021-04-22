@@ -31,7 +31,7 @@
 # Set sources
 ##################################################
 
-SET(CORE_LOG_SRCS
+set(CORE_LOG_SRCS
   RolloverLogFile.h
   RolloverLogFile.cc
   )
@@ -42,7 +42,7 @@ SET(CORE_LOG_SRCS
 
 CORE_ADD_LIBRARY(Core_Log ${CORE_LOG_SRCS} )
             
-TARGET_LINK_LIBRARIES(Core_Log
+target_link_libraries(Core_Log
   Core_Utils
   Core_Application
   ${SCI_BOOST_LIBRARY})

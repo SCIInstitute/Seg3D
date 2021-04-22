@@ -26,7 +26,7 @@
 #  DEALINGS IN THE SOFTWARE.
 #
 
-SET(APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS
+set(APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS
   ActionAssembleFilterTests.cc
   ActionFFTFilterTests.cc
   ActionRefineTranslateFilterTests.cc
@@ -36,7 +36,7 @@ REGISTER_UNIT_TEST(Application_ImageRegistrationTools_Actions_Tests
   ${APPLICATION_IRTOOLS_ACTIONS_TESTS_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(Application_ImageRegistrationTools_Actions_Tests
+target_link_libraries(Application_ImageRegistrationTools_Actions_Tests
   Application_ImageRegistrationTools
   gtest
   gtest_main

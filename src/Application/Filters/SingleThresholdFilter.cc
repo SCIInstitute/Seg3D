@@ -76,6 +76,12 @@ void SingleThresholdFilter::run_filter()
     case DataType::UINT_E:
       this->threshold_data< unsigned int >( threshold_result, this->threshold_ );
       break;
+    case DataType::LONGLONG_E:
+      this->threshold_data< long long >( threshold_result, this->threshold_ );
+      break;
+    case DataType::ULONGLONG_E:
+      this->threshold_data< unsigned long long >( threshold_result, this->threshold_ );
+      break;
     case DataType::FLOAT_E:
       this->threshold_data< float >( threshold_result, this->threshold_ );
       break;

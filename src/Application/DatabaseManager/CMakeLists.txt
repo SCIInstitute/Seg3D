@@ -31,14 +31,14 @@
 # Set sources
 ##################################################
 
-SET(APPLICATION_DATABASEMANAGER_SRCS
+set(APPLICATION_DATABASEMANAGER_SRCS
   DatabaseManager.h
   DatabaseManager.cc
   )
 
 CORE_ADD_LIBRARY(Application_DatabaseManager ${APPLICATION_DATABASEMANAGER_SRCS} )
             
-TARGET_LINK_LIBRARIES(Application_DatabaseManager
+target_link_libraries(Application_DatabaseManager
                       Core_Application
                       Core_Utils
                       ${SCI_BOOST_LIBRARY})

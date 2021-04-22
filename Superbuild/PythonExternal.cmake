@@ -26,59 +26,59 @@
 
 # borrowed liberally from ParaView superbuild
 
-SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # TODO: update when upgrading
-SET(PY_MAJOR 3)
-SET(PY_MINOR 4)
-SET(PY_PATCH 3)
-SET(SCI_PYTHON_VERSION "${PY_MAJOR}.${PY_MINOR}.${PY_PATCH}")
-SET(SCI_PYTHON_VERSION_SHORT "${PY_MAJOR}.${PY_MINOR}")
-SET(SCI_PYTHON_VERSION_SHORT_WIN32 "${PY_MAJOR}${PY_MINOR}")
+set(PY_MAJOR 3)
+set(PY_MINOR 4)
+set(PY_PATCH 3)
+set(SCI_PYTHON_VERSION "${PY_MAJOR}.${PY_MINOR}.${PY_PATCH}")
+set(SCI_PYTHON_VERSION_SHORT "${PY_MAJOR}.${PY_MINOR}")
+set(SCI_PYTHON_VERSION_SHORT_WIN32 "${PY_MAJOR}${PY_MINOR}")
 
 # TODO: recheck when upgrading
 # --with-pydebug
-#SET(python_ABIFLAG_PYDEBUG "d")
-SET(python_ABIFLAG_PYDEBUG)
+#set(python_ABIFLAG_PYDEBUG "d")
+set(python_ABIFLAG_PYDEBUG)
 # --with-pymalloc (default)
 # if disabling pymalloc (--without-pymalloc) for valgrind or to track other memory problems,
 # disable this ABI flag
-SET(python_ABIFLAG_PYMALLOC "m")
-SET(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
+set(python_ABIFLAG_PYMALLOC "m")
+set(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
 
-SET(python_GIT_TAG "origin/master")
-SET(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
+set(python_GIT_TAG "origin/master")
+set(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
 
-SET(python_WIN32_ARCH)
-SET(python_WIN32_64BIT_DIR)
-SET(python_FRAMEWORK_ARCHIVE)
+set(python_WIN32_ARCH)
+set(python_WIN32_64BIT_DIR)
+set(python_FRAMEWORK_ARCHIVE)
 
-IF(UNIX)
+if(UNIX)
   # TODO: figure out pip package
-  SET(python_CONFIGURE_FLAGS
+  set(python_CONFIGURE_FLAGS
     "--prefix=<INSTALL_DIR>"
     "--with-threads"
     "--with-ensurepip=no"
   )
-  IF(APPLE)
+  if(APPLE)
     # framework contains *.dylib
-    LIST(APPEND python_CONFIGURE_FLAGS "--enable-framework=<INSTALL_DIR>")
-    SET(python_FRAMEWORK_ARCHIVE "framework.tar")
-  ELSE()
-    LIST(APPEND python_CONFIGURE_FLAGS "--enable-shared")
-  ENDIF()
-ELSE()
+    list(APPEND python_CONFIGURE_FLAGS "--enable-framework=<INSTALL_DIR>")
+    set(python_FRAMEWORK_ARCHIVE "framework.tar")
+  else()
+    list(APPEND python_CONFIGURE_FLAGS "--enable-shared")
+  endif()
+else()
   # TODO: 32-bit windows build?
-  SET(python_WIN32_ARCH "x64")
+  set(python_WIN32_ARCH "x64")
   # 64-bit build only
   # 32-bit build outputs to PCbuild dir
-  SET(python_WIN32_64BIT_DIR "/amd64")
-  SET(python_ABIFLAG_PYDEBUG "_d")
-ENDIF()
+  set(python_WIN32_64BIT_DIR "/amd64")
+  set(python_ABIFLAG_PYDEBUG "_d")
+endif()
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
-IF(UNIX)
+if(UNIX)
   ExternalProject_Add(Python_external
     GIT_REPOSITORY ${python_GIT_URL}
     GIT_TAG ${python_GIT_TAG}
@@ -86,15 +86,15 @@ IF(UNIX)
     CONFIGURE_COMMAND <SOURCE_DIR>/configure ${python_CONFIGURE_FLAGS}
     PATCH_COMMAND ""
   )
-  IF(APPLE)
+  if(APPLE)
     # Preserves links, permissions
     ExternalProject_Add_Step(Python_external framework_tar_archive
       COMMAND "${CMAKE_COMMAND}" -E tar cf ${python_FRAMEWORK_ARCHIVE} Python.framework
 	DEPENDEES install
 	WORKING_DIRECTORY <INSTALL_DIR>
     )
-  ENDIF()
-ELSE()
+  endif()
+else()
   ExternalProject_Add(Python_external
     GIT_REPOSITORY ${python_GIT_URL}
     GIT_TAG ${python_GIT_TAG}
@@ -113,77 +113,77 @@ ELSE()
       DEPENDERS install
       WORKING_DIRECTORY <SOURCE_DIR>
   )
-ENDIF()
+endif()
 
 ExternalProject_Get_Property(Python_external SOURCE_DIR)
 ExternalProject_Get_Property(Python_external INSTALL_DIR)
 
-SET(SCI_PYTHON_MODULE_PARENT_PATH lib)
+set(SCI_PYTHON_MODULE_PARENT_PATH lib)
 
-IF(UNIX)
-  SET(SCI_PYTHON_NAME python${SCI_PYTHON_VERSION_SHORT})
-  IF(APPLE)
+if(UNIX)
+  set(SCI_PYTHON_NAME python${SCI_PYTHON_VERSION_SHORT})
+  if(APPLE)
     # TODO: check Xcode IDE builds...
 
-    SET(SCI_PYTHON_FRAMEWORK ${INSTALL_DIR}/Python.framework)
-    SET(SCI_PYTHON_ROOT_DIR ${SCI_PYTHON_FRAMEWORK}/Versions/${SCI_PYTHON_VERSION_SHORT})
-    SET(SCI_PYTHON_INCLUDE ${SCI_PYTHON_ROOT_DIR}/Headers)
-    SET(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}/lib)
-    SET(SCI_PYTHON_LINK_LIBRARY_DIRS ${SCI_PYTHON_LIBRARY_DIR})
-    SET(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}/bin/${SCI_PYTHON_NAME})
-    SET(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME})
+    set(SCI_PYTHON_FRAMEWORK ${INSTALL_DIR}/Python.framework)
+    set(SCI_PYTHON_ROOT_DIR ${SCI_PYTHON_FRAMEWORK}/Versions/${SCI_PYTHON_VERSION_SHORT})
+    set(SCI_PYTHON_INCLUDE ${SCI_PYTHON_ROOT_DIR}/Headers)
+    set(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}/lib)
+    set(SCI_PYTHON_LINK_LIBRARY_DIRS ${SCI_PYTHON_LIBRARY_DIR})
+    set(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}/bin/${SCI_PYTHON_NAME})
+    set(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME})
 
     # required by interpreter interface
-    SET(PYTHON_MODULE_SEARCH_ROOT Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
-    IF(SEG3D_BUILD_INTERFACE)
-      SET(PYTHON_MODULE_SEARCH_PATH ../Frameworks/${PYTHON_MODULE_SEARCH_ROOT} CACHE INTERNAL "Python modules." FORCE)
-    ELSE()
-      SET(PYTHON_MODULE_SEARCH_PATH ${PYTHON_MODULE_SEARCH_ROOT} CACHE INTERNAL "Python modules." FORCE)
-    ENDIF()
-    SET(SCI_PYTHON_FRAMEWORK_ARCHIVE ${INSTALL_DIR}/${python_FRAMEWORK_ARCHIVE})
-  ELSE()
-    SET(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR})
-    SET(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/include/${SCI_PYTHON_NAME}${ABIFLAGS})
-    SET(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}/lib)
-    SET(SCI_PYTHON_LINK_LIBRARY_DIRS ${SCI_PYTHON_LIBRARY_DIR})
-    IF(SEG3D_BITS MATCHES 64)
-      LIST(APPEND SCI_PYTHON_LINK_LIBRARY_DIRS ${INSTALL_DIR}/lib64)
-      SET(SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH ${INSTALL_DIR}/lib64/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
-    ENDIF()
-    SET(SCI_PYTHON_EXE ${INSTALL_DIR}/bin/${SCI_PYTHON_NAME})
-    SET(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME}${ABIFLAGS})
+    set(PYTHON_MODULE_SEARCH_ROOT Python.framework/Versions/${SCI_PYTHON_VERSION_SHORT}/lib/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
+    if(SEG3D_BUILD_INTERFACE)
+      set(PYTHON_MODULE_SEARCH_PATH ../Frameworks/${PYTHON_MODULE_SEARCH_ROOT} CACHE INTERNAL "Python modules." FORCE)
+    else()
+      set(PYTHON_MODULE_SEARCH_PATH ${PYTHON_MODULE_SEARCH_ROOT} CACHE INTERNAL "Python modules." FORCE)
+    endif()
+    set(SCI_PYTHON_FRAMEWORK_ARCHIVE ${INSTALL_DIR}/${python_FRAMEWORK_ARCHIVE})
+  else()
+    set(SCI_PYTHON_ROOT_DIR ${INSTALL_DIR})
+    set(SCI_PYTHON_INCLUDE ${INSTALL_DIR}/include/${SCI_PYTHON_NAME}${ABIFLAGS})
+    set(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}/lib)
+    set(SCI_PYTHON_LINK_LIBRARY_DIRS ${SCI_PYTHON_LIBRARY_DIR})
+    if(SEG3D_BITS MATCHES 64)
+      list(APPEND SCI_PYTHON_LINK_LIBRARY_DIRS ${INSTALL_DIR}/lib64)
+      set(SCI_PYTHON_64BIT_MODULE_LIBRARY_PATH ${INSTALL_DIR}/lib64/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
+    endif()
+    set(SCI_PYTHON_EXE ${INSTALL_DIR}/bin/${SCI_PYTHON_NAME})
+    set(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME}${ABIFLAGS})
 
     # required by interpreter interface
-    SET(PYTHON_MODULE_SEARCH_PATH ${SCI_PYTHON_MODULE_PARENT_PATH}/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
-    SET(SCI_PYTHON_MODULE_LIBRARY_PATH ${INSTALL_DIR}/${SCI_PYTHON_MODULE_PARENT_PATH}/${SCI_PYTHON_NAME})
-  ENDIF()
-ELSE()
+    set(PYTHON_MODULE_SEARCH_PATH ${SCI_PYTHON_MODULE_PARENT_PATH}/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
+    set(SCI_PYTHON_MODULE_LIBRARY_PATH ${INSTALL_DIR}/${SCI_PYTHON_MODULE_PARENT_PATH}/${SCI_PYTHON_NAME})
+  endif()
+else()
   # Windows does not do install step
-  SET(SCI_PYTHON_ROOT_DIR ${SOURCE_DIR}/PCbuild)
-  SET(SCI_PYTHON_INCLUDE ${SOURCE_DIR}/Include)
-  SET(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR})
-  SET(SCI_PYTHON_LINK_LIBRARY_DIRS ${SCI_PYTHON_LIBRARY_DIR})
-  SET(SCI_PYTHON_NAME python${SCI_PYTHON_VERSION_SHORT_WIN32})
+  set(SCI_PYTHON_ROOT_DIR ${SOURCE_DIR}/PCbuild)
+  set(SCI_PYTHON_INCLUDE ${SOURCE_DIR}/Include)
+  set(SCI_PYTHON_LIBRARY_DIR ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR})
+  set(SCI_PYTHON_LINK_LIBRARY_DIRS ${SCI_PYTHON_LIBRARY_DIR})
+  set(SCI_PYTHON_NAME python${SCI_PYTHON_VERSION_SHORT_WIN32})
 
-  SET(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/python.exe)
-  SET(SCI_PYTHON_DEBUG_EXE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/python${python_ABIFLAG_PYDEBUG}.exe)
-  SET(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME})
-  SET(SCI_PYTHON_LIBRARY_RELEASE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}.lib)
-  SET(SCI_PYTHON_LIBRARY_DEBUG ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${python_ABIFLAG_PYDEBUG}.lib)
-  SET(SCI_PYTHON_DLL_PATH ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-  SET(SCI_PYTHON_DLL_DEBUG_PATH ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${python_ABIFLAG_PYDEBUG}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(SCI_PYTHON_EXE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/python.exe)
+  set(SCI_PYTHON_DEBUG_EXE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/python${python_ABIFLAG_PYDEBUG}.exe)
+  set(SCI_PYTHON_LIBRARY ${SCI_PYTHON_NAME})
+  set(SCI_PYTHON_LIBRARY_RELEASE ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}.lib)
+  set(SCI_PYTHON_LIBRARY_DEBUG ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${python_ABIFLAG_PYDEBUG}.lib)
+  set(SCI_PYTHON_DLL_PATH ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(SCI_PYTHON_DLL_DEBUG_PATH ${SCI_PYTHON_ROOT_DIR}${python_WIN32_64BIT_DIR}/${SCI_PYTHON_NAME}${python_ABIFLAG_PYDEBUG}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
   # required by interpreter interface
-  SET(PYTHON_MODULE_SEARCH_PATH ${SCI_PYTHON_MODULE_PARENT_PATH}/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
-  SET(SCI_PYTHON_MODULE_LIBRARY_PATH ${SOURCE_DIR}/Lib)
-ENDIF()
+  set(PYTHON_MODULE_SEARCH_PATH ${SCI_PYTHON_MODULE_PARENT_PATH}/${SCI_PYTHON_NAME} CACHE INTERNAL "Python modules." FORCE)
+  set(SCI_PYTHON_MODULE_LIBRARY_PATH ${SOURCE_DIR}/Lib)
+endif()
 
-SET(SCI_PYTHON_USE_FILE ${INSTALL_DIR}/UsePython.cmake)
+set(SCI_PYTHON_USE_FILE ${INSTALL_DIR}/UsePython.cmake)
 
 # Python is special case - normally this should be handled in external library repo
-CONFIGURE_FILE(${SUPERBUILD_DIR}/PythonConfig.cmake.in ${INSTALL_DIR}/PythonConfig.cmake @ONLY)
-CONFIGURE_FILE(${SUPERBUILD_DIR}/UsePython.cmake ${SCI_PYTHON_USE_FILE} COPYONLY)
+configure_file(${SUPERBUILD_DIR}/PythonConfig.cmake.in ${INSTALL_DIR}/PythonConfig.cmake @ONLY)
+configure_file(${SUPERBUILD_DIR}/UsePython.cmake ${SCI_PYTHON_USE_FILE} COPYONLY)
 
-SET(Python_DIR ${INSTALL_DIR} CACHE PATH "")
+set(Python_DIR ${INSTALL_DIR} CACHE PATH "")
 
-MESSAGE(STATUS "Python_DIR: ${Python_DIR}")
+message(STATUS "Python_DIR: ${Python_DIR}")
