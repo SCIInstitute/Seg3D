@@ -72,6 +72,7 @@ set(itk_CACHE_ARGS
   "-DModule_IITKIOMeta:BOOL=ON"
   "-DModule_ITKIONRRD:BOOL=ON"
   "-DModule_ITKDeprecated:BOOL=OFF"
+  "-DModule_GrowCut:BOOL=ON"
   "-DCMAKE_CXX_FLAGS:STATIC=${CMAKE_CXX_FLAGS}"
   "-DCMAKE_CXX_FLAGS_DEBUG:STATIC=${CMAKE_CXX_FLAGS_DEBUG}"
   "-DCMAKE_C_FLAGS:STATIC=${CMAKE_C_FLAGS}"
@@ -89,7 +90,7 @@ if(BUILD_MOSAIC_TOOLS)
   )
 endif()
 
-SET(itk_GIT_TAG "v5.2.0")
+SET(itk_GIT_TAG "3a63e79d17addbc8903270f363fac6c5b89cdf53")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
@@ -104,6 +105,6 @@ ExternalProject_Add(ITK_external
 
 # hardcoded, since we need this before ITK's configure step
 ExternalProject_Get_Property(ITK_external INSTALL_DIR)
-SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.2" CACHE PATH "")
+SET(ITK_DIR "${INSTALL_DIR}/lib/cmake/ITK-5.3" CACHE PATH "")
 
 message(STATUS "ITK_DIR=${ITK_DIR}")

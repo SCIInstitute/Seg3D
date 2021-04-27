@@ -164,18 +164,9 @@ SET(APPLICATION_TOOLS_ACTIONS_SRCS
 )
 
 SET(APPLICATION_TOOLS_ALGORITHM_SRCS
-  Algorithm/FastGrowCut.h
-  Algorithm/FastGrowCut.hxx
-  Algorithm/fibheap.h
-  Algorithm/fibheap.cc
   Algorithm/GrowCutter.h
   Algorithm/GrowCutter.cc
-  Algorithm/HeapNode.h
-  Algorithm/HeapNode.cc
   Algorithm/IslandRemoval.h
-  Algorithm/itkFastGrowCut.h
-  Algorithm/itkFastGrowCut.hxx
-  Algorithm/utilities.h
   )
 
 IF(BUILD_WITH_PYTHON)
@@ -184,6 +175,7 @@ IF(BUILD_WITH_PYTHON)
 endif()
 
 ITK_MODULE_LOAD(ITKCommon)
+ITK_MODULE_LOAD(GrowCut)
 
 CORE_ADD_LIBRARY(Application_Tools
   ${APPLICATION_TOOLS_SRCS}
@@ -208,6 +200,7 @@ target_link_libraries(Application_Tools
   Application_ToolManager
   ${SCI_BOOST_LIBRARY}
   ${ITKCommon_LIBRARIES}
+  ${GrowCut_LIBRARIES}
 )
 
 # Register tool classes
