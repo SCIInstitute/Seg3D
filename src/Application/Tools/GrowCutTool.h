@@ -52,7 +52,7 @@ class GrowCutTool : public SingleTargetTool, public boost::enable_shared_from_th
 
   SEG3D_TOOL
   (
-    SEG3D_TOOL_NAME( "GrowCutTool", "Tool for grow cut segmentationpainting on mask" )
+    SEG3D_TOOL_NAME( "GrowCutTool", "Tool for grow cut segmentation painting on mask" )
     SEG3D_TOOL_MENULABEL( "Grow Cut" )
     SEG3D_TOOL_MENU( "Tools" )
     SEG3D_TOOL_SHORTCUT_KEY( "CTRL+ALT+5" )
