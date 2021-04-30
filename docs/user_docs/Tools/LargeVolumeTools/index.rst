@@ -1,9 +1,8 @@
-User Documentation
+Large Volume Tools
 ========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   Manuals/Functions/index
-   Tools/index
+   ExtractDataLayerTool

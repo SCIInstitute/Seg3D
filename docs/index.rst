@@ -22,7 +22,7 @@ Check the :doc:`Platform Specifications </specs>` for system requirements.
 
 User Documentation
 ------------------
-A :doc:`basic functionality manual </user_docs/functionality>`, :doc:`tool and filter reference </user_docs/tools>`, and :doc:`tutorial </tutorials/Seg3DTutorial>` are available.
+A :doc:`basic functionality manual </user_docs/Manuals/Functions/index>`, :doc:`tool and filter reference </user_docs/tools>`, and :doc:`tutorial </tutorials/Seg3DTutorial>` are available.
 
 
 .. toctree::
