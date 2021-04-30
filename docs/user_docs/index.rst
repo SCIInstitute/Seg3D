@@ -5,5 +5,5 @@ User Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   functionality
+   Manuals/Functions/index
    tools
