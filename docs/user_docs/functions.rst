@@ -31,7 +31,7 @@ Functions:
    :maxdepth: 2
    :caption: Contents:
 
-   BasicProgramFunctions/index
-   Seg3DViewer/index
-   Seg3DWindows/index
-   WelcomeScreen/index
+   Manuals/Functions/BasicProgramFunctions/index
+   Manuals/Functions/Seg3DViewer/index
+   Manuals/Functions/Seg3DWindows/index
+   Manuals/Functions/WelcomeScreen/index

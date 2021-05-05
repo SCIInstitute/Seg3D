@@ -22,20 +22,49 @@ Check the :doc:`Platform Specifications </specs>` for system requirements.
 
 User Documentation
 ------------------
-A :doc:`basic functionality manual </user_docs/Manuals/Functions/index>`, :doc:`tool and filter reference </user_docs/tools>`, and :doc:`tutorial </tutorials/Seg3DTutorial>` are available.
+A :doc:`basic functionality manual </user_docs/Manuals/Functions/index>`, :doc:`tool and filter reference </user_docs/Tools/index>`, and :doc:`tutorial </tutorials/Seg3DTutorial>` are available.
 
+..
+   user doc tree
 
 .. toctree::
-   :maxdepth: 3
-   :hidden:
-   :caption: Contents:
+   :maxdepth: 1
+   :glob:
+   :caption: User Documentation:
 
-   specs
-   py_docs/index
-   tutorials/index
-   user_docs/index
-   dev_docs/index
-   ir-tools
+   user_docs/*
+
+..
+   tutorial tree
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+   :caption: Tutorials:
+
+   tutorials/*
+
+..
+   dev tree
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+   :caption: Developer Documentation:
+
+   dev_docs/*
+
+
+..
+   python tree
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+   :caption: Python Documentation:
+
+   py_docs/*
+
 
 
 
