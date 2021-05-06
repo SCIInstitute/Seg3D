@@ -8,10 +8,11 @@ Note: If you are looking for a refresher on the available keyboard and mouse sho
 About Seg3D
 -----------
 
-<figure>
-  <img src="user_docs/Manuals/Seg3DBasicFunctionality_figures/layout.png" id="layout">
-  <figcaption>Figure 1.1 Seg3D in use.</figcaption>
-</figure>
+.. figure:: Manuals/Seg3DBasicFunctionality_figures/layout.png
+    :width: 495 px
+    :align: center
+
+    Seg3D in use.
 
 Seg3D is a lightweight software tool developed for use in visualizing and segmenting image data. The core intended use of Seg3D involves loading 3D scalar data, such as MRI or CT scans, and generating labels mask to identify various regions of interest in the original image data. Seg3D facilitates the process using interactive tools such as image processing filters and manual masking techniques.
 

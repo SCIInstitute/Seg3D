@@ -2,10 +2,8 @@
 
 With these two options selected, the user now has three rendering options. These options are Simple, Faux Shading, and Ambient Occlusion.
 
-<figure>
-  <img src="../Seg3DBasicFunctionality_figures/VolRendOpt.png" id="VolRendOpt">
-  <figcaption>Figure 4.7 Volume Rendering Options - A) Simple B) Faux Shading C) Ambient Occlusion</figcaption>
-</figure>
+![VolRendOpt](../../../Seg3DBasicFunctionality_figures/VolRendOpt.png)
+*Volume Rendering Options - A) Simple B) Faux Shading C) Ambient Occlusion*
 
 ### Simple
 

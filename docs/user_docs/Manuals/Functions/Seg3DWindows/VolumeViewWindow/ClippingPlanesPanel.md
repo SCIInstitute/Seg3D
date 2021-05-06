@@ -2,10 +2,8 @@
 
 The Clipping Planes Panel allows users to define multiple clipping planes with which to clip the volume. + and - signs at the top of the panel represent individual clipping planes. The + sign is an enabled clipping plan, while the - sign is disabled. The clipping panel option in the viewer window is activated by default.
 
-<figure>
-  <img src="../Seg3DBasicFunctionality_figures/ClippingPanel.png" id="ClippingPanel">
-  <figcaption>Figure 4.5 Volume View Window - Clipping Panel Displayed. Show clipping option at the bottom of the viewer window is activated by default.</figcaption>
-</figure>
+![ClippingPanel](../../../Seg3DBasicFunctionality_figures/ClippingPanel.png)
+*Volume View Window - Clipping Panel Displayed. Show clipping option at the bottom of the viewer window is activated by default.*
 
 Once an clipping plane has been selected, it must be enabled. Click the ’Enable’ checkbox. After the plane is enabled, the user is able to define the influence of each cardinal direction on the plane. The number 1 in a box indicates that the clipping plane will slice a 45-degree angle within the positive side of that cardinal direction on the 3d viewing window. A -1 will clip a -45-degree angle from the negative side.
 

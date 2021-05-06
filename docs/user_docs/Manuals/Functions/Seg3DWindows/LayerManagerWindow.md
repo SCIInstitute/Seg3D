@@ -2,10 +2,8 @@
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
-<figure>
-  <img src="../Seg3DBasicFunctionality_figures/LayerWindow.png" id="LayerWindow">
-  <figcaption>Figure 4.3 Layer Manager Window</figcaption>
-</figure>
+![LayerWindow](../../Seg3DBasicFunctionality_figures/LayerWindow.png)
+*Layer Manager Window*
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
