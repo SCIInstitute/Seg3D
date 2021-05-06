@@ -3,12 +3,7 @@ Data Filters
 
 .. toctree::
    :maxdepth: 2
+   :glob:
    :caption: Contents:
 
-   ArithmeticFilter
-   GaussianBlur
-   MaskDataFilter
-   MeanFilter
-   MedianFilter
-   NeighborhoodConnected
-   OtsuThreshold
+   *

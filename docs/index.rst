@@ -11,7 +11,7 @@ Seg3D (`www.seg3d.org <www.seg3d.org>`_) is a free volume segmentation and proce
 
 Installation
 ------------
-Check the :doc:`Platform Specifications </specs>` for system requirements.
+Check the :doc:`Platform Specifications <dev_docs/specs>` for system requirements.
 
 `Installers <https://github.com/SCIInstitute/Seg3D/releases>`_ are provided for Windows and Mac OS X. Linux users need to build Seg3D from :doc:`source </dev_docs/build>`
 

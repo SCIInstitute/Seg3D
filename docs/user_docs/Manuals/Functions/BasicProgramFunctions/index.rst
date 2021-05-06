@@ -5,9 +5,7 @@ This section gives a brief overview of the options found under the File, Edit, a
 
 .. toctree::
    :maxdepth: 2
+   :glob:
    :caption: Contents:
 
-   Edit
-   File
-   Help
-   Preferences
+   *

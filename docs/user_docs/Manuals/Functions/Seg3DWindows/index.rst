@@ -5,13 +5,9 @@ In addition to the viewer windows discussed in the above chapter, there are seve
 
 .. toctree::
    :maxdepth: 2
+   :glob:
    :caption: Contents:
 
    ControllerWindow/index
    VolumeViewWindow/index
-   LayerManagerWindow
-   MessageHistoryWindow
-   ProjectWindow
-   ProvenanceWindow
-   PythonConsole
-   ToolsWindow
+   *

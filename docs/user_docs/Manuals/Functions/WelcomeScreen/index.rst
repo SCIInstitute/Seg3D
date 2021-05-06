@@ -12,10 +12,7 @@ Anytime you start Seg3D, users are first presented with the Seg3D welcome screen
 
 .. toctree::
    :maxdepth: 2
+   :glob:
    :caption: Contents:
 
-   LoadRecentProject
-   OpenExistingProject
-   QuickOpenFile
-   Quit
-   StartNewProject
+   *

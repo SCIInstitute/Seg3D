@@ -3,6 +3,7 @@ Large Volume Tools
 
 .. toctree::
    :maxdepth: 2
+   :glob:
    :caption: Contents:
 
-   ExtractDataLayerTool
+   *
