@@ -1,6 +1,6 @@
 # Tool Bar
 
-The tool bar located at the bottom of the Seg3D window contains some useful functions. The first is the message history icon on the left side of the tool bar ([Table 3.7](#toolbaricons)). For more information on this window, see [MessageHistoryWindow](MessageHistoryWindow.md). The other use function is on the right side of the tool bar, the information tool bar. This tool bar can switch between displaying information about the active layer at the mouse location and a quick menu for the active layers by clicking on the switch tool button ([Table 3.7](#toolbaricons)).
+The tool bar located at the bottom of the Seg3D window contains some useful functions. The first is the message history icon on the left side of the tool bar ([Table 3.7](#toolbaricons)). For more information on this window, see [MessageHistoryWindow](../Seg3DWindows/MessageHistoryWindow.md). The other use function is on the right side of the tool bar, the information tool bar. This tool bar can switch between displaying information about the active layer at the mouse location and a quick menu for the active layers by clicking on the switch tool button ([Table 3.7](#toolbaricons)).
 
 | **Icon** | **Function** <a name="toolbaricons"></a>|
 |:----|:----|
