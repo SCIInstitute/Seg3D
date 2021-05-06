@@ -11,14 +11,14 @@ A volume file is represented by a gray image with multiple stacked planes. A lab
 
 | **Icon** | **Function** <a name="layericons"></a> |
 |:----|:----|
-|![alt text](../Seg3DBasicFunctionality_figures/VisibleOff.png)          | Visible Icon: The eye icon displays the current mask. When the eye is highlighted the mask is visible in the view plane, when it is not, the mask is ’turned off.’|
-|![alt text](../Seg3DBasicFunctionality_figures/InfoOff.png)             | Info Icon: The ’i’ icon displays information about the layer.|
-|![alt text](../Seg3DBasicFunctionality_figures/OpacityOff.png)          | Opacity Icon: The histogram-looking icon allows the user to change opacity levels of the layer.|
-|![alt text](../Seg3DBasicFunctionality_figures/AppearanceOff.png)       | Appearance Icon: The paintbrush-like icon allows the user to change th layer’s appearance.|
-|![alt text](../Seg3DBasicFunctionality_figures/LockOff.png)             | Lock Icon: The lock icon allows users to lock the layer to further editing.|
-|![alt text](../Seg3DBasicFunctionality_figures/IsosurfaceVisibleOff.png)| Isosurface Visible Icon: This icon toggles visibility of the layers isosurface. Isosurfaces must be computed first.|
-|![alt text](../Seg3DBasicFunctionality_figures/IsosurfaceComputeOff.png)| Isosurface Compute Icon: This icon generates the isosurface for the mask. It must be clicked before the IsosurfaceMenu or IsosurfaceDelete icons become active.|
-|![alt text](../Seg3DBasicFunctionality_figures/IsosurfaceDeleteOff.png) | IsosurfaceDelete Icon: This icon deletes active isosurfaces (if the mask has one).|
+|![alt text](../../Seg3DBasicFunctionality_figures/VisibleOff.png)          | Visible Icon: The eye icon displays the current mask. When the eye is highlighted the mask is visible in the view plane, when it is not, the mask is ’turned off.’|
+|![alt text](../../Seg3DBasicFunctionality_figures/InfoOff.png)             | Info Icon: The ’i’ icon displays information about the layer.|
+|![alt text](../../Seg3DBasicFunctionality_figures/OpacityOff.png)          | Opacity Icon: The histogram-looking icon allows the user to change opacity levels of the layer.|
+|![alt text](../../Seg3DBasicFunctionality_figures/AppearanceOff.png)       | Appearance Icon: The paintbrush-like icon allows the user to change th layer’s appearance.|
+|![alt text](../../Seg3DBasicFunctionality_figures/LockOff.png)             | Lock Icon: The lock icon allows users to lock the layer to further editing.|
+|![alt text](../../Seg3DBasicFunctionality_figures/IsosurfaceVisibleOff.png)| Isosurface Visible Icon: This icon toggles visibility of the layers isosurface. Isosurfaces must be computed first.|
+|![alt text](../../Seg3DBasicFunctionality_figures/IsosurfaceComputeOff.png)| Isosurface Compute Icon: This icon generates the isosurface for the mask. It must be clicked before the IsosurfaceMenu or IsosurfaceDelete icons become active.|
+|![alt text](../../Seg3DBasicFunctionality_figures/IsosurfaceDeleteOff.png) | IsosurfaceDelete Icon: This icon deletes active isosurfaces (if the mask has one).|
 |                                                                     | Shift+Left Button Drag Layer: This moves a layer from one group to another with resampling.|
 
 Table 4.1: List of icons and actions available for each layer.
@@ -27,9 +27,9 @@ Each volume or mask label has standard, associated icons below their names. [Tab
 
 | **Icon**| **Function** <a name="layertopicons"></a> |
 |:----|:----|
-|![alt text](../Seg3DBasicFunctionality_figures/DownArrow.png)            | Expanded Layer Group Icon: This icon indicates that the layer group is visible, showing all the layers in it. The layer group can be collapsed, and expanded again by clicking on this icon. This turns into a right arrow when collapsed.|
-|![alt text](../Seg3DBasicFunctionality_figures/VisibleOff.png)           | Visible Icon: This icon will toggle the visibility of all the layers in the group. If some of the layers are not visible, this icon will make those layers visible so that all the layers are visible. If all layers are visible, this will turn off visibility.|
-|![alt text](../Seg3DBasicFunctionality_figures/IsosurfaceVisibleOff.png) | Isosurface Visibile Icon: This icon toggles visibility of all computed isosurfaces in the layer group. If there are computed isosurfaces that are not visible, this icon will make those visible. If all computed Isosurfaces are visible, this will hide them all.|
+|![alt text](../../Seg3DBasicFunctionality_figures/DownArrow.png)            | Expanded Layer Group Icon: This icon indicates that the layer group is visible, showing all the layers in it. The layer group can be collapsed, and expanded again by clicking on this icon. This turns into a right arrow when collapsed.|
+|![alt text](../../Seg3DBasicFunctionality_figures/VisibleOff.png)           | Visible Icon: This icon will toggle the visibility of all the layers in the group. If some of the layers are not visible, this icon will make those layers visible so that all the layers are visible. If all layers are visible, this will turn off visibility.|
+|![alt text](../../Seg3DBasicFunctionality_figures/IsosurfaceVisibleOff.png) | Isosurface Visibile Icon: This icon toggles visibility of all computed isosurfaces in the layer group. If there are computed isosurfaces that are not visible, this icon will make those visible. If all computed Isosurfaces are visible, this will hide them all.|
 
 Table 4.2: List of icons and actions available at the top of each layer group.
 
@@ -37,10 +37,10 @@ Layers in Seg3D are arranged into layer groups. Layer groups are formed with lay
 
 | **Icon** | **Function** <a name="layerbottomicons"></a> |
 |:----|:----|
-|![alt text](../Seg3DBasicFunctionality_figures/DuplicateOff.png)     | Duplicate Layer Icon: This icon allows the user to duplicate one or more layers. Once this icon is clicked, the user will be prompted to choose the layers to duplicate by checking the boxes next to the layers. The duplicated layers will have the same name with “copy” appended to the front.|
-|![alt text](../Seg3DBasicFunctionality_figures/IsosurfaceMenuOff.png)| Isosurface Menu Icon: This icon will open a menu that allows the user to change some of the isosurface rendering parameters for all the isosurfaces in the layer group. These parameters are the quality and capping of the isosurface.|
-|![alt text](../Seg3DBasicFunctionality_figures/Minus.png)            | Delete Layer Icon: This icon allows the user to delete one or more layer from the layer group. When the icon is clicked, the user will be prompted to choose the layers to delete by clicking the box next to the layer. There will be a confirmation window after the selection is made.|
-|![alt text](../Seg3DBasicFunctionality_figures/Add.png)              | New Layer Icon: This icon will create a new mask layer that is the same size as those in the layer group but will be empty.|
+|![alt text](../../Seg3DBasicFunctionality_figures/DuplicateOff.png)     | Duplicate Layer Icon: This icon allows the user to duplicate one or more layers. Once this icon is clicked, the user will be prompted to choose the layers to duplicate by checking the boxes next to the layers. The duplicated layers will have the same name with “copy” appended to the front.|
+|![alt text](../../Seg3DBasicFunctionality_figures/IsosurfaceMenuOff.png)| Isosurface Menu Icon: This icon will open a menu that allows the user to change some of the isosurface rendering parameters for all the isosurfaces in the layer group. These parameters are the quality and capping of the isosurface.|
+|![alt text](../../Seg3DBasicFunctionality_figures/Minus.png)            | Delete Layer Icon: This icon allows the user to delete one or more layer from the layer group. When the icon is clicked, the user will be prompted to choose the layers to delete by clicking the box next to the layer. There will be a confirmation window after the selection is made.|
+|![alt text](../../Seg3DBasicFunctionality_figures/Add.png)              | New Layer Icon: This icon will create a new mask layer that is the same size as those in the layer group but will be empty.|
 
 Table 4.3: List of icons and actions available at the bottom of each layer group.
 
