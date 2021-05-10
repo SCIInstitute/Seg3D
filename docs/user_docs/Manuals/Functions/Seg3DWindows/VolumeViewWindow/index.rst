@@ -6,6 +6,5 @@ The Volume View Window is not opened by default when Seg3D is opened. To open th
 .. toctree::
    :maxdepth: 2
    :glob:
-   :caption: Contents:
 
    *

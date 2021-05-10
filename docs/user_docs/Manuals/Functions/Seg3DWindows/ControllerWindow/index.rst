@@ -7,6 +7,5 @@ The Controller window supplies the user with all of the data, variables, history
 .. toctree::
    :maxdepth: 2
    :glob:
-   :caption: Contents:
 
    *

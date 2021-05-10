@@ -14,7 +14,6 @@ The default layout when Seg3D is opened and a new project is created is shown in
 .. toctree::
    :maxdepth: 2
    :glob:
-   :caption: Contents:
 
    ViewerPanels/index
    *

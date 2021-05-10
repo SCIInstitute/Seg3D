@@ -30,7 +30,6 @@ Functions:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    Manuals/Functions/BasicProgramFunctions/index
    Manuals/Functions/Seg3DViewer/index
