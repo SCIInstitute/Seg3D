@@ -23,7 +23,7 @@ Seg3D is an crucial element of our software suite also involving BioMesh3D and S
 Software Requirements
 ---------------------
 
-Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the [SCI software portal](https://github.com/SCIInstitute/Seg3D.git) to download the latest Seg3D binary.[](#TODO)
+Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please visit the `SCI software portal <https://github.com/SCIInstitute/Seg3D.git>`_ to download the latest `Seg3D binary <https://github.com/SCIInstitute/Seg3D/releases>`_.
 
 Functions:
 ----------

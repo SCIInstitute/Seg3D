@@ -126,7 +126,7 @@ Qt is available from most package managers. Look for Qt 4.7-4.8.
 ### Compiling Seg3D
 
 Once you have obtained a compatible compiler and installed Qt on your system, you need to
-download and install CMake (http://www.cmake.org) to actually build the software.
+download and install CMake (<http://www.cmake.org>) to actually build the software.
 CMake is a platform independent configuring system that is used for generating Makefiles,
 Visual Studio project files, or Xcode project files.
 
