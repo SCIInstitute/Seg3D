@@ -4,7 +4,7 @@
 
 The following are sample Seg3D python code snippets that can be run in the python console:
 
-~~~
+```python
 # Threshold tool doesn't need to be open in GUI to run
 # thresholding as a python function.
 # Assumes a data layer with ID layer_0 is already open.
@@ -14,10 +14,9 @@ upper_threshold=24248)
 id = opentool(tooltype='thresholdtool')
 # Close the Threshold tool.
 closetool(toolid=id)
-~~~
-{: .language-python}
+```
 
-~~~
+```python
 # Run the Neighborhood Connected filter (does not have to be
 # open in the GUI).
 # Assumes a data layer with ID layer_0 is already open.
@@ -25,13 +24,12 @@ closetool(toolid=id)
 result = neighborhoodconnectedfilter(layerid='layer_0', seeds=
 [[-0.24,20.3,57.2],[35.3,18.1,57.3],[18.7,25.4,57.3]])
 print(result)
-~~~
-{: .language-python}
+```
 
 ## Seg3D State Variables
 Seg3D can be manipulated through state variables using the get and set functions. Look for the variable names in the Controller Window under the State Variables tab.
 
-~~~
+```python
 # Switch the first view window (there are 6 view windows in total) to
 the Sagittal slice plane.
 # Returns bool value.
@@ -45,22 +43,20 @@ polyline(target='layer_2', slice_type=0,
 slice_number=93,vertices=current_vertices,erase=False)
 polyline(target='layer_2', slice_type=0,
 slice_number=94,vertices=current_vertices,erase=False)
-~~~
-{: .language-python}
+```
 
 ## Running scripts
 Python scripts can be run in the console using the open and exec commands, for example:
 
-~~~
+```python
 exec(open('/home/user/mypythonscript.py').read())
-~~~
-{: .language-python}
+```
 
 ## Script example
 A more complex example involves waiting for a filter to finish before exporting the results, in this case, mask layers. It is necessary to check if data is available in the layer using the ID returned by the filter (a layer has 4 states: creating, processing, in use and available).
 In this case, a condition variable blocks until the predicate (lambda function that checks the layer state) evaluates to True.
 
-~~~
+```python
 import os
 import threading
 class MyThread(threading.Thread):
@@ -104,5 +100,4 @@ transformedLayers = transform(layerids=layers, origin=[-128.5,
     t.join()
   exportsegmentation(layers=transformedLayers, file_path=outputDir,
 exporter='[NRRD Exporter]', extension='.nrrd', mode='single_mask')
-~~~
-{: .language-python}
+```
