@@ -14,4 +14,4 @@ The *Histogram Bins* parameter controls the number of bins used in the original 
 
 The *Bins to Ignore* parameter controls the number of ignored bins in the intensity transformation. When bins are ignored, the pixels that would have been in the bins are moved to the next. The result of this is that the resulting value range is altered, which could provide additional contrast in some areas.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/HistogramEqualizationGUI.png)

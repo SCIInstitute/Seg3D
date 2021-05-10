@@ -8,4 +8,4 @@ The Connected Component filter finds connected data regions in a mask layer that
 
 The seed points are chosen by **left clicking** in the 2D viewers or deleted by **right clicking** on existing seed points. Multiple connected regions can be selected with these seed points. Another mask can be used as a seed. Using a mask layer second input field will cause the filter to find regions from the first input that are overlapping or next to any data in the second input. Additional seed points can be used or ignored with the use seed points option.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/ConnectedComponentGUI.png)

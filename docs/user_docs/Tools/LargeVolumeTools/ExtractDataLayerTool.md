@@ -8,4 +8,4 @@ Once a volume is converted, the user can run any filter on the data. Currently, 
 
 It is expected that the ExtractDataLayer and Crop tools will often be used together, with a user cropping a region of the large volume and then selecting an appropriate level of resolution to convert the large volume layer into a normal data layer.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/ExtractDataLayersGUI.png)

@@ -15,4 +15,4 @@ Table: List of keyboard and mouse actions in the for the Measure Tool
 | ctrl/cmd            | snap to axis  |
 | middle mouse button | snap to slice |
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/MeasureGUI.png)

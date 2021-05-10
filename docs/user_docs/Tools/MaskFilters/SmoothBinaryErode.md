@@ -12,4 +12,4 @@ It should be noted that the edge of the volume provides complications to this fi
 
 This filter and Fast Binary Dilate -> Erode are similar in function, but are slightly different in the results. As the name suggests, Smooth Binary Dilate -> Erode will produce a smoother surface after each step due to an additional correction in the algorithm. This additional step adds to runtime dramatically. You should use this algorithm if the radii used are large, or if the erosion and dilation are performed multiple times each.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/SmoothBinaryDilateErodeGUI.png)

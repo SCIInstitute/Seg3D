@@ -16,4 +16,4 @@ Table: List of keyboard and mouse actions in the for the Threshold tool
 | :----: | ------------------------------------- |
 | M      | toggle visibility of the preview mask |
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/ThresholdGUI.png)

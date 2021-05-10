@@ -8,4 +8,4 @@ The Median filter is a non-linear filter that will reduce noise (speckle), but m
 
 The neighborhood is controlled by the *distance* parameter. Though increasing the distance will also increase the smoothing, it is because the size requirement for regions to not be eliminated. Clear divisions of large regions will increase in contrast and smaller regions will be smoothed out.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/MedianGUI.png)

@@ -20,4 +20,4 @@ The *Edge Weight* parameter will control how much effect the edges in the data v
 
 On a final note, when the segmentation level set filter is run with the *edge* and *curvature weight* at zero and high enough iterations, the result will likely seem similar to the Confidence Connected filter, but will require much more compute time to reach it. This can be useful to try when first using this filter on new data, as it will help tune the threshold range better. With that in mind, suggested parameters for novices are: high *Threshold Range* (above 2.5, but 5 might be best), high *Propagation Weight* (Use max unless doing fine tuning or very coarse data), and low *Edge Weight* (less than 1 unless very smooth data). The filter is not as sensitive to the *Curvature Weight* and the *Iterations* can be increased as much as desired.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/SegmentationLevelSetGUI.png)

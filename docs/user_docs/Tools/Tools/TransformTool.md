@@ -10,4 +10,4 @@ The origin and spacing can be changed in the fields provided, or editing the box
 
 A preview of one of the checked layers from the list will be shown in the 2D viewer, as well as the box widget. Both these can be hidden by unchecking the *show preview* and *show border* options, respectively. If more than one layer is checked, you may choose which layer to preview with the drop down menu provided.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/TransformGUI.png)

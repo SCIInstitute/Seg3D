@@ -12,4 +12,4 @@ The two parameters in this filter are *Iterations* and *Multiplier.* The *Iterat
 
 Note: The default values (Iterations=3 and Multiplier=2) should be the best values for most sources of image data.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/ConfidenceConnectedGUI.png)

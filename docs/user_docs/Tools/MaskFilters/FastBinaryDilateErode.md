@@ -12,4 +12,4 @@ It should be noted that the edge of the volume provides complications to this fi
 
 This filter and Smooth Binary Dilate -> Erode are similar in function, but are slightly different in the results. As the name suggests, Fast Binary Dilate -> Erode is the faster filter of the two, but the solution may produce corners in the data instead of smooth surfaces. The runtime of Fast Binary Dilate -> Erode is dramatically less and will the results will be indistinguishable with moderate radii and number of eroding and dilating steps.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/FastBinaryDilateErodeGUI.png)

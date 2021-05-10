@@ -8,4 +8,4 @@ The Otsu Threshold filter attempts to cluster data values in a data layer based 
 
 Using the Ostu Threshold filter is simple. The only parameter in this implementation is the number of thresholds (1 to 4), or the number of divisions in the volume. The results of this filter are mutually exclusive (no output will mask the same pixel as another layer) and collectively exhaustive (the whole volume will be mask by one of the output layers) so that there will be one more mask layer generated than thresholds used. A histogram is presented to aid the user in choosing the threshold number.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/OtsuThresholdGUI.png)

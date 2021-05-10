@@ -12,4 +12,4 @@ Interpolation of the data is often needed when resampling, especially with image
 
 Resampling a layer to match the geometry of another group can also be done by clicking (left mouse button) on a layer while holding down the Shift key, and dragging the layer to the destination group.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/ResampleGUI.png)

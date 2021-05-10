@@ -20,4 +20,4 @@ Table: List of keyboard and mouse actions in the for the Polyline Tool
 | F                    | Paint flood fill                     |
 | E                    | Erase flood fill                     |
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/PolylineGUI.png)

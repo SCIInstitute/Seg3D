@@ -12,7 +12,4 @@ The *polynomial order* parameter controls the kind of line used to correct the i
 
 The *edge sensitivity* parameter controls the correction algorithm that prevents artifacts do to edges in the image. The higher the sensitivity, the less the algorithm will correct for edge artifacts. As *edge sensitivity* approaches 0, the algorithm attempts to leave edges unchanged and may suppress the Intensity Correction altogether.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
-
-{% capture url %}{% include url.md%}{% endcapture %}
-{{ url }}
+![alt text](../images/IntensityCorrectionGUI.png)

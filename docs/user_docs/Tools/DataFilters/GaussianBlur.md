@@ -8,4 +8,4 @@ The Gaussian Blur filter performs a smoothing on the data layer using a discrete
 
 The *distance* parameter set with the slider bar in the tool window determines the size of the neighborhood so that the bigger the distance, the greater the area of averaging and thus more blurring. Since the *distance* parameter is the only exposed parameter, the variance is dependent on the distance.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/GaussianBlurGUI.png)

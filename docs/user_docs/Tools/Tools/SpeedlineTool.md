@@ -22,4 +22,4 @@ Table: Keyboard and mouse actions for the Speedline Tool.
 | E           | Erase flood fill  |
 | C           | Clear Seed points |
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/SpeedlineGUI.png)

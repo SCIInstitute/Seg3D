@@ -8,4 +8,4 @@ The Gradient Anisotropic Diffusion performs anisotropic diffusion on a data laye
 
 The parameters for this filter are *Iterations* and *Sensitivity Range*. The *Iterations* parameter will control how many iterations of the filter will be executed. The more iterations, the smoother the image. The *sensitivity range* parameter controls the 'diffusion' of the objects in the image, therefore the higher the sensitivity, the more 'diffusion' and thus more smoothing.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/GradientAnisotropicDiffusionGUI.png)

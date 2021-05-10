@@ -12,4 +12,4 @@ The paste option is a little more complicated, as the user must specify the slic
 
 This tool will modify the original layer without an option to create a new layer with the action.
 
-![alt text]({{ site.github.url }}/images/{{ page.title }}GUI.png)
+![alt text](../images/CopyPasteGUI.png)
