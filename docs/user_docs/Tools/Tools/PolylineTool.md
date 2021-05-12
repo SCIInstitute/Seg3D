@@ -12,12 +12,20 @@ Once the desired region is designated by the Polyline, the user can fill the are
 
 Table: List of keyboard and mouse actions in the for the Polyline Tool
 
-| Action               | Function                             |
-| :------------------- | ------------------------------------ |
-| left mouse           | add or move point                    |
-| right mouse          | erase point                          |
-| shift+left mouse     | move Polyline (on one of the points) |
-| F                    | Paint flood fill                     |
-| E                    | Erase flood fill                     |
+```eval_rst
++------------------+--------------------------------------+
+| Action           | Function                             |
++==================+======================================+
+| left mouse       | add or move point                    |
++------------------+--------------------------------------+
+| right mouse      | erase point                          |
++------------------+--------------------------------------+
+| shift+left mouse | move Polyline (on one of the points) |
++------------------+--------------------------------------+
+| F                | Paint flood fill                     |
++------------------+--------------------------------------+
+| E                | Erase flood fill                     |
++------------------+--------------------------------------+
+```
 
 ![alt text](../images/PolylineGUI.png)

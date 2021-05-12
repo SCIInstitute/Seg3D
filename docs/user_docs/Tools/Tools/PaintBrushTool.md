@@ -14,15 +14,26 @@ It should be noted that since this tool uses the scroll function to change the P
 
 Table: List of keyboard and mouse actions in the for the Paint Brush Tool
 
+```eval_rst
++-----------------+------------------------------+
 | Action          | Function                     |
-| --------------- | ---------------------------- |
++=================+==============================+
 | left mouse      | Paint                        |
++-----------------+------------------------------+
 | right mouse     | Erase                        |
++-----------------+------------------------------+
 | scroll up/down  | increase/decrease brush size |
++-----------------+------------------------------+
 | alt+left mouse  | add seed point               |
++-----------------+------------------------------+
 | alt+right mouse | remove seed point            |
++-----------------+------------------------------+
 | C               | clear seed points            |
++-----------------+------------------------------+
 | F               | Paint flood fill             |
++-----------------+------------------------------+
 | E               | Erase flood fill             |
++-----------------+------------------------------+
+```
 
 ![alt text](../images/PaintBrushGUI.png)

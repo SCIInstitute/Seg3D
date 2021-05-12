@@ -12,8 +12,12 @@ Using the Threshold tool can provide a very good rough segmentation of the regio
 
 Table: List of keyboard and mouse actions in the for the Threshold tool
 
+```eval_rst
++--------+---------------------------------------+
 | Action | Function                              |
-| :----: | ------------------------------------- |
++========+=======================================+
 | M      | toggle visibility of the preview mask |
++--------+---------------------------------------+
+```
 
 ![alt text](../images/ThresholdGUI.png)

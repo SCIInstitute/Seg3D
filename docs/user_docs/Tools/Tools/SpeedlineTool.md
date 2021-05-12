@@ -14,12 +14,20 @@ It should be noted that if the active slice changes, the points will not change,
 
 Table: Keyboard and mouse actions for the Speedline Tool.
 
+```eval_rst
++-------------+-------------------+
 | Action      | Function          |
-| ----------- | ----------------- |
++=============+===================+
 | left mouse  | add or move point |
++-------------+-------------------+
 | right mouse | erase point       |
++-------------+-------------------+
 | F           | Paint flood fill  |
++-------------+-------------------+
 | E           | Erase flood fill  |
++-------------+-------------------+
 | C           | Clear Seed points |
++-------------+-------------------+
+```
 
 ![alt text](../images/SpeedlineGUI.png)
