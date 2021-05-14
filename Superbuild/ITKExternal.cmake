@@ -89,7 +89,7 @@ if(BUILD_MOSAIC_TOOLS)
   )
 endif()
 
-SET(itk_GIT_TAG "v5.2rc01")
+SET(itk_GIT_TAG "v5.2.0")
 
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
