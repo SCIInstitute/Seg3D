@@ -3,19 +3,19 @@
 The first and second tables below show the mouse and keyboard actions which can be used to control the visualization and manipulation of image and segmentation data. Though these functions are general, there are tools which used these functions for specify purposes or may otherwise block a couple of these functions, the most prominent example is the scroll wheel in the paint brush tool is used to change brush size. In this case, you can still scroll through slices by holding Shift. In all cases, an alternative is given in the software. Also presented in this section is a list and description of the icons presented in the 2D slice viewer.
 
 ```eval_rst
-+-------------------------+-------------------------------------------------------------------------------------------------------------------------+
-| Mouse Command           | Function                                                                                                                |
-+=========================+=========================================================================================================================+
-| left button drag        | Modify brightness and contrast. Vertical is contrast, horizontal is brightness.                                         |
-+-------------------------+-------------------------------------------------------------------------------------------------------------------------+
-| scroll up/down          | Move up/down a slice Note: using Shift maybe needed while using some tools (like paint brush)                           |
-+-------------------------+-------------------------------------------------------------------------------------------------------------------------+
-| CMD/CTRL+right button   | Move slices in other planes to intersect at cursor. Viewers must have the picking icon enabled ([Table 3.3](#2dicons)). |
-+-------------------------+-------------------------------------------------------------------------------------------------------------------------+
-| Shift+left button drag  | Pan view                                                                                                                |
-+-------------------------+-------------------------------------------------------------------------------------------------------------------------+
-| Shift+right button drag | Zoom view in/out                                                                                                        |
-+-------------------------+-------------------------------------------------------------------------------------------------------------------------+
++-------------------------+-------------------------------------------------------------------------------------------------+
+| Mouse Command           | Function                                                                                        |
++=========================+=================================================================================================+
+| left button drag        | Modify brightness and contrast. Vertical is contrast, horizontal is brightness.                 |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| scroll up/down          | Move up/down a slice Note: using Shift maybe needed while using some tools (like paint brush)   |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| CMD/CTRL+right button   | Move slices in other planes to intersect at cursor. Viewers must have the picking icon enabled. |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| Shift+left button drag  | Pan view                                                                                        |
++-------------------------+-------------------------------------------------------------------------------------------------+
+| Shift+right button drag | Zoom view in/out                                                                                |
++-------------------------+-------------------------------------------------------------------------------------------------+
 ```
 *List of mouse functions in the 2D viewers.*
 
@@ -75,7 +75,7 @@ The first and second tables below show the mouse and keyboard actions which can 
 .. |PickingLinesOff| image:: ../../../Seg3DBasicFunctionality_figures/PickingLinesOff.png
    :width: 20pt
    :height: 20pt
-   
+
 +-------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Icon              | Function                                                                                                                                                                                                              |
 +===================+=======================================================================================================================================================================================================================+

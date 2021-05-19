@@ -4,7 +4,7 @@ The File tab contains all the features necessary to manage Seg3D projects and fi
 
 ### New Project
 
-The new project option will prompt you to save your current project such that it can be closed. A dialog box will then open asking for a Project name and a Project Path (<a href="#newproject">Figure 5.1</a>). The Project name will be used to create a folder for all the project data. The Project path defines the location of this folder, which can be set by typing the path or through a seperate dialogue box by pressing ’Choose Alternate Location’. The default location for this path can be set in the preferences section discussed below. A new project can also be created using the shortcut CTRL/CMD+N.
+The new project option will prompt you to save your current project such that it can be closed. A dialog box will then open asking for a Project name and a Project Path. The Project name will be used to create a folder for all the project data. The Project path defines the location of this folder, which can be set by typing the path or through a separate dialogue box by pressing ’Choose Alternate Location’. The default location for this path can be set in the preferences section discussed below. A new project can also be created using the shortcut CTRL/CMD+N.
 
 
 ![newproject](../../Seg3DBasicFunctionality_figures/newProject.png)
@@ -37,7 +37,7 @@ Data and label maps can be stored in a variety of file formats. Use this option 
 
 #### Import Widget
 
-After the user selects the file/files to be read, a menu will appear asking the user to define the type of data being read as seen below (<a href="#ImportWidget">Figure 5.2</a>).
+After the user selects the file/files to be read, a menu will appear asking the user to define the type of data being read as seen below.
 
 ![ImportWidget](../../Seg3DBasicFunctionality_figures/ImportWidget.png)
 *When importing data or label masks, the user is prompted to define the type of data being read.*
@@ -50,14 +50,14 @@ Data and label maps can be stored in a variety of file formats. Use this option 
 
 ### Export Segmentation
 
-Label maps can be exported in a variety of file formats. If a layer containing a label map is selected, then the user may select the Export Segmentation option which opens the segmentation dialogue (<a href="#ExportSeg">Figure 5.3</a>).
+Label maps can be exported in a variety of file formats. If a layer containing a label map is selected, then the user may select the Export Segmentation option which opens the segmentation dialogue.
 
 ![ExportSeg](../../Seg3DBasicFunctionality_figures/ExportSeg.png)
 *This window appears when the user selects export segmentation.  It allows the user to select the layers they wish to export as label masks and the format they wish to export.*
 
 This window allows the user to select the layers to export as label masks and the format they wish to export. The available formats include: .nrrd, .mat (matlab), .tiff, .bmp, .png, .dcm. This function can be called using the shortcut CTRL/CMD+E. The segmentation may be saved as a single file or as multiple files.
 
-After choosing a file name (single file only) and location for the segmentation, you will be shown the Export to Segmentation Summary. This window shows the layers chosen to save as a segmentation. In the case of saving as a single file, there is an additional layer (the background, which is the remainder of the volume) and an option to choose the value to represent each of the layers (<a href="#ExportSeg2">Figure 5.4</a>). I should be noted that the segmentation will only represent one value per voxel, so if any of the selected layers overlap the higher value will overwrite the region of overlap. If saving as multiple files, this window will show the names of the layers only.
+After choosing a file name (single file only) and location for the segmentation, you will be shown the Export to Segmentation Summary. This window shows the layers chosen to save as a segmentation. In the case of saving as a single file, there is an additional layer (the background, which is the remainder of the volume) and an option to choose the value to represent each of the layers. It should be noted that the segmentation will only represent one value per voxel, so if any of the selected layers overlap the higher value will overwrite the region of overlap. If saving as multiple files, this window will show the names of the layers only.
 
 ![ExportSeg2](../../Seg3DBasicFunctionality_figures/ExportSeg_2.png)
 *This window appears when the user selects export segmentation and a file is chosen.  This allows the users to choose the labels to use for each material.*

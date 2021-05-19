@@ -7,7 +7,7 @@ With these two options selected, the user now has three rendering options. These
 
 ### Simple
 
-The simple rendering strategy gives the user the option to select the Sapling Rate. The higher the rate, the more accurate the representation of the selected region. An option in the ’Transfer Function’ section of the pane that allows the user to choose ’Solid’ transfer function representation changes the appearance by coloring each selected slice to a solid color. More on this feature will be addressed below. Note that the images in <a href="#VolRendOpt">Figure 4.7</a> do not have the solid option selected.
+The simple rendering strategy gives the user the option to select the Sapling Rate. The higher the rate, the more accurate the representation of the selected region. An option in the ’Transfer Function’ section of the pane that allows the user to choose ’Solid’ transfer function representation changes the appearance by coloring each selected slice to a solid color. More on this feature will be addressed below. Note that the images above do not have the solid option selected.
 
 ### Faux Shading
 

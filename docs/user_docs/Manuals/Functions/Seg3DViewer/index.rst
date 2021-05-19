@@ -9,7 +9,7 @@ The Seg3D viewer is the main interface between the users and the software. This 
 
     Seg3D interface.
 
-The default layout when Seg3D is opened and a new project is created is shown in <a href="#blank">Figure 3.1</a>. As seen from the image the interface for Seg3D consists of a number of viewers (both 2D and 3D), windows to control the functionality of Seg3D, and a tool bar at the bottom of the screen.
+The default layout when Seg3D is opened and a new project is created is shown in the figure above. As seen from the image the interface for Seg3D consists of a number of viewers (both 2D and 3D), windows to control the functionality of Seg3D, and a tool bar at the bottom of the screen.
 
 .. toctree::
    :maxdepth: 2

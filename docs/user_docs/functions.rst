@@ -1,8 +1,7 @@
 Basic Functionality
 ===================
 
-This document is meant as a basic reference and walkthrough of the Seg3D layout and functionality. Specifically, every feature of the software will be addressed in a brief manner. Tool and filter documention are found in the [Seg3d Tool Documentation](../tools.md)
-
+This document is meant as a basic reference and walkthrough of the Seg3D layout and functionality. Specifically, every feature of the software will be addressed in a brief manner. Tool and filter documention are found in the :doc:`Seg3D Tool Documentation <tools>`.
 Note: If you are looking for a refresher on the available keyboard and mouse shortcuts, there is a list under the **Help** menu of the Seg3D.
 
 About Seg3D
