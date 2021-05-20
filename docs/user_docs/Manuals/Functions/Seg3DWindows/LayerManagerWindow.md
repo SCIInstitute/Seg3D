@@ -3,7 +3,7 @@
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
 ![LayerWindow](../../Seg3DBasicFunctionality_figures/LayerWindow.png)
-*Layer Manager Window*
+<figcaption>Layer Manager Window</figcaption>
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
@@ -34,7 +34,7 @@ A volume file is represented by a gray image with multiple stacked planes. A lab
 .. |IsosurfaceDeleteOff| image:: ../../Seg3DBasicFunctionality_figures/IsosurfaceDeleteOff.png
    :width: 20pt
    :height: 20pt
-   
+
 +------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Icon                   | Function                                                                                                                                                           |
 +========================+====================================================================================================================================================================+
@@ -57,7 +57,7 @@ A volume file is represented by a gray image with multiple stacked planes. A lab
 |                        | Shift+Left Button Drag Layer: This moves a layer from one group to another with resampling.                                                                        |
 +------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
-*List of icons and actions available for each layer.*
+<figcaption>List of icons and actions available for each layer.</figcaption>
 
 Each volume or mask label has standard, associated icons below their names. The above table displays and describes each of these icons. These icons represent tools that are available for each individual layer.
 
@@ -82,7 +82,7 @@ Each volume or mask label has standard, associated icons below their names. The 
 | |IsosurfaceVisibleOff| | Isosurface Visibile Icon: This icon toggles visibility of all computed isosurfaces in the layer group. If there are computed isosurfaces that are not visible, this icon will make those visible. If all computed Isosurfaces are visible, this will hide them all. |
 +------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
-*List of icons and actions available at the top of each layer group.*
+<figcaption>List of icons and actions available at the top of each layer group.</figcaption>
 
 Layers in Seg3D are arranged into layer groups. Layer groups are formed with layers that have the same geometric information, that is the same origin, spacing, and size. Groups are separated by panels with an orange header. Generally speaking, most tools and filters requiring more than one input can only operate on layers in the same group (and therefore the same grid geometry).
 
@@ -112,6 +112,6 @@ Layers in Seg3D are arranged into layer groups. Layer groups are formed with lay
 | |Add|               | New Layer Icon: This icon will create a new mask layer that is the same size as those in the layer group but will be empty.                                                                                                                                                                        |
 +---------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
-*List of icons and actions available at the bottom of each layer group.*
+<figcaption>List of icons and actions available at the bottom of each layer group.</figcaption>
 
 There are some functions that are operated as a group. These are indicated by the icons on the top of the pane, in the orange bar. Additionally, there are some other icons at the bottom of the group that control some of the group functions. Hovering the cursor over the icon will display the the use of each additional icon.

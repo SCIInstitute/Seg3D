@@ -5,4 +5,4 @@ The Python Console window is not opened by default when Seg3D is opened. To open
 The Python Window opens a Python scripting console that can be used by advanced users to control Seg3D (<a href="#PythonConsole">Figure 4.13</a>). Python code wrappers are generated allowing tools, filters, the viewer and data to be controlled in Python scripts. Basic Seg3D Python code samples are available under [Python Code Snippets](../../../../py_docs/python). An extensive treatment of python coding will not be attempted in this document; for more information on python coding, consult other resources.
 
 ![PythonConsole](../../Seg3DBasicFunctionality_figures/PythonConsole_blank.png)
-*Python Console Window*
+<figcaption>Python Console Window</figcaption>

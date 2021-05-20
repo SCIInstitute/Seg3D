@@ -12,7 +12,7 @@ The tool bar located at the bottom of the Seg3D window contains some useful func
 .. |WorldOff| image:: ../../Seg3DBasicFunctionality_figures/WorldOff.png
    :width: 20pt
    :height: 20pt
-   
+
 +--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 | Icon         | Function                                                                                                                                       |
 +==============+================================================================================================================================================+
@@ -28,9 +28,9 @@ The tool bar located at the bottom of the Seg3D window contains some useful func
 The information toolbar will show information about the volume at the location indicated by the mouse. As shown in the figure below, the information given is the x, y, and z coordinates and the value of the layer at the mouse position in the selected volume. By clicking on the world icon, you may toggle between indexed values (relative) and the world values (absolute, considers spacing). The data shown is changed when the mouse is moved, the active slice is changed, or the active layer is changed.
 
 ![geometricinfo](../../Seg3DBasicFunctionality_figures/geometric_info.png)
-*Geometric Information shown in the information tool bar.*
+<figcaption>Geometric Information shown in the information tool bar.</figcaption>
 
 By clicking on the switch tool icon, the tool bar will display a quick menu for the available tools and layers instead of geometric information. As seen in the table above, this menu will display the active tool and layer. If the either is clicked, a dropped down menu will appear allowing the user to switch to an open tool or layer. This can be especially useful in full screen mode.
 
 ![quickmenu](../../Seg3DBasicFunctionality_figures/quick_menu.png)
-*Quick menu shown in the information tool bar.*
+<figcaption>Quick menu shown in the information tool bar.</figcaption>

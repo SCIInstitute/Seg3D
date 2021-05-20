@@ -15,9 +15,14 @@ img:first-child{
   display: block;
 }
 
-img + em {
-  display: flex;
-  justify-content: center;
+figcaption, .figure .caption {
+  text-align: center;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+figcaption {
+  padding-bottom: 20px;
 }
 
 .wy-menu-vertical header, .wy-menu-vertical p.caption {

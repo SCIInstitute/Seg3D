@@ -5,4 +5,4 @@ The tools window is another of the three windows that is opened upon Seg3D launc
 The tool window houses the current tools that the user has selected from the ’Tools’ drop down menu. The active tool will be highlighted in orange and will be displayed. Inactive tools, that have been opened during the session, will be grayed out and minimized. To access one of the other tools, click one of the grayed out items or select it from the ’Tools’ drop down menu. In <a href="#ToolWindow">Figure 4.2</a> the ’Paint Brush’ tool is active, while the ’Threshold,’ ’Crop,’ and ’Measure’ tools are inactive.
 
 ![ToolWindow](../../Seg3DBasicFunctionality_figures/ToolWindow.png)
-*Tools Window*
+<figcaption>Tools Window</figcaption>

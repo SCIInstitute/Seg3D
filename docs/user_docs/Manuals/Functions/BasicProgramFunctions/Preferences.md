@@ -11,25 +11,25 @@ The **Import/Export** options allows you to turn on an off a feature that will e
 The **Project** options allow you to change the default project location, change the buffer size, and change how the project is saved e.g. change if the input files are embedded into the project.
 
 ![Pref_gen](../../Seg3DBasicFunctionality_figures/Pref_gen.png)
-*The Seg3d preferences under the general tab.*
+<figcaption>The Seg3d preferences under the general tab.</figcaption>
 
 ### View
 
 Under this tab the user is able to change many of the default view options such as the window layout (1 big window with 3 smaller windows), background color, and Grid size. In addition there are many options to customize what is seen in the visualization window. At the bottom of this window the user can change the axis labels such that the X,Y, and Z directions are not fixed to represent Sagittal, Coronal, and Axial, but the user can define which axis label is assigned to each direction.
 
 ![Pref_view](../../Seg3DBasicFunctionality_figures/Pref_view.png)
-*The Seg3d preferences under the view tab.*
+<figcaption>The Seg3d preferences under the view tab.</figcaption>
 
 ### Layers
 
 Under this tab the user can change the appearance of the label masks. These options include: layer opacity, available colors, mask fill option (striped or solid), and border thickness.
 
 ![Pref_layers](../../Seg3DBasicFunctionality_figures/Pref_layers.png)
-*The Seg3d preferences under the layers tab*
+<figcaption>The Seg3d preferences under the layers tab</figcaption>
 
 ### Sidebars/Tools + Filters
 
 Under this tab the user can select which menus appear on start up and which tools/filters will appear in the sidebars. This intended for the user to customize their user interface to improve the ease of use.
 
 ![Pref_side](../../Seg3DBasicFunctionality_figures/Pref_side.png)
-*The Seg3d preferences under the sidebars/tools + filters tab.*
+<figcaption>The Seg3d preferences under the sidebars/tools + filters tab.</figcaption>
