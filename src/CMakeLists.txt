@@ -101,7 +101,7 @@ include(CMake/RegisterUnitTest.cmake)
 
 set(SEG3D_MAJOR_VERSION 2 CACHE INTERNAL "Major version number" FORCE)
 set(SEG3D_MINOR_VERSION 5 CACHE INTERNAL "Minor version number" FORCE)
-set(SEG3D_PATCH_VERSION 0 CACHE INTERNAL "Patch version number" FORCE)
+set(SEG3D_PATCH_VERSION 1 CACHE INTERNAL "Patch version number" FORCE)
 
 
 ###########################################
@@ -262,7 +262,7 @@ endif()
 if(SEG3D_BUILD_INTERFACE)
   # see http://doc.qt.io/qt-5/cmake-manual.html
   find_package(Qt5 COMPONENTS Core Gui OpenGL Widgets Svg REQUIRED HINTS ${Qt5_PATH})
-  
+
   get_target_property(QtCore_location_Release Qt5::Core LOCATION_Release)
   #get_target_property(QtCore_location_Debug Qt5::Core LOCATION_Debug)
   get_target_property(QtGui_location_Release Qt5::Gui LOCATION_Release)
