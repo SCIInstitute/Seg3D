@@ -65,12 +65,6 @@ Each volume or mask label has standard, associated icons below their names. The 
 .. |DownArrow| image:: ../../Seg3DBasicFunctionality_figures/DownArrow.png
    :width: 20pt
    :height: 20pt
-.. |VisibleOff| image:: ../../Seg3DBasicFunctionality_figures/VisibleOff.png
-   :width: 20pt
-   :height: 20pt
-.. |IsosurfaceVisibleOff| image:: ../../Seg3DBasicFunctionality_figures/IsosurfaceVisibleOff.png
-   :width: 20pt
-   :height: 20pt
 
 +------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Icon                   | Function                                                                                                                                                                                                                                                            |
