@@ -12,22 +12,24 @@ The selection of the the Speedline is virtually identical to the selection of a 
 
 It should be noted that if the active slice changes, the points will not change, but the connections will still attempt to follow the edge regions of the images. This can therefore be used to segment multiple slices quickly if the slices do not dramatically change. The Speedline points can be cleared or reset in the tool window. The user can also set the iterations and termination value to use in the path selection algorithm.
 
-Table: Keyboard and mouse actions for the Speedline Tool.
-
 ```eval_rst
-+-------------+-------------------+
-| Action      | Function          |
-+=============+===================+
-| left mouse  | add or move point |
-+-------------+-------------------+
-| right mouse | erase point       |
-+-------------+-------------------+
-| F           | Paint flood fill  |
-+-------------+-------------------+
-| E           | Erase flood fill  |
-+-------------+-------------------+
-| C           | Clear Seed points |
-+-------------+-------------------+
+.. table:: Keyboard and Mouse Actions for the Speedline Tool
+   :widths: 25 75
+   :width: 100%
+
+   +-------------+-------------------+
+   | Action      | Function          |
+   +=============+===================+
+   | left mouse  | add or move point |
+   +-------------+-------------------+
+   | right mouse | erase point       |
+   +-------------+-------------------+
+   | F           | Paint flood fill  |
+   +-------------+-------------------+
+   | E           | Erase flood fill  |
+   +-------------+-------------------+
+   | C           | Clear Seed points |
+   +-------------+-------------------+
 ```
 
 ![alt text](../images/SpeedlineGUI.png)

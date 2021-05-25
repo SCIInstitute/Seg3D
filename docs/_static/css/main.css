@@ -25,6 +25,10 @@ figcaption {
   padding-bottom: 20px;
 }
 
+table td {
+  white-space: normal !important;
+}
+
 .wy-menu-vertical header, .wy-menu-vertical p.caption {
   color: #5f911d;
 }

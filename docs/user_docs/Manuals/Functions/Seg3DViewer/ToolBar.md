@@ -4,26 +4,26 @@ The tool bar located at the bottom of the Seg3D window contains some useful func
 
 ```eval_rst
 .. |TextOff| image:: ../../Seg3DBasicFunctionality_figures/TextOff.png
-   :width: 20pt
-   :height: 20pt
-.. |SwitchTool| image:: ../../Seg3DBasicFunctionality_figures/SwitchTool.png
-   :width: 20pt
-   :height: 20pt
-.. |WorldOff| image:: ../../Seg3DBasicFunctionality_figures/WorldOff.png
-   :width: 20pt
-   :height: 20pt
 
-+--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| Icon         | Function                                                                                                                                       |
-+==============+================================================================================================================================================+
-| |TextOff|    | Message History Icon: Opens Message History window.                                                                                            |
-+--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| |SwitchTool| | Switch Tool Icon: Switches between displaying location of mouse in the volume and the quick menu to switch between the active tools and layers.|
-+--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
-| |WorldOff|   | World Icon: Switches between coordinate system displayed in the information tool bar. The options are relative (indexed) and absolute (world). |
-+--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+.. |SwitchTool| image:: ../../Seg3DBasicFunctionality_figures/SwitchTool.png
+
+.. |WorldOff| image:: ../../Seg3DBasicFunctionality_figures/WorldOff.png
+
+
+.. table:: Icons and Actions in the Tool Bar at the Bottom of Seg3D
+   :widths: 10 90
+   :width: 100%
+
+   +--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+   | Icon         | Function                                                                                                                                       |
+   +==============+================================================================================================================================================+
+   | |TextOff|    | Message History Icon: Opens Message History window.                                                                                            |
+   +--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |SwitchTool| | Switch Tool Icon: Switches between displaying location of mouse in the volume and the quick menu to switch between the active tools and layers.|
+   +--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |WorldOff|   | World Icon: Switches between coordinate system displayed in the information tool bar. The options are relative (indexed) and absolute (world). |
+   +--------------+------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
-*List of icons and actions in the tool bar at the bottom of Seg3D*
 
 The information toolbar will show information about the volume at the location indicated by the mouse. As shown in the figure below, the information given is the x, y, and z coordinates and the value of the layer at the mouse position in the selected volume. By clicking on the world icon, you may toggle between indexed values (relative) and the world values (absolute, considers spacing). The data shown is changed when the mouse is moved, the active slice is changed, or the active layer is changed.
 
