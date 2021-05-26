@@ -8,11 +8,21 @@ The user can choose which measurements are visible, change the color, name, and 
 
 Back in the general tab, the active layer can be deleted and the opacity of the visualizations in the viewers can be adjusted. Both tabs allow switching between pixel (indexed) and actual (geometric) distances. When this is changed in the active measurement tab, it changes all the measurements.
 
-Table: List of keyboard and mouse actions in the for the Measure Tool
+```eval_rst
+.. list-table:: Keyboard and Mouse Actions in the for the Measure Tool
+   :widths: 25 75
+   :width: 100%
+   :header-rows: 1
 
-| Action              | Function      |
-| :------------------ | :------------ |
-| ctrl/cmd            | snap to axis  |
-| middle mouse button | snap to slice |
+   * - Action
+     - Function
+
+   * - ctrl/cmd
+     - snap to axis
+
+   * - middle mouse button
+     - snap to slice
+
+```
 
 ![alt text](../images/MeasureGUI.png)

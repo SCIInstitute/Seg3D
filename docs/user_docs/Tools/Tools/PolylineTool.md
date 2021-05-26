@@ -11,23 +11,29 @@ The Polyline is created by clicking with the **left mouse** on the 2D viewer. Th
 Once the desired region is designated by the Polyline, the user can fill the area or delete the mask data in the area. This tools then is like the Paint Brush tool, where the brush can be shaped in any way. The polyline will remain as the slice changes, so that the user can modify the existing polyline instead of creating a new one. If desired, a new polyline can be created by clearing the polyline and starting fresh.
 
 ```eval_rst
-.. table:: Keyboard and Mouse Actions in the for the Polyline Tool
+.. list-table:: Keyboard and Mouse Actions in the for the Polyline Tool
    :widths: 25 75
    :width: 100%
+   :header-rows: 1
+      
+   * - Action
+     - Function
 
-   +------------------+--------------------------------------+
-   | Action           | Function                             |
-   +==================+======================================+
-   | left mouse       | add or move point                    |
-   +------------------+--------------------------------------+
-   | right mouse      | erase point                          |
-   +------------------+--------------------------------------+
-   | shift+left mouse | move Polyline (on one of the points) |
-   +------------------+--------------------------------------+
-   | F                | Paint flood fill                     |
-   +------------------+--------------------------------------+
-   | E                | Erase flood fill                     |
-   +------------------+--------------------------------------+
+   * - left mouse
+     - add or move point
+
+   * - right mouse
+     - erase point
+
+   * - shift+left mouse
+     - move Polyline (on one of the points)
+
+   * - F
+     - Paint flood fill
+     
+   * - E
+     - Erase flood fill
+     
 ```
 
 ![alt text](../images/PolylineGUI.png)

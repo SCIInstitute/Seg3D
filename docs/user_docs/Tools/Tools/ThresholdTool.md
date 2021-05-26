@@ -11,15 +11,17 @@ The threshold range can be set in two ways: the slider provided in the tool wind
 Using the Threshold tool can provide a very good rough segmentation of the region of interest, but may require some editing. The Paint Brush and Polyline tools are manual ways to remove excess regions in the mask, but the user should also try other mask filters such as Connected Component and Connected Component Size (and another Threshold) to remove stray regions of selected noise.
 
 ```eval_rst
-.. table:: Keyboard and Mouse Actions in the for the Threshold Tool
+.. list-table:: Keyboard and Mouse Actions in the for the Threshold Tool
    :widths: 25 75
    :width: 100%
+   :header-rows: 1
+      
+   * - Action
+     - Function
 
-   +--------+---------------------------------------+
-   | Action | Function                              |
-   +========+=======================================+
-   | M      | toggle visibility of the preview mask |
-   +--------+---------------------------------------+
+   * - M
+     - toggle visibility of the preview mask
+
 ```
 
 ![alt text](../images/ThresholdGUI.png)

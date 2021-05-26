@@ -13,30 +13,38 @@ There is a *flood fill and erase* function which will fill an area in the slice 
 It should be noted that since this tool uses the scroll function to change the Paint Brush size, it will not also change the slice in the viewer. To change the slice use the arrow **up/down** or **shift+scroll**.
 
 ```eval_rst
-.. table:: Keyboard and Mouse Actions in the for the Paint Brush Tool
+.. list-table:: Keyboard and Mouse Actions in the for the Paint Brush Tool
    :widths: 25 75
    :width: 100%
-   
+   :header-rows: 1
+      
+   * - Action
+     - Function
 
-   +-----------------+------------------------------+
-   | Action          | Function                     |
-   +=================+==============================+
-   | left mouse      | Paint                        |
-   +-----------------+------------------------------+
-   | right mouse     | Erase                        |
-   +-----------------+------------------------------+
-   | scroll up/down  | increase/decrease brush size |
-   +-----------------+------------------------------+
-   | alt+left mouse  | add seed point               |
-   +-----------------+------------------------------+
-   | alt+right mouse | remove seed point            |
-   +-----------------+------------------------------+
-   | C               | clear seed points            |
-   +-----------------+------------------------------+
-   | F               | Paint flood fill             |
-   +-----------------+------------------------------+
-   | E               | Erase flood fill             |
-   +-----------------+------------------------------+
+   * - left mouse
+     - Paint
+
+   * - right mouse
+     - Erase
+
+   * - scroll up/down
+     - increase/decrease brush size
+
+   * - alt+left mouse
+     - add seed point
+     
+   * - alt+right mouse
+     - remove seed point
+     
+   * - C
+     - clear seed points 
+
+   * - F
+     - Paint flood fill
+   
+   * - E
+     - Erase flood fill
+
 ```
 
 ![alt text](../images/PaintBrushGUI.png)
