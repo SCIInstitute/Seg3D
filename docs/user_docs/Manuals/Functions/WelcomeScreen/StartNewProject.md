@@ -1,3 +1,3 @@
 # Start New Project
 
-This option is the same as the **File** ⇒ **[New Project](../BasicProgramFunctions/File.md#new-project)** menu item. It will display the New Project Wizard ([Figure 5.1](../BasicProgramFunctions/File.md#newproject)), allowing the user to choose a project name and location so that the project can be saved easily and automatically.
+This option is the same as the **File** ⇒ **[New Project](<user_docs/Manuals/Functions/BasicProgramFunctions/File:New Project>)** menu item. It will display the New Project Wizard ([Figure 5.1](../BasicProgramFunctions/File.md#newproject)), allowing the user to choose a project name and location so that the project can be saved easily and automatically.

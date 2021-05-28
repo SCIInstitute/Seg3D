@@ -35,6 +35,7 @@ release = '0.01'
 extensions = [
         'sphinx.ext.autodoc',
         'sphinx.ext.napoleon',
+        'sphinx.ext.autosectionlabel',
         'recommonmark',
         'sphinxcontrib.bibtex',
         'sphinx_markdown_tables'
@@ -100,6 +101,8 @@ html_logo = '_static/seg3d.png'
 html_theme_options = {
     'logo_only': True
 }
+
+autosectionlabel_prefix_document = True
 
 def setup(app):
      app.add_config_value('recommonmark_config', {
