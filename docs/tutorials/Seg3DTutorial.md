@@ -124,9 +124,6 @@ Press on the eye to show which layer is visible. As volume layers are full data 
 
 ## Simple Operator Based Segmentation Strategies
 
-![paintlumen](Seg3DTutorial_figures/paintlumen.png)
-<figcaption>Painting the lumen of the descending aorta.</figcaption>
-
 ### DEMRI Dataset
 
 In this section we will use the paint and polyline tools to segment a simple structure, the aorta, from the DEMRI dataset. Delayed enhancement MRI (DEMRI) makes use of the contrast enhancement that gadolinium (Gd) provides in MR imaging. In this scan Gd was injected via IV into the patient’s venous system. As the Gd washes through the system it enters and exits tissues at variable rates. In this case, 15 minutes after administration, the Gd has washed into and out of most tissue. Enhanced tissues that continue to sequester Gd are assumed to have disrupted, or altered vascular perfusion. This method has be used to detect cardiac ischemia, infarct, and scarring. This particular DEMRI dataset was used to evaluate post-operative scarring in the left atrium. To get started, we will be looking at the ascending and descending aorta.
@@ -143,22 +140,25 @@ Begin by selecting Paint Brush under Tools on the menu bar. When the circular ic
 
 Prepare to segment by clicking on the + widget under DEMRI on the Layer Menu to create a label mask. Begin segmentation of the aorta by navigating the Paint icon over the <span>**Descending Aorta**</span> on the axial plane. Adjust the diameter of the tool with the scroll wheel, or by holding the right mouse button until it just fills the lumen of the aorta. Once you have positioned and sized the icon click the left mouse button. The circle icon should then fill with the same color of the selected label mask. Proceed to the next few slices painting the lumen of each one ([Figure 3.1](#paintlumen)). Next, create a new label mask, and expand the diameter of the Paint icon so it encircles the outer diameter, or superficial surface of the aorta. Now paint the superficial surface of the same slices. It is possible to erase painting on the label mask by holding the right mouse button and moving the icon over the region to be erased.
 
-![polylinelumen](Seg3DTutorial_figures/polylinelumen.png)
-<figcaption>Polyline for masking the lumen of the ascending aorta.</figcaption>
-
-![polylinesuperficial](Seg3DTutorial_figures/polylinesuperficial.png)
-<figcaption>Polyline for masking the superficial surface of the ascending aorta.</figcaption>
+![paintlumen](Seg3DTutorial_figures/paintlumen.png)
+<figcaption>Painting the lumen of the descending aorta.</figcaption>
 
 ### Polyline Tool
 
 The Polyline Tool may be better suited for segmentation of complex shapes. The polyline tool is operated by selecting points, with the left mouse button, around the perimeter of the region of interest. Each point added is connected to the point before it and to the first point selected making a closed polygon. Both tools display the selected regions of interest in label masks.
 
+![polylinesuperficial](Seg3DTutorial_figures/polylinesuperficial.png)
+<figcaption>Polyline for masking the superficial surface of the ascending aorta.</figcaption>
+
 Open the Polyline Tool under the Tools menu on the menu bar. Without changing the label mask, begin clicking points around the superficial surface of the <span>**Ascending Aorta**</span> ([Figure 3.3](#polylinesuperficial)). If you are not satisfied with the location of a point you can move it by moving your cursor over the point, when the cursor turns into a had or a thicker cross, you may move the point by left clicking on it and dragging it to the desired location. Or, you can simply delete the point by right clicking on the point when when the cursor changes. The polyline tool will automatically try to place the point in the order that completes the smoothest shape, so when your are outlining a concave shape, make a convex shape, then add more points to make it concave. Once you have traced the superficial surface all the way around click fill on the Tool Menu, or simply press F on the keyboard. The region surrounded by the polyline should fill with the color of the selected label mask. Navigate to the next slice, and notice that the polyline does not disappear. If the polyline still matches the region of interest, simply hit F. To adjust the polyline hold shift cand left click on one point and drag to move the entire polyline, or move individual points as described before. If you want to start over hit Clear Polyline button in the tool options on the left. It is also possible to erase regions of the label mask with the Polyline tool by creating a polyline around the region to be erased and selecting erase on the Tool Menu. After creating the superficial surface label masks hide the masks by clicking on the eye widget, select the lumen label mask, and use the Polyline tool to create lumen masks on the <span>**Ascending Aorta**</span> ([Figure 3.2](#polylinelumen)).
+
+![polylinelumen](Seg3DTutorial_figures/polylinelumen.png)
+<figcaption>Polyline for masking the lumen of the ascending aorta.</figcaption>
+
+### Logical Operators
 
 ![logicaloperators](Seg3DTutorial_figures/logicaloperators.png)
 <figcaption>Creating label mask of region of interest with logical operators.</figcaption>
-
-### Logical Operators
 
 Once you have masked the lumen and superficial surface of both the ascending and descending aorta we can use logical operators to mask the real region of interest, the aorta wall. Under Mask Filters on the menu bar, select Boolean Xor. Highlight either of the label masks. You will notice that the name of the highlighted filter will appear in the target layer field. You can change this by unchecking the ‘Always use active layer’ option. Choose the other label mask in the Mask Layer option by selecting it from the list of eligible layers, or by holding down shift and clicking on the face color image of desired layer and dragging it to the option list. Click on the Run Filter button, this will create a new label mask that only covers the aorta wall ([Figure 3.4](#logicaloperators)). The resulting layer is shown in [Figure 3.5](#creatingisosurface). Notice there is an option called Replace on the bottom of the tool menu. Most of the filters have this option. It will replace the target layer with the result of the filter. This is very useful when you do not need the unmodified layer after you run the filter.
 
@@ -182,17 +182,14 @@ At this point there are multiple options for saving the work that you have done.
 
 ## Filters and Threshold Tool
 
-![AngioData](Seg3DTutorial_figures/AngioData.png)
-<figcaption>Angiogram.</figcaption>
-
 ### Loading Angiogram
 
 The second cardiac dataset that is part of this example is the angiogram. For this part of the tutorial load the Angio.NRRD file. Use the <span>**Import Layer From Single File...**</span> menu in the File Menu to load this dataset. An example of this dataset is depicted in [Figure 4.1](#AngioData).
 
-This dataset was previously registered to the DEMRI.NRRD dataset. As both datasets have the sampling distance and coordinate system. One can use label mask from the DEMRI dataset in the Angio dataset and vice versa.
+![AngioData](Seg3DTutorial_figures/AngioData.png)
+<figcaption>Angiogram.</figcaption>
 
-![FilteredAngioData](Seg3DTutorial_figures/FilteredAngioData.png)
-<figcaption>Median and Gaussian filtered Angiogram.</figcaption>
+This dataset was previously registered to the DEMRI.NRRD dataset. As both datasets have the sampling distance and coordinate system. One can use label mask from the DEMRI dataset in the Angio dataset and vice versa.
 
 ### Filtering data
 
@@ -202,17 +199,21 @@ Open up the <span>**Median Filters**</span> from the Filters menu and select the
 
 The second stage of filtering uses the <span>**Gaussian Blur**</span> from the <span>**Data Filters**</span> Menu. Again the default settings will do. Select the output from the median filter and run this filter. After filtering the data will look like the results depicted in [Figure 4.2](#FilteredAngioData).
 
-![ThresholdAngio](Seg3DTutorial_figures/ThresholdAngio.png)
-<figcaption>Thresholding Angiogram while looking at DEMRI.</figcaption>
+![FilteredAngioData](Seg3DTutorial_figures/FilteredAngioData.png)
+<figcaption>Median and Gaussian filtered Angiogram.</figcaption>
 
 ### Threshold Tool
 
 To select the blood from the segmentation, use the <span>**Threshold Tool**</span> from the Tools menu. Once this tool has been opened, choose the filtered angio as the target and use the sliders to adjust the threshold values. In order to do this, switch off the visibility of both the filtered Angio datasets as well as the original Angio dataset and make the DEMRI visible. This will allow you to interactively generate a segmentation of the blood using the DEMRI as a visual confirmation, and filtered angio data for the threshold. Once the segmentation looks good press <span>**Create Threshold Layer**</span> in the Threshold Menu to generate the label layer. (see [Figure 4.3](#ThresholdAngio)) The threshold tool however segments both aortas and the left atrium. To select just one of the of the vessels, select the newly created label layer and then select <span>**Mask Data**</span> in the Data Filters Menu.
 
+![ThresholdAngio](Seg3DTutorial_figures/ThresholdAngio.png)
+<figcaption>Thresholding Angiogram while looking at DEMRI.</figcaption>
+
+Now create a new layer by pressing on the + symbol in this layer. This will generate a new empty layer with the same dimensions. Now open up the <span>**Paint Brush**</span> in the Tools Menu. Select the Mask Layer for the<span>Target Layer</span> in the Paint Brush Menu. Then under <span>**Mask Constraint 1**</span> select the Threshold Angio and start painting the Ascending Aorta. As a mask has been set the painting will be restricted to previously segmented blood. (see [Figure 4.4](#MaskedPainting))
+
 ![MaskedPainting](Seg3DTutorial_figures/MaskedPainting.png)
 <figcaption>Painting a label while masking from another label.</figcaption>
 
-Now create a new layer by pressing on the + symbol in this layer. This will generate a new empty layer with the same dimensions. Now open up the <span>**Paint Brush**</span> in the Tools Menu. Select the Mask Layer for the<span>Target Layer</span> in the Paint Brush Menu. Then under <span>**Mask Constraint 1**</span> select the Threshold Angio and start painting the Ascending Aorta. As a mask has been set the painting will be restricted to previously segmented blood. (see [Figure 4.4](#MaskedPainting))
 Paint a couple of slices and then generate the isosurface of the vessel. Once you have captured the vessel to your satisfaction, you may export the segmentation as described in the previous chapter.
 
 ### Otsu Threshold
@@ -254,26 +255,26 @@ The image in [Figure 4.9](#Cannywithmeanandlayers) had a mean filter applied to
 
 ## Speedline Tool
 
+### Speedline Tool Segmentation
+
+In this example we will use the Speedline Tool (also known as the Live-Wire tool) to segment the left atrium. We start off with the Median Filtered Angiogram defined in the previous chapter. In this example, the data is further smoothed using the Gaussian filter. Using a smoothing filter is recommended before the using Speedline tool.
+
 ![SpeedImage](Seg3DTutorial_figures/SpeedlineImage.png)
 <figcaption>The speed function displaying the gradient of the dataset.</figcaption>
 
-### Speedline Tool Segmentation
+Open the <span>**Speedline**</span> tool from the Tools menu as shown in [Figure 5.1](#SpeedImage). Errors (highlighted in red boxes) are displayed in the <span>**Speedline**</span> dialog box explaining what needs to be done in order to proceed. The first error indicates that a mask needs to be selected in order to create the speedline. Push the plus button on the bottom right corner of the <span>**Layer Manager**</span> on the right of the screen. This will create a new layer mask and eliminate the first error message. Next, a data volume layer must be selected on which to apply the speedline. In the middle of the <span>**Speedline**</span> dialog box on the left of the screen is a drop down menu that has <span>**&lt;none&gt;**</span> selected. Click on the dropdown box and select a data layer.
+
+Now we are ready to create the speedline. Insert a point on the border of the left atrium. Place a second point at some distance from the first and a third point even further away. With the third point in place, hover over a point until you get a hand icon. Now drag this point along the border and the tool will follow the edge of the volume. Add points at the corners and drag the speedline along the left atrial wall. An example of this is shown in [Figure 5.2](#SpeedLine1).
 
 ![SpeedLine1](Seg3DTutorial_figures/Speedline.png)
 <figcaption>Creating a speedline contour.</figcaption>
 
-In this example we will use the Speedline Tool (also known as the Live-Wire tool) to segment the left atrium. We start off with the Median Filtered Angiogram defined in the previous chapter. In this example, the data is further smoothed using the Gaussian filter. Using a smoothing filter is recommended before the using Speedline tool.
-
-Open the <span>**Speedline**</span> tool from the Tools menu as shown in [Figure 5.1](#SpeedImage). Errors (highlighted in red boxes) are displayed in the <span>**Speedline**</span> dialog box explaining what needs to be done in order to proceed. The first error indicates that a mask needs to be selected in order to create the speedline. Push the plus button on the bottom right corner of the <span>**Layer Manager**</span> on the right of the screen. This will create a new layer mask and eliminate the first error message. Next, a data volume layer must be selected on which to apply the speedline. In the middle of the <span>**Speedline**</span> dialog box on the left of the screen is a drop down menu that has <span>**&lt;none&gt;**</span> selected. Click on the dropdown box and select a data layer.
-
-![SpeedLine2](Seg3DTutorial_figures/SpeedlineFill.png)
-<figcaption>Filling in a speedline contour.</figcaption>
-
-Now we are ready to create the speedline. Insert a point on the border of the left atrium. Place a second point at some distance from the first and a third point even further away. With the third point in place, hover over a point until you get a hand icon. Now drag this point along the border and the tool will follow the edge of the volume. Add points at the corners and drag the speedline along the left atrial wall. An example of this is shown in [Figure 5.2](#SpeedLine1).
-
 Once the speedline has been completed, it can be filled in by hitting <span>**F**</span> or selecting <span>**Fill**</span> from the Tool Menu on the left. Make sure that the label mask you are using does not already have filled regions as the Fill operation will automatically mask over any part that is within the speedline.
 
 Now a segmentation is generated in one slice, proceed to the next slice by press <span>**&lt;**</span> or <span>**&gt;**</span>. The Speedline tool will try to accommodate it’s shape to the new cross section. However, manual corrections can be made by moving points around using the left or right mouse buttons and dragging point around, or by adding additional points by pressing the left mouse button in the center of a segment. Sometimes removing points by pressing the right mouse button over a point will give a better result. Press <span>**F**</span> again to fill in the segmentation. (see [Figure 5.3](#SpeedLine2)).
+
+![SpeedLine2](Seg3DTutorial_figures/SpeedlineFill.png)
+<figcaption>Filling in a speedline contour.</figcaption>
 
 By doing this sequentially for many slices, one can quickly segment a section of a structure. Once a portion of the structure has been segmented, press the <span>**ISO** </span> button below your selected label mask in the <span>**Layer Manager**</span> window on the right to visualize the results in the 3D.
 
@@ -281,37 +282,34 @@ This concludes the cardiac part of this tutorial. The next chapter will highligh
 
 ## Segmenting a Brain Dataset
 
-![LoadingBrainDataSet](Seg3DTutorial_figures/LoadingBrainDataSet.png)
-<figcaption>Loading the brain dataset into Seg3D.</figcaption>
-
 ### Loading Datasets
 
 This part of the tutorial deals with segmenting a head dataset. The data that will be used is that of a 15 year old pediatric patient. This patient underwent surgery during which electrodes were implanted into the brain cavity. The image that we will be using are the MR image that was taken before the surgery and the CT image that was taken after. Note that one can clearly see in the image where the electrodes were inserted.
 
 The final goal of this research is generate a patient specific model which can be used to find focus of brain activity during a seizure. For this a full volumetric representation of the head is needed. In this example we are extracting three tissues, namely the skull, the white matter and the gray matter. The remaining scalp and CSF can be obtained similarly, but is outside the scope of this tutorial.
 
-![NeighborhoodConnected](Seg3DTutorial_figures/NeighborhoodConnected.png)
-<figcaption>Selecting seed points for Neighborhood Connected filter.</figcaption>
-
 ### Neighborhood Connected
 
 Browse the SCIRunData/Seg3D/Brain\_DataSet directory and load the following two files: CTbrain50.NRRD and MRI-brain50.NRRD. The first one is the post operative CT image and the second one is the pre-surgery MR image. After loading the datasets the Seg3D window should look like the one in [Figure 6.1](#LoadingBrainDataSet).
+
+![LoadingBrainDataSet](Seg3DTutorial_figures/LoadingBrainDataSet.png)
+<figcaption>Loading the brain dataset into Seg3D.</figcaption>
 
 Note that the data is not perfectly registered and that a part of the skull has been lifted to actually insert the electrode arrays.
 
 To segment out the Skull we will be using the CT image. Select the CT image in the Layer Menu. Now from the Data Filters menu select the Neighborhood Connected filter. This filter needs seed points and finds every connected tissue of the same gray scale range. Hence placing seed points needs to be carefully. An example of this placement is given in [Figure 6.2](#NeighborhoodConnected).
 
-![SkullSegmentation](Seg3DTutorial_figures/SkullSegmentation.png)
-<figcaption>Isosurfacing of Skull Segmentation.</figcaption>
+![NeighborhoodConnected](Seg3DTutorial_figures/NeighborhoodConnected.png)
+<figcaption>Selecting seed points for Neighborhood Connected filter.</figcaption>
 
 Place the seed points with the left mouse button. While placing the seed points one can scroll to other slices. Each out of plain seed point will be shown less brightly. Place at least 10 seed points or so and then run the filter on the CT image. Be sure to select that one before running the filter.
 
 The result should look like the ones in [Figure 6.3](#SkullSegmentation). To help understanding the 3D nature of the data, select the newly created label layer and run the isosurface by clicking the create isosurface icon (‘ISO ’) for the layer. This renders the isosurface of the current segmentation.
 
-If parts of the skull are still missing, open up the <span>**Neighborhood Connected**</span> filter again and add a few more seed points. Note that all the previous seed points are still there to make it easier to add new points. To clear the seed points hit clear seed points in the filter menu (if needed). To add additional regions just place seed points in those areas. Use the isosurface rendering to check whether the skull is complete. Use the 3D view to see where the slices are and then put seed points where needed.
+![SkullSegmentation](Seg3DTutorial_figures/SkullSegmentation.png)
+<figcaption>Isosurfacing of Skull Segmentation.</figcaption>
 
-![Median-ImageCorrected](Seg3DTutorial_figures/Median-ImageCorrected.png)
-<figcaption>Filtering the brain dataset.</figcaption>
+If parts of the skull are still missing, open up the <span>**Neighborhood Connected**</span> filter again and add a few more seed points. Note that all the previous seed points are still there to make it easier to add new points. To clear the seed points hit clear seed points in the filter menu (if needed). To add additional regions just place seed points in those areas. Use the isosurface rendering to check whether the skull is complete. Use the 3D view to see where the slices are and then put seed points where needed.
 
 ### Filtering MRI Data
 
@@ -323,8 +321,8 @@ A second very useful filter for MR data is the <span>**Intensity Correction Filt
 
 Apply this filter and again look at the differences. The resulting image is also given in [Figure 6.4](#Median-ImageCorrected).
 
-![LoadingSegmentation](Seg3DTutorial_figures/LoadingSegmentation.png)
-<figcaption>Load a pre-made rough segmentation of the brain.</figcaption>
+![Median-ImageCorrected](Seg3DTutorial_figures/Median-ImageCorrected.png)
+<figcaption>Filtering the brain dataset.</figcaption>
 
 ### Masking out Brain
 
@@ -332,19 +330,22 @@ To mask out brain, the easiest is to manually generate a mask and paint with a b
 
 To jump start the process a segmentation is available in the dataset. This one was generated by manually painting the slices. Load the label layer through the <span>**Import Layer From Single File...**</span> from the File menu. Choose the Brain.NRRD dataset. Then click on Import file as a <span>**Series of Masks:**</span> There are two of these options and either one is valid because this data file has only one mask layer. After loading the dataset Seg3D should look like the image depicted in [Figure 6.5](#LoadingSegmentation).
 
-![MaskDataBrain](Seg3DTutorial_figures/MaskDataBrain.png)
-<figcaption>Mask brain data with hand painted segmentation.</figcaption>
+![LoadingSegmentation](Seg3DTutorial_figures/LoadingSegmentation.png)
+<figcaption>Load a pre-made rough segmentation of the brain.</figcaption>
 
 Now use the <span>**Mask Data**</span> in the Data Filters menu to set the Brain segmentation as a mask. Select the MRI-brain50 for the <span>**Target Layer**</span> and Brain\_1 for the <span>**Mask Layer**</span>. Then click on <span>**Run Filter**</span>. This will create an image where all the scalp and skull are removed and only what is segmented is left as seen in [Figure 6.6](#MaskDataBrain). This mask will now be used for segmenting the gray and white matter.
 
-![ThresholdWHiteMatter](Seg3DTutorial_figures/ThresholdWHiteMatter.png)
-<figcaption>Thresholding white matter using threshold range.</figcaption>
+![MaskDataBrain](Seg3DTutorial_figures/MaskDataBrain.png)
+<figcaption>Mask brain data with hand painted segmentation.</figcaption>
 
 ### Thresholding Gray and White Matter
 
 To segment the white matter, we select the <span>**Threshold Tool**</span> from the Tools menu. Before using the tool make sure to turn off the Masking layer, by selecting “The Eye” underneath Brain\_1.
 
 Now select the Masked Data Volume. With the <span>**Threshold Tool**</span> insert a few seed points in the white matter. The threshold tool will now segment all the points that are within the range of the seed points. Keep adding points until the white matter has been marked. (see [Figure 6.7](#ThresholdWhiteMatter)). Once the segmentation is good enough press <span>**Create Threshold Layer**</span> in the menu on the left and a new masking layer will be created.
+
+![ThresholdWHiteMatter](Seg3DTutorial_figures/ThresholdWHiteMatter.png)
+<figcaption>Thresholding white matter using threshold range.</figcaption>
 
 Repeat the same procedure for the gray matter (see [Figure 6.8](#ThresholdGrayMatter)). Finally one can use the boolean operators to subtract the white matter from the gray matter. Select <span>**Boolean AND**</span> in the Mask Filters menu. Select one of the masks as the <span>**Target Layer**</span> and the other as the <span>**Mask Layer**</span> and click on <span>**Run Filter**</span>.
 
