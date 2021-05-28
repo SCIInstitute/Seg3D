@@ -3,7 +3,7 @@
 ![ProjectWindow](../../Seg3DBasicFunctionality_figures/ProjectWindow.png)
 <figcaption>Project Window</figcaption>
 
-The project window is one of three windows that is opened by default when Seg3D launches. It is located on the left side of the panel and is secondary to the default ’Tools Window’ which is also located on the left but appears over top of the project window. In order to access the window, simply click the tab at the bottom of the left side named ’Current Project’ (See <a href="#ProjectWindow">Figure 4.1</a>) or go to the ’Window’ drop down menu, de-select ’Project Window’ and reselect it.
+The project window is one of three windows that is opened by default when Seg3D launches. It is located on the left side of the panel and is secondary to the default ’Tools Window’ which is also located on the left but appears over top of the project window. In order to access the window, simply click the tab at the bottom of the left side named ’Current Project’ or go to the ’Window’ drop down menu, de-select ’Project Window’ and reselect it.
 
 Now you come to the ’Current Project’ window. The window is divided into two panes. At the top of the window is the Project Settings pane. The name of the current project is listed. Below this is the option to ’Save custom colors in project.’ This option allows the user to keep the defined colors assigned to specific label masks within the project. Below this is an ’Autosave’ option. Seg3D autosaves sessions every 10 minutes by default. The default time between autosaves can be changed in the general Seg3D preferences.
 
