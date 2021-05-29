@@ -85,11 +85,14 @@ void QtRenderWidgetPrivate::exit_size_move()
 // Class QtRenderWidget
 //////////////////////////////////////////////////////////////////////////
 
-QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent,
-                 QGLWidget* share, Core::AbstractViewerHandle viewer ) :
-  QGLWidget( format, parent, share ),
+QtRenderWidget::QtRenderWidget( const QSurfaceFormat& format, QWidget* parent,
+                 QOpenGLContext* share, Core::AbstractViewerHandle viewer ) :
+  QOpenGLWidget(parent),
   private_( new QtRenderWidgetPrivate )
 {
+  this->setFormat(format);
+  this->share=share;
+
   this->private_->viewer_ = viewer;
   this->private_->render_widget_ = this;
   this->private_->in_size_move_ = false;
@@ -120,16 +123,19 @@ static void UpdateDisplay( QtRenderWidgetWeakHandle qpointer )
 
   if ( !qpointer.isNull() && !QCoreApplication::closingDown() )
   {
-    qpointer->updateGL();
+    qpointer->update();
   }
 }
 
 void QtRenderWidget::initializeGL()
 {
-  glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+  this->context()->setShareContext(share);
+
+  glClearColor( 1.0f, 0.3f, 1.0f, 1.0f );
 
   if ( Core::RenderResources::Instance()->valid_render_resources() )
   {
+    std::cout << "RenderResources valid\n";
     Core::Texture::SetActiveTextureUnit( 0 );
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
@@ -137,17 +143,23 @@ void QtRenderWidget::initializeGL()
     this->add_connection( this->private_->viewer_->update_display_signal_.connect(
       boost::bind( &UpdateDisplay, qpointer ) ) );
   }
+  else
+  {
+    std::cout << "RenderResources not valid\n";
+  }
 }
 
 void QtRenderWidget::paintGL()
 {
+  std::cout << "paintGL\n";
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   if ( !Core::RenderResources::Instance()->valid_render_resources() )
   {
     glColor3f( 1.0f, 0.5f, 0.0f );
     QString error_str( "Rendering disabled because the system doesn't have required OpenGL support." );
-    this->renderText( 5, 20, error_str );
+    //TODO update this to work with QOpenGLWidget
+    //this->renderText( 5, 20, error_str );
     return;
   }
 
@@ -334,8 +346,8 @@ void QtRenderWidget::saveOverlayOnly(const std::string& name)
 void QtRenderWidget::saveComposite(const std::string& name)
 {
   // Force a normal rendering (compositing) of the two textures.
-  glDraw();
-  QImage img = grabFrameBuffer();
+  update();
+  QImage img = grabFramebuffer();
   img.save(name.c_str());
 }
 

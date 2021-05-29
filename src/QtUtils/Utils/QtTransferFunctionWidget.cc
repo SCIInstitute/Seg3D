@@ -68,11 +68,14 @@ public:
 
 typedef QPointer< QtTransferFunctionWidget > QtTransferFunctionWidgetWeakHandle;
 
-QtTransferFunctionWidget::QtTransferFunctionWidget( const QGLFormat& format, QWidget* parent,
-                 QGLWidget* share, Core::TransferFunctionHandle tf ) :
-  QGLWidget( format, parent, share ),
+QtTransferFunctionWidget::QtTransferFunctionWidget( const QSurfaceFormat& format, QWidget* parent,
+                 QOpenGLContext* share, Core::TransferFunctionHandle tf ) :
+  QOpenGLWidget(parent),
   private_( new QtTransferFunctionWidgetPrivate )
 {
+  this->setFormat(format);
+  this->share = share;
+
   this->private_->transfer_function_ = tf;
   this->private_->tf_widget_ = this;
 }
@@ -92,16 +95,19 @@ static void UpdateDisplay( QtTransferFunctionWidgetWeakHandle qpointer )
 
   if ( !qpointer.isNull() && !QCoreApplication::closingDown() )
   {
-    qpointer->updateGL();
+    qpointer->update();
   }
 }
 
 void QtTransferFunctionWidget::initializeGL()
 {
+  this->context()->setShareContext(share);
+
   glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
 
-  if ( Core::RenderResources::Instance()->valid_render_resources() )
+  if (Core::RenderResources::Instance()->valid_render_resources() )
   {
+    std::cout << "TF RenderResources valid\n";
     Core::Texture::SetActiveTextureUnit( 0 );
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
     Core::Texture::SetActiveTextureUnit( 1 );
@@ -123,10 +129,15 @@ void QtTransferFunctionWidget::initializeGL()
     this->add_connection( this->private_->transfer_function_->transfer_function_changed_signal_.
       connect( boost::bind( &UpdateDisplay, qpointer ) ) );
   }
+  else
+  {
+    std::cout << "TF RenderResources not valid\n";
+  }
 }
 
 void QtTransferFunctionWidget::paintGL()
 {
+  std::cout << "paintGL TF\n";
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   if ( !Core::RenderResources::Instance()->valid_render_resources() )

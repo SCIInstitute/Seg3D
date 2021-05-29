@@ -290,7 +290,7 @@ void ViewerWidget::image_mode( bool picture )
   if( picture )
   {
     this->private_->facade_widget_->setMinimumSize( this->private_->render_widget_->size() );
-    this->private_->facade_widget_->setPixmap( QPixmap::fromImage( this->private_->render_widget_->grabFrameBuffer() ) );
+    this->private_->facade_widget_->setPixmap( QPixmap::fromImage(this->private_->render_widget_->grabFramebuffer()));
     this->private_->render_widget_->hide();
     this->private_->facade_widget_->show();
   }
