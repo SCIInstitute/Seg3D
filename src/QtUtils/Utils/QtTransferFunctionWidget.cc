@@ -68,9 +68,9 @@ public:
 
 typedef QPointer< QtTransferFunctionWidget > QtTransferFunctionWidgetWeakHandle;
 
-QtTransferFunctionWidget::QtTransferFunctionWidget( const QGLFormat& format, QWidget* parent,
-                 QGLWidget* share, Core::TransferFunctionHandle tf ) :
-  QGLWidget( format, parent, share ),
+QtTransferFunctionWidget::QtTransferFunctionWidget( const QSurfaceFormat& format, QWidget* parent,
+                 QOpenGLWidget* share, Core::TransferFunctionHandle tf ) :
+  QOpenGLWidget( parent, share ),
   private_( new QtTransferFunctionWidgetPrivate )
 {
   this->private_->transfer_function_ = tf;

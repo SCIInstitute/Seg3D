@@ -85,9 +85,9 @@ void QtRenderWidgetPrivate::exit_size_move()
 // Class QtRenderWidget
 //////////////////////////////////////////////////////////////////////////
 
-QtRenderWidget::QtRenderWidget( const QGLFormat& format, QWidget* parent,
-                 QGLWidget* share, Core::AbstractViewerHandle viewer ) :
-  QGLWidget( format, parent, share ),
+QtRenderWidget::QtRenderWidget( const QSurfaceFormat& format, QWidget* parent,
+                 QOpenGLWidget* share, Core::AbstractViewerHandle viewer ) :
+  QOpenGLWidget( parent, share ),
   private_( new QtRenderWidgetPrivate )
 {
   this->private_->viewer_ = viewer;
@@ -165,8 +165,8 @@ void QtRenderWidget::paintGL()
 
   // draw a window size quad and map the render texture onto it
   QSize view_size = QWidget::size();
-  int width = view_size.width();
-  int height = view_size.height();
+  int width = 2 * view_size.width();
+  int height = 2 * view_size.height();
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();

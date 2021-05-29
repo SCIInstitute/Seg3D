@@ -98,7 +98,7 @@ void RendererBasePrivate::redraw_scene( PickPointHandle pick_point )
         this->textures_[ this->active_scene_texture_ ], false );
 
       // swap render textures
-      this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1;
+      this->active_scene_texture_ = this->active_scene_texture_ ^ 1;
     }
   }
 }
@@ -120,7 +120,7 @@ void RendererBasePrivate::redraw_overlay()
       this->textures_[ this->active_overlay_texture_ ], false );
 
     // swap render textures
-    this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+    this->active_overlay_texture_ = this->active_overlay_texture_^ 1;
   }
 }
 
@@ -144,7 +144,7 @@ void RendererBasePrivate::redraw_all()
       this->textures_[ this->active_scene_texture_ ], render_overlay_success );
 
     // swap render textures
-    this->active_scene_texture_ = ( ~this->active_scene_texture_ ) & 1;
+    this->active_scene_texture_ = this->active_scene_texture_ ^ 1;
   }
 
   if ( render_overlay_success )
@@ -154,7 +154,7 @@ void RendererBasePrivate::redraw_all()
       this->textures_[ this->active_overlay_texture_ ], false );
 
     // swap render textures
-    this->active_overlay_texture_ = ( ~( this->active_overlay_texture_ - 2 ) ) & 1 + 2;
+    this->active_overlay_texture_ = this->active_overlay_texture_^ 1;
   }
 }
 
@@ -417,7 +417,7 @@ void RendererBase::redraw_all()
   this->private_->redraw_all();
 }
 
-void RendererBase::resize( int width, int height )
+void RendererBase::resize(int width, int height)
 {
   if ( !this->is_renderer_thread() )
   {
@@ -447,6 +447,7 @@ void RendererBase::resize( int width, int height )
     this->private_->scene_depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );
     this->private_->overlay_depth_buffer_->set_storage( width, height, GL_DEPTH_COMPONENT24 );
   }
+  std::cout << width << ", " << height << "\n";
 
   this->width_ = width;
   this->height_ = height;
