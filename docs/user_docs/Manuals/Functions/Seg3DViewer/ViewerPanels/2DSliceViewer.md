@@ -15,7 +15,7 @@ The first and second tables below show the mouse and keyboard actions which can 
      - Modify brightness and contrast. Vertical is contrast, horizontal is brightness.
 
    * - scroll up/down
-     - Move up/down a slice Note: using Shift maybe needed while using some tools (like paint brush)
+     - Move up/down a slice. Note: using Shift maybe needed while using some tools (like paint brush)
 
    * - CMD/CTRL+right button
      - Move slices in other planes to intersect at cursor. Viewers must have the picking icon enabled.
@@ -39,10 +39,10 @@ The first and second tables below show the mouse and keyboard actions which can 
      - Function
 
    * - up arrow, >
-     - move up one slice
+     - Move up one slice
 
    * - down arrow, <
-     - move down one slice
+     - Move down one slice
 
    * - Shift+up arrow, Shift+>
      - Jump up n slices (set n in preferences)

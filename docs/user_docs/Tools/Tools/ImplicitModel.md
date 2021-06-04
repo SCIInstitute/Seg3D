@@ -22,6 +22,6 @@ The minimization of the perimeter of a polygon passing thought a set of points i
 On each slice, the given points are used to construct a graph in which the points are the nodes and the distance between them are the weights of the corresponding edges.
 The approximate algorithm for the Euclidean TSP begins by constructing a minimal spanning tree (MST) of the graph.
 The nodes on the tree with an odd number of neighbors are then matched such that the sum of their edge weights is minimized (we use a brute-force algorithm since the number of points are small).
-These edges (that connect the matched nodes) are added to the tree, and the new graph (the MST + matched edges) is traversed in the [depth-first search (DFS) manner to obtain the polygon](http://vlsicad.ucsd.edu/courses/cse101/cse101-handout10-6up.pdf).
+These edges (that connect the matched nodes) are added to the tree, and the new graph (the MST + matched edges) is traversed in the depth-first search (DFS) manner to obtain the polygon.
 
 <a id="f1" href="#f1ref"><sup>1</sup></a>Turk, Greg, and James F. O'brien. "Modelling with implicit surfaces that interpolate." ACM Transactions on Graphics (TOG) 21.4 (2002): 855-873.

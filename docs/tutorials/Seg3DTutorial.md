@@ -16,7 +16,7 @@ Seg3D is distributed as a binary download for Linux, Windows, and OS X. Please v
 
 This tutorial uses two datasets. The first one is a set of two 3D scans, one is an anatomical MRI of the atria and the second one is a delayed enhanced MR image of the same region. Both images have been registered. The second data is a brain data set that contains a preoperative MR image of the brain and a post surgery CT image of a pediatric patient.
 
-The datasets are available in the SCIRunData zip files. Please visit [SCIRun Data](http://www.scirun.org) to download the datasets. The datasets for this tutorial are inside the Seg3D directory. The direct linked to the zipped SCIRun Datasets can be found [here](http://www.sci.utah.edu/releases/scirun_v4.6/SCIRunData_4.6_20120809_data.zip).
+The datasets are available in the SCIRunData zip files. Please visit [SCIRun Data](http://www.scirun.org) to download the datasets. The datasets for this tutorial are inside the Seg3D directory. The direct linked to the zipped SCIRun Datasets can be found [here](https://www.sci.utah.edu/releases/scirun_v4.6/SCIRunData_4.6_20130913_data.zip).
 
 ## Basic Orientation
 
@@ -218,7 +218,7 @@ Paint a couple of slices and then generate the isosurface of the vessel. Once yo
 
 ### Otsu Threshold
 
-Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section \[sec:softwarerequirements\]). We will be working with the CTbrain50.NRRD file found in the SCIRunData/Seg3D/Brain\_DataSet directory.
+Another thresholding tool available in the Data Filters menu is the Otsu Threshold. The Otsu Threshold uses an image intensity histogram to determine adequate threshold levels and segment the image based on the determined threshold levels. A demonstration of the Otsu Threshold will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see [Software Requirements](#software-requirements)). We will be working with the CTbrain50.NRRD file found in the SCIRunData/Seg3D/Brain\_DataSet directory.
 
 To use the Otsu Threshold, first select the <span>**Otsu Threshold**</span> tool from the <span>**Data Filters**</span> menu. The tools window will then show the information on the Otsu Threshold tool. The target layer may be selected, and the number of thresholds can be selected, from zero to four different thresholding layers. Below the number of thresholds is the histogram representing the intensities of the pixels of the image. The menu box below the histogram allows the user to select whether they would like a logarithmic or a linear graph.
 
@@ -232,7 +232,7 @@ To use the Otsu Threshold tool on the brain CT image, select the tool and then c
 
 ### Canny Edge Detection Filter
 
-An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image that was taken on the 15 year old pediatric patient.The file can be found in the SCIRun datasets (see section \[sec:softwarerequirements\]). We will be working with the CTbrain50.NRRD data file.
+An advanced tool for edge detection is the Canny Edge Detection Filter. This filter computes the edges using a Canny Edge Detection Filter, which involves smoothing the image with a Gaussian filter, calculating the second directional derivatives of the smoothed image, and performing a non-maximum supression to find the correct extrema. The hysteresis thresholding is then applied to the gradient magnitude of the smoothed image to find and link edges. A demonstration of the Canny Edge Detection Filter will be done on the CT image that was taken on the 15 year old pediatric patient. The file can be found in the SCIRun datasets (see [Software Requirements](#software-requirements)). We will be working with the CTbrain50.NRRD data file.
 
 To use the Canny edge detection filter on the volume, first select the Canny edge detection tool from the Advanced Filters menu. In the tools window, the Canny edge detection tool will appear, allowing you to select the layer to run the filter on, as well as a distance slider. The distance slider sets the variance for the Gaussian smoothing algorithm. Below, there is a slider to set the threshold for hysteresis thresholding to find and link edge.
 
@@ -251,7 +251,7 @@ The Canny edge detection filter may also be run by first applying a mean smoothi
 ![Cannywithmeanandlayers](Seg3DTutorial_figures/Cannywithmeanandlayers.png)
 <figcaption>Canny edge detection with mean filter</figcaption>
 
-The image in screenshot above had a mean filter applied to it with a radius of 6, followed by a Canny edge detection filter with a distance of 5 and a threshold of 30. Notice how smooth the image is prior to the application of the Canny filter.
+The image in the screenshot above had a mean filter applied to it with a radius of 6, followed by a Canny edge detection filter with a distance of 5 and a threshold of 30. Notice how smooth the image is prior to the application of the Canny filter.
 
 ## Speedline Tool
 
