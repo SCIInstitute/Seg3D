@@ -1,6 +1,6 @@
 docutils
 pygments
-recommonmark
+recommonmark==0.7.1
 sphinx
 sphinx-issues
 sphinx-markdown-tables
