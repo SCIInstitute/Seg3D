@@ -6,7 +6,7 @@ Welcome to Seg3D's Documentation!
     :align: center
     :target: https://www.sci.utah.edu/cibc-software/seg3d.html
 
-Seg3D (`www.seg3d.org <www.seg3d.org>`_) is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute.
+Seg3D (`www.seg3d.org <http://www.seg3d.org>`_) is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute.
 
 
 Installation
