@@ -35,7 +35,6 @@ release = '0.01'
 extensions = [
         'sphinx.ext.autodoc',
         'sphinx.ext.napoleon',
-        'sphinx.ext.autosectionlabel',
         'recommonmark',
         'sphinxcontrib.bibtex',
         'sphinx_markdown_tables'
