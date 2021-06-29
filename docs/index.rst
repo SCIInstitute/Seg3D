@@ -25,6 +25,7 @@ A :doc:`basic functionality manual </user_docs/functions>`, :doc:`tool and filte
 .. toctree::
    :maxdepth: 1
    :glob:
+   :hidden:
    :caption: User Documentation:
 
    user_docs/*
@@ -35,6 +36,7 @@ A :doc:`basic functionality manual </user_docs/functions>`, :doc:`tool and filte
 .. toctree::
    :maxdepth: 1
    :glob:
+   :hidden:
    :caption: Tutorials:
 
    tutorials/*
@@ -45,6 +47,7 @@ A :doc:`basic functionality manual </user_docs/functions>`, :doc:`tool and filte
 .. toctree::
    :maxdepth: 1
    :glob:
+   :hidden:
    :caption: Developer Documentation:
 
    dev_docs/*
@@ -56,6 +59,7 @@ A :doc:`basic functionality manual </user_docs/functions>`, :doc:`tool and filte
 .. toctree::
    :maxdepth: 1
    :glob:
+   :hidden:
    :caption: Python Documentation:
 
    py_docs/*
