@@ -20,7 +20,7 @@ The Seg3D 2 installer is not currently signed. The unsigned installer can be run
 
 ### Build from source
 
-Seg3D must be ([compiled]({{ site.github.url }}/build.html)) from source on Linux platforms (OpenSuSE, Ubuntu etc.) and requires at least the following:
+Seg3D must be [compiled](build.md) from source on Linux platforms (OpenSuSE, Ubuntu etc.) and requires at least the following:
 
 + GCC or clang compiler that supports C++11
 + Git 1.8 or greater  (system default packages are usually sufficient)
