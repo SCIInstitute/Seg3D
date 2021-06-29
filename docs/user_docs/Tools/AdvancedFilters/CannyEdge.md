@@ -4,7 +4,9 @@ This filter will output the pixels that are edges in a mask layer.
 
 ### Detailed Description
 
-The Canny Edge filter computes the edges in a data layer using a Canny Edge Detection Filter (Canny, J. F. A computational approach to edge detection, IEEE PAMI 8(6), 679-698, November 1986). This filter will output the pixels that are edges in a mask layer.
+```eval_rst
+The Canny Edge filter computes the edges in a data layer using a Canny Edge Detection Filter :cite:p:`Can1986`. This filter will output the pixels that are edges in a mask layer.
+```
 
 This filter is composed of four steps:
 

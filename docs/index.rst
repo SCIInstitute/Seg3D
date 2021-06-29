@@ -61,6 +61,16 @@ A :doc:`basic functionality manual </user_docs/functions>`, :doc:`tool and filte
    py_docs/*
 
 
+..
+   bib tree
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Bibliography:
+
+   bib
+
 
 
 Indices and tables

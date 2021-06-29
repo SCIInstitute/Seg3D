@@ -4,7 +4,9 @@ This filter creates a segmentation by generating an implicit surface represented
 
 ### Detailed Description
 
-In our algorithm, an implicit surface that is represented by a radial basis function (RBF) interpolation is used to generate a segmentation.<a href="#f1" id="f1ref"><sup>1</sup></a>
+```eval_rst
+In our algorithm, an implicit surface that is represented by a radial basis function (RBF) interpolation is used to generate a segmentation :cite:p:`TO2002`.
+```
 As an input, the algorithm is provided with a set of points on the boundary of the object that needs to be segmented from the images.
 Each slice should contain at least three points for our algorithm is return a reasonable segmentation.
 Our algorithm constructs an approximate function whose value vanishes at the given points and whose value is positive inside the object and negative outside.
@@ -23,5 +25,3 @@ On each slice, the given points are used to construct a graph in which the point
 The approximate algorithm for the Euclidean TSP begins by constructing a minimal spanning tree (MST) of the graph.
 The nodes on the tree with an odd number of neighbors are then matched such that the sum of their edge weights is minimized (we use a brute-force algorithm since the number of points are small).
 These edges (that connect the matched nodes) are added to the tree, and the new graph (the MST + matched edges) is traversed in the depth-first search (DFS) manner to obtain the polygon.
-
-<a id="f1" href="#f1ref"><sup>1</sup></a>Turk, Greg, and James F. O'brien. "Modelling with implicit surfaces that interpolate." ACM Transactions on Graphics (TOG) 21.4 (2002): 855-873.
