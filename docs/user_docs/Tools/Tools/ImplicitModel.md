@@ -4,9 +4,8 @@ This filter creates a segmentation by generating an implicit surface represented
 
 ## Detailed Description
 
-```eval_rst
-In our algorithm, an implicit surface that is represented by a radial basis function (RBF) interpolation is used to generate a segmentation :cite:p:`TO2002`.
-```
+In our algorithm, an implicit surface that is represented by a radial basis function (RBF) interpolation is used to generate a segmentation {cite:p}`TO2002`.
+
 As an input, the algorithm is provided with a set of points on the boundary of the object that needs to be segmented from the images.
 Each slice should contain at least three points for our algorithm is return a reasonable segmentation.
 Our algorithm constructs an approximate function whose value vanishes at the given points and whose value is positive inside the object and negative outside.
