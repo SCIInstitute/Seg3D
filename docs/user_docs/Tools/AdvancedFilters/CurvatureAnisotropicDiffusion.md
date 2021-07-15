@@ -2,7 +2,7 @@
 
 This filter performs anisotropic diffusion using the modified curvature diffusion equation (MCDE).
 
-### Detailed Description
+## Detailed Description
 
 ```eval_rst
 The Curvature Anisotropic Diffusion performs anisotropic diffusion on a data layer using the modified curvature diffusion equation (MCDE). Anisotropic diffusion filtering is used to reduce noise (or unwanted detail) in images while preserving specific image features, such as edges and is based on the work of Pietro Perona and Jalhandra Malik, :cite:p:`PM1990`. The output of this filter is a smoothed data layer.

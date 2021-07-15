@@ -2,7 +2,7 @@
 
 This filter iteratively seeks regions similar to a given seed volume.
 
-### Detailed Description
+## Detailed Description
 
 The Segmentation Level Set filter is an iterative segmentation filter that uses a seed volume to find the regions in a data volume that are similar to the original seed. From mask layer provided as the seed, the statistics of the seeded region are calculated. The filter will then expand the segmented region to surrounding pixels that match the statistics of the original seeded area. The propagation may also retract the segmented area in some cases if the seeded areas do not meet the criteria from the threshold range or edge weight. The filter will continue to expand (or contract) until the iterations are terminated.
 

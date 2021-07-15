@@ -2,7 +2,7 @@
 
 This filter creates a mask of regions data clusters.
 
-### Detailed Description
+## Detailed Description
 
 The Otsu Threshold filter attempts to cluster data values in a data layer based upon how similar they are and create mask layers identifying the regions of similar data. This filter provides a good quick segmentation in many cases. There is a [Wikipedia article](http://en.wikipedia.org/wiki/Otsu%27s_method) containing a good description of the Otsu threshold algorithm.
 

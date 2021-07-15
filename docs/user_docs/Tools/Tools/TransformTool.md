@@ -2,7 +2,7 @@
 
 This tool can be used to translate and scale one or more layers.
 
-### Detailed Description
+## Detailed Description
 
 The Transform tool can be used to translate and scale one or more layers. This tool can be used on both mask layers and image data layers. This tool allows the user to change the origin (translate) and the spacing (scale) of multiple layers in a group. A key use of this tool is to manually transform one layer to match the origin and spacing of a different group, thus including the layer in that group.
 

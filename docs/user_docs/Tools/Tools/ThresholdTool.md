@@ -2,7 +2,7 @@
 
 This tool generates a mask label from an image data volute and the value range to select.
 
-### Detailed Description
+## Detailed Description
 
 The Threshold tool generates a mask label from an image data volume and the value range to select. The mask layer created will be a segmentation of the regions in the image data that have intensities in the range specified. This is one of the most basic semi-automatic tools used in segmentation as it is fast but can also separate contrasted regions very effectively.
 

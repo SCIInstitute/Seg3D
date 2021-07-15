@@ -2,7 +2,7 @@
 
 This filter will produce a mask of pixels statistically similar to pixels surrounding defined seed points.
 
-### Detailed Description
+## Detailed Description
 
 The Confidence Connected filter is similar to the Neighborhood Connected filter in that it will find connected pixels in a data volume that are statistically similar to pixels surrounding the user defined seed points and output them as a mask layer. The seed points set in the 2D viewer (**left mouse** to place, **right mouse** to remove).
 

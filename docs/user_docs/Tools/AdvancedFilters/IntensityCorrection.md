@@ -2,7 +2,7 @@
 
 This filter attempts to make a homogeneous intensity over the data layer.
 
-### Detailed Description
+## Detailed Description
 
 The Intensity Correction filter attempts to make the intensity over the data layer homogenous. This is very useful when dealing with MR images, as the intensity values and contrast can vary over space due to magnetic field variations. This filter will attempt to fit a spline to average intensity of the image, then to use that spline to equalize the intensity values over the space.
 

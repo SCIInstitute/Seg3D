@@ -2,7 +2,7 @@
 
 The Speedline tool is similar to the Polyline tool in that you use lines to identify a region to segment, but the Speedline tool attempts to alter that path between set points to find edges in the image data.
 
-### Detailed Description
+## Detailed Description
 
 The Speedline tool, which is based on the [Live-Wire algorithm](http://www.insight-journal.org/browse/publication/230), is similar to the Polyline tool in that you use lines to identify a region to segment, but the Speedline tool attempts to alter that path between set points to find edges in the image data. The Speedline tool computes the shortest path from a source to a target pixel using a cost function that uses the following parameters, which can be found in the tool interface: *Gradient Magnitude* (image gradient), *Zero Cross* (image zero-crossings), *Gradient Direction* (boundary smoothness constraint). The *Face Connectiveness* option is used to toggle the use of a local neighborhood. The *Image Spacing* option is used to toggle the use of a neighborhood weighting scaling factor.
 

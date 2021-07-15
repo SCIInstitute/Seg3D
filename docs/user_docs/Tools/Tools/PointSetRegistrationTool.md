@@ -2,7 +2,7 @@
 
 This tool will register one mask layer to another.
 
-### Detailed Description
+## Detailed Description
 
 The Point Set Registration tool will register one mask layer to another mask layer. This is currently the only tool or filter that will take inputs from two different layer groups as the main purpose of this tool is to allow the user to map a segmentation from one grid to another with a similar mask layer. The tool attempts to register the entire mask data to another mask data using the iterative closest points method(rigid registration) and will save and display the transform generated for use on the other layers in the registered layer's group. Since this is an iterative method, the user can set the number of iterations.
 

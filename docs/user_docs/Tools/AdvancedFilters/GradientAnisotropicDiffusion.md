@@ -2,7 +2,7 @@
 
 This filter performs anisotropic diffusion on a data layer and an additional edge enhancing step.
 
-### Detailed Description
+## Detailed Description
 
 ```eval_rst
 The Gradient Anisotropic Diffusion performs anisotropic diffusion on a data layer and uses an additional edge enhancing step to preserve useful features. Anisotropic diffusion filtering is used to reduce noise (or unwanted detail) in images while preserving specific image features, such as edges and is based on the work of Pietro Perona and Jalhandra Malik, :cite:p:`PM1990`. The output of this filter is a smoothed data layer.

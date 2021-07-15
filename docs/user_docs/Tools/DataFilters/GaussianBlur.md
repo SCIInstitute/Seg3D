@@ -2,7 +2,7 @@
 
 This filter performs a smoothing on the data layer.
 
-### Detailed Description
+## Detailed Description
 
 The Gaussian Blur filter performs a smoothing on the data layer using a discrete Gaussian kernel. For every pixel (except the edges), this filter performs a weighted averaging of the neighboring pixels where the weights are a 3D Gaussian distribution centered at the pixel. This filter will reduce noise by averaging it out, but will also reduce edges.
 

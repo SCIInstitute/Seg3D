@@ -2,7 +2,7 @@
 
 This filter attempts to transform histogram data to be flat as possible.
 
-### Detailed Description
+## Detailed Description
 
 The Histogram Equalization filter will compute the histogram of the data image layer and attempt to transform the image so that the histogram is as at as possible. The result of this transformation is most often an increase in contrast that can be considered a visual enhancement of the image.
 

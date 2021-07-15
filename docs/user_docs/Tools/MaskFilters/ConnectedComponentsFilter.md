@@ -2,7 +2,7 @@
 
 This filter finds connected data regions in a mask layer that are coincident to the defined seed points.
 
-### Detailed Description
+## Detailed Description
 
 The Connected Component filter finds connected data regions in a mask layer that are coincident to the defined seed points. This filter can be used to eliminate mask data that is not connected (separated by a blank pixel) from a desired region and can thus reduce noise in the segmentation.
 

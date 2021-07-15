@@ -2,7 +2,7 @@
 
 This tool allows the user to copy and paste data from one mask to another.
 
-### Detailed Description
+## Detailed Description
 
 This tool uses only mask layers as inputs. It is used to modify mask layers to repeat a slice of interest. This tool is similar to the basic features found in Copy/Paste Mask Slice. The key difference between the edit functions and this tool is that this tool provides more flexibility with the pasting options, offering pasting anywhere from one slice to the whole volume. The editing options only offer the extremes of pasting a single slice or punching a copied slice through the whole volume. This tool is most useful for pasting multiple slices but not necessarily the entire volume.
 

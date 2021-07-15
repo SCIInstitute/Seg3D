@@ -2,7 +2,7 @@
 
 The Polyline tool allows the user to define a region of the layer to modify by adding or erasing the data in the region defined by the polyline.
 
-### Detailed Description
+## Detailed Description
 
 The Polyline tool is a tool that allows manual creating and editing of mask layers. The polyline tool allows the user to define a region of the layer to modify by adding or erasing the data in the region defined by the polyline. This tool can only manipulate existing mask layers (can be empty).
 

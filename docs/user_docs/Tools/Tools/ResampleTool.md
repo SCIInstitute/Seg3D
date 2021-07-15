@@ -2,7 +2,7 @@
 
 This tool allows the user to resample one or more volumes to change the resolution.
 
-### Detailed Description
+## Detailed Description
 
 This tool can be used on both mask and data layers.
 

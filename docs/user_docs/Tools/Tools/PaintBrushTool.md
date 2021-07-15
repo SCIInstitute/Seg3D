@@ -2,7 +2,7 @@
 
 The Paint Brush tool a tool that allows full manual creating and editing of mask layers. This tool allows the user to specify explicitly which pixels to include in the mask label. This tool can only manipulate existing mask layers (can be empty).
 
-### Detailed Description
+## Detailed Description
 
 The Paint Brush size can be changed with the scroll wheel or in the tools window using the slider. The **left mouse** button paints and the **right mouse** button erases, but this can be reversed by checking the *Erase* option.
 

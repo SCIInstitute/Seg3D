@@ -2,7 +2,7 @@
 
 This filter creates a segmentation by generating an implicit surface represented by a radial basis function (RBF) interpolation.
 
-### Detailed Description
+## Detailed Description
 
 ```eval_rst
 In our algorithm, an implicit surface that is represented by a radial basis function (RBF) interpolation is used to generate a segmentation :cite:p:`TO2002`.

@@ -2,7 +2,7 @@
 
 This filter runs basic boolean operations on a pixel by pixel basis.
 
-### Detailed Description
+## Detailed Description
 
 The Arithmetic filter allows the user to run basic arithmetic and boolean operations on both image and mask data on a pixel by pixel basis. This filter can handle up to four inputs and can be used to perform calculate any expression provided by the user (correct syntax is `RESULT = \<expression\>;`). There are also many saved expressions that exists as separate filters or tools, the main difference is the functionality to handle more than two inputs.
 
