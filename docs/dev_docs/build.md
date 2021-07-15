@@ -193,7 +193,7 @@ Usage information is available using the ***--help*** flag:
 
 #### Optional Image Registration Tools
 
-To build the optional [python-based image registrations tools]({{ site.github.url }}/ir-tools.html), the CMake option **BUILD_MOSAIC_TOOLS** must be turned on, either on the command line with the flag **-DBUILD_MOSAIC_TOOLS:BOOL=ON**, or in the console or GUI interfaces.
+To build the optional [python-based image registrations tools](ir-tools), the CMake option **BUILD_MOSAIC_TOOLS** must be turned on, either on the command line with the flag **-DBUILD_MOSAIC_TOOLS:BOOL=ON**, or in the console or GUI interfaces.
 
 ### Seg3D Packages
 

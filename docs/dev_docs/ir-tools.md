@@ -1,6 +1,6 @@
 # Ir-tools
 
-The ir-tools image registration command line tools ([ir-tools wiki](http://medimagingwiki.sci.utah.edu/wiki/Ir-tools), [more tool documentation](http://www.sci.utah.edu/~bgrimm/iris/docs/tools.html)) are available as Python commands in Seg3D. Seg3D needs to be built from source with the CMake option **BUILD_MOSAIC_TOOLS** turned on ([Seg3D build instructions](build.html#optional-image-registration-tools)).
+The ir-tools image registration command line tools ([ir-tools wiki](http://medimagingwiki.sci.utah.edu/wiki/Ir-tools), [more tool documentation](http://www.sci.utah.edu/~bgrimm/iris/docs/tools.html)) are available as Python commands in Seg3D. Seg3D needs to be built from source with the CMake option **BUILD_MOSAIC_TOOLS** turned on ([Seg3D build instructions](build.md#optional-image-registration-tools)).
 
 ## Commands in Python
 
