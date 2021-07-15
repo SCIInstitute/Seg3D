@@ -1,6 +1,8 @@
 docutils
 pygments
-recommonmark==0.7.1
+linkify-it-py
+lxml
+myst-parser
 sphinx
 sphinx-issues
 sphinx-markdown-tables
