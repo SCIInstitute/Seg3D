@@ -36,36 +36,35 @@ This generates six viewers, the maximum number, three on the left and right. Thi
 
 ## Table of Shortcuts
 
-```eval_rst
-.. list-table::
-   :widths: 25 75
-   :width: 100%
-   :header-rows: 1
+```{list-table}
+:widths: 25 75
+:width: 100%
+:header-rows: 1
 
-   * - Keyboard Action
-     - Function
+* - Keyboard Action
+  - Function
 
-   * - CTRL/CMD+
-     - Toggle Full Screen Mode
+* - CTRL/CMD+
+  - Toggle Full Screen Mode
 
-   * - Alt+0
-     - One viewer only
+* - Alt+0
+  - One viewer only
 
-   * - Alt+1
-     - One and One
+* - Alt+1
+  - One and One
 
-   * - Alt+2
-     - One and Two
+* - Alt+2
+  - One and Two
 
-   * - Alt+3
-     - One and Three
+* - Alt+3
+  - One and Three
 
-   * - Alt+4
-     - Two and Two
+* - Alt+4
+  - Two and Two
 
-   * - Alt+5
-     - Two and Three
+* - Alt+5
+  - Two and Three
 
-   * - Alt+6
-     - Three and Three
+* - Alt+6
+  - Three and Three
 ```

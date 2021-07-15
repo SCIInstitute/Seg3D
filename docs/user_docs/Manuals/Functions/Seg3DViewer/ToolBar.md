@@ -2,30 +2,25 @@
 
 The tool bar located at the bottom of the Seg3D window contains some useful functions. The first is the message history icon on the left side of the tool bar. For more information on this window, see [MessageHistoryWindow](../Seg3DWindows/MessageHistoryWindow.md). The other use function is on the right side of the tool bar, the information tool bar. This tool bar can switch between displaying information about the active layer at the mouse location and a quick menu for the active layers by clicking on the switch tool button.
 
-```eval_rst
-.. |TextOff| image:: ../../Seg3DBasicFunctionality_figures/TextOff.png
+```{list-table} Icons and Actions in the Tool Bar at the Bottom of Seg3D
+:widths: 10 90
+:width: 100%
+:header-rows: 1
 
-.. |SwitchTool| image:: ../../Seg3DBasicFunctionality_figures/SwitchTool.png
+* - Icon
+  - Function
 
-.. |WorldOff| image:: ../../Seg3DBasicFunctionality_figures/WorldOff.png
+* - ```{image} ../../Seg3DBasicFunctionality_figures/TextOff.png
+    ```
+  - Message History Icon: Opens Message History window.
 
+* - ```{image} ../../Seg3DBasicFunctionality_figures/SwitchTool.png
+    ```
+  - Switch Tool Icon: Switches between displaying location of mouse in the volume and the quick menu to switch between the active tools and layers.
 
-.. list-table:: Icons and Actions in the Tool Bar at the Bottom of Seg3D
-   :widths: 10 90
-   :width: 100%
-   :header-rows: 1
-   
-   * - Icon
-     - Function
-
-   * - |TextOff|
-     - Message History Icon: Opens Message History window.
-
-   * - |SwitchTool|
-     - Switch Tool Icon: Switches between displaying location of mouse in the volume and the quick menu to switch between the active tools and layers.
-
-   * - |WorldOff|
-     - World Icon: Switches between coordinate system displayed in the information tool bar. The options are relative (indexed) and absolute (world).
+* - ```{image} ../../Seg3DBasicFunctionality_figures/WorldOff.png
+    ```
+  - World Icon: Switches between coordinate system displayed in the information tool bar. The options are relative (indexed) and absolute (world).
 
 ```
 
