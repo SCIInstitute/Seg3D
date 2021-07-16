@@ -2,12 +2,16 @@
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
+:::{figure-md} figure1
+
 ![LayerWindow](../../Seg3DBasicFunctionality_figures/LayerWindow.png)
-<figcaption>Layer Manager Window</figcaption>
+
+Figure 1: Layer Manager Window
+:::
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
-A volume file is represented by a gray image with multiple stacked planes. A label mask is represented by a colored icon with a white mask in the middle. The colors correspond to the label masks seen in the viewer windows. Names of label masks are, by default, a conglomeration of the tools applied to the original volume. For example, in the image above, five label masks have been created from the volume file `2yo_Imp_labels`. The uppermost mask (in yellow) has the name `Threshold4.5TO5_2yo_Imp_labels`. This name was generated because the threshold tool, with values between 4.5 and 5, was applied to the original volume file. If another tool were to be applied on the yellow mask, the new mask would state the name of the tool, followed by the complete name of the yellow label mask. Names of masks can be manually changed by clicking the current name and typing in the desired text.
+A volume file is represented by a gray image with multiple stacked planes. A label mask is represented by a colored icon with a white mask in the middle. The colors correspond to the label masks seen in the viewer windows. Names of label masks are, by default, a conglomeration of the tools applied to the original volume. For example, in [Figure 1](figure1), five label masks have been created from the volume file `2yo_Imp_labels`. The uppermost mask (in yellow) has the name `Threshold4.5TO5_2yo_Imp_labels`. This name was generated because the threshold tool, with values between 4.5 and 5, was applied to the original volume file. If another tool were to be applied on the yellow mask, the new mask would state the name of the tool, followed by the complete name of the yellow label mask. Names of masks can be manually changed by clicking the current name and typing in the desired text.
 
 ```{list-table} Icons and Actions Available for Each Layer
 :widths: 10 90
