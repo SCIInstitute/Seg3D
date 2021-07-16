@@ -59,6 +59,8 @@ myst_enable_extensions = [
 # (see https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html#auto-generated-header-anchors)
 myst_heading_anchors = 6
 
+# auto number figures
+numfig = True
 
 # Path for bibtex files
 bibtex_bibfiles = ['references.bib']
