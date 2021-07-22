@@ -13,6 +13,7 @@ There is a *flood fill and erase* function which will fill an area in the slice 
 It should be noted that since this tool uses the scroll function to change the Paint Brush size, it will not also change the slice in the viewer. To change the slice use the arrow **up/down** or **shift+scroll**.
 
 ```{list-table} Keyboard and Mouse Actions in the for the Paint Brush Tool
+:name: table-paint-brush-actions
 :widths: 25 75
 :width: 100%
 :header-rows: 1

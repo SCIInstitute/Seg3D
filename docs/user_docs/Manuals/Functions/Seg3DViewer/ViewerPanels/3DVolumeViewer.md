@@ -3,6 +3,7 @@
 Though there is no segmentation that can be performed in the 3D volume viewer, it is a very useful function in Seg3D. It allows the user to see the 3D representation of the original and segmented data. There are many objects that can be viewed in the 3D viewer such as the 2D slices in 3D, isosurfaces of the segmented data, volume rendering of the image data, depth cues, and clipping planes. The purpose of this viewer is to allow you to view your data in as many ways as possible to facilitate segmentation.
 
 ```{list-table} Mouse Functions in the 3D Volume Viewer
+:name: table-3d-functions
 :widths: 25 75
 :width: 100%
 :header-rows: 1
@@ -23,6 +24,7 @@ Though there is no segmentation that can be performed in the 3D volume viewer, i
 
 
 ```{list-table} Keyboard Actions in the 3D volume Viewer
+:name: table-3d-actions
 :widths: 25 75
 :width: 100%
 :header-rows: 1
@@ -46,6 +48,7 @@ Though there is no segmentation that can be performed in the 3D volume viewer, i
 
 
 ```{list-table} Icons and Actions in the 3D Viewer
+:name: table-3d-icons
 :widths: 10 90
 :width: 100%
 :header-rows: 1

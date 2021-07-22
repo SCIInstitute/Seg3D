@@ -37,6 +37,7 @@ This generates six viewers, the maximum number, three on the left and right. Thi
 ## Table of Shortcuts
 
 ```{list-table}
+:name: table-shortcuts
 :widths: 25 75
 :width: 100%
 :header-rows: 1

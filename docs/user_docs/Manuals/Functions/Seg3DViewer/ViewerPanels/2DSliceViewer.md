@@ -1,8 +1,9 @@
 # 2D Slice Viewer
 
-The first and second tables below show the mouse and keyboard actions which can be used to control the visualization and manipulation of image and segmentation data. Though these functions are general, there are tools which used these functions for specify purposes or may otherwise block a couple of these functions, the most prominent example is the scroll wheel in the paint brush tool is used to change brush size. In this case, you can still scroll through slices by holding Shift. In all cases, an alternative is given in the software. Also presented in this section is a list and description of the icons presented in the 2D slice viewer.
+Tables {numref}`%s <table-2d-functions>` and {numref}`%s <table-2d-actions>` below show the mouse and keyboard actions which can be used to control the visualization and manipulation of image and segmentation data. Though these functions are general, there are tools which used these functions for specify purposes or may otherwise block a couple of these functions, the most prominent example is the scroll wheel in the paint brush tool is used to change brush size. In this case, you can still scroll through slices by holding Shift. In all cases, an alternative is given in the software. Also presented in this section is a list and description of the icons presented in the 2D slice viewer ({numref}`fig-2d-icons`).
 
 ```{list-table} Mouse Functions in the 2D Viewers
+:name: table-2d-functions
 :widths: 30 70
 :width: 100%
 :header-rows: 1
@@ -29,6 +30,7 @@ The first and second tables below show the mouse and keyboard actions which can 
 
 
 ```{list-table} Keyboard Actions in the 2D Viewers
+:name: table-2d-actions
 :widths: 30 70
 :width: 100%
 :header-rows: 1
@@ -70,6 +72,7 @@ The first and second tables below show the mouse and keyboard actions which can 
 
 
 ```{list-table} Icons and Actions in the 2D Viewers
+:name: fig-2d-icons
 :widths: 10 90
 :width: 100%
 :header-rows: 1

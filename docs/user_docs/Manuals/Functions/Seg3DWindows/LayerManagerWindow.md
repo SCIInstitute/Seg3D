@@ -2,18 +2,19 @@
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
-:::{figure-md} figure1
+:::{figure-md} fig-layer-window
 
 ![LayerWindow](../../Seg3DBasicFunctionality_figures/LayerWindow.png)
 
-Figure 1: Layer Manager Window
+Layer Manager Window
 :::
 
 The layer manager window is the last of the three windows that open by default upon launching Seg3D. This window is positioned to the right side of the Seg3D window pane and contains all of the mask and volume files involved with the session. If a file is not selected when Seg3D launches, this window will be blank, otherwise it will contain the volume and mask surface files associated with the opened file.
 
-A volume file is represented by a gray image with multiple stacked planes. A label mask is represented by a colored icon with a white mask in the middle. The colors correspond to the label masks seen in the viewer windows. Names of label masks are, by default, a conglomeration of the tools applied to the original volume. For example, in [Figure 1](figure1), five label masks have been created from the volume file `2yo_Imp_labels`. The uppermost mask (in yellow) has the name `Threshold4.5TO5_2yo_Imp_labels`. This name was generated because the threshold tool, with values between 4.5 and 5, was applied to the original volume file. If another tool were to be applied on the yellow mask, the new mask would state the name of the tool, followed by the complete name of the yellow label mask. Names of masks can be manually changed by clicking the current name and typing in the desired text.
+A volume file is represented by a gray image with multiple stacked planes. A label mask is represented by a colored icon with a white mask in the middle. The colors correspond to the label masks seen in the viewer windows. Names of label masks are, by default, a conglomeration of the tools applied to the original volume. For example, in {numref}`fig-layer-window`, five label masks have been created from the volume file `2yo_Imp_labels`. The uppermost mask (in yellow) has the name `Threshold4.5TO5_2yo_Imp_labels`. This name was generated because the threshold tool, with values between 4.5 and 5, was applied to the original volume file. If another tool were to be applied on the yellow mask, the new mask would state the name of the tool, followed by the complete name of the yellow label mask. Names of masks can be manually changed by clicking the current name and typing in the desired text.
 
 ```{list-table} Icons and Actions Available for Each Layer
+:name: table-layer-icons
 :widths: 10 90
 :width: 100%
 :header-rows: 1
@@ -58,9 +59,10 @@ A volume file is represented by a gray image with multiple stacked planes. A lab
 
 ```
 
-Each volume or mask label has standard, associated icons below their names. The above table displays and describes each of these icons. These icons represent tools that are available for each individual layer.
+Each volume or mask label has standard, associated icons below their names. {numref}`table-layer-icons` displays and describes each of these icons. These icons represent tools that are available for each individual layer.
 
 ```{list-table} Icons and Actions Available at the Top of Each Layer Group
+:name: table-top-icons
 :widths: 10 90
 :width: 100%
 :header-rows: 1
@@ -85,6 +87,7 @@ Each volume or mask label has standard, associated icons below their names. The 
 Layers in Seg3D are arranged into layer groups. Layer groups are formed with layers that have the same geometric information, that is the same origin, spacing, and size. Groups are separated by panels with an orange header. Generally speaking, most tools and filters requiring more than one input can only operate on layers in the same group (and therefore the same grid geometry).
 
 ```{list-table} Icons and Actions Available at the Bottom of Each Layer Group
+:name: table-bottom-icons
 :widths: 10 90
 :width: 100%
 :header-rows: 1
@@ -110,4 +113,4 @@ Layers in Seg3D are arranged into layer groups. Layer groups are formed with lay
 
 ```
 
-There are some functions that are operated as a group. These are indicated by the icons on the top of the pane, in the orange bar. Additionally, there are some other icons at the bottom of the group that control some of the group functions. Hovering the cursor over the icon will display the the use of each additional icon.
+There are some functions that are operated as a group. These are indicated by the icons on the top of the pane, in the orange bar (Shown in {numref}`table-top-icons`). Additionally, there are some other icons at the bottom of the group that control some of the group functions ({numref}`table-bottom-icons`). Hovering the cursor over the icon will display the the use of each additional icon.
