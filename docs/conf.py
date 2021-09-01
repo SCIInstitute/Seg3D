@@ -106,7 +106,7 @@ language = 'python'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_book_theme'
+html_theme = 'furo'
 
 #html_theme = 'groundwork'
 
@@ -133,7 +133,15 @@ html_title = project
 html_logo = '_static/seg3d.png'
 
 html_theme_options = {
-    'logo_only': True
+    "sidebar_hide_name": True,
+    "light_css_variables": {
+        "color-brand-primary": "#ad1f1f",
+        "color-brand-content": "#ad1f1f",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#ec9393",
+        "color-brand-content": "#ec9393",
+    },
 }
 
 autosectionlabel_prefix_document = True
