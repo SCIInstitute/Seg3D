@@ -1,0 +1,7 @@
+# Transfer Function
+
+Within the transfer function pane, a histogram exists that defines the volumetric image. The transfer function can be displayed on a Linear or Logarithmic scale. In the transfer function window, the user can choose to add or delete a feature. A feature can be dragged into positions defining regions of the histogram that the user wants to render. The default Feature is a line. By clicking and dragging the line, the feature can be moved. By clicking a point on the line, the individual point can be moved. Additional points can be added to a feature by clicking anywhere in the histogram panel that is not already defined by a line, that is, in the gray or black regions.
+
+Each of the features observed can also be enabled/disabled and viewed as solid or graded. The solid feature (as addressed above) allows the feature to be represented as a graded slice or as a solid one. Solid slices simply apply the same color saturation to each section of the volume slice. De-selecting the solid option applies a gradient to the slices, with the outer edge being the brightest color.
+
+Each point and feature can be repositioned, reshaped, and recolored in order to distinguish between defined regions. To change the color of a feature, select the desired feature and adjust the slider regions below the histogram in the Red/Green/Blue features. Colors can be used to easily distinguish different features in the volume. Additionally, each features Ambient and Specular lighting can be adjusted as well as volume shininess is adjustable
