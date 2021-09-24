@@ -12,9 +12,12 @@ bin*
 *.*~
 CMakeCache.txt
 CMakeFiles
-Makefile
+src/Makefile
 cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
 DartConfiguration.tcl
 xCode_bin*
+
+# Sphinx builds
+docs/_build/
