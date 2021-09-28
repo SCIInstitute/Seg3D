@@ -51,6 +51,7 @@ set(boost_Libraries
   "regex"
   "system"
   "thread"
+  "chrono"
   CACHE INTERNAL "Boost library name.")
 
 if(BUILD_WITH_PYTHON)

@@ -33,8 +33,6 @@
 #include <GL/glew.h>
 #include <atomic>
 #include <chrono>
-#include <boost/logic/tribool.hpp>
-#include <boost/logic/tribool_io.hpp>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -87,12 +85,13 @@ public:
   boost::mutex thread_mutex_;
   boost::condition_variable thread_condition_variable_;
 
-  std::atomic<boost::tribool> gl_capable_{ boost::logic::indeterminate };
+  std::atomic<bool> gl_capable_{ false };
+  std::atomic<bool> gl_capable_set_{ false };
   unsigned long vram_size_;
 
   bool wait_for_render_resources()
   {
-    return boost::logic::indeterminate(gl_capable_) || !videoDone_;
+    return !gl_capable_set_ || !videoDone_;
   }
 
 };
@@ -100,6 +99,7 @@ public:
 void RenderResourcesPrivate::initialize_gl_log_error(const std::string& error_string)
 {
 	this->gl_capable_ = false;
+  gl_capable_set_ = true;
 	CORE_LOG_ERROR(error_string);
 }
 
@@ -128,6 +128,7 @@ void RenderResourcesPrivate::initialize_gl()
 	else
 	{
 		this->gl_capable_ = true;
+    gl_capable_set_ = true;
 	}
 }
 
@@ -327,11 +328,10 @@ bool RenderResources::valid_render_resources()
 	  boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
   }
 
-  const bool glCap = static_cast<bool>(this->private_->gl_capable_.load());
   return (this->private_->resources_context_ &&
 		  this->private_->resources_context_->valid_render_resources() &&
 		  this->private_->delete_context_ &&
-		  glCap);
+		  private_->gl_capable_);
 }
 
 void RenderResources::initialize_on_event_thread()
