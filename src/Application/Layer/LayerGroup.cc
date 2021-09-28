@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -47,6 +47,7 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/Layer/Actions/ActionComputeIsosurface.h>
 
+using namespace boost::placeholders;
 
 namespace Seg3D
 {
@@ -60,7 +61,7 @@ class LayerGroupPrivate : public Core::ConnectionHandler
 public:
   void update_layers_visible_state();
   void update_grid_information();
-  
+
   void update_layers_iso_visible_state();
 
   void handle_layers_visible_state_changed( std::string state );
@@ -183,7 +184,7 @@ void LayerGroupPrivate::update_layers_iso_visible_state()
 
     ++it;
   }
-  
+
   std::string state;
   if ( total_visible_layers == 0 )
   {
@@ -275,12 +276,12 @@ void LayerGroupPrivate::handle_layers_iso_visible_state_changed( std::string sta
 
 void LayerGroupPrivate::update_grid_information()
 {
-  Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ), 
-    static_cast< double>( this->grid_transform_.get_ny() ), 
+  Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ),
+    static_cast< double>( this->grid_transform_.get_ny() ),
     static_cast< double>( this->grid_transform_.get_nz() ) );
   this->layer_group_->dimensions_state_->set( dimensions );
 
-  this->layer_group_->origin_state_->set( this->grid_transform_ * 
+  this->layer_group_->origin_state_->set( this->grid_transform_ *
     Core::Point( 0, 0, 0 ) );
 
   Core::Vector spacing( 1, 1, 1 );
@@ -290,26 +291,26 @@ void LayerGroupPrivate::update_grid_information()
 
 void LayerGroupPrivate::initialize_states()
 {
-  this->layer_group_->add_state( "isosurface_quality", 
+  this->layer_group_->add_state( "isosurface_quality",
     this->layer_group_->isosurface_quality_state_, "1.0", "1.0|0.5|0.25|0.125" );
-  this->layer_group_->add_state( "isosurface_capping_enabled", 
-    this->layer_group_->isosurface_capping_enabled_state_, true ); 
-  this->layer_group_->add_state( "layers_visible", 
+  this->layer_group_->add_state( "isosurface_capping_enabled",
+    this->layer_group_->isosurface_capping_enabled_state_, true );
+  this->layer_group_->add_state( "layers_visible",
     this->layer_group_->layers_visible_state_, "all", "none|some|all" );
-  this->layer_group_->add_state( "layers_iso_visible", 
+  this->layer_group_->add_state( "layers_iso_visible",
     this->layer_group_->layers_iso_visible_state_, "all", "none|some|all" );
 
   this->layer_group_->add_state( "provenance_id", this->layer_group_->provenance_id_state_, -1 );
-  this->layer_group_->add_state( "meta_data", this->layer_group_->meta_data_state_, "" ); 
-  this->layer_group_->add_state( "meta_data_info", this->layer_group_->meta_data_info_state_, "" ); 
+  this->layer_group_->add_state( "meta_data", this->layer_group_->meta_data_state_, "" );
+  this->layer_group_->add_state( "meta_data_info", this->layer_group_->meta_data_info_state_, "" );
 
-  Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ), 
-    static_cast< double>( this->grid_transform_.get_ny() ), 
+  Core::Point dimensions( static_cast< double>( this->grid_transform_.get_nx() ),
+    static_cast< double>( this->grid_transform_.get_ny() ),
     static_cast< double>( this->grid_transform_.get_nz() ) );
   this->layer_group_->add_state( "dimensions", this->layer_group_->dimensions_state_, dimensions );
   this->layer_group_->dimensions_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
-  this->layer_group_->add_state( "origin", this->layer_group_->origin_state_, 
+  this->layer_group_->add_state( "origin", this->layer_group_->origin_state_,
     this->grid_transform_ * Core::Point( 0, 0, 0 ) );
   this->layer_group_->origin_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
@@ -318,13 +319,13 @@ void LayerGroupPrivate::initialize_states()
   this->layer_group_->add_state( "spacing", this->layer_group_->spacing_state_, Core::Point( spacing ) );
   this->layer_group_->spacing_state_->set_session_priority( Core::StateBase::DO_NOT_LOAD_E );
 
-  this->layer_group_->add_state( "group_widget_expanded", 
+  this->layer_group_->add_state( "group_widget_expanded",
     this->layer_group_->group_widget_expanded_state_, true );
-  this->layer_group_->add_state( "show_iso_menu", 
+  this->layer_group_->add_state( "show_iso_menu",
     this->layer_group_->show_iso_menu_state_, false );
-  this->layer_group_->add_state( "show_delete_menu", 
+  this->layer_group_->add_state( "show_delete_menu",
     this->layer_group_->show_delete_menu_state_, false );
-  this->layer_group_->add_state( "show_duplicate_menu", 
+  this->layer_group_->add_state( "show_duplicate_menu",
     this->layer_group_->show_duplicate_menu_state_, false );
 
   this->gui_state_group_.reset( new Core::BooleanStateGroup );
@@ -336,10 +337,10 @@ void LayerGroupPrivate::initialize_states()
   for ( size_t i = 0; i < num_of_viewers; ++i )
   {
     this->add_connection( ViewerManager::Instance()->get_viewer( i )->
-      viewer_visible_state_->state_changed_signal_.connect( boost::bind( 
+      viewer_visible_state_->state_changed_signal_.connect( boost::bind(
       &LayerGroupPrivate::update_layers_visible_state, this ) ) );
   }
-  this->add_connection( this->layer_group_->layers_visible_state_->value_changed_signal_.connect( 
+  this->add_connection( this->layer_group_->layers_visible_state_->value_changed_signal_.connect(
     boost::bind( &LayerGroupPrivate::handle_layers_visible_state_changed, this, _1 ) ) );
 
   this->add_connection( this->layer_group_->layers_iso_visible_state_->value_changed_signal_.connect(
@@ -350,7 +351,7 @@ void LayerGroupPrivate::initialize_states()
 // Class LayerGroup
 //////////////////////////////////////////////////////////////////////////
 
-LayerGroup::LayerGroup( Core::GridTransform grid_transform, 
+LayerGroup::LayerGroup( Core::GridTransform grid_transform,
   ProvenanceID provenance_id, const LayerMetaData& meta_data ) :
   StateHandler( "group", true ),
   private_( new LayerGroupPrivate )
@@ -359,7 +360,7 @@ LayerGroup::LayerGroup( Core::GridTransform grid_transform,
   this->private_->signal_block_count_ = 0;
   this->private_->grid_transform_ = grid_transform;
   this->private_->initialize_states();
-  
+
   // This is the layer that generated this group. Hence that is the dependent layer
   // for new mask or other layers that are created in the group.
   this->provenance_id_state_->set( provenance_id );
@@ -401,7 +402,7 @@ void LayerGroup::set_meta_data( const LayerMetaData& meta_data )
 
 
 void LayerGroup::insert_layer( LayerHandle new_layer )
-{ 
+{
   ASSERT_IS_APPLICATION_THREAD();
 
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -409,7 +410,7 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   new_layer->set_layer_group( this->shared_from_this() );
 
   if( new_layer->get_type() == Core::VolumeType::MASK_E )
-  { 
+  {
     this->private_->layer_list_.push_front( new_layer );
     boost::dynamic_pointer_cast< MaskLayer >( new_layer )->show_isosurface_state_->
       state_changed_signal_.connect( boost::bind(
@@ -417,11 +418,11 @@ void LayerGroup::insert_layer( LayerHandle new_layer )
   }
   else
   {
-    LayerList::iterator it = std::find_if( this->private_->layer_list_.begin(), 
-      this->private_->layer_list_.end(), boost::lambda::bind( &Layer::get_type, 
-      boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) 
-      == Core::VolumeType::DATA_E || boost::lambda::bind( &Layer::get_type, 
-      boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) ) 
+    LayerList::iterator it = std::find_if( this->private_->layer_list_.begin(),
+      this->private_->layer_list_.end(), boost::lambda::bind( &Layer::get_type,
+      boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) )
+      == Core::VolumeType::DATA_E || boost::lambda::bind( &Layer::get_type,
+      boost::lambda::bind( &LayerHandle::get, boost::lambda::_1 ) )
       == Core::VolumeType::LARGE_DATA_E );
     this->private_->layer_list_.insert( it, new_layer );
   }
@@ -453,7 +454,7 @@ void LayerGroup::insert_layer( LayerHandle new_layer, size_t pos )
   {
     return;
   }
-  
+
   LayerList::iterator layer_it;
   if ( this->private_->layer_list_.size() > pos )
   {
@@ -485,7 +486,7 @@ bool LayerGroup::move_layer( LayerHandle src_layer, LayerHandle dst_layer )
   }
 
   // Find the src_layer in the list
-  LayerList::iterator src_it = std::find( this->private_->layer_list_.begin(), 
+  LayerList::iterator src_it = std::find( this->private_->layer_list_.begin(),
     this->private_->layer_list_.end(), src_layer );
   assert( src_it != this->private_->layer_list_.end() );
 
@@ -505,16 +506,16 @@ bool LayerGroup::move_layer( LayerHandle src_layer, LayerHandle dst_layer )
     dst_it = std::find( this->private_->layer_list_.begin(),
       this->private_->layer_list_.end(), dst_layer );
   }
-  
+
   // If src_layer is a data layer, it must be below all mask layers
   if ( src_layer->get_type() == Core::VolumeType::DATA_E || src_layer->get_type() == Core::VolumeType::LARGE_DATA_E )
   {
     if ( dst_layer && dst_layer->get_type() == Core::VolumeType::MASK_E )
     {
-      do 
+      do
       {
         ++dst_it;
-      } while ( dst_it != this->private_->layer_list_.end() && 
+      } while ( dst_it != this->private_->layer_list_.end() &&
         ( *dst_it )->get_type() == Core::VolumeType::MASK_E );
     }
   }
@@ -525,7 +526,7 @@ bool LayerGroup::move_layer( LayerHandle src_layer, LayerHandle dst_layer )
     if ( tmp_it == this->private_->layer_list_.end() ) --tmp_it;
 
     while ( tmp_it != this->private_->layer_list_.begin() &&
-      ( ( *tmp_it )->get_type() == Core::VolumeType::DATA_E || 
+      ( ( *tmp_it )->get_type() == Core::VolumeType::DATA_E ||
       ( *tmp_it )->get_type() == Core::VolumeType::LARGE_DATA_E ) )
     {
       dst_it = tmp_it--;
@@ -574,7 +575,7 @@ void LayerGroup::delete_layer( LayerHandle layer )
   }
 }
 
-void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names, 
+void LayerGroup::get_layer_names( std::vector< LayerIDNamePair >& layer_names,
   Core::VolumeType type, LayerHandle excluded_layer ) const
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
@@ -602,7 +603,7 @@ bool LayerGroup::post_save_states( Core::StateIO& state_io )
 
   state_io.push_current_element();
   state_io.set_current_element( layers_element );
-  
+
   bool succeeded = true;
   LayerList::reverse_iterator it = this->private_->layer_list_.rbegin();
   for ( ; it != this->private_->layer_list_.rend(); it++ )
@@ -612,15 +613,15 @@ bool LayerGroup::post_save_states( Core::StateIO& state_io )
       succeeded = succeeded && ( *it )->save_states( state_io );
     }
   }
-  
+
   state_io.pop_current_element();
   return succeeded;
 }
-  
+
 bool LayerGroup::has_a_valid_layer() const
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
+
   LayerList::const_iterator it = this->private_->layer_list_.begin();
   for ( ; it != this->private_->layer_list_.end(); it++ )
   {
@@ -629,7 +630,7 @@ bool LayerGroup::has_a_valid_layer() const
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -663,7 +664,7 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
     else if ( layer_type == "large" )
     {
       layer.reset( new LargeVolumeLayer( layer_id ) );
-    }   
+    }
     else
     {
       CORE_LOG_ERROR( "Unsupported layer type" );
@@ -678,32 +679,32 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
       }
       else
       {
-        // In order to provide backward compatibility, we need to force all layers in a 
-        // group to have the same grid transform (space origin and space direction).  
-        // Otherwise it is possible for a session file to have a layer group with a mix of 
-        // cell-centered and node-centered layers that, when correctly processed, have 
+        // In order to provide backward compatibility, we need to force all layers in a
+        // group to have the same grid transform (space origin and space direction).
+        // Otherwise it is possible for a session file to have a layer group with a mix of
+        // cell-centered and node-centered layers that, when correctly processed, have
         // slightly different grid transforms.
 
-        // We are supposed to preserve the original centering (node vs. cell) when exporting 
+        // We are supposed to preserve the original centering (node vs. cell) when exporting
         // nrrds, so we only change the matrix portion of the grid transform and leave the
         // original centering alone.
         bool preserve_centering = true;
         layer->set_grid_transform( this->private_->grid_transform_, preserve_centering );
       }
       this->insert_layer( layer );
-      
+
       // Here we do any post loading processing that requires both the group and layer info
-      
+
       // Now, if the mask had its isosurface generated we dispatch an action to do it again
-      if( layer_type == "mask" ) 
+      if( layer_type == "mask" )
       {
         MaskLayerHandle temp_mask_handle = boost::dynamic_pointer_cast< MaskLayer >( layer );
-        if( temp_mask_handle->iso_generated_state_->get() ) 
+        if( temp_mask_handle->iso_generated_state_->get() )
         {
           double quality = 1.0;
           Core::ImportFromString( this->isosurface_quality_state_->get(), quality );
           bool capping_enabled = this->isosurface_capping_enabled_state_->get();
-          ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(), 
+          ActionComputeIsosurface::Dispatch( Core::Interface::GetWidgetActionContext(),
             temp_mask_handle, quality, capping_enabled );
         }
       }
@@ -723,7 +724,7 @@ bool LayerGroup::post_load_states( const Core::StateIO& state_io )
   {
     this->provenance_id_state_->set( this->private_->layer_list_.front()->provenance_id_state_->get() );
   }
-  
+
   this->private_->update_grid_information();
   return success;
 }

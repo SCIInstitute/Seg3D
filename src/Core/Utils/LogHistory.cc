@@ -29,6 +29,8 @@
 #include <Core/Utils/LogHistory.h>
 #include <Core/Utils/Log.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -94,4 +96,3 @@ void LogHistory::record_log( int type, std::string message )
 }
 
 } // end namespace Core
-

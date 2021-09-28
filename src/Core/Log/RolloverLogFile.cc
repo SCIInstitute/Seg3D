@@ -43,6 +43,8 @@
 #include <Core/Utils/Log.h>
 #include <Core/Utils/StringUtil.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -58,7 +60,7 @@ public:
   std::ofstream ofstream_; // Closes file automatically on destruction
   int max_files_;
   int max_lines_;
-  int max_age_days_;  
+  int max_age_days_;
   int line_count_;
   boost::filesystem::path log_dir_;
   std::string log_file_prefix_;
@@ -105,7 +107,7 @@ void RolloverLogFilePrivate::rollover_log_files()
   // Remove old/excess log files
   try // Catch any boost exceptions
   {
-    // Make sure log directory exists 
+    // Make sure log directory exists
     if( !boost::filesystem::exists( this->log_dir_ ) )
     {
       return;
@@ -120,13 +122,13 @@ void RolloverLogFilePrivate::rollover_log_files()
       if ( boost::filesystem::is_regular_file( itr->status() ) )
       {
         // Log files are identified as starting with app name and ending with .log
-        if( boost::algorithm::starts_with( itr->path().filename().string(), 
+        if( boost::algorithm::starts_with( itr->path().filename().string(),
           Application::GetUtilName() ) && boost::filesystem::extension( itr->path() ) == ".log" )
         {
           std::time_t file_write_time = boost::filesystem::last_write_time( itr->path() );
           std::time_t current_time = std::time( 0 );
           double elapsed_days = static_cast< double >( ( current_time - file_write_time ) )
-            / static_cast< double >( SECONDS_PER_DAY_C ); 
+            / static_cast< double >( SECONDS_PER_DAY_C );
           if( elapsed_days > this->max_age_days_ )
           {
             boost::filesystem::remove( itr->path() );
@@ -139,7 +141,7 @@ void RolloverLogFilePrivate::rollover_log_files()
       }
     }
 
-    // If num log files exceeds (or will exceed) max log files, remove oldest logs 
+    // If num log files exceeds (or will exceed) max log files, remove oldest logs
     if( log_files.size() >= static_cast< size_t >( this->max_files_ ) )
     {
       // Sort files by date
@@ -157,7 +159,7 @@ void RolloverLogFilePrivate::rollover_log_files()
   {
     // Do nothing.  There is no current log to write an error to.
   }
-  
+
   // Create new log file
   this->create_new_log_file();
 }
@@ -166,31 +168,31 @@ bool RolloverLogFilePrivate::create_new_log_file()
 {
   lock_type lock( this->get_mutex() );
 
-  // Make sure log directory exists 
+  // Make sure log directory exists
   if( !boost::filesystem::exists( this->log_dir_ ) )
   {
     return false;
   }
 
-  // Create log file name 
-  std::string date_time_str = 
+  // Create log file name
+  std::string date_time_str =
     boost::posix_time::to_iso_string( boost::posix_time::second_clock::local_time() );
   // Using the process id prevents multiple instances of Seg3D from trying to create the same
   // log file.
   std::string process_id = ExportToString( Application::Instance()->get_process_id() );
-  std::string log_filename = this->log_file_prefix_ + "_" + date_time_str + "_" + 
+  std::string log_filename = this->log_file_prefix_ + "_" + date_time_str + "_" +
     process_id + ".log";
-  
+
   boost::filesystem::path log_path = this->log_dir_ / log_filename;
 
   // Close any previously open stream
-  if( this->ofstream_.is_open() ) 
+  if( this->ofstream_.is_open() )
   {
-    this->ofstream_.close(); 
+    this->ofstream_.close();
   }
   // Open a new output filestream
   this->ofstream_.open( log_path.string().c_str() );
-  if( !this->ofstream_.is_open() ) 
+  if( !this->ofstream_.is_open() )
   {
     return false;
   }
@@ -203,7 +205,7 @@ bool RolloverLogFilePrivate::create_new_log_file()
 
 RolloverLogFile::RolloverLogFile( unsigned int log_flags ) :
   private_( new RolloverLogFilePrivate )
-{ 
+{
   // post_log_signal could cause asynchronous call to log_message(), so need to protect private
   // members with mutex.
   RolloverLogFilePrivate::lock_type lock( this->private_->get_mutex() );
@@ -230,7 +232,7 @@ RolloverLogFile::RolloverLogFile( unsigned int log_flags ) :
   // the shared_ptr is locked so that the object is not destroyed while the
   // call back is evaluated.
   Log::Instance()->post_log_signal_.connect(
-    Log::post_log_signal_type::slot_type( &RolloverLogFilePrivate::log_message, 
+    Log::post_log_signal_type::slot_type( &RolloverLogFilePrivate::log_message,
     this->private_.get(), _1, _2 ).track( this->private_ ) );
 }
 
@@ -238,7 +240,7 @@ void RolloverLogFile::set_max_files( int num_files )
 {
   RolloverLogFilePrivate::lock_type lock( this->private_->get_mutex() );
 
-  this->private_->max_files_ = num_files; 
+  this->private_->max_files_ = num_files;
 }
 
 void RolloverLogFile::set_max_lines( int num_lines )

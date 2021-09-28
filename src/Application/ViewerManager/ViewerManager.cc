@@ -28,11 +28,11 @@
 
 // STL includes
 
-// Boost includes 
+// Boost includes
 
 // Application includes
 #include <Application/Layer/LayerManager.h>
-#include <Application/Viewer/Viewer.h> 
+#include <Application/Viewer/Viewer.h>
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Project/Project.h>
@@ -42,6 +42,8 @@
 #include <Core/Utils/ScopedCounter.h>
 #include <Core/Interface/Interface.h>
 #include <Core/State/StateIO.h>
+
+using namespace boost::placeholders;
 
 namespace Seg3D
 {
@@ -279,7 +281,7 @@ void ViewerManagerPrivate::change_layout( std::string layout )
       this, layout ) );
     return;
   }
-  
+
   if( layout == ViewerManager::VIEW_SINGLE_C )
   {
     this->viewers_[ 0 ]->viewer_visible_state_->set( true );
@@ -363,10 +365,10 @@ void ViewerManagerPrivate::update_clipping_range( size_t index )
   {
     return;
   }
-  
+
   Core::BBox bbox = LayerManager::Instance()->get_layers_bbox();
   if ( !bbox.valid() )  return;
-  
+
   Core::Vector norm( this->vm_->clip_plane_x_state_[ index ]->get(),
     this->vm_->clip_plane_y_state_[ index ]->get(),
     this->vm_->clip_plane_z_state_[ index ]->get() );
@@ -375,7 +377,7 @@ void ViewerManagerPrivate::update_clipping_range( size_t index )
   {
     return;
   }
-  
+
   Core::Point corners[ 2 ] = { bbox.min(), bbox.max() };
   Core::Point center = bbox.center();
   double max_d = 0.0;
@@ -386,14 +388,14 @@ void ViewerManagerPrivate::update_clipping_range( size_t index )
       for ( size_t k = 0; k < 2; ++k )
       {
         Core::Point vertex( corners[ i ].x(), corners[ j ].y(), corners[ k ].z() );
-        Core::Vector dir = vertex - center;       
+        Core::Vector dir = vertex - center;
         max_d = Core::Max( max_d, Core::Dot( dir, norm ) );
       }
     }
   }
   // Extend the clipping range by a small amount so it can clip out the whole volume
   max_d *= 1.01;
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
   this->vm_->clip_plane_distance_state_[ index ]->set_range( -max_d, max_d );
   this->vm_->clip_plane_distance_state_[ index ]->set_step( max_d / 50 );
@@ -406,7 +408,7 @@ void ViewerManagerPrivate::handle_clipping_plane_changed( size_t index )
   {
     return;
   }
-  
+
   for ( size_t i = 0; i < 6; ++i )
   {
     if ( this->viewers_[ i ]->is_volume_view() )
@@ -422,7 +424,7 @@ void ViewerManagerPrivate::handle_clipping_plane_enabled( size_t index, bool ena
   {
     this->update_clipping_range( index );
   }
-  
+
   for ( size_t i = 0; i < 6; ++i )
   {
     if ( this->viewers_[ i ]->is_volume_view() )
@@ -447,7 +449,7 @@ void ViewerManagerPrivate::handle_fog_density_changed()
 void ViewerManagerPrivate::update_volume_rendering()
 {
   if ( this->signal_block_count_ > 0 ) return;
-  
+
   for ( size_t i = 0; i < 6; ++i )
   {
     if ( this->viewers_[ i ]->is_volume_view() &&
@@ -532,7 +534,7 @@ ViewerManager::ViewerManager() :
   this->add_connection( this->volume_rendering_target_state_->state_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::update_volume_rendering, this->private_ ) ) );
 
-  this->add_state( "volume_renderer", this->volume_renderer_state_, 
+  this->add_state( "volume_renderer", this->volume_renderer_state_,
     "simple", "simple=Simple|simple_faux=Faux Shading|ao=Ambient Occlusion" );
   this->add_connection( this->volume_renderer_state_->value_changed_signal_.connect(
     boost::bind( &ViewerManagerPrivate::handle_volume_renderer_changed, this->private_, _2 ) ) );
@@ -615,14 +617,14 @@ ViewerManager::ViewerManager() :
   this->add_state( "active_coronal_viewer", active_coronal_viewer_, 4 );
   this->add_state( "active_sagittal_viewer", active_sagittal_viewer_, 5 );
 
-  this->add_connection( this->layout_state_->value_changed_signal_.connect( boost::bind( 
+  this->add_connection( this->layout_state_->value_changed_signal_.connect( boost::bind(
     &ViewerManagerPrivate::change_layout, this->private_, _1 ) ) );
 
   // Step (2)
   // Create the viewers that are part of the application
   // Currently a maximum of 6 viewers can be created
   this->private_->viewers_.resize( 6 );
-  
+
   this->private_->viewers_[ 0 ] = ViewerHandle( new Viewer( 0, true,  Viewer::VOLUME_C ) );
   this->private_->viewers_[ 1 ] = ViewerHandle( new Viewer( 1, false, Viewer::AXIAL_C ) );
   this->private_->viewers_[ 2 ] = ViewerHandle( new Viewer( 2, false, Viewer::AXIAL_C ) );
@@ -646,24 +648,24 @@ ViewerManager::ViewerManager() :
   {
     // NOTE: ViewerManager needs to process these signals first
     this->add_connection( this->private_->viewers_[ j ]->view_mode_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManagerPrivate::viewer_mode_changed, this->private_, j ), 
+      connect( boost::bind( &ViewerManagerPrivate::viewer_mode_changed, this->private_, j ),
       boost::signals2::at_front ) );
     this->add_connection( this->private_->viewers_[ j ]->viewer_visible_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManagerPrivate::viewer_visibility_changed, this->private_, j ), 
+      connect( boost::bind( &ViewerManagerPrivate::viewer_visibility_changed, this->private_, j ),
       boost::signals2::at_front ) );
     this->add_connection( this->private_->viewers_[ j ]->is_picking_target_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManagerPrivate::viewer_became_picking_target, this->private_, j ), 
+      connect( boost::bind( &ViewerManagerPrivate::viewer_became_picking_target, this->private_, j ),
       boost::signals2::at_front ) );
     this->add_connection( this->private_->viewers_[ j ]->lock_state_->value_changed_signal_.
-      connect( boost::bind( &ViewerManagerPrivate::viewer_lock_state_changed, this->private_, j ), 
+      connect( boost::bind( &ViewerManagerPrivate::viewer_lock_state_changed, this->private_, j ),
       boost::signals2::at_front ) );
-      
-    // NOTE: For these signals order does not matter  
+
+    // NOTE: For these signals order does not matter
     this->add_connection( this->private_->viewers_[ j ]->slice_visible_state_->state_changed_signal_.
       connect( boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   }
-  
-  // NOTE: ViewerManager needs to process these signals last  
+
+  // NOTE: ViewerManager needs to process these signals last
   this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
     boost::bind( &ViewerManager::update_volume_viewers, this ) ) );
   this->add_connection( LayerManager::Instance()->layer_volume_changed_signal_.connect(
@@ -713,7 +715,7 @@ void ViewerManager::get_2d_viewers_info( ViewerInfoList viewers[ 3 ] )
     ViewerHandle viewer = this->private_->viewers_[ i ];
     if ( viewer->viewer_visible_state_->get() && !viewer->is_volume_view() )
     {
-      Core::StateView2D* view2d = static_cast< Core::StateView2D* >( 
+      Core::StateView2D* view2d = static_cast< Core::StateView2D* >(
         viewer->get_active_view_state().get() );
       ViewerInfoHandle viewer_info( new ViewerInfo );
       viewer_info->viewer_id_ = i;
@@ -729,7 +731,7 @@ void ViewerManager::update_volume_viewers()
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( 
+    Core::Application::PostEvent( boost::bind(
       &ViewerManager::update_volume_viewers, this ) );
     return;
   }
@@ -752,7 +754,7 @@ void ViewerManager::update_volume_viewers()
 void ViewerManager::pick_point( size_t source_viewer, const Core::Point& pt )
 {
   ViewerHandle src_viewer = this->private_->viewers_[ source_viewer ];
-  if ( this->active_axial_viewer_->get() >= 0 && 
+  if ( this->active_axial_viewer_->get() >= 0 &&
     this->active_axial_viewer_->get() != static_cast< int >( source_viewer ) )
   {
     ViewerHandle viewer = this->private_->viewers_[ this->active_axial_viewer_->get() ];
@@ -761,7 +763,7 @@ void ViewerManager::pick_point( size_t source_viewer, const Core::Point& pt )
       viewer->move_slice_to( pt );
     }
   }
-  if ( this->active_coronal_viewer_->get() >= 0 && 
+  if ( this->active_coronal_viewer_->get() >= 0 &&
     this->active_coronal_viewer_->get() != static_cast< int >( source_viewer ) )
   {
     ViewerHandle viewer = this->private_->viewers_[ this->active_coronal_viewer_->get() ];
@@ -770,7 +772,7 @@ void ViewerManager::pick_point( size_t source_viewer, const Core::Point& pt )
       viewer->move_slice_to( pt );
     }
   }
-  if ( this->active_sagittal_viewer_->get() >= 0 && 
+  if ( this->active_sagittal_viewer_->get() >= 0 &&
     this->active_sagittal_viewer_->get() != static_cast< int >( source_viewer ) )
   {
     ViewerHandle viewer = this->private_->viewers_[ this->active_sagittal_viewer_->get() ];
@@ -811,9 +813,9 @@ bool ViewerManager::post_save_states( Core::StateIO& state_io )
   {
     this->private_->viewers_[ i ]->save_states( state_io );
   }
-  
+
   this->private_->transfer_function_->save_states( state_io );
-  
+
   return true;
 }
 
@@ -842,30 +844,30 @@ bool ViewerManager::post_load_states( const Core::StateIO& state_io )
   {
     this->private_->viewers_[ i ]->is_picking_target_state_->set( false );
   }
-  
+
   // Restore picking targets for each view mode.
   if ( this->active_axial_viewer_->get() >= 0 )
   {
     assert ( this->private_->viewers_[ this->active_axial_viewer_->get() ]->
       view_mode_state_->get() == Viewer::AXIAL_C );
     this->private_->viewers_[ this->active_axial_viewer_->get() ]->
-      is_picking_target_state_->set( true ); 
+      is_picking_target_state_->set( true );
   }
   if ( this->active_coronal_viewer_->get() >= 0 )
   {
     assert ( this->private_->viewers_[ this->active_coronal_viewer_->get() ]->
       view_mode_state_->get() == Viewer::CORONAL_C );
     this->private_->viewers_[ this->active_coronal_viewer_->get() ]->
-      is_picking_target_state_->set( true ); 
+      is_picking_target_state_->set( true );
   }
   if ( this->active_sagittal_viewer_->get() >= 0 )
   {
     assert ( this->private_->viewers_[ this->active_sagittal_viewer_->get() ]->
       view_mode_state_->get() == Viewer::SAGITTAL_C );
     this->private_->viewers_[ this->active_sagittal_viewer_->get() ]->
-      is_picking_target_state_->set( true ); 
+      is_picking_target_state_->set( true );
   }
-  
+
   this->reset_cursor();
   return true;
 }
@@ -883,7 +885,7 @@ void ViewerManager::update_viewers_overlay( const std::string& view_mode )
       this, view_mode ) );
     return;
   }
-  
+
   for ( size_t i = 0; i < this->private_->viewers_.size(); ++i )
   {
     if ( this->private_->viewers_[ i ]->viewer_visible_state_->get() &&
@@ -898,7 +900,7 @@ void ViewerManager::update_2d_viewers_overlay()
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( 
+    Core::Application::PostEvent( boost::bind(
       &ViewerManager::update_2d_viewers_overlay, this ) );
     return;
   }
@@ -928,7 +930,7 @@ void ViewerManager::reset_cursor()
   for ( size_t i = 0; i < this->private_->viewers_.size(); ++i )
   {
     ViewerHandle viewer = this->private_->viewers_[ i ];
-    viewer->set_cursor( viewer->is_volume_view() ? Core::CursorShape::ARROW_E : 
+    viewer->set_cursor( viewer->is_volume_view() ? Core::CursorShape::ARROW_E :
       Core::CursorShape::CROSS_E );
   }
 }
@@ -961,4 +963,3 @@ void ViewerManager::delete_feature( const std::string& feature_id )
 }
 
 } // end namespace Seg3D
-

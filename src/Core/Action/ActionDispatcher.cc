@@ -34,6 +34,8 @@
 #include <Core/Action/ActionDispatcher.h>
 #include <Core/Action/ActionHistory.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -55,7 +57,7 @@ public:
   boost::posix_time::ptime last_action_completed_;
 };
 
-void ActionDispatcherPrivate::run_action( ActionHandle action, 
+void ActionDispatcherPrivate::run_action( ActionHandle action,
                      ActionContextHandle action_context )
 {
   this->dispatcher_->run_action( action, action_context );
@@ -63,7 +65,7 @@ void ActionDispatcherPrivate::run_action( ActionHandle action,
   this->make_timestamp();
 }
 
-void ActionDispatcherPrivate::make_timestamp() 
+void ActionDispatcherPrivate::make_timestamp()
 {
   this->last_action_completed_ = boost::posix_time::second_clock::local_time();
 }
@@ -84,7 +86,7 @@ ActionDispatcher::ActionDispatcher() :
 {
   this->private_->dispatcher_ = this;
   // Connect this class to the ActionHistory
-  post_action_signal_.connect( boost::bind( &ActionHistory::record_action, 
+  post_action_signal_.connect( boost::bind( &ActionHistory::record_action,
     ActionHistory::Instance() , _1, _2 ) );
 }
 
@@ -101,7 +103,7 @@ void ActionDispatcher::post_action( ActionHandle action, ActionContextHandle act
 
   CORE_LOG_DEBUG( std::string("Posting Action: ") + action->export_to_string() );
   ++this->private_->action_count_;
-  Application::Instance()->post_event( boost::bind( &ActionDispatcherPrivate::run_action, 
+  Application::Instance()->post_event( boost::bind( &ActionDispatcherPrivate::run_action,
     this->private_.get(), action, action_context ) );
 }
 
@@ -121,7 +123,7 @@ void ActionDispatcher::post_and_wait_action( ActionHandle action,
 
   CORE_LOG_DEBUG(std::string("Posting and Waiting Action: ") + action->export_to_string());
   ++this->private_->action_count_;
-  Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcherPrivate::run_action, 
+  Application::Instance()->post_and_wait_event( boost::bind( &ActionDispatcherPrivate::run_action,
     this->private_.get(), action, action_context ) );
 }
 
@@ -136,7 +138,7 @@ void ActionDispatcher::post_actions( std::vector< ActionHandle > actions,
   for ( size_t j = 0; j < actions.size(); j++ )
   {
     ++this->private_->action_count_;
-    CORE_LOG_DEBUG( std::string("Posting Action sequence: " ) + 
+    CORE_LOG_DEBUG( std::string("Posting Action sequence: " ) +
       actions[ j ]->export_to_string() );
   }
 
@@ -190,7 +192,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
 
     // Clear any cached handles
     action->clear_cache();
-    return; 
+    return;
   }
 
   // Step (2): Post-construction and translation step.
@@ -253,7 +255,7 @@ void ActionDispatcher::run_action( ActionHandle action, ActionContextHandle acti
   {
     action_context->report_result( result );
   }
-  
+
   action_context->report_status( ActionStatus::SUCCESS_E );
   action_context->report_done();
 
@@ -280,13 +282,13 @@ void ActionDispatcher::run_actions( std::vector< ActionHandle > actions,
   }
 }
 
-void ActionDispatcher::PostAction( const ActionHandle& action, 
+void ActionDispatcher::PostAction( const ActionHandle& action,
   const ActionContextHandle& action_context )
 {
   Instance()->post_action( action, action_context );
 }
 
-void ActionDispatcher::PostAndWaitAction( const ActionHandle& action, 
+void ActionDispatcher::PostAndWaitAction( const ActionHandle& action,
   const ActionContextHandle& action_context )
 {
   Instance()->post_and_wait_action( action, action_context );

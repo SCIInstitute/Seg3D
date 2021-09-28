@@ -62,6 +62,7 @@
 #include <Application/Viewer/Viewer.h>
 #include <Application/Renderer/OrientationArrows.h>
 
+using namespace boost::placeholders;
 
 namespace Seg3D
 {
@@ -362,9 +363,6 @@ void RendererPrivate::map_large_slice_texture(Core::Texture2DHandle slice_tex, i
 
   Core::Texture::lock_type slice_tex_lock(slice_tex->get_mutex());
   slice_tex->bind();
-
-  double texel_width = slice_width / width;
-  double texel_height = slice_height / height;
 
   if (rect)
   {

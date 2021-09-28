@@ -65,6 +65,8 @@
 
 #include <Application/Layer/Actions/ActionComputeIsosurface.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, GrowCutTool )
 

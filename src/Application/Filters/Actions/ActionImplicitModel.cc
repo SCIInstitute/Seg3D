@@ -56,6 +56,8 @@
 
 CORE_REGISTER_ACTION( ImplicitModel, ImplicitModel )
 
+using namespace boost::placeholders;
+
 namespace ImplicitModel
 {
 

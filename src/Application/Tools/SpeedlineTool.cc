@@ -55,6 +55,8 @@
 
 #include "Core/RenderResources/RenderResources.h"
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, SpeedlineTool )
 
@@ -82,12 +84,12 @@ public:
 
   bool find_vertex( ViewerHandle viewer, int x, int y, int& index );
   bool find_closest_vertex( ViewerHandle viewer, int x, int y, int& index );
-  void execute_fill_erase( ActionContextHandle context, bool erase, 
+  void execute_fill_erase( ActionContextHandle context, bool erase,
                            ViewerHandle viewer = ViewerHandle() );
   void execute_path();
 
-  bool get_update_paths(); 
-  void set_update_paths( bool update_all_paths ); 
+  bool get_update_paths();
+  void set_update_paths( bool update_all_paths );
 
   SpeedlineTool* tool_;
   bool moving_vertex_; //interface thread
@@ -178,7 +180,7 @@ bool SpeedlineToolPrivate::find_vertex( ViewerHandle viewer, int x, int y, int& 
   {
     slice_type = VolumeSliceType::SAGITTAL_E;
   }
-  
+
   for ( size_t i = 0; i < vertices.size(); ++i )
   {
     double pt_x, pt_y;
@@ -201,7 +203,7 @@ bool SpeedlineToolPrivate::find_closest_vertex( ViewerHandle viewer, int x, int 
   // Step 1. Compute the mouse position in world space
   double world_x, world_y;
   viewer->window_to_world( x, y, world_x, world_y );
-  
+
   // Step 2. Search for the closest vertex to the current mouse position
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   std::vector< Point > vertices = this->tool_->vertices_state_->get();
@@ -214,7 +216,7 @@ bool SpeedlineToolPrivate::find_closest_vertex( ViewerHandle viewer, int x, int 
   {
     slice_type = VolumeSliceType::SAGITTAL_E;
   }
-  
+
   int closest_index = -1;
   double min_dist;
   for ( size_t i = 0; i < vertices.size(); ++i )
@@ -235,7 +237,7 @@ bool SpeedlineToolPrivate::find_closest_vertex( ViewerHandle viewer, int x, int 
       min_dist = distance;
     }
   }
-  
+
   index = closest_index;
   return index >= 0;
 }
@@ -380,7 +382,7 @@ SpeedlineTool::SpeedlineTool( const std::string& toolid ) :
   this->add_connection( this->grad_dir_weight_state_->state_changed_signal_.connect(
     boost::bind( &SpeedlineToolPrivate::handle_speed_params_changed, this->private_ ) ) );
 
-  std::vector< LayerIDNamePair > empty_list( 1, 
+  std::vector< LayerIDNamePair > empty_list( 1,
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
   this->add_state( "mask", this->mask_state_, Tool::NONE_OPTION_C, empty_list );
@@ -434,7 +436,7 @@ void SpeedlineTool::activate()
 
   for ( size_t i = 0; i < 6; ++i )
   {
-    this->private_->viewer_connection_[ i ] = 
+    this->private_->viewer_connection_[ i ] =
       ViewerManager::Instance()->get_viewer( i )->slice_number_state_->value_changed_signal_.connect(
         boost::bind( &SpeedlineToolPrivate::handle_slice_changed, this->private_ ) );
   }
@@ -444,9 +446,9 @@ void SpeedlineTool::activate()
     for ( size_t i = 0; i < 6; ++i )
     {
       DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
-        < DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
+        < DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice(
         this->target_data_layer_state_->get() ) );
-      
+
       if ( volume_slice->get_slice_number() != this->private_->slice_no_[ i ]  )
       {
         is_recompute = true;
@@ -478,13 +480,13 @@ void SpeedlineTool::deactivate()
 //    for ( size_t i = 0; i < 6; ++i )
 //    {
 //      DataVolumeSliceHandle volume_slice = boost::dynamic_pointer_cast
-//        < DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice( 
+//        < DataVolumeSlice >( ViewerManager::Instance()->get_viewer( i )->get_volume_slice(
 //        this->gradient_state_->get() ) );
 //
 //      if ( volume_slice != nullptr )
 //      {
 //        this->private_->slice_no_[ i ]  = volume_slice->get_slice_number();
-//      } 
+//      }
 //    }
 //  }
 }
@@ -758,7 +760,7 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
       this->private_->moving_vertex_ = false;
       return false;
     }
-    
+
     if ( modifiers == Core::KeyModifier::SHIFT_MODIFIER_E )
     {
       for ( size_t i = 0; i < vertices.size(); ++i )
@@ -775,15 +777,15 @@ bool SpeedlineTool::handle_mouse_move( ViewerHandle viewer,
       Core::ActionSetAt::Dispatch( Core::Interface::GetMouseActionContext(),
                                   this->vertices_state_, this->private_->vertex_index_, pt );
     }
-    else 
+    else
     {
       this->private_->moving_vertex_ = false;
       return false;
     }
-    
+
     return true;
   }
-  
+
   return false;
 }
 
@@ -883,10 +885,10 @@ void SpeedlineTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
         double x_pos, y_pos;
         Core::VolumeSlice::ProjectOntoSlice( slice_type, p0, x_pos, y_pos );
         glVertex2d( x_pos, y_pos );
-        
+
         Core::VolumeSlice::ProjectOntoSlice( slice_type, p1, x_pos, y_pos );
         glVertex2d( x_pos, y_pos );
-        
+
       }
       glEnd();
     }

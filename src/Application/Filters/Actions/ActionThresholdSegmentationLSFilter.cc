@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -38,6 +38,8 @@
 #include <Application/Filters/ITKFilter.h>
 #include <Application/Filters/Actions/ActionThresholdSegmentationLSFilter.h>
 
+using namespace boost::placeholders;
+
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
@@ -53,29 +55,29 @@ bool ActionThresholdSegmentationLSFilter::validate( Core::ActionContextHandle& c
   if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
 
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistenceAndType( this->layer_id_, 
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->layer_id_,
     Core::VolumeType::DATA_E, context, this->sandbox_ ) ) return false;
-  
-  if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_, 
+
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_,
     Core::VolumeType::MASK_E, context, this->sandbox_ ) ) return false;
 
-  if ( ! LayerManager::CheckLayerSize( this->layer_id_, this->mask_, 
+  if ( ! LayerManager::CheckLayerSize( this->layer_id_, this->mask_,
     context, this->sandbox_ ) ) return false;
-  
-  // Check for layer availability 
-  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_, 
+
+  // Check for layer availability
+  if ( ! LayerManager::CheckLayerAvailability( this->layer_id_,
     false, context, this->sandbox_ ) ) return false;
-  
-  if ( ! LayerManager::CheckLayerAvailability( this->mask_, 
+
+  if ( ! LayerManager::CheckLayerAvailability( this->mask_,
     false, context, this->sandbox_ ) ) return false;
-        
+
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_ < 1 )
   {
     context->report_error( "The number of iterations needs to be larger than zero." );
     return false;
   }
-  
+
   // Validation successful
   return true;
 }
@@ -92,20 +94,20 @@ public:
   LayerHandle data_layer_;
   LayerHandle mask_layer_;
   LayerHandle dst_layer_;
-  
+
   int iterations_;
-  
+
   double threshold_range_;
   double curvature_;
   double propagation_;
   double edge_;
-  
+
   Core::ActionHandle action_;
 
 public:
-  typedef itk::ThresholdSegmentationLevelSetImageFilter< 
+  typedef itk::ThresholdSegmentationLevelSetImageFilter<
       FLOAT_IMAGE_TYPE, FLOAT_IMAGE_TYPE > filter_type;
-      
+
   // RUN:
   // Implemtation of run of the Runnable base class, this function is called when the thread
   // is launched.
@@ -118,17 +120,17 @@ public:
 
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
-    Core::ITKFloatImageDataHandle feature_image; 
+    Core::ITKFloatImageDataHandle feature_image;
     this->get_itk_image_from_layer<float>( this->data_layer_, feature_image );
 
-    Core::ITKFloatImageDataHandle seed_image; 
+    Core::ITKFloatImageDataHandle seed_image;
     this->get_itk_image_from_mask_layer<float>( this->mask_layer_, seed_image, 1000.0 );
-    
-        
+
+
     // Calculate mean and std deviation
-    Core::DataBlockHandle seed_data_block = Core::ITKDataBlock::New( seed_image );    
+    Core::DataBlockHandle seed_data_block = Core::ITKDataBlock::New( seed_image );
     Core::DataBlockHandle feature_data_block = Core::ITKDataBlock::New( feature_image );
-    
+
     size_t size = seed_data_block->get_size();
     float* seed_data = reinterpret_cast< float* >( seed_data_block->get_data() );
     float* feature_data = reinterpret_cast< float* >( feature_data_block->get_data() );
@@ -147,33 +149,33 @@ public:
         n++;
       }
     }
-        
-    float mean = 0.0;   
+
+    float mean = 0.0;
     float var = 0.0;
-    
+
     if ( n > 1 )
     {
       float fn = static_cast<float>( n );
       mean = x / fn;
       var = ( x2 - 2.0f * x * mean + fn * mean * mean ) / ( fn - 1.0f );
     }
-        
-    // Create a new ITK filter instantiation. 
+
+    // Create a new ITK filter instantiation.
     filter_type::Pointer filter = filter_type::New();
-    
+
     // Relay abort and progress information to the layer that is executing the filter.
     this->forward_abort_to_filter( filter, this->dst_layer_ );
     this->observe_itk_progress( filter, this->dst_layer_ );
-    this->observe_itk_iterations( filter, boost::bind( 
-      &ThresholdSegmentationLSFilterAlgo::update_iteration, this, _1, 
+    this->observe_itk_iterations( filter, boost::bind(
+      &ThresholdSegmentationLSFilterAlgo::update_iteration, this, _1,
       this->dst_layer_, this->action_ ) );
 
     // Setup the filter parameters that we do not want to change.
     filter->SetInput( seed_image->get_image() );
     filter->SetFeatureImage( feature_image->get_image() );
-    
+
     filter->SetNumberOfIterations( this->iterations_ );
-    
+
     filter->SetUpperThreshold( mean + this->threshold_range_ * sqrt( var ) );
     filter->SetLowerThreshold( mean - this->threshold_range_ * sqrt( var ) );
     filter->SetCurvatureScaling( this->curvature_ );
@@ -185,67 +187,67 @@ public:
     filter->SetIsoSurfaceValue( 0.5 );
     filter->SetMaximumRMSError( 0.0 );
     filter->ReverseExpansionDirectionOn();
-    
+
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( filter );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
     // are aborted. In that case we will relay a message to the status bar for information.
-    try 
-    { 
-      filter->Update(); 
-    } 
-    catch ( ... ) 
+    try
+    {
+      filter->Update();
+    }
+    catch ( ... )
     {
       if ( this->check_stop() )
       {
         return;
       }
-      
+
       if ( this->check_abort() )
       {
         this->report_error( "Filter was aborted." );
         return;
       }
-      
+
       this->report_error( "ITK filter failed to complete." );
       return;
     }
 
     // As ITK filters generate an inconsistent abort behavior, we record our own abort flag
     // This one is set when the abort button is pressed and an abort is sent to ITK.
-    if ( this->check_abort() ) 
+    if ( this->check_abort() )
     {
       // ADD function that makes mask invalid
       return;
     }
-    
+
     // If we want to preserve the data type we convert the data before inserting it back.
     // NOTE: Conversion is done on the filter thread and insertion is done on the application
     // thread.
 
-    this->insert_itk_positive_labels_into_mask_layer( this->dst_layer_, filter->GetOutput() );  
+    this->insert_itk_positive_labels_into_mask_layer( this->dst_layer_, filter->GetOutput() );
 
     // Update provenance information
     this->update_provenance_action_string( this->action_ );
   }
   SCI_END_ITK_RUN()
-  
+
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
   {
     return "ThresholdSegmentationLevelSet Filter";
   }
-  
+
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "TSLevelSet";  
-  } 
+    return "TSLevelSet";
+  }
 
 private:
 
@@ -271,7 +273,7 @@ private:
 };
 
 
-bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& context, 
+bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
@@ -285,7 +287,7 @@ bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& contex
   algo->curvature_ = this->curvature_;
   algo->propagation_ = this->propagation_;
   algo->edge_ = this->edge_;
-  
+
   algo->action_ = this->shared_from_this();
 
   // Find the handle to the layer
@@ -302,7 +304,7 @@ bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& contex
   // Lock the src layer, so it cannot be used else where
   algo->lock_for_use( algo->data_layer_ );
   algo->lock_for_use( algo->mask_layer_ );
-  
+
   // Create the destination layer, which will show progress
   algo->create_and_lock_mask_layer_from_layer( algo->mask_layer_, algo->dst_layer_ );
   // Tell the new layer to enable the stop button which can trigger a stop signal and stop
@@ -318,22 +320,22 @@ bool ActionThresholdSegmentationLSFilter::run( Core::ActionContextHandle& contex
   {
     context->report_need_resource( algo->get_notifier() );
   }
-  
+
   // Build the undo-redo record
   algo->create_undo_redo_and_provenance_record( context, this->shared_from_this() );
-  
+
   // Start the filter.
   Core::Runnable::Start( algo );
 
   return true;
 }
 
-void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle context, 
-    std::string layer_id, std::string mask, int iterations, double threshold_range, 
+void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle context,
+    std::string layer_id, std::string mask, int iterations, double threshold_range,
     double curvature, double propagation, double edge  )
-{ 
+{
   // Create a new action
-  ActionThresholdSegmentationLSFilter* action = 
+  ActionThresholdSegmentationLSFilter* action =
     new ActionThresholdSegmentationLSFilter;
 
   // Setup the parameters
@@ -348,5 +350,5 @@ void ActionThresholdSegmentationLSFilter::Dispatch(  Core::ActionContextHandle c
   // Dispatch action to underlying engine
   Core::ActionDispatcher::PostAction( Core::ActionHandle( action ), context );
 }
-  
+
 } // end namespace Seg3D

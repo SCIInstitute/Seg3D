@@ -33,10 +33,12 @@
 
 #include <QtUtils/Bridge/detail/QtActionGroupConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtActionGroupConnector::QtActionGroupConnector( QActionGroup* parent, 
+QtActionGroupConnector::QtActionGroupConnector( QActionGroup* parent,
     Core::StateOptionHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -44,7 +46,7 @@ QtActionGroupConnector::QtActionGroupConnector( QActionGroup* parent,
 {
   QPointer< QtActionGroupConnector > qpointer( this );
 
-  // TODO: Create QAction's for each option in the state variable and add them to 
+  // TODO: Create QAction's for each option in the state variable and add them to
   // the QActionGroup. Should not add anything to the QActionGroup outside.
 
   this->connect( parent, SIGNAL( triggered( QAction* ) ), SLOT( set_state( QAction* ) ) );
@@ -57,8 +59,8 @@ QtActionGroupConnector::~QtActionGroupConnector()
   this->disconnect_all();
 }
 
-void QtActionGroupConnector::TriggerAction( 
-    QPointer< QtActionGroupConnector > qpointer, 
+void QtActionGroupConnector::TriggerAction(
+    QPointer< QtActionGroupConnector > qpointer,
     std::string option, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )

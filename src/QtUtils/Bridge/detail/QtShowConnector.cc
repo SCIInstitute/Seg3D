@@ -38,10 +38,12 @@
 // QtUtils includes
 #include <QtUtils/Bridge/detail/QtShowConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtShowConnector::QtShowConnector( QWidget* parent, 
+QtShowConnector::QtShowConnector( QWidget* parent,
   Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -57,27 +59,7 @@ QtShowConnector::QtShowConnector( QWidget* parent,
   }
 }
 
-QtShowConnector::QtShowConnector( QtCustomDockWidget* parent, 
-  Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
-  QtConnectorBase( parent, blocking ),
-  parent_( parent ),
-  state_( state ),
-  opposite_logic_( opposite_logic )
-{
-  QPointer< QtShowConnector > qpointer( this );
-
-  {
-    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    parent->setVisible( state->get() ^ this->opposite_logic_ );
-    this->add_connection( state->value_changed_signal_.connect(
-      boost::bind( &QtShowConnector::ShowWidget, qpointer, _1 ) ) );
-  }
-  
-  this->connect( parent, SIGNAL( closed() ), SLOT( set_state() ) );
-  this->connect( parent, SIGNAL( opened() ), SLOT( set_state_visible() ) );
-}
-
-QtShowConnector::QtShowConnector( QtCustomDialog* parent, 
+QtShowConnector::QtShowConnector( QtCustomDockWidget* parent,
   Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -97,8 +79,28 @@ QtShowConnector::QtShowConnector( QtCustomDialog* parent,
   this->connect( parent, SIGNAL( opened() ), SLOT( set_state_visible() ) );
 }
 
-QtShowConnector::QtShowConnector( QWidget* parent, 
-  Core::StateBaseHandle state, 
+QtShowConnector::QtShowConnector( QtCustomDialog* parent,
+  Core::StateBoolHandle& state, bool opposite_logic, bool blocking ) :
+  QtConnectorBase( parent, blocking ),
+  parent_( parent ),
+  state_( state ),
+  opposite_logic_( opposite_logic )
+{
+  QPointer< QtShowConnector > qpointer( this );
+
+  {
+    Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
+    parent->setVisible( state->get() ^ this->opposite_logic_ );
+    this->add_connection( state->value_changed_signal_.connect(
+      boost::bind( &QtShowConnector::ShowWidget, qpointer, _1 ) ) );
+  }
+
+  this->connect( parent, SIGNAL( closed() ), SLOT( set_state() ) );
+  this->connect( parent, SIGNAL( opened() ), SLOT( set_state_visible() ) );
+}
+
+QtShowConnector::QtShowConnector( QWidget* parent,
+  Core::StateBaseHandle state,
   boost::function< bool () > condition, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -112,8 +114,8 @@ QtShowConnector::QtShowConnector( QWidget* parent,
   parent->setVisible( condition() );
 }
 
-QtShowConnector::QtShowConnector( QWidget* parent, 
-  std::vector< Core::StateBaseHandle >& states, 
+QtShowConnector::QtShowConnector( QWidget* parent,
+  std::vector< Core::StateBaseHandle >& states,
   boost::function< bool () > condition, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -151,7 +153,7 @@ void QtShowConnector::ShowWidget( QPointer< QtShowConnector > qpointer, bool vis
   {
     return;
   }
-  
+
   qpointer->parent_->setVisible( visible ^ qpointer->opposite_logic_ );
 }
 

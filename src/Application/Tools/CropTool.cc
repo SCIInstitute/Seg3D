@@ -40,6 +40,8 @@
 #include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, CropTool )
 
@@ -107,11 +109,11 @@ void CropToolPrivate::handle_target_group_changed()
   this->tool_->cropbox_origin_state_[ 0 ]->set_range( origin[ 0 ], end[ 0 ] );
   this->tool_->cropbox_origin_state_[ 1 ]->set_range( origin[ 1 ], end[ 1 ] );
   this->tool_->cropbox_origin_state_[ 2 ]->set_range( origin[ 2 ], end[ 2 ] );
-  this->tool_->cropbox_size_state_[ 0 ]->set_range( 0, 
+  this->tool_->cropbox_size_state_[ 0 ]->set_range( 0,
     end[ 0 ] - this->tool_->cropbox_origin_state_[ 0 ]->get() );
-  this->tool_->cropbox_size_state_[ 1 ]->set_range( 0, 
+  this->tool_->cropbox_size_state_[ 1 ]->set_range( 0,
     end[ 1 ] - this->tool_->cropbox_origin_state_[ 1 ]->get() );
-  this->tool_->cropbox_size_state_[ 2 ]->set_range( 0, 
+  this->tool_->cropbox_size_state_[ 2 ]->set_range( 0,
     end[ 2 ] - this->tool_->cropbox_origin_state_[ 2 ]->get() );
 
   this->tool_->cropbox_origin_index_state_[ 0 ]->set_range( 0, nx - 1 );
@@ -144,7 +146,7 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
   {
     return;
   }
-  
+
   // NOTE: Lock the state engine because the following changes need to be atomic
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
 
@@ -172,7 +174,7 @@ void CropToolPrivate::handle_cropbox_origin_changed( int index, double value,
   if ( source == Core::ActionSource::INTERFACE_MOUSE_E )
   {
     double size = this->tool_->cropbox_size_state_[ index ]->get();
-    this->tool_->cropbox_size_state_[ index ]->set( size + max_val - value - max_size );  
+    this->tool_->cropbox_size_state_[ index ]->set( size + max_val - value - max_size );
   }
 
   this->tool_->cropbox_origin_index_state_[ index ]->set( crop_index );
@@ -191,7 +193,7 @@ void CropToolPrivate::handle_cropbox_size_changed( int index, double value )
   {
     return;
   }
-  
+
   const std::string& group_id = this->tool_->target_group_state_->get();
   if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
   {
@@ -206,7 +208,7 @@ void CropToolPrivate::handle_cropbox_size_changed( int index, double value )
   end = inv_trans * end;
 
   Core::ScopedCounter signal_block( this->signal_block_count_ );
-  this->tool_->cropbox_size_index_state_[ index ]->set( Core::Round( end[ index ] ) - 
+  this->tool_->cropbox_size_index_state_[ index ]->set( Core::Round( end[ index ] ) -
     this->tool_->cropbox_origin_index_state_[ index ]->get() + 1 );
 }
 
@@ -216,7 +218,7 @@ void CropToolPrivate::handle_cropbox_origin_index_changed( int index, int value 
   {
     return;
   }
-  
+
   const std::string& group_id = this->tool_->target_group_state_->get();
   if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
   {
@@ -274,7 +276,7 @@ void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
   {
     return;
   }
-  
+
   // Compute the size of a pixel in world space
   double x0, y0, x1, y1;
   viewer->window_to_world( 0, 0, x0, y0 );
@@ -305,7 +307,7 @@ void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
   // Compute the boundary of the crop box in 2D space
   double left, right, bottom, top;
   Core::Point origin( this->tool_->cropbox_origin_state_[ 0 ]->get(),
-    this->tool_->cropbox_origin_state_[ 1 ]->get(), 
+    this->tool_->cropbox_origin_state_[ 1 ]->get(),
     this->tool_->cropbox_origin_state_[ 2 ]->get() );
   Core::Vector size( this->tool_->cropbox_size_state_[ 0 ]->get(),
     this->tool_->cropbox_size_state_[ 1 ]->get(),
@@ -321,15 +323,15 @@ void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
 
   // Test left boundary
   if ( Core::Abs( world_x - left ) <= range_x &&
-    world_y + range_y >= bottom && 
+    world_y + range_y >= bottom &&
     world_y - range_y <= top )
   {
     this->hit_pos_ |= Core::HitPosition::LEFT_E;
   }
 
   // Test bottom boundary
-  if ( Core::Abs( world_y - bottom ) <= range_y && 
-    world_x + range_x >= left && 
+  if ( Core::Abs( world_y - bottom ) <= range_y &&
+    world_x + range_x >= left &&
     world_x - range_x <= right )
   {
     this->hit_pos_ |= Core::HitPosition::BOTTOM_E;
@@ -340,25 +342,25 @@ void CropToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
   {
     return;
   }
-  
+
   // Test top boundary
   if ( !( this->hit_pos_ & Core::HitPosition::BOTTOM_E ) &&
     Core::Abs( world_y - top ) <= range_y &&
-    world_x + range_x >= left && 
+    world_x + range_x >= left &&
     world_x - range_x <= right )
   {
     this->hit_pos_ |= Core::HitPosition::TOP_E;
   }
-  
+
   if ( this->hit_pos_ == Core::HitPosition::TOP_LEFT_E )
   {
     return;
   }
-  
+
   // Test right boundary
   if ( !( this->hit_pos_ & Core::HitPosition::LEFT_E ) &&
     Core::Abs( world_x - right ) <= range_x &&
-    world_y + range_y >= bottom && 
+    world_y + range_y >= bottom &&
     world_y - range_y <= top )
   {
     this->hit_pos_ |= Core::HitPosition::RIGHT_E;
@@ -391,21 +393,21 @@ void CropToolPrivate::resize( ViewerHandle viewer, int x0, int y0, int x1, int y
       this->tool_->cropbox_origin_state_[ this->hor_index_ ], dx );
     size_changed = true;
   }
-  
+
   if ( ( this->hit_pos_ & Core::HitPosition::BOTTOM_E ) && Core::Abs( dy ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
       this->tool_->cropbox_origin_state_[ this->ver_index_ ], dy );
     size_changed = true;
   }
-  
+
   if ( ( this->hit_pos_ & Core::HitPosition::RIGHT_E ) && Core::Abs( dx ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
       this->tool_->cropbox_size_state_[ this->hor_index_ ], dx );
     size_changed = true;
   }
-  
+
   if ( ( this->hit_pos_ & Core::HitPosition::TOP_E ) && Core::Abs( dy ) > epsilon )
   {
     Core::ActionOffset::Dispatch( Core::Interface::GetMouseActionContext(),
@@ -521,7 +523,7 @@ CropTool::CropTool( const std::string& toolid ) :
     this->add_connection( this->cropbox_size_index_state_[ i ]->value_changed_signal_.connect(
       boost::bind( &CropToolPrivate::handle_cropbox_changed, this->private_, _2 ) ) );
   }
-  
+
   this->private_->handle_target_group_changed();
 }
 
@@ -557,14 +559,14 @@ void CropTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
     std::string target_group_id = this->target_group_state_->get();
-    if ( viewer->is_volume_view() || 
-      target_group_id == "" || 
+    if ( viewer->is_volume_view() ||
+      target_group_id == "" ||
       target_group_id == Tool::NONE_OPTION_C )
     {
       return;
     }
 
-    Core::StateView2D* state_view2d = static_cast< Core::StateView2D* >( 
+    Core::StateView2D* state_view2d = static_cast< Core::StateView2D* >(
       viewer->get_active_view_state().get() );
     depth = state_view2d->get().center().z();
 
@@ -620,16 +622,16 @@ bool CropTool::handle_mouse_leave( ViewerHandle viewer )
   return true;
 }
 
-bool CropTool::handle_mouse_move( ViewerHandle viewer, 
-                 const Core::MouseHistory& mouse_history, 
+bool CropTool::handle_mouse_move( ViewerHandle viewer,
+                 const Core::MouseHistory& mouse_history,
                  int button, int buttons, int modifiers )
-{ 
+{
   if ( viewer->is_volume_view() )
   {
     this->private_->hit_pos_ = Core::HitPosition::NONE_E;
     return false;
   }
-  
+
   if ( buttons == Core::MouseButton::NO_BUTTON_E &&
     modifiers == Core::KeyModifier::NO_MODIFIER_E )
   {
@@ -637,7 +639,7 @@ bool CropTool::handle_mouse_move( ViewerHandle viewer,
     this->private_->update_cursor( viewer );
     return true;
   }
-  
+
   if ( this->private_->resizing_ )
   {
     this->private_->resize( viewer, mouse_history.previous_.x_, mouse_history.previous_.y_,
@@ -648,8 +650,8 @@ bool CropTool::handle_mouse_move( ViewerHandle viewer,
   return false;
 }
 
-bool CropTool::handle_mouse_press( ViewerHandle viewer, 
-                  const Core::MouseHistory& mouse_history, 
+bool CropTool::handle_mouse_press( ViewerHandle viewer,
+                  const Core::MouseHistory& mouse_history,
                   int button, int buttons, int modifiers )
 {
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
@@ -659,12 +661,12 @@ bool CropTool::handle_mouse_press( ViewerHandle viewer,
     this->private_->resizing_ = true;
     return true;
   }
-  
+
   return false;
 }
 
-bool CropTool::handle_mouse_release( ViewerHandle viewer, 
-                  const Core::MouseHistory& mouse_history, 
+bool CropTool::handle_mouse_release( ViewerHandle viewer,
+                  const Core::MouseHistory& mouse_history,
                   int button, int buttons, int modifiers )
 {
   if ( button == Core::MouseButton::LEFT_BUTTON_E &&
@@ -675,7 +677,7 @@ bool CropTool::handle_mouse_release( ViewerHandle viewer,
     this->private_->update_cursor( viewer );
     return true;
   }
-  
+
   return false;
 }
 
@@ -691,7 +693,7 @@ void CropTool::reset()
     Core::Application::PostEvent( boost::bind( &CropTool::reset, this ) );
     return;
   }
-  
+
   const std::string& group_id = this->target_group_state_->get();
   if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
   {

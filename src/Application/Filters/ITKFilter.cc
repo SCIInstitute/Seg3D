@@ -25,10 +25,10 @@
  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  DEALINGS IN THE SOFTWARE.
  */
- 
-// ITK includes 
+
+// ITK includes
 #include <itkCommand.h>
- 
+
 // Core includes
 #include <Core/Utils/Exception.h>
 #include <Core/DataBlock/StdDataBlock.h>
@@ -41,6 +41,7 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Filters/ITKFilter.h>
 
+using namespace boost::placeholders;
  
 namespace Seg3D
 {
@@ -71,7 +72,7 @@ public:
   float progress_;
   float progress_start_;
   float progress_amount_;
-  
+
 public:
   static void Report( ITKProgressReporterHandle reporter, const itk::Object* itk_object );
 };
@@ -81,7 +82,7 @@ void ITKProgressReporter::Report( ITKProgressReporterHandle reporter, const itk:
   const itk::ProcessObject* obj = dynamic_cast<const itk::ProcessObject* >( itk_object );
   if ( obj )
   {
-    float progress = ( obj->GetProgress() * reporter->progress_amount_ ) + 
+    float progress = ( obj->GetProgress() * reporter->progress_amount_ ) +
       reporter->progress_start_;
     if ( progress > ( reporter->progress_ + 0.01f ) )
     {
@@ -107,7 +108,7 @@ public:
   // NOTE: Virtual destructor is needed for ITK
   virtual ~ITKObserver()
   {}
-  
+
   // Overloaded ITK function that is called when progress is reported
   virtual void Execute(itk::Object *caller, const itk::EventObject& event )
   {
@@ -118,7 +119,7 @@ public:
   virtual void Execute(const itk::Object *caller, const itk::EventObject& event )
   {
   }
-  
+
 private:
   // Handle to the layer that is displaying progress
   boost::function< void ( itk::Object* ) > function_;
@@ -136,7 +137,7 @@ public:
   // NOTE: Virtual destructor is needed for ITK
   virtual ~ITKConstObserver()
   {}
-  
+
   // Overloaded ITK function that is called when progress is reported
   virtual void Execute(itk::Object *caller, const itk::EventObject& event )
   {
@@ -175,42 +176,42 @@ ITKFilter::~ITKFilter()
 }
 
 
-void ITKFilter::observe_itk_progress_internal( itk::ProcessObject::Pointer filter, 
+void ITKFilter::observe_itk_progress_internal( itk::ProcessObject::Pointer filter,
   const LayerHandle& layer, float progress_start, float progress_amount )
 {
   // Setup a new reporter
-  ITKProgressReporterHandle reporter( new ITKProgressReporter( layer, progress_start, 
+  ITKProgressReporterHandle reporter( new ITKProgressReporter( layer, progress_start,
     progress_amount ) );
 
   // Setup progress measuring, by forwarding progress to the filter
-  filter->AddObserver( itk::ProgressEvent(), new ITKConstObserver( boost::bind( 
+  filter->AddObserver( itk::ProgressEvent(), new ITKConstObserver( boost::bind(
     &ITKProgressReporter::Report, reporter, _1 ) ) );
 }
 
-//void ITKFilter::observe_itk_iterations_internal( itk::ProcessObject::Pointer filter, 
+//void ITKFilter::observe_itk_iterations_internal( itk::ProcessObject::Pointer filter,
 //  boost::function< void( itk::Object* ) > iteration_fcn )
 //{
 //  // Setup progress measuring, by forwarding progress to the filter
-//  filter->AddObserver( itk::IterationEvent(), new ITKObserver( iteration_fcn ) ); 
+//  filter->AddObserver( itk::IterationEvent(), new ITKObserver( iteration_fcn ) );
 //}
 
-void ITKFilter::observe_itk_iterations_internal( itk::Object::Pointer filter, 
+void ITKFilter::observe_itk_iterations_internal( itk::Object::Pointer filter,
                         boost::function< void( itk::Object* ) > iteration_fcn )
 {
   // Setup progress measuring, by forwarding progress to the filter
-  filter->AddObserver( itk::IterationEvent(), new ITKObserver( iteration_fcn ) ); 
+  filter->AddObserver( itk::IterationEvent(), new ITKObserver( iteration_fcn ) );
 }
 
-void ITKFilter::forward_abort_to_filter_internal( itk::ProcessObject::Pointer filter, 
+void ITKFilter::forward_abort_to_filter_internal( itk::ProcessObject::Pointer filter,
   LayerHandle layer )
-{   
+{
   // TODO: Most of this can be handled by the layer above --JGS
 
   // Setup forwarding of the abort signal to the itk filter
   ITKFilterPrivate::lock_type lock( this->private_->get_mutex() );
   this->private_->disconnect_all();
   this->private_->filter_ = filter;
-  
+
   // NOTE: The following logic is already done by LayerFilter.
   //this->private_->add_connection( layer->abort_signal_.connect( boost::bind(
   //  &ITKFilter::raise_abort, this ) ) );
@@ -242,7 +243,7 @@ void ITKFilter::limit_number_of_itk_threads_internal( itk::ProcessObject::Pointe
   // there is at least one thread doing the computation.
   unsigned int max_threads = boost::thread::hardware_concurrency();
   if ( max_threads < 2 ) max_threads = 2;
-  
+
   filter->GetMultiThreader()->SetMaximumNumberOfThreads( max_threads - 1 );
 }
 

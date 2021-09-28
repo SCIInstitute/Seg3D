@@ -34,20 +34,22 @@
 
 #include <QtUtils/Bridge/detail/QtComboBoxConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent, 
+QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent,
           Core::StateOptionHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )
 {
   QPointer< QtComboBoxConnector > qpointer( this );
-  
+
   // Populate the content of the state variable to the combo box
   UpdateComboBoxItems( qpointer );
-  
+
   this->connect( parent, SIGNAL( currentIndexChanged( QString ) ),
     SLOT( set_state( QString ) ) );
 
@@ -57,7 +59,7 @@ QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent,
     &QtComboBoxConnector::UpdateComboBoxItems, qpointer ) ) );
 }
 
-QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent, 
+QtComboBoxConnector::QtComboBoxConnector( QComboBox* parent,
   Core::StateLabeledOptionHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -88,16 +90,16 @@ void QtComboBoxConnector::set_state( const QString& value )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, 
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_,
       value.toStdString() );
   }
 }
 
-void QtComboBoxConnector::SetComboBoxIndexByText( 
+void QtComboBoxConnector::SetComboBoxIndexByText(
   QPointer< QtComboBoxConnector > qpointer,
   Core::ActionSource source )
 {
-  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state
   // and updated simultaneously.  This is safe because there will be at most one extra call to set
   // the state since the state will be unchanged in subsequent calls.
 
@@ -136,11 +138,11 @@ void QtComboBoxConnector::SetComboBoxIndexByText(
   qpointer->unblock();
 }
 
-void QtComboBoxConnector::SetComboBoxIndexByData( 
+void QtComboBoxConnector::SetComboBoxIndexByData(
   QPointer< QtComboBoxConnector > qpointer,
   Core::ActionSource source )
 {
-  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state
   // and updated simultaneously.  This is safe because there will be at most one extra call to set
   // the state since the state will be unchanged in subsequent calls.
 
@@ -211,7 +213,7 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
       for ( int i = 0; i < num_items; i++ )
       {
         combobox->setItemText( i, QString( option_list[ i ].c_str() ) );
-      }   
+      }
     }
     else
     {
@@ -225,7 +227,7 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
   }
   else
   {
-    Core::StateLabeledOption* state_labeled_option = 
+    Core::StateLabeledOption* state_labeled_option =
       static_cast< Core::StateLabeledOption* >( state_base );
     std::vector< Core::OptionLabelPair > option_list = state_labeled_option->get_option_list();
     int num_items = static_cast< int >( option_list.size() );
@@ -248,7 +250,7 @@ void QtComboBoxConnector::UpdateComboBoxItems( QPointer< QtComboBoxConnector > q
     }
     combobox->setCurrentIndex( state_labeled_option->index() );
   }
-  
+
   // unblock signals
   qpointer->unblock();
 }

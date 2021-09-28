@@ -39,6 +39,8 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/LayerManager.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, PadTool )
 

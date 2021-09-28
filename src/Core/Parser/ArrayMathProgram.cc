@@ -30,8 +30,10 @@
 #include <boost/thread.hpp>
 
 // Core includes
-#include <Core/Parser/ArrayMathProgram.h> 
+#include <Core/Parser/ArrayMathProgram.h>
 #include <Core/Utils/Parallel.h>
+
+using namespace boost::placeholders;
 
 namespace Core
 {
@@ -77,7 +79,7 @@ public:
   typedef boost::signals2::signal< void (double) > update_progress_signal_type;
 
   // UPDATE_PROGRESS:
-  // When new information on progress is available this signal is triggered. If this signal is 
+  // When new information on progress is available this signal is triggered. If this signal is
   // triggered it should end with a value 1.0 indicating that progress reporting has finised.
   // Progress is measured between 0.0 and 1.0.
   update_progress_signal_type update_progress_signal_;
@@ -89,7 +91,7 @@ void ArrayMathProgramPrivate::parallel_run( int thread, int num_threads, boost::
   index_type start = thread * per_thread;
   index_type end = ( thread + 1 ) * per_thread;
   index_type offset, sz;
-  if ( thread + 1 == num_threads ) 
+  if ( thread + 1 == num_threads )
   {
     end = this->array_size_;
   }
@@ -110,7 +112,7 @@ void ArrayMathProgramPrivate::parallel_run( int thread, int num_threads, boost::
     }
 
     sz = this->buffer_size_;
-    if ( offset + sz >= end ) 
+    if ( offset + sz >= end )
     {
       sz = end - offset;
     }
@@ -136,7 +138,7 @@ void ArrayMathProgramPrivate::parallel_run( int thread, int num_threads, boost::
   if( thread == 0 )
   {
     // Make sure we hit 100%
-    this->update_progress_signal_( 1.0 ); 
+    this->update_progress_signal_( 1.0 );
   }
 
   barrier.wait();
@@ -163,7 +165,7 @@ ArrayMathProgram::ArrayMathProgram( size_type array_size, size_type buffer_size,
   // grouped together for vectorized execution
   this->private_->buffer_size_ = buffer_size;
   // Number of processors to use
-  if ( num_threads < 1 ) 
+  if ( num_threads < 1 )
   {
     num_threads = boost::thread::hardware_concurrency();
   }
@@ -199,9 +201,9 @@ bool ArrayMathProgram::add_sink( std::string& name, DataBlockHandle data_block )
 
 bool ArrayMathProgram::find_source( std::string& name, ArrayMathProgramSource& ps )
 {
-  std::map< std::string, ArrayMathProgramSource >::iterator it = 
+  std::map< std::string, ArrayMathProgramSource >::iterator it =
     this->private_->input_sources_.find( name );
-  if ( it == this->private_->input_sources_.end() ) 
+  if ( it == this->private_->input_sources_.end() )
   {
     return false;
   }
@@ -211,9 +213,9 @@ bool ArrayMathProgram::find_source( std::string& name, ArrayMathProgramSource& p
 
 bool ArrayMathProgram::find_sink( std::string& name, ArrayMathProgramSource& ps )
 {
-  std::map< std::string, ArrayMathProgramSource >::iterator it = 
+  std::map< std::string, ArrayMathProgramSource >::iterator it =
     this->private_->output_sinks_.find( name );
-  if ( it == this->private_->output_sinks_.end() ) 
+  if ( it == this->private_->output_sinks_.end() )
   {
     return false;
   }
@@ -255,11 +257,11 @@ bool ArrayMathProgram::run_sequential( size_t& error_line )
   this->private_->error_line_.resize( this->private_->num_threads_, 0 );
   this->private_->success_.resize( this->private_->num_threads_, true );
 
-  this->private_->update_progress_signal_.connect( 
+  this->private_->update_progress_signal_.connect(
     boost::bind( &ArrayMathProgram::update_progress, this, _1 ) );
 
-  Parallel parallel_run_sequential( 
-    boost::bind( &ArrayMathProgramPrivate::parallel_run, this->private_, _1, _2, _3 ), 
+  Parallel parallel_run_sequential(
+    boost::bind( &ArrayMathProgramPrivate::parallel_run, this->private_, _1, _2, _3 ),
     this->private_->num_threads_ );
   parallel_run_sequential.run();
 
@@ -335,7 +337,7 @@ void ArrayMathProgram::resize_sequential_functions( size_t sz )
 
 float* ArrayMathProgram::create_buffer( size_t size )
 {
-  this->private_->buffer_.resize( size ); 
+  this->private_->buffer_.resize( size );
   return &( this->private_->buffer_[ 0 ] );
 }
 
@@ -349,7 +351,7 @@ void ArrayMathProgram::set_single_variable( size_t j, ArrayMathProgramVariableHa
   this->private_->single_variables_[ j ] = handle;
 }
 
-void ArrayMathProgram::set_sequential_variable( size_t j, size_t np, 
+void ArrayMathProgram::set_sequential_variable( size_t j, size_t np,
   ArrayMathProgramVariableHandle& handle )
 {
   this->private_->sequential_variables_[ np ][ j ] = handle;

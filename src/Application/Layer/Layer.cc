@@ -43,6 +43,8 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -59,7 +61,7 @@ public:
 
   // Function for setting abort flag
   void handle_abort();
-  
+
   // Function for setting stop flag
   void handle_stop();
 
@@ -71,12 +73,12 @@ public:
   // due to a circular dependency)
   LayerGroupWeakHandle layer_group_;
 
-  // Identifier for keeping track which data_processing action is running. 
+  // Identifier for keeping track which data_processing action is running.
   std::set<Layer::filter_key_type> keys_;
-  
+
   // WeakHandle to the algorithm that is currently creating or processing this layer
   LayerAbstractFilterWeakHandle filter_;
-  
+
   // Abort flag
   bool abort_;
 
@@ -137,7 +139,7 @@ const std::string Layer::IN_USE_C( "inuse" );
 Layer::Layer( const std::string& name, bool creating ) :
   StateHandler( "layer",  true ),
   private_( new LayerPrivate )
-{ 
+{
   this->initialize_states( name, creating );
 }
 
@@ -147,7 +149,7 @@ Layer::Layer( const std::string& name, const std::string& state_id, bool creatin
 {
   this->initialize_states( name, creating );
 }
-  
+
 Layer::~Layer()
 {
   this->private_->disconnect_all();
@@ -155,11 +157,11 @@ Layer::~Layer()
   this->disconnect_all();
 }
 
-LayerGroupHandle Layer::get_layer_group() 
-{ 
-  return this->private_->layer_group_.lock(); 
+LayerGroupHandle Layer::get_layer_group()
+{
+  return this->private_->layer_group_.lock();
 }
-  
+
 void Layer::set_layer_group( LayerGroupWeakHandle layer_group )
 {
   this->private_->layer_group_ = layer_group;
@@ -169,12 +171,12 @@ std::string Layer::get_layer_id() const
 {
   return this->get_statehandler_id();
 }
-  
+
 std::string Layer::get_layer_name() const
 {
   return this->name_state_->get();
 }
-  
+
 Core::DataBlock::generation_type Layer::get_generation() const
 {
   return this->generation_state_->get();
@@ -192,12 +194,12 @@ void Layer::initialize_states( const std::string& name, bool creating )
 
   this->private_->abort_ = false;
   this->private_->stop_ = false;
-  
+
   //  Build the layer specific state variables
 
   // Ensure that the states are encoded as states that change the project
   this->mark_as_project_data();
-  
+
   // == The name of the layer ==
   this->add_state( "name", name_state_, name );
 
@@ -205,7 +207,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->visible_state_.resize( ViewerManager::Instance()->number_of_viewers() );
   for ( size_t j = 0; j < this->visible_state_.size(); j++ )
   {
-    this->add_state( std::string( "visible" ) + Core::ExportToString( j ), 
+    this->add_state( std::string( "visible" ) + Core::ExportToString( j ),
       this->visible_state_[ j ], true );
   }
 
@@ -217,7 +219,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->locked_state_->set_is_project_data( false );
 
   // == The opacity of the layer ==
-  this->add_state( "opacity", opacity_state_, 
+  this->add_state( "opacity", opacity_state_,
     PreferencesManager::Instance()->default_layer_opacity_state_->get(), 0.0, 1.0, 0.01 );
 
   // == The generation number of the data, or -1 if there is no data ==
@@ -225,18 +227,18 @@ void Layer::initialize_states( const std::string& name, bool creating )
 
   // == The generation number of the data, or -1 if there is no data ==
   this->add_state( "provenance_id", this->provenance_id_state_, -1 );
-  
+
   // == The meta data for this dataset ==
   this->add_state( "metadata", this->meta_data_state_, "" );
 
   // == Information string for the metadata of this dataset ==
   this->add_state( "metadata_info", this->meta_data_info_state_, "" );
-  
+
   // == The layer state indicating whether data is bein processed ==
-  this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  , 
+  this->add_state( "data", this->data_state_,  creating ? CREATING_C : AVAILABLE_C  ,
     AVAILABLE_C + "|" + CREATING_C + "|" + PROCESSING_C + "|" + IN_USE_C );
   this->data_state_->set_is_project_data( false );
-  
+
   // == Centering (node vs. cell) ==
   this->add_state( "centering", this->centering_state_, "node" );
   this->centering_state_->set_is_project_data( false );
@@ -248,7 +250,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   this->add_state( "show_progress", this->show_progress_bar_state_, creating );
   this->add_state( "show_abort", this->show_abort_message_state_, false );
   this->add_state( "show_stop_button", this->show_stop_button_state_, false );
-  
+
   this->show_information_state_->set_is_project_data( false );
   this->show_advanced_visibility_state_->set_is_project_data( false );
   this->show_opacity_state_->set_is_project_data( false );
@@ -266,7 +268,7 @@ void Layer::initialize_states( const std::string& name, bool creating )
   // be accidentally deleted by subclasses.
   this->private_->add_connection( this->locked_state_->value_changed_signal_.connect(
     boost::bind( &LayerPrivate::handle_locked_state_changed, this->private_, _1 ) ) );
-  this->private_->add_connection( this->data_state_->value_changed_signal_.connect( 
+  this->private_->add_connection( this->data_state_->value_changed_signal_.connect(
     boost::bind( &LayerPrivate::handle_data_state_changed, this->private_, _1 ) ) );
 
   // Make sure handle_abort is called when the signal is triggered
@@ -313,7 +315,7 @@ bool Layer::post_save_states( Core::StateIO& state_io )
     CORE_LOG_ERROR( "Unknown layer type" );
     assert( false );
   }
-  
+
   layer_element->SetAttribute( "type", layer_type );
   return true;
 }
@@ -353,13 +355,13 @@ bool Layer::check_filter_key( filter_key_type key ) const
 
 void Layer::add_filter_key( filter_key_type key )
 {
-  if ( key == 0 ) return; 
+  if ( key == 0 ) return;
   this->private_->keys_.insert( key );
 }
 
 void Layer::remove_filter_key( filter_key_type key )
 {
-  if ( key == 0 ) return; 
+  if ( key == 0 ) return;
   this->private_->keys_.erase( key );
 }
 
@@ -377,7 +379,7 @@ void Layer::set_filter_handle( LayerAbstractFilterHandle layer )
 {
   this->private_->filter_ = LayerAbstractFilterWeakHandle( layer );
 }
-  
+
 void Layer::reset_filter_handle()
 {
   this->private_->filter_.reset();

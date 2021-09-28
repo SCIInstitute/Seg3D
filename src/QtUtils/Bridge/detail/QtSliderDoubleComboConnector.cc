@@ -34,17 +34,19 @@
 
 #include <QtUtils/Bridge/detail/QtSliderDoubleComboConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtSliderDoubleComboConnector::QtSliderDoubleComboConnector( QtSliderDoubleCombo* parent, 
+QtSliderDoubleComboConnector::QtSliderDoubleComboConnector( QtSliderDoubleCombo* parent,
     Core::StateRangedDoubleHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )
 {
   QPointer< QtSliderDoubleComboConnector > qpointer( this );
-  
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     double min_val, max_val, step_size;
@@ -71,7 +73,7 @@ QtSliderDoubleComboConnector::~QtSliderDoubleComboConnector()
   this->disconnect_all();
 }
 
-void QtSliderDoubleComboConnector::SetValue( QPointer< QtSliderDoubleComboConnector > qpointer, 
+void QtSliderDoubleComboConnector::SetValue( QPointer< QtSliderDoubleComboConnector > qpointer,
     double val, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -96,7 +98,7 @@ void QtSliderDoubleComboConnector::SetValue( QPointer< QtSliderDoubleComboConnec
   qpointer->unblock();
 }
 
-void QtSliderDoubleComboConnector::SetRange( QPointer< QtSliderDoubleComboConnector > qpointer, 
+void QtSliderDoubleComboConnector::SetRange( QPointer< QtSliderDoubleComboConnector > qpointer,
     double min_val, double max_val, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -121,7 +123,7 @@ void QtSliderDoubleComboConnector::SetRange( QPointer< QtSliderDoubleComboConnec
   qpointer->unblock();
 }
 
-void QtSliderDoubleComboConnector::SetStep( QPointer< QtSliderDoubleComboConnector > qpointer, 
+void QtSliderDoubleComboConnector::SetStep( QPointer< QtSliderDoubleComboConnector > qpointer,
                       double step, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -162,5 +164,5 @@ void QtSliderDoubleComboConnector::set_state_range( double min_val, double max_v
       min_val, max_val );
   }
 }
-  
+
 } // end namespace QtUtils

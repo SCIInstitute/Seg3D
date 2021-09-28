@@ -46,6 +46,7 @@
 #include <Core/LargeVolume/LargeVolumeConverter.h>
 #include <Core/LargeVolume/LargeVolumeSchema.h>
 
+using namespace boost::placeholders;
 
 namespace Core
 {

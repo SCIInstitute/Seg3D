@@ -30,6 +30,8 @@
 #include <Core/Utils/Exception.h>
 #include <Core/Viewer/AbstractViewer.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -44,7 +46,7 @@ public:
 
   // Handle with the renderer
   AbstractRendererHandle renderer_;
-  
+
   // Width and height of the viewer window
   int width_;
   int height_;
@@ -123,7 +125,7 @@ AbstractViewer::AbstractViewer( size_t viewer_id ) :
   this->private_->width_ = 0;
   this->private_->height_ = 0;
   this->private_->viewer_ = this;
-  
+
   this->add_state( "viewer_visible", this->viewer_visible_state_, false );
   this->viewer_visible_state_->set_session_priority( StateBase::DO_NOT_LOAD_E );
 }
@@ -181,19 +183,19 @@ void AbstractViewer::install_renderer( AbstractRendererHandle renderer )
     boost::bind( &AbstractViewerPrivate::set_overlay_texture, this->private_, _1, _2 ) ) );
 }
 
-void AbstractViewer::mouse_move_event( const MouseHistory& mouse_history, 
+void AbstractViewer::mouse_move_event( const MouseHistory& mouse_history,
                     int button, int buttons, int modifiers )
 {
   // Do nothing
 }
 
-void AbstractViewer::mouse_press_event( const MouseHistory& mouse_history, 
+void AbstractViewer::mouse_press_event( const MouseHistory& mouse_history,
                      int button, int buttons, int modifiers )
 {
   // Do nothing
 }
 
-void AbstractViewer::mouse_release_event( const MouseHistory& mouse_history, 
+void AbstractViewer::mouse_release_event( const MouseHistory& mouse_history,
                      int button, int buttons, int modifiers )
 {
   // Do nothing
@@ -269,4 +271,3 @@ CursorShape AbstractViewer::get_cursor() const
 }
 
 } // end namespace Core
-

@@ -35,10 +35,12 @@
 
 #include <QtUtils/Bridge/detail/QtButtonGroupConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent, 
+QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent,
           Core::StateOptionHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -67,12 +69,12 @@ QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent,
     this->add_connection( state->value_changed_signal_.connect( boost::bind(
       &QtButtonGroupConnector::SetCheckedButton, qpointer, _2 ) ) );
   }
-  
+
   this->connect( parent, SIGNAL( buttonClicked ( QAbstractButton* ) ),
     SLOT( set_state( QAbstractButton* ) ) );
 }
 
-QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent, 
+QtButtonGroupConnector::QtButtonGroupConnector( QButtonGroup* parent,
       Core::StateLabeledOptionHandle& state, bool blocking /*= true */ ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -117,7 +119,7 @@ void QtButtonGroupConnector::set_state( QAbstractButton* button )
   {
     if ( this->option_state_ )
     {
-      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+      Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
         this->option_state_, button->text().toStdString() );
     }
     else
@@ -128,11 +130,11 @@ void QtButtonGroupConnector::set_state( QAbstractButton* button )
   }
 }
 
-void QtButtonGroupConnector::SetCheckedButton( 
+void QtButtonGroupConnector::SetCheckedButton(
   QPointer< QtButtonGroupConnector > qpointer,
   Core::ActionSource source )
 {
-  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state
   // and updated simultaneously.  This is safe because there will be at most one extra call to set
   // the state since the state will be unchanged in subsequent calls.
 
@@ -159,7 +161,7 @@ void QtButtonGroupConnector::SetCheckedButton(
   {
     qpointer->parent_->button( qpointer->labeled_option_state_->index() )->setChecked( true );
   }
-  
+
   // unblock signals
   qpointer->unblock();
 }

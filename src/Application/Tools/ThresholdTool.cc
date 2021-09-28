@@ -51,6 +51,8 @@
 #undef max
 #endif
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ThresholdTool )
 
@@ -81,7 +83,7 @@ void ThresholdToolPrivate::handle_threshold_changed()
   {
     return;
   }
-  
+
   if ( this->tool_->show_preview_state_->get() )
   {
     this->update_viewers();
@@ -100,8 +102,8 @@ void ThresholdToolPrivate::handle_target_layer_changed()
     double min_val = data_layer->get_data_volume()->get_data_block()->get_min();
     double max_val = data_layer->get_data_volume()->get_data_block()->get_max();
 
-    //TODO: We need to fix this.  This causes an inconsistency in the threshold tool between 
-    // the histogram and the sliders 
+    //TODO: We need to fix this.  This causes an inconsistency in the threshold tool between
+    // the histogram and the sliders
 //    double epsilon = ( max_val - min_val ) * 0.005;
 //    min_val -= epsilon;
 //    max_val += epsilon;
@@ -113,7 +115,7 @@ void ThresholdToolPrivate::handle_target_layer_changed()
       this->tool_->handle_seed_points_changed();
     }
   }
-  
+
   this->update_viewers();
 }
 
@@ -203,8 +205,8 @@ ThresholdTool::ThresholdTool(const std::string& toolid) :
     boost::bind( &ThresholdToolPrivate::handle_threshold_changed, this->private_ ) ) );
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect(
     boost::bind( &ThresholdToolPrivate::handle_target_layer_changed, this->private_ ) ) );
-  this->add_connection( this->show_preview_state_->value_changed_signal_.connect( 
-    boost::bind( &ThresholdToolPrivate::handle_preview_visibility_changed, 
+  this->add_connection( this->show_preview_state_->value_changed_signal_.connect(
+    boost::bind( &ThresholdToolPrivate::handle_preview_visibility_changed,
     this->private_, _1 ) ) );
   this->add_connection( this->preview_opacity_state_->state_changed_signal_.connect(
     boost::bind( &ThresholdToolPrivate::handle_preview_opacity_changed, this->private_ ) ) );
@@ -240,21 +242,21 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   {
     return;
   }
-  
+
   DataLayerHandle target_layer = boost::dynamic_pointer_cast< DataLayer >(
     LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
   if ( !target_layer )
   {
     CORE_THROW_LOGICERROR( "Target layer '" + target_layer_id + "' doesn't exist" );
   }
-  
+
   Core::DataVolumeSliceHandle target_slice = boost::dynamic_pointer_cast
     < Core::DataVolumeSlice >( viewer->get_volume_slice( target_layer_id ) );
   if ( target_slice->out_of_boundary() )
   {
     return;
   }
-  
+
   // Only show the preview if the target layer is visible in the viewer
   if ( show_preview && target_layer->is_visible( viewer_id ) && opacity > 0 )
   {
@@ -282,7 +284,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
         GL_ALPHA, GL_UNSIGNED_BYTE );
     }
 
-    double voxel_width = ( target_slice->right() - target_slice->left() ) / 
+    double voxel_width = ( target_slice->right() - target_slice->left() ) /
       ( target_slice->nx() - 1 );
     double voxel_height = ( target_slice->top() - target_slice->bottom() ) /
       ( target_slice->ny() - 1 );
@@ -299,7 +301,7 @@ void ThresholdTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
 
     MaskShader::lock_type shader_lock( this->private_->shader_->get_mutex() );
     this->private_->shader_->enable();
-    this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ), 
+    this->private_->shader_->set_pixel_size( static_cast< float >( 1.0 / slice_screen_width ),
       static_cast< float >( 1.0 /slice_screen_height ) );
     this->private_->shader_->set_color( color[0], color[1], color[2] );
     this->private_->shader_->set_opacity( static_cast< float >( opacity ) );
@@ -352,7 +354,7 @@ void ThresholdTool::handle_seed_points_changed()
     return;
   }
 
-  const Core::StatePointVector::value_type& seed_points = 
+  const Core::StatePointVector::value_type& seed_points =
     this->seed_points_state_->get();
   if ( seed_points.size() == 0 )
   {
@@ -364,9 +366,9 @@ void ThresholdTool::handle_seed_points_changed()
     LayerManager::Instance()->find_layer_by_id( target_layer_id ) );
   Core::DataVolumeHandle data_volume = data_layer->get_data_volume();
   Core::DataBlockHandle data_block = data_volume->get_data_block();
-  double min_val = std::numeric_limits< double >::max(); 
+  double min_val = std::numeric_limits< double >::max();
   double max_val = (-1.0)*std::numeric_limits< double >::max();
-  
+
   for ( size_t i = 0; i < seed_points.size(); ++i )
   {
     Core::Point pt = data_volume->apply_inverse_grid_transform( seed_points[ i ] );
@@ -398,10 +400,10 @@ bool ThresholdTool::handle_key_press( ViewerHandle viewer, int key, int modifier
   if ( key == Core::Key::KEY_M_E )
   {
     Core::ActionToggle::Dispatch( Core::Interface::GetKeyboardActionContext(),
-          this->show_preview_state_ );    
+          this->show_preview_state_ );
     return true;
   }
-  
+
   return SeedPointsTool::handle_key_press( viewer, key, modifiers );
 }
 

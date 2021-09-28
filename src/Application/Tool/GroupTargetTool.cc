@@ -39,13 +39,15 @@
 #include <Application/Layer/LayerManager.h>
 #include <Application/Tool/GroupTargetTool.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
 //////////////////////////////////////////////////////////////////////////
 // Class GroupTargetToolPrivate
 //////////////////////////////////////////////////////////////////////////
-  
+
 class GroupTargetToolPrivate
 {
 
@@ -76,11 +78,11 @@ public:
   // UPDATE_LAYER_LIST:
   // Update the target layers option list.
   void update_layer_list();
-  
+
 public:
   // The type of layer that can be used with this filter
   Core::VolumeType target_type_;
-  
+
   // Pointer back to the tool.
   // NOTE: This can be a pointer, as the callbacks are deleted when the tool is deleted and all
   // the tool components run on the same thread.
@@ -100,9 +102,9 @@ void GroupTargetToolPrivate::handle_layer_inserted( LayerHandle layer, bool new_
     this->update_group_list();
     target_changed = ( old_target_group != this->tool_->target_group_state_->get() );
   }
-  
+
   // If the layer belongs to the current target group, update the layer list as well
-  if ( !target_changed && layer->get_layer_group()->get_group_id() == 
+  if ( !target_changed && layer->get_layer_group()->get_group_id() ==
     this->tool_->target_group_state_->get() )
   {
     this->update_layer_list();
@@ -123,7 +125,7 @@ void GroupTargetToolPrivate::handle_layers_deleted( std::vector< std::string > g
     this->update_group_list();
     target_changed = ( old_target_group != this->tool_->target_group_state_->get() );
   }
-  
+
   // Update the layer list only if the target hasn't been changed. Otherwise, the layer
   // list should have already been updated by handle_target_group_changed.
   if ( !target_changed )
@@ -189,7 +191,7 @@ void GroupTargetToolPrivate::handle_target_group_changed( std::string group_id )
     {
       selected_layers.push_back( active_layer->get_layer_id() );
       this->tool_->target_layers_state_->set( selected_layers );
-    }   
+    }
   }
 }
 
@@ -208,13 +210,13 @@ void GroupTargetToolPrivate::handle_layer_name_changed( std::string layer_id )
     ( layer->get_type() & this->target_type_ ) )
   {
     this->update_layer_list();
-  } 
+  }
 }
 
 void GroupTargetToolPrivate::handle_layer_data_changed( LayerHandle layer )
 {
   LayerGroupHandle layer_group = layer->get_layer_group();
-  if ( layer_group && 
+  if ( layer_group &&
     layer_group->get_group_id() == this->tool_->target_group_state_->get() &&
     ( layer->get_type() & this->target_type_ ) &&
     layer->data_state_->get() != Layer::CREATING_C )
@@ -232,7 +234,7 @@ void GroupTargetToolPrivate::update_group_list()
   {
     const Core::GridTransform& grid_trans = groups[ i ]->get_grid_transform();
     std::string group_name = Core::ExportToString( grid_trans.get_nx() ) + " x " +
-      Core::ExportToString( grid_trans.get_ny() ) + " x " + 
+      Core::ExportToString( grid_trans.get_ny() ) + " x " +
       Core::ExportToString( grid_trans.get_nz() );
     group_names.push_back( std::make_pair( groups[ i ]->get_group_id(), group_name ) );
   }
@@ -262,13 +264,13 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
   // The target type that we allow for the input
   this->private_->target_type_ = target_type;
   this->private_->tool_ = this;
-  
+
   std::vector< std::string > empty_option;
-      
-  // Add the states of this class to the StateEngine    
+
+  // Add the states of this class to the StateEngine
   this->add_state( "target_group", this->target_group_state_, "", "" );
   this->add_state( "target_layers", this->target_layers_state_, empty_option, "" );
-  this->add_state( "use_active_group", this->use_active_group_state_, true ); 
+  this->add_state( "use_active_group", this->use_active_group_state_, true );
   this->add_state( "valid_layer", this->valid_target_state_, false );
 
   this->target_group_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 10 );
@@ -287,7 +289,7 @@ GroupTargetTool::GroupTargetTool(  Core::VolumeType target_type, const std::stri
     boost::bind( &GroupTargetToolPrivate::handle_layer_data_changed, this->private_, _1 ) ) );
 
   this->add_connection( this->use_active_group_state_->value_changed_signal_.connect(
-    boost::bind( &GroupTargetToolPrivate::handle_use_active_group_changed, 
+    boost::bind( &GroupTargetToolPrivate::handle_use_active_group_changed,
     this->private_, _1 ) ) );
   this->add_connection( this->target_group_state_->value_changed_signal_.connect(
     boost::bind( &GroupTargetToolPrivate::handle_target_group_changed, this->private_, _2 ) ) );

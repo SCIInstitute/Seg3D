@@ -42,6 +42,8 @@
 #include <Application/ViewerManager/ViewerManager.h>
 #include <Application/StatusBar/StatusBar.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ClipboardTool )
 
@@ -74,7 +76,7 @@ void ClipboardToolPrivate::update_slice_numbers()
   }
 
   bool zero_based = PreferencesManager::Instance()->zero_based_slice_numbers_state_->get();
-  
+
   Core::VolumeSliceType slice_type( Core::VolumeSliceType::AXIAL_E );
   std::string slice_type_str = this->tool_->slice_type_state_->get();
   if ( slice_type_str == ClipboardTool::CORONAL_C )
@@ -86,9 +88,9 @@ void ClipboardToolPrivate::update_slice_numbers()
     slice_type = Core::VolumeSliceType::SAGITTAL_E;
   }
 
-  MaskLayerHandle layer = boost::dynamic_pointer_cast< MaskLayer >( 
+  MaskLayerHandle layer = boost::dynamic_pointer_cast< MaskLayer >(
     LayerManager::Instance()->find_layer_by_id( this->tool_->target_layer_state_->get() ) );
-  Core::MaskVolumeSliceHandle vol_slice( new Core::MaskVolumeSlice( 
+  Core::MaskVolumeSliceHandle vol_slice( new Core::MaskVolumeSlice(
     layer->get_mask_volume(), slice_type ) );
   int min_slice = zero_based ? 0 : 1;
   int max_slice = static_cast< int >( vol_slice->number_of_slices() );
@@ -117,7 +119,7 @@ void ClipboardToolPrivate::handle_active_viewer_changed( int active_viewer )
   {
     return;
   }
-  
+
   size_t viewer_id = static_cast< size_t >( active_viewer );
   ViewerHandle viewer = ViewerManager::Instance()->get_viewer( viewer_id );
   if ( !viewer->is_volume_view() )
@@ -153,7 +155,7 @@ void ClipboardToolPrivate::handle_use_active_viewer_changed( bool use_active_vie
   {
     return;
   }
-  
+
   this->tool_->use_active_layer_state_->set( true );
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
   if ( !viewer->is_volume_view() )
@@ -171,7 +173,7 @@ ClipboardTool::ClipboardTool( const std::string& toolid ) :
   private_( new ClipboardToolPrivate )
 {
   this->private_->tool_ = this;
-      
+
   this->add_state( "copy_slice", this->copy_slice_number_state_, 1, 1, 1, 1 );
   this->add_state( "paste_min_slice", this->paste_min_slice_number_state_, 1, 1, 1, 1 );
   this->add_state( "paste_max_slice", this->paste_max_slice_number_state_, 1, 1, 1, 1 );
@@ -186,14 +188,14 @@ ClipboardTool::ClipboardTool( const std::string& toolid ) :
     boost::bind( &ClipboardToolPrivate::update_slice_numbers, this->private_ ) ) );
   this->add_connection( this->slice_type_state_->state_changed_signal_.connect(
     boost::bind( &ClipboardToolPrivate::update_slice_numbers, this->private_ ) ) );
-    
-  this->add_connection( this->use_active_viewer_state_->value_changed_signal_.connect( 
+
+  this->add_connection( this->use_active_viewer_state_->value_changed_signal_.connect(
     boost::bind( &ClipboardToolPrivate::handle_use_active_viewer_changed, this->private_, _1 ) ) );
   this->add_connection( ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.
-    connect( boost::bind( &ClipboardToolPrivate::handle_active_viewer_changed, 
+    connect( boost::bind( &ClipboardToolPrivate::handle_active_viewer_changed,
     this->private_, _1 ) ) );
   size_t num_of_viewrs = ViewerManager::Instance()->number_of_viewers();
-  
+
   for ( size_t i = 0; i < num_of_viewrs; ++i )
   {
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
@@ -216,19 +218,19 @@ void ClipboardTool::copy( Core::ActionContextHandle context )
     Core::Application::PostEvent( boost::bind( &ClipboardTool::copy, this, context ) );
     return;
   }
-  
+
   const std::string& layer_id = this->target_layer_state_->get();
   if ( layer_id == Tool::NONE_OPTION_C )
   {
     return;
   }
-  
+
   int slice_num = this->copy_slice_number_state_->get();
   if ( !PreferencesManager::Instance()->zero_based_slice_numbers_state_->get() )
   {
     slice_num -= 1;
   }
-  
+
   ActionCopy::Dispatch( context, layer_id, this->slice_type_state_->index(),
     static_cast< size_t >( slice_num ) );
 }
@@ -266,7 +268,7 @@ void ClipboardTool::grab_min_paste_slice()
     Core::Application::PostEvent( boost::bind( &ClipboardTool::grab_min_paste_slice, this ) );
     return;
   }
-  
+
   ViewerHandle viewer = ViewerManager::Instance()->get_active_viewer();
   if ( viewer->is_volume_view() )
   {

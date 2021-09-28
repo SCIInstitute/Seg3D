@@ -33,11 +33,13 @@
 
 #include <QtUtils/Bridge/detail/QtAbstractButtonVectorConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtAbstractButtonVectorConnector::QtAbstractButtonVectorConnector( 
-  QAbstractButton* parent, std::vector<Core::StateBoolHandle>& state, 
+QtAbstractButtonVectorConnector::QtAbstractButtonVectorConnector(
+  QAbstractButton* parent, std::vector<Core::StateBoolHandle>& state,
   Core::StateIntSetHandle indices, bool blocking /*= true */ ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -58,13 +60,13 @@ QtAbstractButtonVectorConnector::QtAbstractButtonVectorConnector(
       assert( ( *it ) >= 0 && ( *it ) < static_cast< int >( state.size() ) );
       combined_state = combined_state && this->state_[ *it ]->get();
     }
-    
+
     parent->setChecked( combined_state );
 
     for ( size_t j = 0; j < this->state_.size(); j++)
     {
       this->add_connection( this->state_[ j ]->value_changed_signal_.connect(
-        boost::bind( &QtAbstractButtonVectorConnector::SetActionChecked, qpointer, 
+        boost::bind( &QtAbstractButtonVectorConnector::SetActionChecked, qpointer,
         static_cast< int >( j ), _1, _2 ) ) );
     }
 
@@ -81,8 +83,8 @@ QtAbstractButtonVectorConnector::~QtAbstractButtonVectorConnector()
   this->disconnect_all();
 }
 
-void QtAbstractButtonVectorConnector::UpdateIndex( 
-  QPointer< QtAbstractButtonVectorConnector > qpointer, 
+void QtAbstractButtonVectorConnector::UpdateIndex(
+  QPointer< QtAbstractButtonVectorConnector > qpointer,
   std::set< int > indices, Core::ActionSource source )
 {
   if ( !Core::Interface::IsInterfaceThread() )
@@ -114,7 +116,7 @@ void QtAbstractButtonVectorConnector::UpdateIndex(
   qpointer->unblock();
 }
 
-void QtAbstractButtonVectorConnector::SetActionChecked( 
+void QtAbstractButtonVectorConnector::SetActionChecked(
     QPointer< QtAbstractButtonVectorConnector > qpointer, int index,
     bool checked, Core::ActionSource source )
 {
@@ -155,7 +157,7 @@ void QtAbstractButtonVectorConnector::SetActionChecked(
     }
     qpointer->parent_->setChecked( combined_state );
   }
-  
+
   qpointer->unblock();
 }
 
@@ -174,7 +176,7 @@ void QtAbstractButtonVectorConnector::set_state( bool value )
     {
       if ( ( *it ) >= 0 && ( *it ) < static_cast< int >( this->state_.size() ) )
       {
-        Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
           this->state_[ *it ], value );
       }
     }

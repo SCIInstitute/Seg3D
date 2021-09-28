@@ -33,10 +33,12 @@
 
 #include <QtUtils/Bridge/detail/QtActionConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtActionConnector::QtActionConnector( QAction* parent, 
+QtActionConnector::QtActionConnector( QAction* parent,
     Core::StateBoolHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -55,7 +57,7 @@ QtActionConnector::QtActionConnector( QAction* parent,
   this->connect( parent, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
 }
 
-QtActionConnector::QtActionConnector( QAction* parent, 
+QtActionConnector::QtActionConnector( QAction* parent,
   boost::function< void() > func ) :
   QtConnectorBase( parent ),
   parent_( parent ),
@@ -69,8 +71,8 @@ QtActionConnector::~QtActionConnector()
   this->disconnect_all();
 }
 
-void QtActionConnector::SetActionChecked( 
-    QPointer< QtActionConnector > qpointer, 
+void QtActionConnector::SetActionChecked(
+    QPointer< QtActionConnector > qpointer,
     bool checked, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -95,12 +97,12 @@ void QtActionConnector::SetActionChecked(
   qpointer->unblock();
 }
 
-  
+
 void QtActionConnector::set_state( bool value )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       this->state_, value );
   }
 }

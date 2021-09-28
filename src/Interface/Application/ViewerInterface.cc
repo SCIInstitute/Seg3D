@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -53,6 +53,8 @@
 #include <Interface/Application/ViewerInterface.h>
 #include <Interface/Application/ViewerWidget.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -64,7 +66,7 @@ public:
 
   // -- Setup the UI --
 public:
-  void setup_ui( QWidget* parent ); 
+  void setup_ui( QWidget* parent );
 
   // -- The UI pieces of the interface --
 public:
@@ -94,7 +96,7 @@ ViewerInterfacePrivate::ViewerInterfacePrivate() :
 }
 
 
-void ViewerInterfacePrivate::setup_ui( QWidget* parent ) 
+void ViewerInterfacePrivate::setup_ui( QWidget* parent )
 {
   this->layout_ = new QVBoxLayout( parent );
   this->layout_->setContentsMargins( 0, 0, 0, 0 );
@@ -123,14 +125,14 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
     }
     else
     {
-      viewer->install_renderer( Core::AbstractRendererHandle( 
+      viewer->install_renderer( Core::AbstractRendererHandle(
         new Core::DummyRenderer ) );
     }
     // Step 3: Generate the widget
     this->viewer_[ j ] = new ViewerWidget( viewer, parent );
     QtUtils::QtBridge::Show( this->viewer_[ j ], viewer->viewer_visible_state_ );
   }
-  
+
   this->vert_splitter1_->addWidget( this->viewer_[ 0 ] );
   this->vert_splitter1_->addWidget( this->viewer_[ 1 ] );
   this->vert_splitter1_->addWidget( this->viewer_[ 2 ] );
@@ -142,12 +144,12 @@ void ViewerInterfacePrivate::setup_ui( QWidget* parent )
   vert_splitter2_->setOpaqueResize( false );
 
   this->layout_->addWidget( this->horiz_splitter_ );
-  
-  
+
+
   //this->facade_widget_ = new QLabel( parent );
 //  this->layout_->addWidget( this->facade_widget_ );
 //  this->facade_widget_->hide();
-  
+
   parent->setLayout( this->layout_ );
 
 }
@@ -165,11 +167,11 @@ ViewerInterface::ViewerInterface( QWidget *parent ) :
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
     qpointer_type qpointer( this );
-    
+
     // Connect signals
-    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect( 
+    ViewerManager::Instance()->layout_state_->value_changed_signal_.connect(
       boost::bind( &ViewerInterface::SetViewerLayout, qpointer, _1 ) );
-      
+
     ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.connect(
         boost::bind( &ViewerInterface::SetActiveViewer, qpointer, _1 ) );
 
@@ -182,7 +184,7 @@ ViewerInterface::ViewerInterface( QWidget *parent ) :
 ViewerInterface::~ViewerInterface()
 {
 }
-  
+
 void ViewerInterface::set_pic_mode( bool pic_mode )
 {
   for ( size_t j = 0; j < 6; j++ )

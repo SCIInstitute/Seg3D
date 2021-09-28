@@ -37,6 +37,8 @@
 #include <Application/Tool/SliceTargetTool.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -59,11 +61,11 @@ public:
 void SliceTargetToolPrivate::update_slice_type_labels()
 {
   Core::OptionLabelPairVector label_options;
-  label_options.push_back( std::make_pair( SliceTargetTool::AXIAL_C, 
+  label_options.push_back( std::make_pair( SliceTargetTool::AXIAL_C,
     PreferencesManager::Instance()->z_axis_label_state_->get() ) );
-  label_options.push_back( std::make_pair( SliceTargetTool::CORONAL_C, 
+  label_options.push_back( std::make_pair( SliceTargetTool::CORONAL_C,
     PreferencesManager::Instance()->y_axis_label_state_->get() ) );
-  label_options.push_back( std::make_pair( SliceTargetTool::SAGITTAL_C, 
+  label_options.push_back( std::make_pair( SliceTargetTool::SAGITTAL_C,
     PreferencesManager::Instance()->x_axis_label_state_->get() ) );
 
   this->tool_->slice_type_state_->set_option_list( label_options );
@@ -144,7 +146,7 @@ SliceTargetTool::SliceTargetTool(  int target_type, const std::string& tool_type
   std::string coronal = CORONAL_C + "=" + PreferencesManager::Instance()->y_axis_label_state_->get();
   std::string axial = AXIAL_C + "=" + PreferencesManager::Instance()->z_axis_label_state_->get();
 
-  this->add_state( "slice_type", this->slice_type_state_, AXIAL_C,  axial + "|" + coronal 
+  this->add_state( "slice_type", this->slice_type_state_, AXIAL_C,  axial + "|" + coronal
     + "|" + sagittal );
 
   this->add_connection( PreferencesManager::Instance()->x_axis_label_state_->state_changed_signal_.
@@ -158,18 +160,18 @@ SliceTargetTool::SliceTargetTool(  int target_type, const std::string& tool_type
 
   this->private_->handle_use_active_viewer_changed( true );
 
-  this->add_connection( this->use_active_viewer_state_->value_changed_signal_.connect( 
+  this->add_connection( this->use_active_viewer_state_->value_changed_signal_.connect(
     boost::bind( &SliceTargetToolPrivate::handle_use_active_viewer_changed, this->private_, _1 ) ) );
   this->add_connection( ViewerManager::Instance()->active_viewer_state_->value_changed_signal_.
-    connect( boost::bind( &SliceTargetToolPrivate::handle_active_viewer_changed, 
+    connect( boost::bind( &SliceTargetToolPrivate::handle_active_viewer_changed,
     this->private_, _1 ) ) );
   size_t num_of_viewrs = ViewerManager::Instance()->number_of_viewers();
 
   for ( size_t i = 0; i < num_of_viewrs; ++i )
   {
     ViewerHandle viewer = ViewerManager::Instance()->get_viewer( i );
-    this->add_connection( viewer->view_mode_state_->value_changed_signal_.connect( 
-      boost::bind( &SliceTargetToolPrivate::handle_viewer_mode_changed, 
+    this->add_connection( viewer->view_mode_state_->value_changed_signal_.connect(
+      boost::bind( &SliceTargetToolPrivate::handle_viewer_mode_changed,
       this->private_, i, _2 ) ) );
   }
 }

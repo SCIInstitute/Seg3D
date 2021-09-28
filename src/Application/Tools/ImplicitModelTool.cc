@@ -43,6 +43,8 @@
 #include <Core/Volume/VolumeSlice.h>
 #include <Core/Interface/Interface.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ImplicitModelTool )
 

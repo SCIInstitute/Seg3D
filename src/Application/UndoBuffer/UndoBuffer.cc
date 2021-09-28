@@ -36,6 +36,8 @@
 #include <Application/UndoBuffer/UndoBuffer.h>
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -51,7 +53,7 @@ public:
     Core::ActionContextContainer( context )
   {
   }
-  
+
   virtual ~UndoActionContext() {}
 
   virtual Core::ActionSource source() const
@@ -66,16 +68,16 @@ class UndoBufferPrivate
 public:
   typedef std::deque< UndoBufferItemHandle > undo_list_type;
   typedef std::deque< UndoBufferItemHandle > redo_list_type;
-  
+
   // List of items on the undo stack
   undo_list_type undo_list_;
-  
+
   // List of items on the redo stack
   redo_list_type redo_list_;
-  
+
   UndoBuffer* buffer_;
   long long max_mem_;
-  
+
   void handle_enable( bool enable );
 };
 
@@ -94,9 +96,9 @@ UndoBuffer::UndoBuffer() :
   this->private_->buffer_ = this;
   this->private_->max_mem_ = Core::Application::Instance()->
     get_total_addressable_physical_memory();
-  
+
   this->add_connection( PreferencesManager::Instance()->enable_undo_state_->
-    value_changed_signal_.connect( boost::bind( 
+    value_changed_signal_.connect( boost::bind(
     &UndoBufferPrivate::handle_enable, this->private_, _1 ) ) );
   this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
     &UndoBuffer::reset_undo_buffer, this ) ) );
@@ -107,7 +109,7 @@ UndoBuffer::~UndoBuffer()
   this->disconnect_all();
 }
 
-void UndoBuffer::insert_undo_item( Core::ActionContextHandle context, 
+void UndoBuffer::insert_undo_item( Core::ActionContextHandle context,
   UndoBufferItemHandle undo_item )
 {
   if ( PreferencesManager::Instance()->enable_undo_state_->get() == false ) return;
@@ -121,7 +123,7 @@ void UndoBuffer::insert_undo_item( Core::ActionContextHandle context,
     this->update_redo_tag_signal_( this->get_redo_tag() );
   }
 
-  size_t max_size = static_cast<size_t> ( this->private_->max_mem_ * 
+  size_t max_size = static_cast<size_t> ( this->private_->max_mem_ *
     PreferencesManager::Instance()->percent_of_memory_state_->get() );
 
   // Get the size of the element
@@ -143,7 +145,7 @@ void UndoBuffer::insert_undo_item( Core::ActionContextHandle context,
 
   this->private_->undo_list_.erase( it, it_end );
   this->private_->undo_list_.push_front( undo_item );
-  
+
   this->update_undo_tag_signal_( undo_item->get_tag() );
   this->buffer_changed_signal_();
 }
@@ -154,10 +156,10 @@ bool UndoBuffer::undo( Core::ActionContextHandle context )
   {
     context->report_error( "Undo list is empty" );
     return false;
-  }  
+  }
 
   // This function removes the first item from the undo buffer
-  // and reapplies it. 
+  // and reapplies it.
   UndoBufferItemHandle undo_item;
   undo_item = this->private_->undo_list_.front();
   this->private_->undo_list_.pop_front();
@@ -168,7 +170,7 @@ bool UndoBuffer::undo( Core::ActionContextHandle context )
       "check point" );
     return false;
   }
-  
+
   // Move the action that was just undone on top of the redo stack, in case one wants to
   // redo the action
   this->private_->redo_list_.push_front( undo_item );
@@ -187,21 +189,21 @@ bool UndoBuffer::redo( Core::ActionContextHandle context )
   {
     context->report_error( "Redo list is empty" );
     return false;
-  }  
-  
+  }
+
   // This function removes the first item from the undo buffer
-  // and reapplies it. 
+  // and reapplies it.
   UndoBufferItemHandle redo_item;
   redo_item = this->private_->redo_list_.front();
   this->private_->redo_list_.pop_front();
-  
+
   Core::ActionContextHandle undo_context( new UndoActionContext( context ) );
   redo_item->apply_redo( undo_context );
 
   // Update the entries in the menu
   this->update_redo_tag_signal_( this->get_redo_tag() );
   this->buffer_changed_signal_();
-  
+
   // Applying the redo action should put a new undo check point onto the undo stack.
   return true;
 }
@@ -293,4 +295,3 @@ size_t UndoBuffer::num_redo_items()
 }
 
 } // end namespace Seg3D
-

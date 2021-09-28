@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -54,6 +54,8 @@
 // The interface from the designer
 #include "ui_ControllerInterface.h"
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -75,18 +77,18 @@ public:
 };
 
 ControllerInterface::ControllerInterface( QWidget* parent ) :
-  QtUtils::QtCustomDialog( parent ), 
+  QtUtils::QtCustomDialog( parent ),
   private_( new ControllerInterfacePrivate )
 {
   // Step 1: Setup the private structure and allocate all the needed structures
   private_->ui_.setupUi( this );
   private_->context_ = Core::ActionContextHandle( new ControllerContext( this ) );
-  
+
   // Update the title of the dialog
   std::string title = std::string( "Controller - "  )
     + Core::Application::GetApplicationNameAndVersion();
   this->setWindowTitle( QString::fromStdString( title ) );
-  
+
   // Step 1.5: Remove the help button and set the icon because removing the button can occasionaly
   // cause problems with it
   QIcon icon = windowIcon();
@@ -141,7 +143,7 @@ ControllerInterface::ControllerInterface( QWidget* parent ) :
   this->private_->ui_.TV_UNDOBUFFER->setColumnWidth( 1, 200 );
   this->private_->ui_.TV_UNDOBUFFER->resizeRowsToContents();
   this->private_->ui_.TV_REDOBUFFER->resizeRowsToContents();
-  
+
   this->private_->ui_.TW_CONTROLLER->setCurrentIndex( 0 );
 
 
@@ -153,27 +155,27 @@ ControllerInterface::ControllerInterface( QWidget* parent ) :
 
   std::vector<std::string>::iterator it = action_list.begin();
   std::vector<std::string>::iterator it_end = action_list.end();
-  
+
   while ( it != it_end )
   {
     QAction* action_item = action_menu->addAction( QString::fromStdString( *it ) );
-    QtUtils::QtBridge::Connect( action_item, boost::bind( &ControllerInterface::SetActionType, 
+    QtUtils::QtBridge::Connect( action_item, boost::bind( &ControllerInterface::SetActionType,
       controller, ( *it ) ) );
     ++it;
   }
 
   this->private_->ui_.TB_ACTION->setMenu( action_menu );
 
-  // Step 5: Link the ActionHistory/StateEngine/EventLog to this widget and have it update 
+  // Step 5: Link the ActionHistory/StateEngine/EventLog to this widget and have it update
   // automatically using the signal/slot system
 
-  this->add_connection( Core::ActionHistory::Instance()->history_changed_signal_.connect( 
+  this->add_connection( Core::ActionHistory::Instance()->history_changed_signal_.connect(
     boost::bind( &ControllerInterface::UpdateActionHistory, controller ) ) );
 
-  this->add_connection( Core::StateEngine::Instance()->state_changed_signal_.connect( 
+  this->add_connection( Core::StateEngine::Instance()->state_changed_signal_.connect(
     boost::bind( &ControllerInterface::UpdateStateEngine, controller ) ) );
-  
-  this->add_connection( Core::Log::Instance()->post_log_signal_.connect( 
+
+  this->add_connection( Core::Log::Instance()->post_log_signal_.connect(
     boost::bind( &ControllerInterface::UpdateLogHistory, controller, true, _1, _2 ) ) );
 
   this->add_connection( UndoBuffer::Instance()->buffer_changed_signal_.connect(
@@ -267,7 +269,7 @@ void ControllerInterface::UpdateActionHistory( qpointer_type controller )
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &ControllerInterface::UpdateActionHistory, controller ) );
     return;
   }
@@ -284,11 +286,11 @@ void ControllerInterface::UpdateActionHistory( qpointer_type controller )
 }
 
 void ControllerInterface::UpdateStateEngine( qpointer_type controller )
-{ 
+{
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &ControllerInterface::UpdateStateEngine, controller ) );
     return;
   }
@@ -302,11 +304,11 @@ void ControllerInterface::UpdateStateEngine( qpointer_type controller )
 }
 
 void ControllerInterface::UpdateUndoBuffer( qpointer_type controller )
-{ 
+{
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &ControllerInterface::UpdateUndoBuffer, controller ) );
     return;
   }
@@ -326,7 +328,7 @@ void ControllerInterface::UpdateLogHistory( qpointer_type controller, bool relay
   // Ensure that this call gets relayed to the right thread
   if ( relay )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &ControllerInterface::UpdateLogHistory, controller, false, message_type, message ) );
     return;
   }
@@ -348,7 +350,7 @@ void ControllerInterface::PostActionMessage( qpointer_type controller, std::stri
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &ControllerInterface::PostActionMessage, 
+    Core::Interface::PostEvent( boost::bind( &ControllerInterface::PostActionMessage,
       controller, message ) );
   }
 
@@ -365,7 +367,7 @@ void ControllerInterface::PostActionUsage( qpointer_type controller, std::string
   // Ensure that this call gets relayed to the right thread
   if ( !( Core::Interface::IsInterfaceThread() ) )
   {
-    Core::Interface::PostEvent( boost::bind( &ControllerInterface::PostActionUsage, 
+    Core::Interface::PostEvent( boost::bind( &ControllerInterface::PostActionUsage,
       controller, usage ) );
   }
 

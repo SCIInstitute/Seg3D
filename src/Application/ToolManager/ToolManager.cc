@@ -47,6 +47,8 @@
 
 #include <Application/ViewerManager/ViewerManager.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -60,9 +62,9 @@ class ToolManagerPrivate
 public:
   bool handle_mouse_enter( ViewerHandle viewer, int x, int y );
   bool handle_mouse_leave( ViewerHandle viewer );
-  bool handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
+  bool handle_mouse_move( ViewerHandle viewer, const Core::MouseHistory& mouse_history,
     int button, int buttons, int modifiers );
-  bool handle_mouse_press( ViewerHandle viewer, const Core::MouseHistory& mouse_history, 
+  bool handle_mouse_press( ViewerHandle viewer, const Core::MouseHistory& mouse_history,
     int button, int buttons, int modifiers );
   bool handle_mouse_release( ViewerHandle viewer, const Core::MouseHistory& mouse_history,
     int button, int buttons, int modifiers );
@@ -78,7 +80,7 @@ public:
   void handle_active_tool_state_changed( std::string tool_id );
 
   // DELETE_ALL:
-  // This function closes and deletes all the current tools. 
+  // This function closes and deletes all the current tools.
   // It's called when the application is being reset.
   void reset();
 
@@ -122,8 +124,8 @@ bool ToolManagerPrivate::handle_mouse_leave( ViewerHandle viewer )
   return false;
 }
 
-bool ToolManagerPrivate::handle_mouse_move( ViewerHandle viewer, 
-                       const Core::MouseHistory& mouse_history, 
+bool ToolManagerPrivate::handle_mouse_move( ViewerHandle viewer,
+                       const Core::MouseHistory& mouse_history,
                        int button, int buttons, int modifiers )
 {
   // If there is no focus viewer, simulate a mouse enter event.
@@ -131,10 +133,10 @@ bool ToolManagerPrivate::handle_mouse_move( ViewerHandle viewer,
   // the mouse history information might not be correct.
   if ( !this->focus_viewer_ )
   {
-    return this->handle_mouse_enter( viewer, mouse_history.current_.x_, 
+    return this->handle_mouse_enter( viewer, mouse_history.current_.x_,
       mouse_history.current_.y_ );
   }
-  
+
   ToolHandle active_tool;
   {
     ToolManager::lock_type lock( ToolManager::Instance()->get_mutex() );
@@ -142,14 +144,14 @@ bool ToolManagerPrivate::handle_mouse_move( ViewerHandle viewer,
   }
   if ( active_tool )
   {
-    return active_tool->handle_mouse_move( viewer, mouse_history, 
+    return active_tool->handle_mouse_move( viewer, mouse_history,
       button, buttons, modifiers );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_mouse_press( ViewerHandle viewer, 
-                      const Core::MouseHistory& mouse_history, 
+bool ToolManagerPrivate::handle_mouse_press( ViewerHandle viewer,
+                      const Core::MouseHistory& mouse_history,
                       int button, int buttons, int modifiers )
 {
   this->focus_viewer_ = viewer;
@@ -161,14 +163,14 @@ bool ToolManagerPrivate::handle_mouse_press( ViewerHandle viewer,
   }
   if ( active_tool )
   {
-    return active_tool->handle_mouse_press( viewer, mouse_history, 
+    return active_tool->handle_mouse_press( viewer, mouse_history,
       button, buttons, modifiers );
   }
   return false;
 }
 
 bool ToolManagerPrivate::handle_mouse_release( ViewerHandle viewer,
-                        const Core::MouseHistory& mouse_history, 
+                        const Core::MouseHistory& mouse_history,
                         int button, int buttons, int modifiers )
 {
   this->focus_viewer_ = viewer;
@@ -180,13 +182,13 @@ bool ToolManagerPrivate::handle_mouse_release( ViewerHandle viewer,
   }
   if ( active_tool )
   {
-    return active_tool->handle_mouse_release( viewer, mouse_history, 
+    return active_tool->handle_mouse_release( viewer, mouse_history,
       button, buttons, modifiers );
   }
   return false;
 }
 
-bool ToolManagerPrivate::handle_wheel( ViewerHandle viewer, int delta, 
+bool ToolManagerPrivate::handle_wheel( ViewerHandle viewer, int delta,
                     int x, int y, int buttons, int modifiers )
 {
   this->focus_viewer_ = viewer;
@@ -286,7 +288,7 @@ void ToolManagerPrivate::handle_active_tool_changed()
   {
     return;
   }
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
   if ( this->active_tool_ )
   {
@@ -300,7 +302,7 @@ void ToolManagerPrivate::handle_active_tool_state_changed( std::string tool_id )
   {
     return;
   }
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
   this->tool_manager_->activate_tool( tool_id );
 }
@@ -337,10 +339,10 @@ ToolManager::ToolManager() :
   this->mark_as_project_data();
 
   this->add_state( "active_tool", this->active_tool_state_ );
-  
+
   // this state variable is currently not being used.
   this->add_state( "disable_tools", this->disable_tools_state_, false );
-  
+
   this->private_->tool_manager_ = this;
   this->private_->signal_block_count_ = 0;
 
@@ -369,13 +371,13 @@ ToolManager::ToolManager() :
       this->private_, _1 ) );
   }
 
-  this->add_connection( this->open_tool_signal_.connect( boost::bind( 
+  this->add_connection( this->open_tool_signal_.connect( boost::bind(
     &ToolManagerPrivate::update_tool_list, this->private_ ) ) );
-  this->add_connection( this->close_tool_signal_.connect( boost::bind( 
+  this->add_connection( this->close_tool_signal_.connect( boost::bind(
     &ToolManagerPrivate::update_tool_list, this->private_ ) ) );
-  this->add_connection( this->activate_tool_signal_.connect( boost::bind( 
+  this->add_connection( this->activate_tool_signal_.connect( boost::bind(
     &ToolManagerPrivate::handle_active_tool_changed, this->private_ ) ) );
-  this->add_connection( this->active_tool_state_->value_changed_signal_.connect( boost::bind( 
+  this->add_connection( this->active_tool_state_->value_changed_signal_.connect( boost::bind(
     &ToolManagerPrivate::handle_active_tool_state_changed, this->private_, _2 ) ) );
   this->add_connection( Core::Application::Instance()->reset_signal_.connect( boost::bind(
     &ToolManagerPrivate::reset, this->private_ ) ) );
@@ -411,7 +413,7 @@ bool ToolManager::open_tool( const std::string& tool_type, std::string& new_tool
   // Step (5): Add the tool id to the tool and add the tool to the list
   new_toolid = tool->toolid();
   this->private_->tool_list_[ new_toolid ] = tool;
-  
+
   // Step (6): Signal any observers (UIs) that the tool has been opened
   open_tool_signal_( tool );
 
@@ -474,9 +476,9 @@ void ToolManager::close_tool( const std::string& toolid )
       this->activate_tool_signal_( this->private_->active_tool_ );
     }
 
-    bool redraw_2d = tool->has_2d_visual() || ( this->private_->active_tool_ && 
+    bool redraw_2d = tool->has_2d_visual() || ( this->private_->active_tool_ &&
       this->private_->active_tool_->has_2d_visual() );
-    bool redraw_3d = tool->has_3d_visual() || ( this->private_->active_tool_ && 
+    bool redraw_3d = tool->has_3d_visual() || ( this->private_->active_tool_ &&
       this->private_->active_tool_->has_3d_visual() );
 
     if ( redraw_2d || redraw_3d )
@@ -499,7 +501,7 @@ void ToolManager::activate_tool( const std::string& toolid )
   CORE_LOG_DEBUG( std::string( "Activate tool: " ) + toolid );
 
   // Step (3): Check if anything needs to be done
-  if ( this->private_->active_tool_ && 
+  if ( this->private_->active_tool_ &&
     this->private_->active_tool_->toolid() == toolid )
   {
     return;
@@ -518,7 +520,7 @@ void ToolManager::activate_tool( const std::string& toolid )
   if ( old_tool )
   {
     old_tool->deactivate();
-  } 
+  }
   this->private_->active_tool_->activate();
 
   // Step (5): Update viewers if necessary.
@@ -531,7 +533,7 @@ void ToolManager::activate_tool( const std::string& toolid )
   {
     this->private_->update_viewers( redraw_2d, redraw_3d );
   }
-  
+
   // Step (6): signal for interface
   activate_tool_signal_( ( *it ).second );
 }
@@ -617,7 +619,7 @@ bool ToolManager::pre_load_states( const Core::StateIO& state_io )
         CORE_LOG_ERROR( error );
         // NOTE: We should not fail the entire session if a tool fails to load
         //success = false;
-      } 
+      }
     }
     tool_element = tool_element->NextSiblingElement();
   }
@@ -648,7 +650,7 @@ ToolHandle ToolManager::get_tool( const std::string& toolid )
   {
     return ( *it ).second;
   }
-  
+
   return ToolHandle();
 }
 
@@ -672,7 +674,7 @@ int ToolManager::get_session_priority()
 
 void ToolManager::open_default_tools()
 {
-  ToolFactory::startup_tools_map_type::const_iterator it = 
+  ToolFactory::startup_tools_map_type::const_iterator it =
     ToolFactory::Instance()->startup_tools_state_.begin();
   while ( it != ToolFactory::Instance()->startup_tools_state_.end() )
   {

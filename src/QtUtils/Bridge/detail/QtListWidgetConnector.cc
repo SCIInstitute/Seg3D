@@ -34,10 +34,12 @@
 
 #include <QtUtils/Bridge/detail/QtListWidgetConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent, 
+QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent,
   Core::StateLabeledMultiOptionHandle& state, bool blocking /*= true */ ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -59,7 +61,7 @@ QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent,
     &QtListWidgetConnector::UpdateListWidgetOptionItems, qpointer ) ) );
 }
 
-QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent, 
+QtListWidgetConnector::QtListWidgetConnector( QListWidget* parent,
                        Core::StateStringVectorHandle& state ) :
   QtConnectorBase( parent, true ),
   parent_( parent ),
@@ -85,7 +87,7 @@ void QtListWidgetConnector::set_state()
   {
     return;
   }
-  
+
   std::vector< std::string > selections;
   int num_items = this->parent_->count();
   for ( int i = 0; i < num_items; ++i )
@@ -101,12 +103,12 @@ void QtListWidgetConnector::set_state()
       item->setCheckState( Qt::Unchecked );
     }
   }
-  
-  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->option_state_, 
+
+  Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->option_state_,
     selections );
 }
 
-static void SetSelectedItemsInternal( QListWidget* listwidget, 
+static void SetSelectedItemsInternal( QListWidget* listwidget,
   const std::vector< std::string >& selections )
 {
   listwidget->setUpdatesEnabled( false );
@@ -115,7 +117,7 @@ static void SetSelectedItemsInternal( QListWidget* listwidget,
   for ( int i = 0; i < num_items; ++i )
   {
     QListWidgetItem* item = listwidget->item( i );
-    if ( std::find( selections.begin(), selections.end(), 
+    if ( std::find( selections.begin(), selections.end(),
       item->data( Qt::UserRole ).toString().toStdString() ) != selections.end() )
     {
       item->setSelected( true );
@@ -129,7 +131,7 @@ static void SetSelectedItemsInternal( QListWidget* listwidget,
   listwidget->setUpdatesEnabled( true );
 }
 
-void QtListWidgetConnector::SetListWidgetSelectedItems( 
+void QtListWidgetConnector::SetListWidgetSelectedItems(
   QPointer< QtListWidgetConnector > qpointer,
   std::vector< std::string > selections, Core::ActionSource source )
 {
@@ -159,12 +161,12 @@ void QtListWidgetConnector::SetListWidgetSelectedItems(
   qpointer->unblock();
 }
 
-void QtListWidgetConnector::UpdateListWidgetOptionItems( 
+void QtListWidgetConnector::UpdateListWidgetOptionItems(
   QPointer< QtListWidgetConnector > qpointer )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &QtListWidgetConnector::UpdateListWidgetOptionItems, qpointer ) );
     return;
   }
@@ -193,17 +195,17 @@ void QtListWidgetConnector::UpdateListWidgetOptionItems(
     item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
   }
   SetSelectedItemsInternal( listwidget, qpointer->option_state_->get() );
-  
+
   // unblock signals
   qpointer->unblock();
 }
 
-void QtListWidgetConnector::UpdateListWidgetStringItems( 
+void QtListWidgetConnector::UpdateListWidgetStringItems(
   QPointer< QtListWidgetConnector > qpointer )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &QtListWidgetConnector::UpdateListWidgetStringItems, qpointer ) );
     return;
   }

@@ -30,6 +30,8 @@
 #include <Core/Utils/Log.h>
 #include <Core/Utils/LogStreamer.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -63,7 +65,7 @@ LogStreamerPrivate::stream_message( unsigned int type, std::string message )
 LogStreamer::LogStreamer( unsigned int log_flags, std::ostream* stream )
 {
   // Use a shared pointer to register the internals of this class
-  this->private_ = boost::shared_ptr< LogStreamerPrivate >( 
+  this->private_ = boost::shared_ptr< LogStreamerPrivate >(
     new LogStreamerPrivate( log_flags,stream ) );
 
   // If the internals are detroyed, so should the connection:

@@ -31,6 +31,8 @@
 
 #include <Application/StatusBar/StatusBar.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -45,7 +47,7 @@ DataPointInfo::DataPointInfo() :
 {
 }
 
-DataPointInfo::DataPointInfo( const Core::Point& index_coord, 
+DataPointInfo::DataPointInfo( const Core::Point& index_coord,
   const Core::Point& world_coord, double value ) :
   index_coord_( index_coord ),
   world_coord_( world_coord ),
@@ -93,7 +95,7 @@ StatusBar::StatusBar() :
   this->private_->status_bar_ = this;
   this->private_->signal_block_count_ = 0;
 
-  this->add_connection( Core::Log::Instance()->post_status_signal_.connect( 
+  this->add_connection( Core::Log::Instance()->post_status_signal_.connect(
     boost::bind( &StatusBar::set_message, this, _1, _2 ) ) );
 }
 
@@ -113,7 +115,7 @@ void StatusBar::set_message( int msg_type, std::string message )
   found = message.find_last_not_of( " \t\f\v\n\r" );
   if( found != std::string::npos )
     message.erase( found + 1 );
-    
+
   if ( msg_type & Core::LogMessageType::STATUS_BAR_E )
   {
     this->message_updated_signal_( msg_type, message );

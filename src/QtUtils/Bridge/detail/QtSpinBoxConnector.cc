@@ -33,17 +33,19 @@
 
 #include <QtUtils/Bridge/detail/QtSpinBoxConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent, 
+QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
   Core::StateIntHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   spinbox_( parent ),
   state_( state )
 {
   QPointer< QtSpinBoxConnector > qpointer( this );
-  
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setValue( state->get() );
@@ -54,8 +56,8 @@ QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
   this->connect( parent, SIGNAL( valueChanged( int ) ), SLOT( set_state( int ) ) );
 }
 
-QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent, 
-                     Core::StateRangedIntHandle& state, 
+QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
+                     Core::StateRangedIntHandle& state,
                      bool blocking /*= true */ ) :
   QtConnectorBase( parent, blocking ),
   spinbox_( parent ),
@@ -80,14 +82,14 @@ QtSpinBoxConnector::QtSpinBoxConnector( QSpinBox* parent,
   this->connect( parent, SIGNAL( valueChanged( int ) ), SLOT( set_state( int ) ) );
 }
 
-QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent, 
+QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent,
   Core::StateDoubleHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   double_spinbox_( parent ),
   state_( state )
 {
   QPointer< QtSpinBoxConnector > qpointer( this );
-  
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setValue( state->get() );
@@ -98,7 +100,7 @@ QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent,
   this->connect( parent, SIGNAL( valueChanged( double ) ), SLOT( set_state( double ) ) );
 }
 
-QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent, 
+QtSpinBoxConnector::QtSpinBoxConnector( QDoubleSpinBox* parent,
   Core::StateRangedDoubleHandle& state, bool blocking /*= true */ ) :
   QtConnectorBase( parent, blocking ),
   double_spinbox_( parent ),
@@ -202,7 +204,7 @@ void QtSpinBoxConnector::SetDoubleSpinBoxValue( QPointer< QtSpinBoxConnector > q
   qpointer->unblock();
 }
 
-void QtSpinBoxConnector::SetDoubleSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer, 
+void QtSpinBoxConnector::SetDoubleSpinBoxRange( QPointer< QtSpinBoxConnector > qpointer,
     double min_val, double max_val, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )

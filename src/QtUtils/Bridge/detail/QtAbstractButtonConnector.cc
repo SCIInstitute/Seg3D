@@ -33,17 +33,19 @@
 
 #include <QtUtils/Bridge/detail/QtAbstractButtonConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent, 
+QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
     Core::StateBoolHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )
 {
   QPointer< QtAbstractButtonConnector > qpointer( this );
-  
+
   parent->setCheckable( true );
 
   {
@@ -56,7 +58,7 @@ QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
   this->connect( parent, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
 }
 
-QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent, 
+QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
   boost::function< void() > func ) :
   QtConnectorBase( parent ),
   parent_( parent ),
@@ -65,7 +67,7 @@ QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
   this->connect( parent, SIGNAL( clicked() ), SLOT( call_func() ) );
 }
 
-QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent, 
+QtAbstractButtonConnector::QtAbstractButtonConnector( QAbstractButton* parent,
   boost::function< void( bool ) > func ) :
   QtConnectorBase( parent ),
   parent_( parent ),
@@ -80,8 +82,8 @@ QtAbstractButtonConnector::~QtAbstractButtonConnector()
   this->disconnect_all();
 }
 
-void QtAbstractButtonConnector::SetButtonChecked( 
-    QPointer< QtAbstractButtonConnector > qpointer, 
+void QtAbstractButtonConnector::SetButtonChecked(
+    QPointer< QtAbstractButtonConnector > qpointer,
     bool checked, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -124,5 +126,5 @@ void QtAbstractButtonConnector::call_func( bool value )
   this->bool_func_( value );
 }
 
-    
+
 } // end namespace QtUtils

@@ -38,13 +38,15 @@
 // Application includes
 #include <Application/PreferencesManager/PreferencesManager.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
 //////////////////////////////////////////////////////////////////////////
 // Class PreferencesManagerPrivate
 //////////////////////////////////////////////////////////////////////////
-  
+
 class PreferencesManagerPrivate
 {
 public:
@@ -92,7 +94,7 @@ CORE_SINGLETON_IMPLEMENTATION( PreferencesManager );
 PreferencesManager::PreferencesManager() :
   StateHandler( "preferences", false ),
   private_( new PreferencesManagerPrivate )
-{ 
+{
   this->private_->pm_ = this;
   this->set_initializing( true );
 
@@ -158,7 +160,7 @@ void PreferencesManager::initialize_states()
   //General Preferences
   this->add_state( "project_path", this->project_path_state_, user_path.string() );
   this->add_state( "export_path", this->export_path_state_, desktop_path.string() );
-  
+
   this->add_state( "full_screen_on_startup", this->full_screen_on_startup_state_, false );
   this->add_state( "auto_save", this->auto_save_state_, true );
   this->add_state( "auto_save_time", this->auto_save_time_state_, 10, 1, 120, 1 );
@@ -170,8 +172,8 @@ void PreferencesManager::initialize_states()
   this->add_state( "slice_step_multiplier", this->slice_step_multiplier_state_, 8 );
   this->add_state( "add_dicom_headers", this->export_dicom_headers_state_, true );
   this->add_state( "use_nrrd0005_format", this->export_nrrd0005_state_, true );
-  
-  this->add_state( "axis_labels_option", this->axis_labels_option_state_, "sca", 
+
+  this->add_state( "axis_labels_option", this->axis_labels_option_state_, "sca",
     "sca=Sagittal/Coronal/Axial|sct=Sagittal/Coronal/Transverse|"
     "xyz=X Axis/Y Axis/Z Axis|custom=Custom" );
   this->axis_labels_option_state_->set_session_priority( Core::StateBase::DEFAULT_LOAD_E + 1 );
@@ -179,13 +181,13 @@ void PreferencesManager::initialize_states()
   this->add_state( "x_axis_label", this->x_axis_label_state_, "Sagittal" );
   this->add_state( "y_axis_label", this->y_axis_label_state_, "Coronal" );
   this->add_state( "z_axis_label", this->z_axis_label_state_, "Axial" );
-  
+
   this->add_state( "enable_undo", this->enable_undo_state_, true );
-  
+
   double percent_of_memory = 0.15;
   if ( sizeof( void* ) == 4 ) percent_of_memory = 0.05;
-  
-  this->add_state( "percent_of_memory", this->percent_of_memory_state_, 
+
+  this->add_state( "percent_of_memory", this->percent_of_memory_state_,
     percent_of_memory, 0.0, 0.5, 0.01 );
 
   this->add_state( "embed_input_files_state", this->embed_input_files_state_, true );
@@ -195,31 +197,31 @@ void PreferencesManager::initialize_states()
   this->add_state( "zero_based_slice_numbers", this->zero_based_slice_numbers_state_, false );
   this->add_state( "active_layer_navigation", this->active_layer_navigation_state_, true );
   this->add_state( "status_sci_notation", this->status_sci_notation_state_, false );
-  
+
   //Viewer Preferences
-  this->add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3", 
+  this->add_state( "default_viewer_mode", this->default_viewer_mode_state_, "1and3",
     "single|1and1|1and2|1and3|2and2|2and3|3and3" );
   this->add_state( "grid_size", this->grid_size_state_, 50, 10, 500, 5 );
-  this->add_state( "background_color", this->background_color_state_, "darkgray", 
+  this->add_state( "background_color", this->background_color_state_, "darkgray",
     "black=Black|darkgray=Dark Gray|gray=Gray|lightgray=Light Gray|white=White" );
   this->add_state( "show_slice_number", this->show_slice_number_state_, true );
-  
+
   //Layers Preferences
   this->add_state( "default_layer_opacity", this->default_layer_opacity_state_, 1.0, 0.0, 1.0, 0.01 );
   this->add_state( "default_mask_fill", this->default_mask_fill_state_, "striped", "none|striped|solid" );
   this->add_state( "default_mask_border", this->default_mask_border_state_, "thick", "none|thin|thick" );
   this->add_state("default_colormap", this->default_colormap_state_, "Grayscale",
 	  "Grayscale|Single Hue|Rainbow|Blackbody" ); //|Load Colormap..."); - add later
-    
+
   this->color_states_.resize( 12 );
   for ( size_t j = 0; j < 12; j++ )
   {
     std::string stateid = std::string( "color_" ) + Core::ExportToString( j );
     this->add_state( stateid, this->color_states_[ j ], this->private_->default_colors_[ j ] );
   }
-  
+
   //Interface Controls Preferences
-  
+
   //Sidebars Preferences
   this->add_state( "show_tools_bar", this->show_tools_bar_state_, true );
   this->add_state( "show_layermanager_bar", this->show_layermanager_bar_state_, true );
@@ -230,7 +232,7 @@ void PreferencesManager::initialize_states()
   this->add_state( "enable_large_volume", this->enable_large_volume_state_, false );
 
   this->add_connection( this->axis_labels_option_state_->value_changed_signal_.connect(
-    boost::bind( &PreferencesManagerPrivate::handle_axis_labels_option_changed, 
+    boost::bind( &PreferencesManagerPrivate::handle_axis_labels_option_changed,
     this->private_, _2 ) ) );
 }
 
@@ -242,24 +244,24 @@ bool PreferencesManager::initialize_default_colors()
   this->private_->default_colors_.push_back( Core::Color( 116, 255, 122 ) );
   this->private_->default_colors_.push_back( Core::Color( 143, 214, 255 ) );
   this->private_->default_colors_.push_back( Core::Color( 255, 0, 0 ) );
-  
+
   this->private_->default_colors_.push_back( Core::Color( 255, 233, 0 ) );
   this->private_->default_colors_.push_back( Core::Color( 0, 0, 255 ) );
   this->private_->default_colors_.push_back( Core::Color( 112, 181, 66 ) );
   this->private_->default_colors_.push_back( Core::Color( 255, 94, 122 ) );
-  
+
   this->private_->default_colors_.push_back( Core::Color( 255, 255, 165 ) );
   this->private_->default_colors_.push_back( Core::Color( 108, 0, 212 ) );
   this->private_->default_colors_.push_back( Core::Color( 194, 118, 0 ) );
   this->private_->default_colors_.push_back( Core::Color( 159, 143, 255 ) );
-  
+
   return true;
 }
 
 Core::Color PreferencesManager::get_background_color() const
 {
-  static Core::Color bkg_colors_s[] = 
-  { 
+  static Core::Color bkg_colors_s[] =
+  {
     Core::Color( 0.0f, 0.0f, 0.0f ), Core::Color( 0.278f, 0.278f, 0.290f ),
     Core::Color( 0.416f, 0.416f, 0.439f ), Core::Color( 0.886f, 0.875f, 0.925f ),
     Core::Color( 1.0f, 1.0f, 1.0f )

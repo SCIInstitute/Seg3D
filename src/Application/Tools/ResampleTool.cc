@@ -40,6 +40,8 @@
 #include <Application/Layer/LayerGroup.h>
 #include <Application/Layer/LayerManager.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ResampleTool )
 
@@ -53,7 +55,7 @@ class ResampleToolPrivate
 public:
 
   // UPDATE_DST_GROUP_LIST:
-  // Update list of destination groups that can be chosen by the user. 
+  // Update list of destination groups that can be chosen by the user.
   void update_dst_group_list();
 
   // HANDLE_TARGET_GROUP_CHANGED:
@@ -122,7 +124,7 @@ void ResampleToolPrivate::handle_target_group_changed()
   this->tool_->input_dimensions_state_[ 0 ]->set( nx );
   this->tool_->input_dimensions_state_[ 1 ]->set( ny );
   this->tool_->input_dimensions_state_[ 2 ]->set( nz );
-  
+
   double scale = 1.0;
   if ( this->tool_->constraint_aspect_state_->get() )
   {
@@ -143,7 +145,7 @@ void ResampleToolPrivate::handle_output_dimension_changed( int index, int size )
   {
     return;
   }
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
   double scale = size * 1.0 / static_cast<double>( this->tool_->input_dimensions_state_[ index ]->get() );
@@ -177,7 +179,7 @@ void ResampleToolPrivate::handle_constraint_aspect_changed( bool constraint )
   {
     return;
   }
-  
+
   Core::ScopedCounter signal_block( this->signal_block_count_ );
 
   double scale = this->tool_->scale_state_->get();
@@ -242,7 +244,7 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "input_y", this->input_dimensions_state_[ 1 ], 0 );
   this->add_state( "input_z", this->input_dimensions_state_[ 2 ], 0 );
 
-  this->add_state( "size_scheme", this->size_scheme_state_, SIZE_MANUAL_C, 
+  this->add_state( "size_scheme", this->size_scheme_state_, SIZE_MANUAL_C,
     SIZE_OTHER_GROUP_C + "=Resample to Match Another Group|" +
     SIZE_MANUAL_C + "=Set Dimensions Manually" );
   this->add_state( "manual_size", this->manual_size_state_, true );
@@ -262,8 +264,8 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   this->add_state( "scale", this->scale_state_, 1.0, 0.01, 2.0, 0.01 );
   this->add_state( "spline_order", this->spline_order_state_, 3, 0, 5, 1 );
 
-  // Need to load dimensions after constraint_aspect_state_ is loaded so that scale isn't 
-  // incorrectly used to overwrite output dimensions 
+  // Need to load dimensions after constraint_aspect_state_ is loaded so that scale isn't
+  // incorrectly used to overwrite output dimensions
   this->output_dimensions_state_[ 0 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
   this->output_dimensions_state_[ 1 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
   this->output_dimensions_state_[ 2 ]->set_session_priority( Core::StateBase::LOAD_LAST_E );
@@ -304,16 +306,16 @@ ResampleTool::ResampleTool( const std::string& toolid ) :
   for ( int i = 0; i < 3; ++i )
   {
     this->add_connection( this->output_dimensions_state_[ i ]->value_changed_signal_.connect(
-      boost::bind( &ResampleToolPrivate::handle_output_dimension_changed, 
+      boost::bind( &ResampleToolPrivate::handle_output_dimension_changed,
       this->private_, i, _1 ) ) );
   }
 
   // If groups were added or removed, update the destination group list in the tool interface
-  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect( 
+  this->add_connection( LayerManager::Instance()->layer_inserted_signal_.connect(
     boost::bind( &ResampleToolPrivate::handle_layer_groups_changed, this->private_, _2 ) ) );
   this->add_connection( LayerManager::Instance()->layers_deleted_signal_.connect(
     boost::bind( &ResampleToolPrivate::handle_layer_groups_changed, this->private_, _3 ) ) );
-  
+
   this->private_->handle_target_group_changed();
 }
 
@@ -325,7 +327,7 @@ ResampleTool::~ResampleTool()
 void ResampleTool::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
+
   // Reverse the order of target layers
   std::vector< std::string > target_layers = this->target_layers_state_->get();
   std::reverse( target_layers.begin(), target_layers.end() );

@@ -48,6 +48,8 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/Filters/Actions/ActionTransform.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, TransformTool )
 
@@ -85,7 +87,7 @@ public:
   Core::Vector src_spacing_;
   int size_[ 3 ];
   Core::Point world_min_, world_max_;
-  
+
   MaskShaderHandle shader_;
   TransformTool* tool_;
 
@@ -123,7 +125,7 @@ void TransformToolPrivate::handle_target_group_changed( std::string group_id )
     this->size_[ 1 ] = static_cast< int >( grid_trans.get_ny() );
     this->size_[ 2 ] = static_cast< int >( grid_trans.get_nz() );
     this->world_min_ = this->grid_transform_ * Core::Point( -0.5, -0.5, -0.5 );
-    this->world_max_ = this->grid_transform_ * Core::Point( this->size_[ 0 ] - 0.5, 
+    this->world_max_ = this->grid_transform_ * Core::Point( this->size_[ 0 ] - 0.5,
       this->size_[ 1 ] - 0.5, this->size_[ 2 ] - 0.5 );
   }
 }
@@ -146,7 +148,7 @@ void TransformToolPrivate::handle_target_layers_changed()
       }
     }
   }
-  
+
   this->tool_->preview_layer_state_->set_option_list(   preview_layers_list );
 }
 
@@ -155,7 +157,7 @@ void TransformToolPrivate::handle_preview_layer_changed()
   if ( this->signal_block_count_ == 0 )
   {
     ViewerManager::Instance()->update_2d_viewers_overlay();
-  } 
+  }
 }
 
 void TransformToolPrivate::handle_origin_changed()
@@ -165,7 +167,7 @@ void TransformToolPrivate::handle_origin_changed()
   {
     this->update_grid_transform();
     ViewerManager::Instance()->update_2d_viewers_overlay();
-  } 
+  }
 }
 
 void TransformToolPrivate::handle_spacing_changed( int index )
@@ -175,17 +177,17 @@ void TransformToolPrivate::handle_spacing_changed( int index )
   {
     return;
   }
-  
+
   if ( this->tool_->keep_aspect_ratio_state_->get() )
   {
     Core::ScopedCounter signal_block( this->signal_block_count_ );
     double scale = this->tool_->spacing_state_[ index ]->get() / this->src_spacing_[ index ];
-    this->tool_->spacing_state_[ ( index + 1 ) % 3 ]->set( 
+    this->tool_->spacing_state_[ ( index + 1 ) % 3 ]->set(
       this->src_spacing_[ ( index + 1 ) % 3 ] * scale );
-    this->tool_->spacing_state_[ ( index + 2 ) % 3 ]->set( 
+    this->tool_->spacing_state_[ ( index + 2 ) % 3 ]->set(
       this->src_spacing_[ ( index + 2 ) % 3 ] * scale );
   }
-  
+
   this->update_grid_transform();
   ViewerManager::Instance()->update_2d_viewers_overlay();
 }
@@ -227,7 +229,7 @@ void TransformToolPrivate::initialize_gl()
     this->shader_.reset( new MaskShader );
     this->shader_->initialize();
   }
-  
+
   this->shader_->enable();
   this->shader_->set_border_width( 0 );
   this->shader_->set_texture( 0 );
@@ -240,15 +242,15 @@ void TransformToolPrivate::update_grid_transform()
   ASSERT_IS_APPLICATION_THREAD();
 
   lock_type lock( this->get_mutex() );
-  Core::Point origin( this->tool_->origin_state_[ 0 ]->get(), 
+  Core::Point origin( this->tool_->origin_state_[ 0 ]->get(),
     this->tool_->origin_state_[ 1 ]->get(),
     this->tool_->origin_state_[ 2 ]->get() );
-  this->grid_transform_.load_basis( origin, 
+  this->grid_transform_.load_basis( origin,
     Core::Vector( this->tool_->spacing_state_[ 0 ]->get(), 0, 0 ),
     Core::Vector( 0, this->tool_->spacing_state_[ 1 ]->get(), 0 ),
     Core::Vector( 0, 0, this->tool_->spacing_state_[ 2 ]->get() ) );
   this->world_min_ = this->grid_transform_ * Core::Point( -0.5, -0.5, -0.5 );
-  this->world_max_ = this->grid_transform_ * Core::Point( this->size_[ 0 ] - 0.5, 
+  this->world_max_ = this->grid_transform_ * Core::Point( this->size_[ 0 ] - 0.5,
     this->size_[ 1 ] - 0.5, this->size_[ 2 ] - 0.5 );
 }
 
@@ -259,7 +261,7 @@ void TransformToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
   Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
   if ( viewer->is_volume_view() ||
     this->tool_->target_group_state_->get() == "" ||
-    ( !this->tool_->show_border_state_->get() && 
+    ( !this->tool_->show_border_state_->get() &&
     !this->tool_->show_preview_state_->get() ) )
   {
     return;
@@ -304,7 +306,7 @@ void TransformToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
 
   // Test top boundary
   if ( Core::Abs( world_y - top ) <= range_y &&
-    world_x + range_x >= left && 
+    world_x + range_x >= left &&
     world_x - range_x <= right )
   {
     this->hit_pos_ |= Core::HitPosition::TOP_E;
@@ -313,7 +315,7 @@ void TransformToolPrivate::hit_test( ViewerHandle viewer, int x, int y )
 
   // Test right boundary
   if ( Core::Abs( world_x - right ) <= range_x &&
-    world_y + range_y >= bottom && 
+    world_y + range_y >= bottom &&
     world_y - range_y <= top )
   {
     this->hit_pos_ |= Core::HitPosition::RIGHT_E;
@@ -451,7 +453,7 @@ TransformTool::~TransformTool()
 void TransformTool::execute( Core::ActionContextHandle context )
 {
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
- 
+
   Core::Point origin( this->origin_state_[ 0 ]->get(),
     this->origin_state_[ 1 ]->get(), this->origin_state_[ 2 ]->get() );
   Core::Vector spacing( this->spacing_state_[ 0 ]->get(),
@@ -461,9 +463,9 @@ void TransformTool::execute( Core::ActionContextHandle context )
   std::reverse( target_layers.begin(), target_layers.end() );
 
   ActionTransform::Dispatch( context, target_layers, origin, spacing, this->replace_state_->get() );
-  Core::Application::PostEvent( boost::bind( &Core::StateBool::set, 
+  Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
     this->show_preview_state_, false, Core::ActionSource::NONE_E ) );
-  Core::Application::PostEvent( boost::bind( &Core::StateBool::set, 
+  Core::Application::PostEvent( boost::bind( &Core::StateBool::set,
     this->show_border_state_, false, Core::ActionSource::NONE_E ) );
 }
 
@@ -487,18 +489,18 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     world_min = this->private_->world_min_;
     world_max = this->private_->world_max_;
   }
-  
+
   {
     Core::StateEngine::lock_type state_lock( Core::StateEngine::GetMutex() );
     std::string target_group_id = this->target_group_state_->get();
-    if ( viewer->is_volume_view() || 
-      target_group_id == "" || 
+    if ( viewer->is_volume_view() ||
+      target_group_id == "" ||
       target_group_id == Tool::NONE_OPTION_C )
     {
       return;
     }
 
-    Core::StateView2D* state_view2d = static_cast< Core::StateView2D* >( 
+    Core::StateView2D* state_view2d = static_cast< Core::StateView2D* >(
       viewer->get_active_view_state().get() );
     depth = state_view2d->get().center().z();
 
@@ -523,7 +525,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
       case Core::VolumeType::MASK_E:
         {
           MaskLayer* mask_layer = dynamic_cast< MaskLayer* >( layer.get() );
-          color = PreferencesManager::Instance()->get_color( 
+          color = PreferencesManager::Instance()->get_color(
             mask_layer->color_state_->get() );
           Core::MaskVolumeHandle dummy_vol( new Core::MaskVolume( grid_trans,
             mask_layer->get_mask_volume()->get_mask_data_block() ) );
@@ -555,7 +557,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
   bool in_range = depth >= depth_min && depth <= depth_max;
 
   glPushAttrib( GL_LINE_BIT | GL_TRANSFORM_BIT | GL_TEXTURE_BIT );
-  
+
   Core::Texture::SetActiveTextureUnit( 0 );
   glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
@@ -579,7 +581,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     if ( vol_slice->get_volume()->get_type() == Core::VolumeType::MASK_E )
     {
       this->private_->shader_->enable();
-      this->private_->shader_->set_color( static_cast< float >( color.r() / 255 ), 
+      this->private_->shader_->set_color( static_cast< float >( color.r() / 255 ),
         static_cast< float >( color.g() / 255 ), static_cast< float >( color.b() / 255 ) );
     }
 
@@ -604,7 +606,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
       this->private_->shader_->disable();
     }
   }
-  
+
   if ( show_border )
   {
     glColor4f( 1.0f, 0.0f, 0.0f, in_range ? 1.0f : 0.5f );
@@ -616,7 +618,7 @@ void TransformTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat,
     glVertex2d( start_x, end_y );
     glEnd();
   }
-  
+
   glPopMatrix();
   glPopAttrib();
   glFinish();
@@ -633,10 +635,10 @@ bool TransformTool::handle_mouse_leave( ViewerHandle viewer )
   return true;
 }
 
-bool TransformTool::handle_mouse_move( ViewerHandle viewer, 
-                 const Core::MouseHistory& mouse_history, 
+bool TransformTool::handle_mouse_move( ViewerHandle viewer,
+                 const Core::MouseHistory& mouse_history,
                  int button, int buttons, int modifiers )
-{ 
+{
   if ( viewer->is_volume_view() )
   {
     this->private_->hit_pos_ = Core::HitPosition::NONE_E;
@@ -661,8 +663,8 @@ bool TransformTool::handle_mouse_move( ViewerHandle viewer,
   return false;
 }
 
-bool TransformTool::handle_mouse_press( ViewerHandle viewer, 
-                  const Core::MouseHistory& mouse_history, 
+bool TransformTool::handle_mouse_press( ViewerHandle viewer,
+                  const Core::MouseHistory& mouse_history,
                   int button, int buttons, int modifiers )
 {
   if ( modifiers == Core::KeyModifier::NO_MODIFIER_E &&
@@ -676,8 +678,8 @@ bool TransformTool::handle_mouse_press( ViewerHandle viewer,
   return false;
 }
 
-bool TransformTool::handle_mouse_release( ViewerHandle viewer, 
-                  const Core::MouseHistory& mouse_history, 
+bool TransformTool::handle_mouse_release( ViewerHandle viewer,
+                  const Core::MouseHistory& mouse_history,
                   int button, int buttons, int modifiers )
 {
   if ( button == Core::MouseButton::LEFT_BUTTON_E &&
@@ -704,13 +706,13 @@ void TransformTool::reset()
     Core::Application::PostEvent( boost::bind( &TransformTool::reset, this ) );
     return;
   }
-  
+
   const std::string& group_id = this->target_group_state_->get();
   if ( group_id == "" || group_id == Tool::NONE_OPTION_C )
   {
     return;
   }
-  
+
   this->private_->handle_target_group_changed( group_id );
   if ( this->show_border_state_->get() || ( this->show_preview_state_->get() &&
     this->preview_layer_state_->get() != "" ) )

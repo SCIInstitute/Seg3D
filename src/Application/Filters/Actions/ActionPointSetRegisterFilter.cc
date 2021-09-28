@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -56,6 +56,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+using namespace boost::placeholders;
+
 // REGISTER ACTION:
 // Define a function that registers the action. The action also needs to be
 // registered in the CMake file.
@@ -71,19 +73,19 @@ bool ActionPointSetRegisterFilter::validate( Core::ActionContextHandle& context 
   if ( !LayerManager::CheckSandboxExistence( this->sandbox_, context ) ) return false;
 
   // Check for layer existence and type information
-  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, Core::VolumeType::MASK_E, 
+  if ( ! LayerManager::CheckLayerExistenceAndType( this->target_layer_, Core::VolumeType::MASK_E,
     context, this->sandbox_ ) ) return false;
 
-  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, false, 
+  if ( ! LayerManager::CheckLayerAvailability( this->target_layer_, false,
     context, this->sandbox_ ) ) return false;
-  
+
   // Check for layer existence and type information mask layer
   if ( ! LayerManager::CheckLayerExistenceAndType( this->mask_layer_, Core::VolumeType::MASK_E,
     context, this->sandbox_ ) ) return false;
 
-  if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_, 
+  if ( ! LayerManager::CheckLayerAvailability( this->mask_layer_,
     false, context, this->sandbox_ ) ) return false;
-  
+
   // If the number of iterations is lower than one, we cannot run the filter
   if( this->iterations_ < 1 )
   {
@@ -127,7 +129,7 @@ std::vector<double> calculateTransformationMatrix(transform_type::Pointer transf
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
-		{ 
+		{
 			transformation[inx] = transform->GetMatrix()[i][j];
 			inx++;
 		}
@@ -166,11 +168,11 @@ public:
 
   SCI_BEGIN_TYPED_ITK_RUN( this->src_layer_->get_data_type() )
   {
-    MaskLayerHandle input_fixed_layer = 
+    MaskLayerHandle input_fixed_layer =
       boost::dynamic_pointer_cast<MaskLayer>( this->src_layer_ );
-    MaskLayerHandle input_moving_layer = 
+    MaskLayerHandle input_moving_layer =
       boost::dynamic_pointer_cast<MaskLayer>( this->mask_layer_ );
-    
+
     double quality_factor = 1.0;
     Core::IsosurfaceHandle fixed_iso;
     Core::IsosurfaceHandle moving_iso;
@@ -212,7 +214,7 @@ public:
       }
     }
 
-    
+
     //-----------------------------------------------------------
     // Set up  the Metric
     //-----------------------------------------------------------
@@ -232,7 +234,7 @@ public:
     unsigned int point_id = 0;
 
     std::vector< Core::PointF >::const_iterator cii;
-    for( cii=fixed_iso_points_set.begin(); 
+    for( cii=fixed_iso_points_set.begin();
       cii!=fixed_iso_points_set.end(); cii++ )
     {
       point_type fixed_point;
@@ -244,8 +246,8 @@ public:
     }
 
     fixed_point_set->SetPoints( fixed_point_container );
-    unsigned long fixed_points_num = fixed_point_set->GetNumberOfPoints(); 
-    CORE_LOG_MESSAGE( std::string("Number of fixed Points = ") + 
+    unsigned long fixed_points_num = fixed_point_set->GetNumberOfPoints();
+    CORE_LOG_MESSAGE( std::string("Number of fixed Points = ") +
       boost::lexical_cast<std::string>(fixed_points_num) );
 
     point_id = 0;
@@ -261,8 +263,8 @@ public:
     }
 
     moving_point_set->SetPoints( moving_point_container );
-    unsigned long moving_points_num = moving_point_set->GetNumberOfPoints(); 
-    CORE_LOG_MESSAGE( std::string("Number of moving Points = ") + 
+    unsigned long moving_points_num = moving_point_set->GetNumberOfPoints();
+    CORE_LOG_MESSAGE( std::string("Number of moving Points = ") +
       boost::lexical_cast< std::string >( moving_points_num ) );
 
     typedef itk::EuclideanDistancePointMetric< point_set_type, point_set_type > metric_type;
@@ -297,7 +299,7 @@ public:
 
     // Scale the translation components of the Transform in the Optimizer
     optimizer_type::ScalesType scales( transform->GetNumberOfParameters() );
-    
+
     const double TRANSLATION_SCALE_C = 1000.0; // dynamic range of translations
     const double ROTATION_SCALE_C = 1.0; // dynamic range of rotations
     scales[0] = 1.0 / ROTATION_SCALE_C;
@@ -336,26 +338,26 @@ public:
 
     // Retrieve the image as an itk image from the underlying data structure
     // NOTE: This only does wrapping and does not regenerate the data.
-    
+
     this->forward_abort_to_filter( registration, this->dst_layer_ );
 
     double progress_unit =  1.0 / number_of_iterations ;
-    this->observe_itk_iterations( optimizer, boost::bind( 
+    this->observe_itk_iterations( optimizer, boost::bind(
       &PointSetFilterAlgo::update_iteration, this, _1, progress_unit ) );
 
     this->progress_ = 0.0;
-  
+
     // Ensure we will have some threads left for doing something else
     this->limit_number_of_itk_threads( registration );
 
     // Run the actual ITK filter.
     // This needs to be in a try/catch statement as certain filters throw exceptions when they
     // are aborted. In that case we will relay a message to the status bar for information.
-    try 
-    { 
-      registration->Update(); 
-    } 
-    catch ( ... ) 
+    try
+    {
+      registration->Update();
+    }
+    catch ( ... )
     {
       if ( this->check_abort() )
       {
@@ -371,16 +373,16 @@ public:
     // This one is set when the abort button is pressed and an abort is sent to ITK.
     if ( this->check_abort() ) return;
 
-    registration_type::ParametersType final_parameters = 
+    registration_type::ParametersType final_parameters =
       registration->GetLastTransformParameters();
 
     std::string solution = "[" + boost::lexical_cast<std::string>(final_parameters[0]) +
       "," + boost::lexical_cast<std::string>(final_parameters[1]) +"," +
-      boost::lexical_cast<std::string>(final_parameters[2]) + "," + 
+      boost::lexical_cast<std::string>(final_parameters[2]) + "," +
       boost::lexical_cast<std::string>(final_parameters[3]) + "," +
       boost::lexical_cast<std::string>(final_parameters[4]) + "," +
-      boost::lexical_cast<std::string>(final_parameters[5]) + "]"; 
-    CORE_LOG_MESSAGE( std::string("Solution = ") + 
+      boost::lexical_cast<std::string>(final_parameters[5]) + "]";
+    CORE_LOG_MESSAGE( std::string("Solution = ") +
       solution );
 
 	std::vector< double > matrix_entries(final_parameters.begin(), final_parameters.end());
@@ -397,10 +399,10 @@ public:
       TYPED_IMAGE_TYPE > resample_filter_type;
 
     typename resample_filter_type::Pointer resampler = resample_filter_type::New();
-    typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image; 
+    typename Core::ITKImageDataT<VALUE_TYPE>::Handle moving_image;
     this->get_itk_image_from_layer<VALUE_TYPE>( this->mask_layer_, moving_image );
     resampler->SetInput( moving_image->get_image() );
-  
+
     final_transform->GetInverse( final_transform );
     resampler->SetTransform( final_transform );
 
@@ -429,7 +431,7 @@ public:
     }
   }
   SCI_END_TYPED_ITK_RUN()
-  
+
   // GET_FITLER_NAME:
   // The name of the filter, this information is used for generating new layer labels.
   virtual std::string get_filter_name() const
@@ -438,11 +440,11 @@ public:
   }
 
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
-    return "PointSetRegister";  
+    return "PointSetRegister";
   }
 
 private:
@@ -509,10 +511,10 @@ private:
       layer_->update_progress_signal_( progress_start_ );
 
 
-      CORE_LOG_MESSAGE( std::string("value = ") + 
+      CORE_LOG_MESSAGE( std::string("value = ") +
         boost::lexical_cast<std::string>( optimizer->GetValue() ));
 
-      CORE_LOG_MESSAGE( std::string("params = ") + 
+      CORE_LOG_MESSAGE( std::string("params = ") +
         boost::lexical_cast<std::string>( optimizer->GetCurrentPosition() ));
 
     }
@@ -521,7 +523,7 @@ private:
 };
 
 
-bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context, 
+bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Create algorithm
@@ -535,22 +537,22 @@ bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
   algo->transform_state_id_ = this->transform_state_id_;
   algo->complete_transform_state_id_ = this->complete_transform_state_id_;
 
-  
+
   // Check whether the source layer was found
   if ( !algo->src_layer_ || !algo->mask_layer_ ) return false;
-  
+
   // Lock the mask layer, so no other layer can access it
   algo->lock_for_use( algo->mask_layer_ );
   algo->lock_for_use( algo->src_layer_ );
 
   switch ( algo->src_layer_->get_type() )
-  { 
+  {
   case Core::VolumeType::DATA_E:
-    algo->create_and_lock_data_layer_from_layer( 
+    algo->create_and_lock_data_layer_from_layer(
       algo->src_layer_, algo->dst_layer_  );
     break;
   case Core::VolumeType::MASK_E:
-    algo->create_and_lock_mask_layer_from_layer( 
+    algo->create_and_lock_mask_layer_from_layer(
       algo->src_layer_, algo->dst_layer_ , algo->mask_layer_->get_layer_name() );
     break;
   default:
@@ -577,9 +579,9 @@ bool ActionPointSetRegisterFilter::run( Core::ActionContextHandle& context,
 
 
 void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context,
-  const std::string& target_layer, const std::string& mask_layer,  
+  const std::string& target_layer, const std::string& mask_layer,
   int iterations, const std::string& transform_state_id, const std::string& complete_transform_state_id)
-{ 
+{
   // Create a new action
   ActionPointSetRegisterFilter* action = new ActionPointSetRegisterFilter;
 
@@ -595,5 +597,5 @@ void ActionPointSetRegisterFilter::Dispatch( Core::ActionContextHandle context,
 }
 
 
-  
+
 } // end namespace Seg3D

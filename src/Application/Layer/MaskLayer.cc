@@ -28,7 +28,7 @@
 
 // STL includes
 
-// Boost includes 
+// Boost includes
 
 // Core includes
 #include <Core/Application/Application.h>
@@ -44,11 +44,12 @@
 #include <Application/PreferencesManager/PreferencesManager.h>
 #include <Application/ProjectManager/ProjectManager.h>
 
+using namespace boost::placeholders;
 
 namespace Seg3D
 {
 
-class MaskLayerPrivate 
+class MaskLayerPrivate
 {
   // -- internal functions --
 public:
@@ -80,7 +81,7 @@ void MaskLayerPrivate::initialize_states()
 
   {
     boost::mutex::scoped_lock lock( ColorCountMutex );
-    this->layer_->add_state( "color", this->layer_->color_state_, static_cast< int >( ColorCount % 
+    this->layer_->add_state( "color", this->layer_->color_state_, static_cast< int >( ColorCount %
       PreferencesManager::Instance()->color_states_.size() ) );
 
     ColorCount++;
@@ -134,7 +135,7 @@ void MaskLayerPrivate::handle_isosurface_update_progress( double progress )
 
 void MaskLayerPrivate::update_mask_info()
 {
-  this->layer_->centering_state_->set( 
+  this->layer_->centering_state_->set(
     this->layer_->get_grid_transform().get_originally_node_centered() ? "node" : "cell" );
 
   if (! this->mask_volume_ ||
@@ -144,21 +145,21 @@ void MaskLayerPrivate::update_mask_info()
     this->layer_->max_value_state_->set( std::numeric_limits< double >::quiet_NaN() );
     return;
   }
-  
+
   this->layer_->min_value_state_->set( this->mask_volume_->get_min() );
   this->layer_->max_value_state_->set( this->mask_volume_->get_max() );
 }
 
 MaskLayer::MaskLayer( const std::string& name, const Core::MaskVolumeHandle& volume ) :
-  Layer( name, !( volume->is_valid() ) ), 
+  Layer( name, !( volume->is_valid() ) ),
   private_( new MaskLayerPrivate )
 {
   this->private_->mask_volume_ = volume;
   this->private_->mask_volume_->register_data();
   this->private_->layer_ = this;
-  
+
   this->private_->initialize_states();
-  
+
   if (  volume->get_mask_data_block() )
   {
     this->private_->bit_state_->set( static_cast< int >( volume->get_mask_data_block()->get_mask_bit() ) );
@@ -186,13 +187,13 @@ MaskLayer::~MaskLayer()
   }
 }
 
-Core::GridTransform MaskLayer::get_grid_transform() const 
-{ 
+Core::GridTransform MaskLayer::get_grid_transform() const
+{
   Layer::lock_type lock( Layer::GetMutex() );
 
   if ( this->private_->mask_volume_ )
   {
-    return this->private_->mask_volume_->get_grid_transform(); 
+    return this->private_->mask_volume_->get_grid_transform();
   }
   else
   {
@@ -200,14 +201,14 @@ Core::GridTransform MaskLayer::get_grid_transform() const
   }
 }
 
-void MaskLayer::set_grid_transform( const Core::GridTransform& grid_transform, 
+void MaskLayer::set_grid_transform( const Core::GridTransform& grid_transform,
   bool preserve_centering )
 {
   Layer::lock_type lock( Layer::GetMutex() );
 
   if ( this->private_->mask_volume_ )
   {
-    this->private_->mask_volume_->set_grid_transform( grid_transform, preserve_centering ); 
+    this->private_->mask_volume_->set_grid_transform( grid_transform, preserve_centering );
   }
 }
 
@@ -257,7 +258,7 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
       // Unregister the old volume
       this->private_->mask_volume_->unregister_data();
     }
-    
+
     // delete the isosurface
     this->private_->isosurface_.reset();
 
@@ -269,7 +270,7 @@ bool MaskLayer::set_mask_volume( Core::MaskVolumeHandle volume )
       // Register the new volume
       this->private_->mask_volume_->register_data();
       this->generation_state_->set( this->private_->mask_volume_->get_generation() );
-      this->private_->bit_state_->set( static_cast< int >( 
+      this->private_->bit_state_->set( static_cast< int >(
         volume->get_mask_data_block()->get_mask_bit() ) );
 
       this->add_connection( this->private_->mask_volume_->get_mask_data_block()->mask_updated_signal_.
@@ -289,7 +290,7 @@ bool MaskLayer::pre_save_states( Core::StateIO& state_io )
 
   // Add the number to the project so it can be recorded into the session database
   ProjectManager::Instance()->get_current_project()->add_generation_number( generation_number );
-  
+
   boost::filesystem::path data_file = ProjectManager::Instance()->get_current_project()->
     get_project_data_path() / ( this->generation_state_->export_to_string() + ".nrrd" );
   if ( boost::filesystem::exists( data_file ) )
@@ -297,7 +298,7 @@ bool MaskLayer::pre_save_states( Core::StateIO& state_io )
     // File has already been saved
     return true;
   }
-  
+
   bool compress = PreferencesManager::Instance()->compression_state_->get();
   int level = PreferencesManager::Instance()->compression_level_state_->get();
 
@@ -312,7 +313,7 @@ bool MaskLayer::pre_save_states( Core::StateIO& state_io )
     CORE_LOG_ERROR( error );
     return false;
   }
-  
+
   return true;
 }
 
@@ -334,7 +335,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
     if( Core::DataVolume::LoadDataVolume( volume_path, data_volume, error ) )
     {
       data_volume->register_data( generation );
-      Core::MaskDataBlockManager::Instance()->register_data_block( 
+      Core::MaskDataBlockManager::Instance()->register_data_block(
         data_volume->get_data_block(), data_volume->get_grid_transform() );
       success = Core::MaskDataBlockManager::Instance()->
         create( generation, bit, grid_transform, mask_data_block );
@@ -343,7 +344,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
 
   if ( success )
   {
-    this->private_->mask_volume_ = Core::MaskVolumeHandle( new Core::MaskVolume( 
+    this->private_->mask_volume_ = Core::MaskVolumeHandle( new Core::MaskVolume(
       grid_transform, mask_data_block ) );
     this->add_connection( this->private_->mask_volume_->get_mask_data_block()->mask_updated_signal_.
       connect( boost::bind( &MaskLayerPrivate::handle_mask_data_changed, this->private_ ) ) );
@@ -355,7 +356,7 @@ bool MaskLayer::post_load_states( const Core::StateIO& state_io )
   {
     this->provenance_id_state_->set( GenerateProvenanceID() );
   }
-  
+
   return success;
 }
 
@@ -363,7 +364,7 @@ void MaskLayer::clean_up()
 {
   // Abort any filter still using this layer
   this->abort_signal_();
-  
+
   // Clean up the data that is still associated with this layer
   {
     Layer::lock_type lock( Layer::GetMutex() );
@@ -391,11 +392,11 @@ void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled 
 {
   if ( !Core::Application::IsApplicationThread() )
   {
-    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface, 
+    Core::Application::PostEvent( boost::bind( &MaskLayer::compute_isosurface,
       this, quality_factor, capping_enabled ) );
     return;
   }
-  
+
   Core::IsosurfaceHandle iso = this->private_->isosurface_;
   if ( !iso )
   {
@@ -403,7 +404,7 @@ void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled 
     this->add_connection( iso->update_progress_signal_.connect(
       boost::bind( &MaskLayerPrivate::handle_isosurface_update_progress, this->private_, _1 ) ) );
   }
-  
+
   // Set data state to processing so that progress bar is displayed
   this->data_state_->set( Layer::PROCESSING_C );
 
@@ -418,7 +419,7 @@ void MaskLayer::compute_isosurface( double quality_factor, bool capping_enabled 
     lock_type lock( Layer::GetMutex() );
     this->private_->isosurface_ = iso;
   }
-  
+
   if ( this->show_isosurface_state_->get() )
   {
     this->isosurface_updated_signal_();
@@ -444,8 +445,8 @@ void MaskLayer::delete_isosurface()
   if ( this->show_isosurface_state_->get() )
   {
     this->isosurface_updated_signal_();
-  } 
-  
+  }
+
   this->iso_generated_state_->set( false );
 
   LayerManager::Instance()->mask_layer_isosurface_deleted_signal_();
@@ -455,7 +456,7 @@ void MaskLayer::calculate_volume()
 {
   Core::MaskDataBlockHandle mask_block = this->get_mask_volume()->
     get_mask_data_block();
-    
+
   size_t voxel_count = 0;
   for( size_t j = 0; j < mask_block->get_size(); ++j )
   {
@@ -464,13 +465,13 @@ void MaskLayer::calculate_volume()
       voxel_count++;
     }
   }
-  
-  double calculated_mask_volume = ( this->get_grid_transform().spacing_x() * 
+
+  double calculated_mask_volume = ( this->get_grid_transform().spacing_x() *
     this->get_grid_transform().spacing_y() * this->get_grid_transform().spacing_z() )
     * voxel_count;
-    
+
   this->calculated_volume_state_->set( Core::ExportToString( calculated_mask_volume, size_t( 3 ) ) );
-  this->counted_pixels_state_->set( Core::ExportToString( voxel_count ) );  
+  this->counted_pixels_state_->set( Core::ExportToString( voxel_count ) );
 }
 
 size_t MaskLayer::get_byte_size() const
@@ -493,7 +494,7 @@ LayerHandle MaskLayer::duplicate() const
     // NOTE: return an empty handle
     return layer;
   }
-  
+
   return MaskLayerHandle( new MaskLayer( "Copy_" + this->get_layer_name(), mask_volume ) );
 }
 

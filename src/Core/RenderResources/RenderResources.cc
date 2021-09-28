@@ -327,10 +327,11 @@ bool RenderResources::valid_render_resources()
 	  boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
   }
 
+  const bool glCap = static_cast<bool>(this->private_->gl_capable_.load());
   return (this->private_->resources_context_ &&
 		  this->private_->resources_context_->valid_render_resources() &&
 		  this->private_->delete_context_ &&
-		  this->private_->gl_capable_);
+		  glCap);
 }
 
 void RenderResources::initialize_on_event_thread()

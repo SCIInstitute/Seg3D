@@ -33,11 +33,13 @@
 
 #include <QtUtils/Bridge/detail/QtTransferFunctionCurveConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtTransferFunctionCurveConnector::QtTransferFunctionCurveConnector( 
-  QtTransferFunctionCurve* parent, 
+QtTransferFunctionCurveConnector::QtTransferFunctionCurveConnector(
+  QtTransferFunctionCurve* parent,
   Core::TransferFunctionFeatureHandle& tf_feature, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -63,8 +65,8 @@ QtTransferFunctionCurveConnector::QtTransferFunctionCurveConnector(
       boost::bind( &QtTransferFunctionCurveConnector::UpdateCurveColor, qpointer ) ) );
   }
 
-  this->connect( parent, SIGNAL( control_points_changed( 
-    const Core::TransferFunctionControlPointVector& ) ), 
+  this->connect( parent, SIGNAL( control_points_changed(
+    const Core::TransferFunctionControlPointVector& ) ),
     SLOT( set_control_points_state( const Core::TransferFunctionControlPointVector& ) ) );
 }
 
@@ -73,8 +75,8 @@ QtTransferFunctionCurveConnector::~QtTransferFunctionCurveConnector()
   this->disconnect_all();
 }
 
-void QtTransferFunctionCurveConnector::SetCurveControlPoints( 
-  QPointer< QtTransferFunctionCurveConnector > qpointer, 
+void QtTransferFunctionCurveConnector::SetCurveControlPoints(
+  QPointer< QtTransferFunctionCurveConnector > qpointer,
   Core::TransferFunctionControlPointVector control_points, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -84,7 +86,7 @@ void QtTransferFunctionCurveConnector::SetCurveControlPoints(
 
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &QtTransferFunctionCurveConnector::SetCurveControlPoints,
       qpointer, control_points, source ) );
     return;
@@ -100,12 +102,12 @@ void QtTransferFunctionCurveConnector::SetCurveControlPoints(
   qpointer->unblock();
 }
 
-void QtTransferFunctionCurveConnector::UpdateCurveColor( 
+void QtTransferFunctionCurveConnector::UpdateCurveColor(
   QPointer< QtTransferFunctionCurveConnector > qpointer )
 {
   if ( !Core::Interface::IsInterfaceThread() )
   {
-    Core::Interface::PostEvent( boost::bind( 
+    Core::Interface::PostEvent( boost::bind(
       &QtTransferFunctionCurveConnector::UpdateCurveColor,
       qpointer ) );
     return;
@@ -124,12 +126,12 @@ void QtTransferFunctionCurveConnector::UpdateCurveColor(
   qpointer->parent_->set_color( color );
 }
 
-void QtTransferFunctionCurveConnector::set_control_points_state( 
+void QtTransferFunctionCurveConnector::set_control_points_state(
   const Core::TransferFunctionControlPointVector& control_points )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
       this->tf_feature_->control_points_state_, control_points );
   }
 }

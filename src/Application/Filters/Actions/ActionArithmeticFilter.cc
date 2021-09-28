@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -44,6 +44,8 @@
 // NOTE: Registration needs to be done outside of any namespace
 CORE_REGISTER_ACTION( Seg3D, ArithmeticFilter )
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 
@@ -67,7 +69,7 @@ public:
 public:
 
   // RUN_FILTER:
-  // Implementation of run of the Runnable base class, this function is called 
+  // Implementation of run of the Runnable base class, this function is called
   // when the thread is launched.
   virtual void run_filter();
 
@@ -79,8 +81,8 @@ public:
   }
 
   // GET_LAYER_PREFIX:
-  // This function returns the name of the filter. The latter is prepended to the new layer name, 
-  // when a new layer is generated. 
+  // This function returns the name of the filter. The latter is prepended to the new layer name,
+  // when a new layer is generated.
   virtual std::string get_layer_prefix() const
   {
     return "Arithmetic";
@@ -101,29 +103,29 @@ void ArithmeticFilterAlgo::run_filter()
   {
     Core::DataBlockHandle output_data_block;
     this->engine_.get_data_block( ActionArithmeticFilter::RESULT_C, output_data_block );
-    
+
     if ( this->dst_layer_->get_type() == Core::VolumeType::MASK_E )
     {
       Core::MaskDataBlockHandle mask_data_block;
-      Core::MaskDataBlockManager::ConvertLargerThan( output_data_block, 
+      Core::MaskDataBlockManager::ConvertLargerThan( output_data_block,
         this->dst_layer_->get_grid_transform(), mask_data_block );
       this->dispatch_insert_mask_volume_into_layer( this->dst_layer_, Core::MaskVolumeHandle(
-        new Core::MaskVolume( this->dst_layer_->get_grid_transform(), 
+        new Core::MaskVolume( this->dst_layer_->get_grid_transform(),
         mask_data_block ) ) );
     }
     else
     {
-      if ( this->preserve_data_format_ && 
+      if ( this->preserve_data_format_ &&
         output_data_block->get_data_type() != this->src_layer_->get_data_type() )
       {
 
         Core::DataBlockHandle converted_data_block;
-        Core::DataBlock::ConvertDataType( output_data_block, converted_data_block, 
-          this->src_layer_->get_data_type() ); 
+        Core::DataBlock::ConvertDataType( output_data_block, converted_data_block,
+          this->src_layer_->get_data_type() );
         output_data_block = converted_data_block;
       }
       this->dispatch_insert_data_volume_into_layer( this->dst_layer_, Core::DataVolumeHandle(
-        new Core::DataVolume( this->dst_layer_->get_grid_transform(), output_data_block ) ), 
+        new Core::DataVolume( this->dst_layer_->get_grid_transform(), output_data_block ) ),
         true );
     }
   }
@@ -173,11 +175,11 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
       switch ( layers[ i ]->get_type() )
       {
       case Core::VolumeType::MASK_E:
-        if ( ! ( Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >( 
-          layers[ i ].get() )->get_mask_volume()->get_mask_data_block(), 
+        if ( ! ( Core::MaskDataBlockManager::Convert( dynamic_cast< MaskLayer* >(
+          layers[ i ].get() )->get_mask_volume()->get_mask_data_block(),
           input_data_block, Core::DataType::UCHAR_E ) ) )
         {
-          context->report_error( 
+          context->report_error(
             std::string("Arithmetic Filter: Running out of memory.") );
           this->algo_.reset();
           return false;
@@ -187,7 +189,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
         if ( ! ( input_data_block = dynamic_cast< DataLayer* >( layers[ i ].get() )->
           get_data_volume()->get_data_block() ) )
         {
-          context->report_error( 
+          context->report_error(
             std::string("Arithmetic Filter: Running out of memory.") );
           this->algo_.reset();
           return false;
@@ -230,7 +232,7 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
           {
             context->report_error( "Could not lock layer." );
             this->algo_.reset();
-            return false;       
+            return false;
           }
         }
       }
@@ -248,34 +250,34 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   {
     this->algo_->dst_layer_ = layers[ 0 ];
     // Make sure the dst layer type matches the output type
-    if( !( ( this->algo_->dst_layer_->get_type() == Core::VolumeType::MASK_E && 
+    if( !( ( this->algo_->dst_layer_->get_type() == Core::VolumeType::MASK_E &&
       this->output_type_ ==  ActionArithmeticFilter::MASK_C ) ||
-      ( this->algo_->dst_layer_->get_type() == Core::VolumeType::DATA_E && 
+      ( this->algo_->dst_layer_->get_type() == Core::VolumeType::DATA_E &&
       this->output_type_ ==  ActionArithmeticFilter::DATA_C ) ) )
     {
-      context->report_error( 
+      context->report_error(
         std::string("Arithmetic Filter: Cannot replace first input -- input/output types don't match.") );
       return false;
     }
   }
   else if ( this->output_type_ == ActionArithmeticFilter::DATA_C )
   {
-    if ( ! (this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ], 
+    if ( ! (this->algo_->create_and_lock_data_layer_from_layer( layers[ 0 ],
       this->algo_->dst_layer_ ) ) )
     {
       context->report_error( "Could not create output layer." );
       this->algo_.reset();
-      return false;   
+      return false;
     }
   }
   else
   {
-    if ( ! ( this->algo_->create_and_lock_mask_layer_from_layer( layers[ 0 ], 
+    if ( ! ( this->algo_->create_and_lock_mask_layer_from_layer( layers[ 0 ],
       this->algo_->dst_layer_ ) ) )
     {
       context->report_error( "Could not create output layer." );
       this->algo_.reset();
-      return false;   
+      return false;
     }
   }
 
@@ -289,8 +291,8 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
 
   if ( this->algo_->dst_layer_->get_type() == Core::VolumeType::MASK_E )
   {
-    if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
-      grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(), 
+    if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C,
+      grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(),
       Core::DataType::CHAR_E, error ) )
     {
       context->report_error( error );
@@ -300,8 +302,8 @@ bool ActionArithmeticFilterPrivate::validate_parser( Core::ActionContextHandle& 
   }
   else
   {
-    if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C, 
-      grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(), 
+    if( !this->algo_->engine_.add_output_data_block( ActionArithmeticFilter::RESULT_C,
+      grid_trans.get_nx(), grid_trans.get_ny(), grid_trans.get_nz(),
       Core::DataType::FLOAT_E, error ) )
     {
       context->report_error( error );
@@ -352,14 +354,14 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
     context->report_error( "No input layers specified" );
     return false;
   }
-  
+
   // Validate layers
   Core::GridTransform grid_trans;
   for ( size_t i = 0; i < this->private_->layer_ids_.size(); ++i )
   {
     if ( this->private_->layer_ids_[ i ] == "<none>" || this->private_->layer_ids_[ i ] == "" ) continue;
     // Check for layer existence
-    LayerHandle layer = LayerManager::FindLayer( this->private_->layer_ids_[ i ], 
+    LayerHandle layer = LayerManager::FindLayer( this->private_->layer_ids_[ i ],
       this->private_->sandbox_ );
     if ( !layer )
     {
@@ -377,9 +379,9 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
       context->report_error( "Input layers do not belong to the same group" );
       return false;
     }
-    
-    // Check for layer availability 
-    if ( ! LayerManager::CheckLayerAvailability( this->private_->layer_ids_[ i ], 
+
+    // Check for layer availability
+    if ( ! LayerManager::CheckLayerAvailability( this->private_->layer_ids_[ i ],
       i == 0 && this->private_->replace_, context, this->private_->sandbox_ ) ) return false;
   }
 
@@ -388,12 +390,12 @@ bool ActionArithmeticFilter::validate( Core::ActionContextHandle& context )
   {
     return false;
   }
-  
+
   // Validation successful
   return true;
 }
 
-bool ActionArithmeticFilter::run( Core::ActionContextHandle& context, 
+bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   Core::ActionResultHandle& result )
 {
   // Copy the parameters over to the algorithm that runs the filter
@@ -425,10 +427,10 @@ bool ActionArithmeticFilter::run( Core::ActionContextHandle& context,
   return true;
 }
 
-void ActionArithmeticFilter::Dispatch( Core::ActionContextHandle context, 
-                    const std::vector< std::string >& layer_ids, 
-                    const std::string& expressions, 
-                    const std::string& output_type, 
+void ActionArithmeticFilter::Dispatch( Core::ActionContextHandle context,
+                    const std::vector< std::string >& layer_ids,
+                    const std::string& expressions,
+                    const std::string& output_type,
                     bool replace, bool preserve_data_format )
 {
   ActionArithmeticFilter* action = new ActionArithmeticFilter;

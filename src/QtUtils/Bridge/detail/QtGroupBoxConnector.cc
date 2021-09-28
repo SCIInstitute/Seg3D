@@ -33,6 +33,8 @@
 
 #include <QtUtils/Bridge/detail/QtGroupBoxConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 

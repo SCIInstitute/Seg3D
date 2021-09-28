@@ -63,6 +63,8 @@
 // Include CMake generated files
 #include "ApplicationConfiguration.h"
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 

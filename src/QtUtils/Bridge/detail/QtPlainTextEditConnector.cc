@@ -33,10 +33,12 @@
 
 #include <QtUtils/Bridge/detail/QtPlainTextEditConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtPlainTextEditConnector::QtPlainTextEditConnector( QPlainTextEdit* parent, 
+QtPlainTextEditConnector::QtPlainTextEditConnector( QPlainTextEdit* parent,
     Core::StateStringHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -59,7 +61,7 @@ QtPlainTextEditConnector::~QtPlainTextEditConnector()
   this->disconnect_all();
 }
 
-void QtPlainTextEditConnector::SetPlainTextEditText( QPointer< QtPlainTextEditConnector > qpointer, 
+void QtPlainTextEditConnector::SetPlainTextEditText( QPointer< QtPlainTextEditConnector > qpointer,
     std::string text, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )

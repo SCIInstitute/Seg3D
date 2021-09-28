@@ -33,10 +33,12 @@
 
 #include <QtUtils/Bridge/detail/QtLineEditConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtLineEditConnector::QtLineEditConnector( QLineEdit* parent, 
+QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
     Core::StateStringHandle& state, bool immediate_update, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -54,7 +56,7 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
 
   if ( immediate_update )
   {
-    this->connect( parent, SIGNAL( textChanged ( const QString& ) ), 
+    this->connect( parent, SIGNAL( textChanged ( const QString& ) ),
       SLOT( set_state( const QString& ) ) );
   }
   else
@@ -63,7 +65,7 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
   }
 }
 
-QtLineEditConnector::QtLineEditConnector( QLineEdit* parent, 
+QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
     Core::StateNameHandle& state, bool immediate_update, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -75,17 +77,17 @@ QtLineEditConnector::QtLineEditConnector( QLineEdit* parent,
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     parent->setText( QString( state->get().c_str() ) );
     parent->setCursorPosition( 0 );
-    
+
     // NOTE: for StateName, always update the QLineEdit no matter what the source
     // of the change is, because the actual value set in the state may be different from
     // user input.
-    this->add_connection( state->value_changed_signal_.connect( boost::bind( 
+    this->add_connection( state->value_changed_signal_.connect( boost::bind(
       &QtLineEditConnector::SetLineEditText, qpointer, _2, Core::ActionSource::NONE_E ) ) );
   }
 
   if ( immediate_update )
   {
-    this->connect( parent, SIGNAL( textChanged ( const QString&) ), 
+    this->connect( parent, SIGNAL( textChanged ( const QString&) ),
       SLOT( set_state( const QString& ) ) );
   }
   else
@@ -100,7 +102,7 @@ QtLineEditConnector::~QtLineEditConnector()
   this->disconnect_all();
 }
 
-void QtLineEditConnector::SetLineEditText( QPointer< QtLineEditConnector > qpointer, 
+void QtLineEditConnector::SetLineEditText( QPointer< QtLineEditConnector > qpointer,
     std::string text, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -140,7 +142,7 @@ void QtLineEditConnector::set_state( const QString& text )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_, 
+    Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), this->state_,
       text.trimmed().toStdString() );
   }
 }

@@ -33,10 +33,12 @@
 
 #include <QtUtils/Bridge/detail/QtColorButtonConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtColorButtonConnector::QtColorButtonConnector( QtColorButton* parent, 
+QtColorButtonConnector::QtColorButtonConnector( QtColorButton* parent,
                      Core::StateColorHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -59,11 +61,11 @@ QtColorButtonConnector::~QtColorButtonConnector()
   this->disconnect_all();
 }
 
-void QtColorButtonConnector::SetButtonColor( QPointer< QtColorButtonConnector > qpointer, 
+void QtColorButtonConnector::SetButtonColor( QPointer< QtColorButtonConnector > qpointer,
     Core::Color val, Core::ActionSource source )
 {
-  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state 
-  // and updated simultaneously.  For example, a INTERFACE_WIDGET_E source may be another widget, 
+  // NOTE: Not checking ActionSource so that multiple widgets can be connected to the same state
+  // and updated simultaneously.  For example, a INTERFACE_WIDGET_E source may be another widget,
   // not this one.  This is safe because there will be at most one extra call to set
   // the state since the state will be unchanged in subsequent calls.
 

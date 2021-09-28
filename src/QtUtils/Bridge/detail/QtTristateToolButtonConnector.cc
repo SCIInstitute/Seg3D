@@ -34,11 +34,13 @@
 
 #include <QtUtils/Bridge/detail/QtTristateToolButtonConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtTristateToolButtonConnector::QtTristateToolButtonConnector( 
-  QtTristateToolButton* parent, 
+QtTristateToolButtonConnector::QtTristateToolButtonConnector(
+  QtTristateToolButton* parent,
   Core::StateOptionHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -54,11 +56,11 @@ QtTristateToolButtonConnector::QtTristateToolButtonConnector(
     parent->set_state_strings( option_list[ 0 ], option_list[ 1 ], option_list[ 2 ] );
     parent->set_state( state->get() );
 
-    this->add_connection( state->value_changed_signal_.connect( boost::bind( 
+    this->add_connection( state->value_changed_signal_.connect( boost::bind(
       &QtTristateToolButtonConnector::SetButtonState, qpointer, _1, _2 ) ) );
   }
 
-  this->connect( parent, SIGNAL( state_changed( std::string ) ), 
+  this->connect( parent, SIGNAL( state_changed( std::string ) ),
     SLOT( set_state( std::string ) ) );
 }
 
@@ -75,8 +77,8 @@ void QtTristateToolButtonConnector::set_state( std::string value )
   }
 }
 
-void QtTristateToolButtonConnector::SetButtonState( 
-  QPointer< QtTristateToolButtonConnector > qpointer, 
+void QtTristateToolButtonConnector::SetButtonState(
+  QPointer< QtTristateToolButtonConnector > qpointer,
   std::string state, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )

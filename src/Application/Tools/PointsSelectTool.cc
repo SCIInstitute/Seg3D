@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -42,6 +42,8 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerManager.h>
 #include <Application/ViewerManager/ViewerManager.h>
+
+using namespace boost::placeholders;
 
 SCI_REGISTER_TOOL( Seg3D, PointsSelectTool )
 
@@ -81,7 +83,7 @@ PointsSelectToolPrivate::update_unit_point_list()
   bool convert_units = true;
 
   // We need access to the use_world_units_state_, and several functions we call also lock
-  // the state engine.  
+  // the state engine.
   Core::StateEngine::lock_type stateLock( Core::StateEngine::GetMutex() );
   convert_units = ! this->tool_->use_world_units_state_->get();
 
@@ -111,9 +113,9 @@ PointsSelectToolPrivate::handle_units_selection_changed( std::string units )
 {
   // Don't need to lock state engine because we're running on app thread
   ASSERT_IS_APPLICATION_THREAD();
-  
+
   bool old_show_world_units_state = this->tool_->use_world_units_state_->get();
-  
+
   if ( units == PointsSelectTool::WORLD_UNITS_C )
   {
     this->tool_->use_world_units_state_->set( true );
@@ -122,7 +124,7 @@ PointsSelectToolPrivate::handle_units_selection_changed( std::string units )
   {
     this->tool_->use_world_units_state_->set( false );
   }
-  
+
   // If units have changed, emit signal
   if ( old_show_world_units_state != this->tool_->use_world_units_state_->get() )
   {
@@ -161,12 +163,12 @@ PointsSelectTool::PointsSelectTool( const std::string& toolid ) :
 {
   this->private_->tool_ = this;
 
-  this->add_state( "units_selection", this->units_selection_state_, WORLD_UNITS_C, 
+  this->add_state( "units_selection", this->units_selection_state_, WORLD_UNITS_C,
                   INDEX_UNITS_C + "=Pixel|" +
                   WORLD_UNITS_C + "=Actual" );
   this->add_state( "show_world_units", this->use_world_units_state_, true );
   this->add_state( "seed_points_index", this->seed_points_index_state_ );
-  
+
   this->private_->handle_target_layer_changed();
 
   this->add_connection( this->target_layer_state_->state_changed_signal_.connect(
@@ -174,15 +176,15 @@ PointsSelectTool::PointsSelectTool( const std::string& toolid ) :
   this->add_connection( this->units_selection_state_->value_changed_signal_.connect(
     boost::bind( &PointsSelectToolPrivate::handle_units_selection_changed, this->private_, _2 ) ) );
 }
-  
+
 PointsSelectTool::~PointsSelectTool()
 {
   this->disconnect_all();
 }
 
 bool
-PointsSelectTool::handle_mouse_press( ViewerHandle viewer, 
-                                      const Core::MouseHistory& mouse_history, 
+PointsSelectTool::handle_mouse_press( ViewerHandle viewer,
+                                      const Core::MouseHistory& mouse_history,
                                       int button, int buttons, int modifiers )
 {
   this->private_->viewer_ = viewer;
@@ -211,13 +213,13 @@ PointsSelectTool::redraw( size_t viewer_id, const Core::Matrix& proj_mat, int vi
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     target_layer_id = this->target_layer_state_->get();
   }
-  
+
   if ( target_layer_id == Tool::NONE_OPTION_C )
   {
     return;
   }
-  
+
   SeedPointsTool::redraw( viewer_id, proj_mat, viewer_width, viewer_height );
-}    
+}
 
 }

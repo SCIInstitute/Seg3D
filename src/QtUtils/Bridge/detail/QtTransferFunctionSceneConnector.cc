@@ -35,10 +35,12 @@
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Bridge/detail/QtTransferFunctionSceneConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtTransferFunctionSceneConnector::QtTransferFunctionSceneConnector( 
+QtTransferFunctionSceneConnector::QtTransferFunctionSceneConnector(
   QtTransferFunctionScene* parent, Core::TransferFunctionHandle& tf ) :
   QtConnectorBase( parent ),
   parent_( parent ),
@@ -48,7 +50,7 @@ QtTransferFunctionSceneConnector::QtTransferFunctionSceneConnector(
 
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-    
+
     this->add_connection( tf->feature_added_signal_.connect( boost::bind(
       &QtTransferFunctionSceneConnector::AddCurve, qpointer, _1 ) ) );
     this->add_connection( tf->feature_deleted_signal_.connect( boost::bind(
@@ -61,8 +63,8 @@ QtTransferFunctionSceneConnector::~QtTransferFunctionSceneConnector()
   this->disconnect_all();
 }
 
-void QtTransferFunctionSceneConnector::AddCurve( 
-  QPointer< QtTransferFunctionSceneConnector > qpointer, 
+void QtTransferFunctionSceneConnector::AddCurve(
+  QPointer< QtTransferFunctionSceneConnector > qpointer,
   Core::TransferFunctionFeatureHandle feature )
 {
   if ( !Core::Interface::IsInterfaceThread() )
@@ -83,8 +85,8 @@ void QtTransferFunctionSceneConnector::AddCurve(
   QtUtils::QtBridge::Connect( curve, feature );
 }
 
-void QtTransferFunctionSceneConnector::DeleteCurve( 
-  QPointer< QtTransferFunctionSceneConnector > qpointer, 
+void QtTransferFunctionSceneConnector::DeleteCurve(
+  QPointer< QtTransferFunctionSceneConnector > qpointer,
   Core::TransferFunctionFeatureHandle feature )
 {
   if ( !Core::Interface::IsInterfaceThread() )

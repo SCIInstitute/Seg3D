@@ -37,6 +37,8 @@
 #include <Application/Layer/Layer.h>
 #include <Application/Layer/LayerGroup.h>
 
+using namespace boost::placeholders;
+
 namespace Seg3D
 {
 

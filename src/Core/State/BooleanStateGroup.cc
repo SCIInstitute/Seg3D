@@ -29,6 +29,8 @@
 #include <Core/State/BooleanStateGroup.h>
 #include <Core/Utils/ConnectionHandler.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -46,12 +48,12 @@ void BooleanStateGroupPrivate::handle_state_changed( size_t index, bool state_va
   {
     return;
   }
-  
+
   for ( size_t i = 0; i < index; ++i )
   {
     this->states_[ i ]->set( false );
   }
-  
+
   for ( size_t i = index + 1; i < this->states_.size(); ++i )
   {
     this->states_[ i ]->set( false );
@@ -76,7 +78,7 @@ void BooleanStateGroup::add_boolean_state( StateBoolHandle state )
 
   this->private_->states_.push_back( state );
   this->private_->add_connection( state->value_changed_signal_.connect(
-    boost::bind( &BooleanStateGroupPrivate::handle_state_changed, 
+    boost::bind( &BooleanStateGroupPrivate::handle_state_changed,
     this->private_, this->private_->states_.size() - 1, _1 ) ) );
   this->private_->handle_state_changed( this->private_->states_.size() - 1, state->get() );
 }
@@ -90,7 +92,7 @@ void BooleanStateGroup::clear_selection()
     this->private_->states_[ i ]->set( false );
   }
 }
-  
+
 bool BooleanStateGroup::get_enabled() const
 {
   for ( size_t i = 0; i < this->private_->states_.size(); ++i )

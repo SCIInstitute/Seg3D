@@ -34,11 +34,13 @@
 #include <QtUtils/Bridge/QtBridge.h>
 #include <QtUtils/Bridge/detail/QtColorBarWidgetConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtColorBarWidgetConnector::QtColorBarWidgetConnector( 
-    QtColorBarWidget* parent, Core::StateIntHandle& state, 
+QtColorBarWidgetConnector::QtColorBarWidgetConnector(
+    QtColorBarWidget* parent, Core::StateIntHandle& state,
     std::vector< Core::StateColorHandle >& colors, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
@@ -52,7 +54,7 @@ QtColorBarWidgetConnector::QtColorBarWidgetConnector(
     // Create color buttons for color bar
     for ( size_t j = 0; j < colors.size(); j++ )
     {
-      QtColorButton* color_button =  new QtColorButton( parent, 
+      QtColorButton* color_button =  new QtColorButton( parent,
         static_cast< int >( j ), colors[ j ]->get(), 16, 16 );
       QtBridge::Connect( color_button, colors[ j ] );
       parent->add_color_button( color_button, static_cast< int >( j ) );
@@ -69,8 +71,8 @@ QtColorBarWidgetConnector::~QtColorBarWidgetConnector()
   this->disconnect_all();
 }
 
-void QtColorBarWidgetConnector::SetColorIndex( 
-    QPointer< QtColorBarWidgetConnector > qpointer, 
+void QtColorBarWidgetConnector::SetColorIndex(
+    QPointer< QtColorBarWidgetConnector > qpointer,
     int index, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )

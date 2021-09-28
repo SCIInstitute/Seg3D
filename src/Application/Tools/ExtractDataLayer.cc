@@ -38,6 +38,8 @@
 // Action associated with tool
 #include <Application/Tools/Actions/ActionExtractDataLayer.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, ExtractDataLayer )
 
@@ -128,10 +130,10 @@ ExtractDataLayer::~ExtractDataLayer()
 }
 
 void ExtractDataLayer::execute( Core::ActionContextHandle context )
-{ 
+{
   // NOTE: Need to lock state engine as this function is run from the interface thread
   Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
-  
+
   ActionExtractDataLayer::Dispatch( context,
                                     this->target_layer_state_->get(),
                                     this->level_state_->get()
@@ -139,5 +141,3 @@ void ExtractDataLayer::execute( Core::ActionContextHandle context )
 }
 
 } // end namespace Seg3D
-
-

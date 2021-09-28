@@ -1,22 +1,22 @@
 /*
  For more information, please see: http://software.sci.utah.edu
- 
+
  The MIT License
- 
+
  Copyright (c) 2016 Scientific Computing and Imaging Institute,
  University of Utah.
- 
- 
+
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included
  in all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -39,6 +39,8 @@
 #include <Application/Filters/Actions/ActionPointSetRegisterFilter.h>
 #include <Application/Filters/Actions/ActionPointSetTransformFilter.h>
 
+using namespace boost::placeholders;
+
 // Register the tool into the tool factory
 SCI_REGISTER_TOOL( Seg3D, PointSetFilter )
 
@@ -49,7 +51,7 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   SingleTargetTool( Core::VolumeType::MASK_E, toolid )
 {
   // Create an empty list of label options
-  std::vector< LayerIDNamePair > empty_list( 1, 
+  std::vector< LayerIDNamePair > empty_list( 1,
     std::make_pair( Tool::NONE_OPTION_C, Tool::NONE_OPTION_C ) );
 
   std::vector< std::string > empty_option;
@@ -94,7 +96,7 @@ PointSetFilter::PointSetFilter( const std::string& toolid ) :
   this->add_connection( this->transform_matrix_state_->state_changed_signal_.connect(
     boost::bind( &PointSetFilter::handle_transform_changed, this ) ) );
 }
-  
+
 PointSetFilter::~PointSetFilter()
 {
   this->disconnect_all();
@@ -138,7 +140,7 @@ void PointSetFilter::handle_layers_changed()
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
 
   std::string mask_layer_id = this->mask_state_->get();
-  
+
   LayerHandle layer = LayerManager::Instance()->find_layer_by_id( mask_layer_id );
 
   if ( layer )
@@ -155,7 +157,7 @@ void PointSetFilter::handle_layers_changed()
     {
       group->get_layer_names( layer_names, mask_type );
 
-      LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
+      LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id(
         this->target_layer_state_->get());
 
       std::string target_layer_name = "";
@@ -164,7 +166,7 @@ void PointSetFilter::handle_layers_changed()
 
       for ( ; it!=layer_names.end(); ++it )
       {
-        if ( target_layer_name.compare( (*it).second ) == 0 ) 
+        if ( target_layer_name.compare( (*it).second ) == 0 )
         {
           break;
         }
@@ -202,7 +204,7 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
     {
       group->get_layer_names( layer_names, mask_type );
 
-      LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id( 
+      LayerHandle target_layer = LayerManager::Instance()->find_layer_by_id(
         this->target_layer_state_->get());
 
       std::string target_layer_name = "";
@@ -211,7 +213,7 @@ void PointSetFilter::handle_mask_layer_changed( std::string layer_id )
 
       for ( ; it!=layer_names.end(); ++it )
       {
-        if ( target_layer_name.compare( (*it).second ) == 0 ) 
+        if ( target_layer_name.compare( (*it).second ) == 0 )
         {
           break;
         }
@@ -239,7 +241,7 @@ void PointSetFilter::registration( Core::ActionContextHandle context )
     this->iterations_state_->get(),
     this->transform_matrix_state_->get_stateid(),
 	this->complete_transform_matrix_state_->get_stateid()
-    );  
+    );
 
 }
 
@@ -252,9 +254,7 @@ void PointSetFilter::apply( Core::ActionContextHandle context )
     this->target_layer_state_->get(),
     this->target_layers_state_->get(),
     this->transform_matrix_state_->get()
-    );    
+    );
 }
 
 } // end namespace Seg3D
-
-

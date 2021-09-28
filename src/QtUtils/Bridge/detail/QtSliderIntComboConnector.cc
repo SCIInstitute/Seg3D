@@ -34,17 +34,19 @@
 
 #include <QtUtils/Bridge/detail/QtSliderIntComboConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
-QtSliderIntComboConnector::QtSliderIntComboConnector( QtSliderIntCombo* parent, 
+QtSliderIntComboConnector::QtSliderIntComboConnector( QtSliderIntCombo* parent,
   Core::StateRangedIntHandle& state, bool blocking ) :
   QtConnectorBase( parent, blocking ),
   parent_( parent ),
   state_( state )
 {
   QPointer< QtSliderIntComboConnector > qpointer( this );
-  
+
   {
     Core::StateEngine::lock_type lock( Core::StateEngine::GetMutex() );
     int min_val, max_val, step_size;
@@ -68,7 +70,7 @@ QtSliderIntComboConnector::~QtSliderIntComboConnector()
   this->disconnect_all();
 }
 
-void QtSliderIntComboConnector::SetValue( QPointer< QtSliderIntComboConnector > qpointer, 
+void QtSliderIntComboConnector::SetValue( QPointer< QtSliderIntComboConnector > qpointer,
     int val, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -93,7 +95,7 @@ void QtSliderIntComboConnector::SetValue( QPointer< QtSliderIntComboConnector > 
   qpointer->unblock();
 }
 
-void QtSliderIntComboConnector::SetRange( QPointer< QtSliderIntComboConnector > qpointer, 
+void QtSliderIntComboConnector::SetRange( QPointer< QtSliderIntComboConnector > qpointer,
     int min_val, int max_val, Core::ActionSource source )
 {
   if ( source == Core::ActionSource::INTERFACE_WIDGET_E )
@@ -130,9 +132,9 @@ void QtSliderIntComboConnector::set_state_range( int min_val, int max_val )
 {
   if ( !this->is_blocked() )
   {
-    Core::ActionSetRange::Dispatch( Core::Interface::GetWidgetActionContext(),this->state_, 
+    Core::ActionSetRange::Dispatch( Core::Interface::GetWidgetActionContext(),this->state_,
       min_val, max_val );
   }
 }
-  
+
 } // end namespace QtUtils

@@ -36,6 +36,8 @@
 #include <Core/Parser/ParserEnums.h>
 #include <Core/Utils/StringUtil.h>
 
+using namespace boost::placeholders;
+
 namespace Core
 {
 
@@ -47,12 +49,12 @@ public:
   {
   public:
     std::string array_name_;
-    std::string data_block_name_; 
+    std::string data_block_name_;
     DataBlockHandle data_block_;
   };
 
   // We don't support outputting a MaskDataBlock because it would have to be registered with the
-  // MaskDataBlockManager and locked to prevent conflicts with other masks.  Also, we can avoid 
+  // MaskDataBlockManager and locked to prevent conflicts with other masks.  Also, we can avoid
   // bit operations when copying back the parser result.
 
   // Parser program : the structure of the expressions and simple reduction
@@ -113,7 +115,7 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
   // Check whether size is OK
   if ( size > 1 )
   {
-    if ( this->private_->array_size_ == 1 ) 
+    if ( this->private_->array_size_ == 1 )
     {
       this->private_->array_size_ = size;
     }
@@ -133,7 +135,7 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
   this->private_->pre_expression_ += name + "=get_scalar(" + tname + ");";
 
   int flags = 0;
-  if ( size > 1 ) 
+  if ( size > 1 )
   {
     flags = SCRIPT_SEQUENTIAL_VAR_E;
   }
@@ -152,7 +154,7 @@ bool ArrayMathEngine::add_input_data_block( std::string name, DataBlockHandle da
 }
 
 
-bool ArrayMathEngine::add_input_mask_data_block( std::string name, 
+bool ArrayMathEngine::add_input_mask_data_block( std::string name,
   MaskDataBlockHandle mask_data_block, std::string& error )
 {
   if ( mask_data_block->get_size() == 0 )
@@ -166,7 +168,7 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name,
   // Check whether size is OK
   if ( size > 1 )
   {
-    if ( this->private_->array_size_ == 1 ) 
+    if ( this->private_->array_size_ == 1 )
     {
       this->private_->array_size_ = size;
     }
@@ -186,7 +188,7 @@ bool ArrayMathEngine::add_input_mask_data_block( std::string name,
   this->private_->pre_expression_ += name + "=get_scalar(" + tname + ");";
 
   int flags = 0;
-  if ( size > 1 ) 
+  if ( size > 1 )
   {
     flags = SCRIPT_SEQUENTIAL_VAR_E;
   }
@@ -216,15 +218,15 @@ bool ArrayMathEngine::add_size( std::string name )
   return true;
 }*/
 
-bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t ny, size_t nz, 
+bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t ny, size_t nz,
   Core::DataType type, std::string& error )
 {
   size_t size = nx * ny * nz;
   if ( static_cast<size_t>( this->private_->array_size_ ) != size )
   {
-    error = "The output field '" + name + 
+    error = "The output field '" + name +
       "' does not have the same number of elements as the other objects.";
-    return false;  
+    return false;
   }
 
   std::string tname = "__" + name;
@@ -235,9 +237,9 @@ bool ArrayMathEngine::add_output_data_block( std::string name, size_t nx, size_t
   }
 
   int flags = 0;
-  if ( size > 1 ) 
+  if ( size > 1 )
   {
-    flags = SCRIPT_SEQUENTIAL_VAR_E;  
+    flags = SCRIPT_SEQUENTIAL_VAR_E;
   }
 
   this->private_->post_expression_ += tname + "=to_data_block(" + name + ");";
@@ -277,7 +279,7 @@ bool ArrayMathEngine::add_expressions( std::string& expressions )
 bool ArrayMathEngine::parse_and_validate( std::string& error )
 {
   // Link everything together
-  std::string full_expression = this->private_->pre_expression_ + ";" + this->private_->expression_ + ";" + 
+  std::string full_expression = this->private_->pre_expression_ + ";" + this->private_->expression_ + ";" +
     this->private_->post_expression_;
 
   // Parse the full expression
@@ -335,7 +337,7 @@ bool ArrayMathEngine::run( std::string& error )
   }
 
   // Connect the ArrayMathProgram update progress signal to the engine update progress signal
-  this->private_->mprogram_->update_progress_signal_.connect( 
+  this->private_->mprogram_->update_progress_signal_.connect(
     boost::bind( &ArrayMathEngine::update_progress, this, _1 ) );
 
   // Run the program
@@ -366,7 +368,3 @@ void ArrayMathEngine::update_progress( double amount )
 }
 
 } // end namespace
-
-
-
-

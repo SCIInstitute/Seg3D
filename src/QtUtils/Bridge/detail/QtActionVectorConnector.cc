@@ -33,6 +33,8 @@
 
 #include <QtUtils/Bridge/detail/QtActionVectorConnector.h>
 
+using namespace boost::placeholders;
+
 namespace QtUtils
 {
 
@@ -67,16 +69,16 @@ QtActionVectorConnector::QtActionVectorConnector( QAction* parent, std::vector<C
     for ( size_t j = 0; j < this->state_.size(); j++)
     {
       this->add_connection( this->state_[ j ]->value_changed_signal_.connect(
-        boost::bind( &QtActionVectorConnector::SetActionChecked, qpointer, 
+        boost::bind( &QtActionVectorConnector::SetActionChecked, qpointer,
         static_cast< int >( j ), _1, _2 ) ) );
     }
-    
+
     this->add_connection( this->index_->value_changed_signal_.connect(
       boost::bind( &QtActionVectorConnector::UpdateIndex, qpointer, _1, _2 ) ) );
   }
 
   this->connect( this->parent_, SIGNAL( toggled( bool ) ), SLOT( set_state( bool ) ) );
-  
+
 }
 
 QtActionVectorConnector::~QtActionVectorConnector()
@@ -107,16 +109,16 @@ void QtActionVectorConnector::UpdateIndex( QPointer< QtActionVectorConnector > q
     {
       combined_state = combined_state && qpointer->state_[ j ]->get();
     }
-    qpointer->parent_->setChecked( combined_state );  
+    qpointer->parent_->setChecked( combined_state );
   }
   else if ( index >= 0 && index < static_cast<int>( qpointer->state_.size() ) )
   {
     qpointer->parent_->setChecked(  qpointer->state_[ index ]->get() );
   }
-  
+
 }
 
-void QtActionVectorConnector::SetActionChecked( 
+void QtActionVectorConnector::SetActionChecked(
     QPointer< QtActionVectorConnector > qpointer, int index,
     bool checked, Core::ActionSource source )
 {
@@ -151,7 +153,7 @@ void QtActionVectorConnector::SetActionChecked(
   {
     if ( index == qpointer->index_->get() ) qpointer->parent_->setChecked( checked );
   }
-  
+
   qpointer->unblock();
 }
 
@@ -164,7 +166,7 @@ void QtActionVectorConnector::set_state( bool value )
     {
       for ( size_t j = 0; j< state_.size(); j++ )
       {
-        Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(), 
+        Core::ActionSet::Dispatch( Core::Interface::GetWidgetActionContext(),
           this->state_[ j ], value );
       }
     }
