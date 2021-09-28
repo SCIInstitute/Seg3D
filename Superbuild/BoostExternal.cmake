@@ -62,12 +62,9 @@ endif()
 
 # TODO: set up 64-bit build detection
 # Boost Jam needs to have 64-bit build explicitly configured
-if(WIN32)
-  set(FORCE_64BIT_BUILD ON)
-  set(boost_GIT_TAG "origin/v1.67.0")
-else()
-    set(boost_GIT_TAG "origin/v1.58.0")
-endif()
+
+set(boost_GIT_TAG "origin/v1.75.0")
+
 
 set(boost_GIT_URL "https://github.com/CIBC-Internal/boost.git")
 

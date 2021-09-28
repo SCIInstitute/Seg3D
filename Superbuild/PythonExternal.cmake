@@ -30,8 +30,8 @@ set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 # TODO: update when upgrading
 set(PY_MAJOR 3)
-set(PY_MINOR 4)
-set(PY_PATCH 3)
+set(PY_MINOR 9)
+set(PY_PATCH 7)
 set(SCI_PYTHON_VERSION "${PY_MAJOR}.${PY_MINOR}.${PY_PATCH}")
 set(SCI_PYTHON_VERSION_SHORT "${PY_MAJOR}.${PY_MINOR}")
 set(SCI_PYTHON_VERSION_SHORT_WIN32 "${PY_MAJOR}${PY_MINOR}")
@@ -46,7 +46,7 @@ set(python_ABIFLAG_PYDEBUG)
 set(python_ABIFLAG_PYMALLOC "m")
 set(ABIFLAGS "${python_ABIFLAG_PYMALLOC}${python_ABIFLAG_PYDEBUG}")
 
-set(python_GIT_TAG "origin/master")
+set(python_GIT_TAG "origin/3.9.7")
 set(python_GIT_URL "https://github.com/CIBC-Internal/python.git")
 
 set(python_WIN32_ARCH)
