@@ -7,8 +7,8 @@ jobs:
   windows-build-gui:
     strategy:
       matrix:
-        qtversion: [5.12.8, 5.14.2]
-    runs-on: windows-2016
+        qtversion: [5.15.2]
+    runs-on: windows-latest
 
     steps:
 
@@ -21,13 +21,13 @@ jobs:
         version: ${{ matrix.qtversion }}
         target: desktop
         host: windows
-        arch: win64_msvc2017_64
+        arch: win64_msvc2019_64
         install-deps: true
 
     - name: Configure
       working-directory: bin
       run: |
-        cmake ..\Superbuild -DCMAKE_BUILD_TYPE=Release -G"Visual Studio 15 2017" -Ax64 -DQt5_PATH:PATH="$env:Qt5_Dir" -DBUILD_WITH_PYTHON:BOOL=OFF
+        cmake ..\Superbuild -DCMAKE_BUILD_TYPE=Release -G"Visual Studio 16 2019" -Ax64 -DQt5_PATH:PATH="$env:Qt5_Dir"
 
     - name: Compile
       working-directory: bin
