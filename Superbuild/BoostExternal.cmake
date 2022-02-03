@@ -71,10 +71,6 @@ endif()
 
 set(boost_GIT_URL "https://github.com/CIBC-Internal/boost.git")
 
-if(TRAVIS_BUILD)
-  list(APPEND boost_CXX_Flag "-w")
-endif()
-
 # TODO: fix install step
 #
 # If CMake ever allows overriding the checkout command or adding flags,
