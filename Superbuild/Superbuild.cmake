@@ -142,13 +142,12 @@ else()
   option(DO_ZLIB_MANGLE "Mangle Zlib names to avoid conflicts with Qt5 or other external libraries" ON)
 endif()
 
-if (TRAVIS_BUILD)
-  set(QT_MIN_VERSION "5.9")
-else()
-  set(QT_MIN_VERSION "5.12")
-endif()
-
 if(SEG3D_BUILD_INTERFACE)
+
+  if(NOT DEFINED QT_MIN_VERSION)
+    set(QT_MIN_VERSION "5.12")
+  endif()
+
   set(Qt5_PATH "" CACHE PATH "Path to directory where Qt 5 is installed. Directory should contain lib and bin subdirectories.")
   #set(CMAKE_AUTOMOC ON)
 
