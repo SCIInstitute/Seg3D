@@ -24,8 +24,7 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 
-cmake_minimum_required(VERSION 2.8.9 FATAL_ERROR)
-#cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 #cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 if(POLICY CMP0053)
    cmake_policy(SET CMP0053 OLD)
