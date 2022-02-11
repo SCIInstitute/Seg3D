@@ -1,5 +1,8 @@
 [Seg3D](http://www.seg3d.org) is a free volume segmentation and processing tool developed by the NIH Center for Integrative Biomedical Computing at the University of Utah Scientific Computing and Imaging (SCI) Institute. Seg3D combines a flexible manual segmentation interface with powerful higher-dimensional image processing and segmentation algorithms from the Insight Toolkit. Users can explore and label image volumes using volume rendering and orthogonal slice view windows.
 
-Seg3D [build instructions and documentation](http://sciinstitute.github.io/seg3d.pages).
+Seg3D [build instructions and documentation](http://seg3d.readthedocs.io).
 
 [![Build Status](https://travis-ci.org/SCIInstitute/Seg3D.svg?branch=master)](https://travis-ci.org/SCIInstitute/Seg3D)
+![mac-build](https://github.com/SCIInstitute/Seg3D/workflows/mac-build/badge.svg)
+![linux-build](https://github.com/SCIInstitute/Seg3D/workflows/linux-build/badge.svg)
+![windows-build](https://github.com/SCIInstitute/Seg3D/workflows/windows-build/badge.svg)
