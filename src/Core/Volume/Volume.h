@@ -162,7 +162,7 @@ public:
   }
 
   // TO_INDEX:
-  /// Compute the index into the data blcok based on a coordinate in index space
+  /// Compute the index into the data block based on a coordinate in index space
   inline size_t to_index( size_t x, size_t y, size_t z ) const
   {
     assert( x < this->nx_ && y < this->ny_ && z < this->nz_ );

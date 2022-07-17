@@ -459,7 +459,7 @@ public:
                                                            clahe_window);
 
         // NOTE: this was added per James request --  don't clip
-        // againt the child node if it is a leaf node.
+        // against the child node if it is a leaf node.
         if (!link.b_->children_.empty())
         {
           // clip this nodes mask against the childs mask:

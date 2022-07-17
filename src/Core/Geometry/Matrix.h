@@ -107,7 +107,7 @@ public:
 private:
   double data_[16];
 
-  // static funtions
+  // static functions
 public:
   // INVERT:
   /// Compute the inverse of the input matrix using LU decomposition
@@ -193,7 +193,7 @@ public:
 private:
   float data_[16];
 
-  // static funtions
+  // static functions
 public:
 
   // INVERT:

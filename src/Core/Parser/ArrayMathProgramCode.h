@@ -50,7 +50,7 @@ typedef boost::function< bool( ArrayMathProgramCode& pc ) > ArrayMathFunctionObj
 //-----------------------------------------------------------------------------
 // Code segment class, all the function calls are based on this class
 // providing the program with input and output variables all located in one
-// piece of memory. Although this class points to auxilary memory block,
+// piece of memory. Although this class points to auxiliary memory block,
 // an effort is made to store them all in the same array, to minimize
 // page swapping
 
@@ -75,7 +75,7 @@ public:
     return this->function_;
   }
 
-  /// Tell the progam where to temporary space has been allocated
+  /// Tell the program where to temporary space has been allocated
   /// for this part of the program
   inline void set_variable( size_t j, float* variable )
   {

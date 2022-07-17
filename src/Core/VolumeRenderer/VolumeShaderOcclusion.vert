@@ -6,7 +6,7 @@ uniform vec3 tex_bbox_size; // Size of texture in world space
 varying vec2 correction_factor;
 varying vec4 clip_space_pos;
 
-// Vertex postion in world coordinates
+// Vertex position in world coordinates
 varying vec4 world_coord_pos;
 
 // Half vector between eye and light source.

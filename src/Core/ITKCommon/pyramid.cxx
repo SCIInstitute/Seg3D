@@ -302,7 +302,7 @@ generate_feature_vector_v0(// gradient image:
   
   static const double sqrt_two = sqrt(2.0);
   
-  // contrinution buffers:
+  // contribution buffers:
   static unsigned int col_addr[3];
   static unsigned int row_addr[3];
   static double col_w[3];
@@ -411,7 +411,7 @@ generate_feature_vector_v1(// gradient image:
   
   static const double sqrt_two = sqrt(2.0);
   
-  // contrinution buffers:
+  // contribution buffers:
   static double weight[9];
   
   // weight sigma:
@@ -560,7 +560,7 @@ generate_feature_vector_v2(// minima and maxima of a given octave scale:
   // section addresses in the feature vector:
   static const unsigned int address[] = { 0, 4, 16, 36, 64, 100 };
   
-  // indeces of the first and last annulus of the sampling window:
+  // indices of the first and last annulus of the sampling window:
   static const unsigned int a0 = 0;
   static const unsigned int a1 = annulai - 1;
   
@@ -1070,7 +1070,7 @@ generate_feature_vector_v5(// gradient image:
   
   static const double sqrt_two = sqrt(2.0);
   
-  // contrinution buffers:
+  // contribution buffers:
   static unsigned int col_addr[3];
   static unsigned int row_addr[3];
   static double col_w[3];
@@ -1176,7 +1176,7 @@ generate_feature_vector_v6(// gradient image:
   static const unsigned int rows = static_cast<unsigned int>(sqrt(static_cast<double>(KEY_SIZE / bins)));
   static const unsigned int cols = rows;
   
-  // contrinution buffers:
+  // contribution buffers:
   static unsigned int col_addr[3];
   static unsigned int row_addr[3];
   static double col_w[3];

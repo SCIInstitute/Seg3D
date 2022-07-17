@@ -161,7 +161,7 @@ std::string StringToLower( std::string );
 void StripSpaces( std::string& str );
 void StripSurroundingSpaces( std::string& str );
 
-// Function to split a list of options delimited by a characher into a vector of
+// Function to split a list of options delimited by a character into a vector of
 // strings
 std::vector<std::string> SplitString( const std::string& str, const std::string& delimiter );
 

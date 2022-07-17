@@ -58,7 +58,7 @@ class EventHandlerContext : public boost::noncopyable
 
 public:
 
-  // Constuctor and destructor for class that can be overloaded
+  // Constructor and destructor for class that can be overloaded
   EventHandlerContext()
   {
   }

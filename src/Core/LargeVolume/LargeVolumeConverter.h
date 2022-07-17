@@ -82,7 +82,7 @@ public:
   bool run_phase1( std::string& error );
 
   /// SET_MEM_LIMIT
-  /// How much meory to devote to the conversion process
+  /// How much memory to devote to the conversion process
   void set_mem_limit( long long mem_limit );
 
   /// RUN_PHASE2

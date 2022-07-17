@@ -91,7 +91,7 @@ public:
   // provided for each sub class of this class. Hence that also explains why the get_action_info
   // function is virtual. It accesses the record from the derived class.
   
-  // GET_DEFINTION:
+  // GET_DEFINITION:
   /// Get the definition of the action (in XML format)
   std::string get_definition() const;
   

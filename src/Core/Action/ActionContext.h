@@ -123,7 +123,7 @@ typedef boost::shared_ptr< ActionContext > ActionContextHandle;
 /// entity with a pointer to the Action which describes the action that needs
 /// to be done. Action itself contains the pointers to the functions that need
 /// to be executed and with which parameters, but not where to report errors,
-/// the source of the action ect. The latter information is contained in the
+/// the source of the action etc. The latter information is contained in the
 /// ActionContext. Each source needs to derive its own ActionContext from this
 /// class and generate the specifics of where information needs to be relayed
 /// to.

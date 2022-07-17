@@ -262,7 +262,7 @@ public:
   inline const T & operator [] (const size_t & i) const
   { return elem(i); }
   
-  // this is usefull for filling-in the array:
+  // this is useful for filling-in the array:
   the_dynamic_array_ref_t<T> operator << (const T & elem)
   {
     (*this)[0] = elem;
