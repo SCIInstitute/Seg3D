@@ -13,10 +13,10 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qtversion }}
         target: desktop
@@ -40,7 +40,7 @@ jobs:
       run: cmake --build . --config Release --target package
 
     - name: Upload installer
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Seg3DWindowsInstaller_${{ matrix.qtversion }}
         path: bin/Seg3D/Seg3D2-2.*-win64.exe
