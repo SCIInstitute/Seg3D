@@ -123,13 +123,6 @@ endif()
 
 option(BUILD_MANUAL_TOOLS_ONLY "Build Seg3D library with only manual tools." OFF)
 
-###########################################ß
-# Travis CI build needs to be as slim as possible
-###########################################
-
-option(TRAVIS_BUILD "Slim build for Travis CI" OFF)
-mark_as_advanced(TRAVIS_BUILD)
-
 set(ENABLED_WARNINGS "-Wall")
 
 ###########################################
