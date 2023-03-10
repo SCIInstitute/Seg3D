@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-latest]
+        os: [ubuntu-20.04]
 
     steps:
     - name: Checkout
@@ -24,11 +24,14 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
-        version: 5.14.2
+        version: 5.15.2
         target: desktop
         host: linux
         install-deps: true
 
     - name: Build
-      run: ./build.sh -DQt5_PATH="${Qt5_Dir}" -j3
+      run: |
+        ./build.sh \
+          -DQt5_PATH="${Qt5_Dir}" \
+          -j3
       continue-on-error: true

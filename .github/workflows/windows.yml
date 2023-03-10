@@ -11,8 +11,14 @@ jobs:
   windows-build-gui:
     strategy:
       matrix:
-        qtversion: [5.12.8, 5.14.2]
-    runs-on: windows-2016
+        qtversion: [5.15.2]
+        include:
+          - qtversion: 5.15.2
+            qtarch: win64_msvc2019_64
+            cmake-generator: "Visual Studio 17 2022"
+            cmake-arch: x64
+            cmake-toolset: v143
+    runs-on: windows-2022
 
     steps:
 
@@ -25,13 +31,20 @@ jobs:
         version: ${{ matrix.qtversion }}
         target: desktop
         host: windows
-        arch: win64_msvc2017_64
+        arch: ${{ matrix.qtarch }}
         install-deps: true
 
     - name: Configure
       working-directory: bin
       run: |
-        cmake ..\Superbuild -DCMAKE_BUILD_TYPE=Release -G"Visual Studio 15 2017" -Ax64 -DQt5_PATH:PATH="$env:Qt5_Dir" -DBUILD_WITH_PYTHON:BOOL=OFF
+        cmake `
+          ..\Superbuild `
+          -DCMAKE_BUILD_TYPE=Release `
+          -G"${{ matrix.cmake-generator }}" `
+          -A${{ matrix.cmake-arch }} `
+          -T${{ matrix.cmake-toolset }} `
+          -DQt5_PATH:PATH="$env:Qt5_Dir" `
+          -DBUILD_WITH_PYTHON:BOOL=OFF
 
     - name: Compile
       working-directory: bin
