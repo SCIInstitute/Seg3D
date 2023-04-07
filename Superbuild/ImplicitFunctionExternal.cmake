@@ -28,10 +28,6 @@ set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 set(implicitFunction_GIT_TAG "origin/master")
 set(implicitFunction_DEPENDENCIES "Tetgen_external;Eigen_external")
 
-if(TRAVIS_BUILD)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-endif()
-
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
 ExternalProject_Add(ImplicitFunction_external

@@ -27,11 +27,6 @@
 set_property(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 set(freetype_GIT_TAG "origin/master")
 
-if(TRAVIS_BUILD)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-endif()
-
 # If CMake ever allows overriding the checkout command or adding flags,
 # git checkout -q will silence message about detached head (harmless).
 ExternalProject_Add(Freetype_external
