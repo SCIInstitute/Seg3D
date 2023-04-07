@@ -50,7 +50,7 @@
     same type (and therefore have the same number of parameters). Some
     of the transforms parameters may be shared across transforms. The
     shared/unique parameters are specified by a bit vector
-    (true - shared, false - unique). This is usefull for radial
+    (true - shared, false - unique). This is useful for radial
     distortion transforms where the translation parameters are unique
     for each image but the distortion parameters are the same across
     all images (all images are assumed to have been distorted by
@@ -272,7 +272,7 @@ public:
   // image gradients:
   std::vector<typename gradient_image_t::ConstPointer> gradient_;
 
-  // adresses of the individual transform parameter indices within the
+  // addresses of the individual transform parameter indices within the
   // concatenated parameter vector:
   std::vector<std::vector<unsigned int> > address_;
 

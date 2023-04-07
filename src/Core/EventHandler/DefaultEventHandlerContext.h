@@ -55,7 +55,7 @@ class DefaultEventHandlerContext : public EventHandlerContext
 
 public:
 
-  // Constuctor and destructor
+  // Constructor and destructor
   DefaultEventHandlerContext();
   virtual ~DefaultEventHandlerContext();
 

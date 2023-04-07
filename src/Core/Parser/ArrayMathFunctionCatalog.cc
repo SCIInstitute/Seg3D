@@ -75,7 +75,7 @@ void ArrayMathFunctionCatalog::add_function( ArrayMathFunctionObject function,
 
 // A symmetric function can have its arguments entered in any combination
 // that matches the types. Argmuments can be swapped to match types, or
-// arguments can be swapped to optimize code by removing duplicate functio
+// arguments can be swapped to optimize code by removing duplicate function
 // calls
 
 void ArrayMathFunctionCatalog::add_sym_function( ArrayMathFunctionObject function,

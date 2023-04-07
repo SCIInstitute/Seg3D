@@ -65,7 +65,7 @@ enum
 
 enum
 {
-  /// Define a function as sequential it will be evaluted for each instance in
+  /// Define a function as sequential it will be evaluated for each instance in
   /// the sequence. This one is used for functions without parameters like rand
   /// so they trigger for each case
   PARSER_SEQUENTIAL_FUNCTION_E = 1,

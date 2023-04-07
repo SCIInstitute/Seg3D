@@ -45,7 +45,7 @@ Variant::~Variant()
 
 std::string Variant::export_to_string() const
 {
-  // Export a value that is still typed or has been convereted to a string
+  // Export a value that is still typed or has been converted to a string
   // if typed_value exist, we need to convert it
   if ( this->typed_value_.get() )
   {

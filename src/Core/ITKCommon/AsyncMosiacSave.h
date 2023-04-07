@@ -30,7 +30,7 @@
 // Author       : Bradley C. Grimm
 // Created      : 2009/06/25
 // Copyright    : (C) 2009 University of Utah
-// Description  : An asyncronous save manager so that ir-assemble
+// Description  : An asynchronous save manager so that ir-assemble
 //                progress is not halted with each save.
 
 #ifndef __ASYNC_MOSAIC_SAVE_H__

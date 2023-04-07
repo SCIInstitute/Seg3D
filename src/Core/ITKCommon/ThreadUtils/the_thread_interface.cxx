@@ -435,7 +435,7 @@ the_thread_interface_t::work()
     {
       active_transaction_ = nullptr;
 #ifdef DEBUG_THREAD
-      cerr << "FIXME: caught unknonwn exception" << endl;
+      cerr << "FIXME: caught unknown exception" << endl;
 #endif
       t->notify(this,
     the_transaction_t::ABORTED_E,

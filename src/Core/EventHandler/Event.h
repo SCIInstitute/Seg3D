@@ -45,7 +45,7 @@ namespace Core
 {
 
 // CLASS EVENTSYNC:
-/// Auxilary class needed for doing synchronization
+/// Auxiliary class needed for doing synchronization
 
 class EventSync
 {
@@ -96,7 +96,7 @@ private:
 
 // CLASS EVENTT <TEMPLATE>
 /// This class is redefined for each functor and contains only the
-/// pointer to the function object. It is generated on the fly whereever
+/// pointer to the function object. It is generated on the fly wherever
 /// the compiler needs it. 
 
 template< class FUNCTOR >

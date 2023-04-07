@@ -65,7 +65,7 @@ public:
   void add_seq_function( ArrayMathFunctionObject function, std::string function_id,
       std::string return_type );
 
-  /// Add a function that wil always output a single
+  /// Add a function that will always output a single
   void add_sgl_function( ArrayMathFunctionObject function, std::string function_id,
       std::string return_type );
 

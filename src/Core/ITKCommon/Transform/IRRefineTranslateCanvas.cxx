@@ -137,7 +137,7 @@ fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
 //----------------------------------------------------------------
 // IRRefineTranslateCanvas::fillTransformAndImageIDVectors
 //
-// silly other version that uses a list because fo some reason
+// silly other version that uses a list because for some reason
 // paul likes using lists for the image IDs........
 //
 void
@@ -410,7 +410,7 @@ IRRefineTranslateCanvas::getConectionToProcess()
   if (_preProcessedConnectionVector.size() > 0)
   {
     // by picking out  random connection we have less of a chance
-    // to keep on picking connection with the same trasformation
+    // to keep on picking connection with the same transformation
     // and thus not having good multithreaded performance because
     // multiple threads are waiting for the same image to load
     int element;
@@ -468,7 +468,7 @@ setTransformAndNeighborsToGroupID(IRTransform* transform, long groupID)
       {
         if (neighbor->groupID() != -1)
         {
-          printf("Error! why was this groupID aready set!");
+          printf("Error! why was this groupID already set!");
         }
 
         transformStack.push(neighbor);

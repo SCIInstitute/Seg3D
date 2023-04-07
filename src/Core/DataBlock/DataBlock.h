@@ -221,7 +221,7 @@ public:
   void set_histogram( const Histogram& histogram );
 
   // SWAP_ENDIAN:
-  /// Swap the endianess of the data
+  /// Swap the endianness of the data
   void swap_endian();
 
 private:

@@ -12,7 +12,7 @@ varying vec3 half_vector; // Half vector between eye and light source.
 uniform vec2 fog_range;
 varying float fog_depth;
 
-// Vertex postion in world coordinates
+// Vertex position in world coordinates
 varying vec4 world_coord_pos;
 
 void main()
@@ -22,7 +22,7 @@ void main()
 
   if ( enable_lighting )
   {
-    // With headlight, light position is alway at the origin in eye space
+    // With headlight, light position is always at the origin in eye space
     vec3 aux = vec3( -eye_coord_pos );
     light_dir = normalize( aux );
     half_vector = light_dir;

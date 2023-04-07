@@ -92,7 +92,7 @@ public:
       // If less than 1 GB, use 1 GB.
       if (mem_size < ( static_cast<long long>( 1 ) << 30 )) mem_size = static_cast<long long>( 1 ) << 30;
 
-      // Do not use more than 32 GB, unless explicity requested.
+      // Do not use more than 32 GB, unless explicitly requested.
       this->cache_capacity_ = Core::Min( static_cast<long long>( 32 ) << 30, mem_size );
     }
 

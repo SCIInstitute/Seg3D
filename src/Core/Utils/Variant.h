@@ -185,7 +185,7 @@ public:
     this->string_value_ = variant.export_to_string();
   }
 
-  // desctructor
+  // destructor
   virtual ~Variant();
 
   // assignment operator

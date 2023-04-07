@@ -134,9 +134,9 @@ estimate_displacement(double & best_metric, // current best metric
                       const TImage * a, // large image A
                       const TImage * b, // small image B
 
-                      // this could be the size of B (ususally when matching
+                      // this could be the size of B (usually when matching
                       // small neighborhoods in A and B), or the
-                      // maximum dimesions of A and B (plain image matching):
+                      // maximum dimensions of A and B (plain image matching):
                       const typename TImage::SizeType & period_sz,
 
                       const local_max_t & lm,
@@ -269,9 +269,9 @@ match_one_pair(translate_transform_t::Pointer & best_transform,
                const TImage * mi,
                const mask_t * mi_mask,
 
-               // this could be the size of B (ususally when matching
+               // this could be the size of B (usually when matching
                // small neighborhoods in A and B), or the
-               // maximum dimesions of A and B (plain image matching):
+               // maximum dimensions of A and B (plain image matching):
                const typename TImage::SizeType & period_sz,
 
                const double & overlap_min,
