@@ -16,6 +16,10 @@
 	<string>Seg3D.icns</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Seg3D 2.0.0 - MIT License</string>
+	<key>NSPrincipalClass</key>
+  <string>NSApplication</string>
+  <key>NSHighResolutionCapable</key>
+  <string>True</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>

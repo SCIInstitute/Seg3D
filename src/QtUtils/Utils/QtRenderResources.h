@@ -31,7 +31,7 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
-#endif 
+#endif
 
 // Glew include
 #include <GL/glew.h>
@@ -60,9 +60,9 @@ namespace QtUtils
 // Forward declarations
 class QtRenderResourcesContext;
 class QtRenderResourcesContextPrivate;
-typedef boost::shared_ptr< QtRenderResourcesContext > 
+typedef boost::shared_ptr< QtRenderResourcesContext >
   QtRenderResourcesContextHandle;
-typedef boost::shared_ptr< QtRenderResourcesContextPrivate > 
+typedef boost::shared_ptr< QtRenderResourcesContextPrivate >
   QtRenderResourcesContextPrivateHandle;
 
 // Class definition
