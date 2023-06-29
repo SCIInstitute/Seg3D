@@ -47,13 +47,13 @@ typedef boost::shared_ptr< QtRenderContext > QtRenderContextHandle;
 // Shared pointer to one of Qt's internal resources
 // NOTE: As GLContext objects are not managed by Qt we
 // need to do this ourselves using a smart pointer
-typedef boost::shared_ptr< QGLContext > QGLContextHandle;
+typedef boost::shared_ptr< QOpenGLContext > QOpenGLContextHandle;
 
 class QtRenderContext : public Core::RenderContext
 {
   // -- constructor/ destructor --
 public:
-  QtRenderContext( QGLContextHandle context );
+  QtRenderContext( QOpenGLContextHandle context );
   virtual ~QtRenderContext();
 
   // -- context functions --
@@ -74,23 +74,29 @@ public:
   virtual void swap_buffers() const;
 
 private:
-  QGLContextHandle context_;
+  QOpenGLContextHandle context_;
+  QOffscreenSurface surface_;
 };
 
 class QtRenderResourcesContextPrivate
 {
 public:
   // The Qt render context format options
-  QGLFormat format_;
+  QSurfaceFormat format_;
 
   // The handle to the first qt widget that defines all the sharing
   // between contexts
-  QGLWidget* shared_widget_;
+  QOpenGLContext* shared_context_;
 };
 
-QtRenderContext::QtRenderContext( QGLContextHandle context ) :
+QtRenderContext::QtRenderContext( QOpenGLContextHandle context ) :
   context_( context )
 {
+
+  context_->create();
+
+  surface_.setFormat(QSurfaceFormat::defaultFormat());
+  surface_.create();
 }
 
 QtRenderContext::~QtRenderContext()
@@ -104,7 +110,9 @@ bool QtRenderContext::is_valid() const
 
 void QtRenderContext::make_current()
 {
-  context_->makeCurrent();
+  //sort of a hack to allow resources to be inistilized before widget surface is created
+  if(context_->surface()) context_->makeCurrent(context_->surface());
+  else                    context_->makeCurrent(&surface_);
 }
 
 void QtRenderContext::done_current()
@@ -114,7 +122,8 @@ void QtRenderContext::done_current()
 
 void QtRenderContext::swap_buffers() const
 {
-  context_->swapBuffers();
+  std::cout << "no implementation\n";
+  //context_->swapBuffers();
 }
 
 
@@ -124,47 +133,53 @@ void QtRenderContext::swap_buffers() const
 QtRenderResourcesContext::QtRenderResourcesContext() :
   private_( new QtRenderResourcesContextPrivate )
 {
-  this->private_->format_ = QGLFormat::defaultFormat();
-  this->private_->shared_widget_ = new QGLWidget( this->private_->format_ );
+  this->private_->format_ = QSurfaceFormat::defaultFormat();
+  this->private_->shared_context_ = new QOpenGLContext();
+  this->private_->shared_context_->setFormat(this->private_->format_);
+  this->private_->shared_context_->create();
 }
 
 QtRenderResourcesContext::~QtRenderResourcesContext()
 {
-  delete this->private_->shared_widget_;
+  delete this->private_->shared_context_;
 }
 
 bool QtRenderResourcesContext::create_render_context( Core::RenderContextHandle& context )
 {
   // Generate a new context
-  QGLContextHandle qt_context = QGLContextHandle( new QGLContext( this->private_->format_,
-    this->private_->shared_widget_->context()->device() ) );
-  qt_context->create( this->private_->shared_widget_->context() );
+  QOpenGLContextHandle qt_context = QOpenGLContextHandle(new QOpenGLContext());
+
+  qt_context->setFormat(this->private_->format_);
+  qt_context->setShareContext(this->private_->shared_context_);
+  qt_context->create();
 
   // Bind the new context in the GUI independent wrapper class
-  context = Core::RenderContextHandle( new QtRenderContext( qt_context ) );
+  context = Core::RenderContextHandle(new QtRenderContext(qt_context));
 
   return context->is_valid();
 }
 
-QtRenderWidget* QtRenderResourcesContext::create_qt_render_widget( QWidget* parent, 
+QtRenderWidget* QtRenderResourcesContext::create_qt_render_widget( QWidget* parent,
                           Core::AbstractViewerHandle viewer )
 {
   CORE_LOG_DEBUG( "Create an OpenGL widget" );
 
-  return new QtRenderWidget( this->private_->format_, parent, 
-    this->private_->shared_widget_, viewer );
+  return new QtRenderWidget(
+    this->private_->format_, parent,
+    this->private_->shared_context_, viewer );
 }
 
-QtTransferFunctionWidget* QtRenderResourcesContext::create_qt_transfer_function_widget( 
+QtTransferFunctionWidget* QtRenderResourcesContext::create_qt_transfer_function_widget(
   QWidget* parent, Core::TransferFunctionHandle tf )
 {
-  return new QtTransferFunctionWidget( this->private_->format_, parent,
-    this->private_->shared_widget_, tf );
+  return new QtTransferFunctionWidget(
+    this->private_->format_, parent,
+    this->private_->shared_context_, tf );
 }
 
 bool QtRenderResourcesContext::valid_render_resources()
 {
-  return this->private_->shared_widget_->isValid();
+  return this->private_->shared_context_->isValid();
 }
 
 class SharedPtrNopDeleter
@@ -178,15 +193,15 @@ public:
 
 Core::RenderContextHandle QtRenderResourcesContext::get_current_context()
 {
-  const QGLContext* current_context = QGLContext::currentContext();
+  const QOpenGLContext* current_context = QOpenGLContext::currentContext();
   if ( current_context != 0 )
   {
     // NOTE: We don't want to delete the context after the handle goes out of scope,
     // so we pass a NOP deleter to shared_ptr
-    return Core::RenderContextHandle( new QtRenderContext( QGLContextHandle( 
-      const_cast< QGLContext* >( current_context ), SharedPtrNopDeleter() ) ) );
+    return Core::RenderContextHandle( new QtRenderContext( QOpenGLContextHandle(
+      const_cast< QOpenGLContext* >( current_context ), SharedPtrNopDeleter() ) ) );
   }
-  
+
   return Core::RenderContextHandle();
 }
 
