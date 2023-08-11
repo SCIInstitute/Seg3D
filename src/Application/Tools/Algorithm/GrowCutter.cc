@@ -158,14 +158,12 @@ void GrowCutter::execute()
   {
     this->fast_grow_cut_->SetInput( data_image_ );
     this->fast_grow_cut_->SetSeedImage( background_image_ );
-    this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->GenerateData();
     this->initialization_flag_ = true;
   }
   else
   {
     this->fast_grow_cut_->SetSeedImage( background_image_ );
-    this->fast_grow_cut_->SetInitializationFlag( this->initialization_flag_ );
     this->fast_grow_cut_->GenerateData();
   }
   this->output_image_ = this->fast_grow_cut_->GetOutput();
