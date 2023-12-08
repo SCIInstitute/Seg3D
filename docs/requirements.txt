@@ -10,3 +10,4 @@ sphinx-notfound-page
 furo
 sphinxcontrib-bibtex
 sphinx-markdown-tables
+os

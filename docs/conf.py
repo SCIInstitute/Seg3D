@@ -23,7 +23,7 @@ copyright = '2021, The Scientific Computing and Imaging Institute at the Univers
 author = 'To be Added'
 
 # The full version, including alpha/beta/rc tags
-release = '0.01'
+release = '2.5.1'
 
 
 # -- General configuration ---------------------------------------------------

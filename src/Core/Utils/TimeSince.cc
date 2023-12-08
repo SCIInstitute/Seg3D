@@ -32,6 +32,7 @@
 #include <boost/thread.hpp>
 
 //Qt
+// TODO: is this used here?  it also doesn't have a Cmake check
 #include <QtGui>
 
 //Core
