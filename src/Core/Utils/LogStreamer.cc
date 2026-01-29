@@ -66,7 +66,7 @@ LogStreamer::LogStreamer( unsigned int log_flags, std::ostream* stream )
   this->private_ = boost::shared_ptr< LogStreamerPrivate >( 
     new LogStreamerPrivate( log_flags,stream ) );
 
-  // If the internals are detroyed, so should the connection:
+  // If the internals are destroyed, so should the connection:
   // we use the signals2 system to track the shared_ptr and destroy the connection
   // if the object is destroyed. This will ensure that when the slot is called
   // the shared_ptr is locked so that the object is not destroyed while the

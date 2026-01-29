@@ -142,7 +142,7 @@ public:
   const ParametersType & GetParameters() const override
   { return this->m_Parameters; }
   
-  // virtual: mumber of parameters that define this transform:
+  // virtual: number of parameters that define this transform:
   virtual
   NumberOfParametersType GetNumberOfParameters() const override
   { return N + 2; }

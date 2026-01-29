@@ -180,7 +180,7 @@ public:
   inline unsigned int num_points() const
   { return (this->m_FixedParameters.size() - 4) / 2; }
   
-  // calculate parameter vector indeces for various transform parameters:
+  // calculate parameter vector indices for various transform parameters:
   inline static unsigned int index_a(const unsigned int & i)
   { return i * 2; }
   

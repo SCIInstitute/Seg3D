@@ -55,7 +55,7 @@ class InterfacePrivate;
 // Private part of the class 
 typedef boost::shared_ptr<InterfacePrivate> InterfacePrivateHandle;
 
-// Class defintion
+// Class definition
 class Interface : public Core::EventHandler
 {
   CORE_SINGLETON( Interface );

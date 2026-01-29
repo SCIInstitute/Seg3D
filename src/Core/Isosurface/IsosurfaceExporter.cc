@@ -293,7 +293,7 @@ bool IsosurfaceExporter::ExportSTLBinary( const boost::filesystem::path& filenam
     // Get vertices of face
     if (vertex_index1 >= points.size() || vertex_index2 >= points.size() || vertex_index3 >= points.size())
     {
-      throw("verticies are out of points bounds");
+      throw("vertices are out of points bounds");
     }
 
     PointF p1 = points[vertex_index1];

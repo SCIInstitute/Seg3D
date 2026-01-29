@@ -274,7 +274,7 @@ find_maxima_cm(std::list<local_max_t> & max_list,
         unsigned int cluster_id = cluster_map[u * h + v];
         if (cluster_id == i || cluster_id == static_cast<unsigned int>(~0)) continue;
 
-        // figure out which boundaries this cluster was broken accross:
+        // figure out which boundaries this cluster was broken across:
         cluster_bbox_t & ba = bboxes[i];
         cluster_bbox_t & bb = bboxes[cluster_id];
 

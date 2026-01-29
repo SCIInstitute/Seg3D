@@ -183,7 +183,7 @@ private:
   // the transform whose inverse we are trying to evaluate:
   const TransformType & transform_;
   
-  // the point for which we are tryying to find the inverse mapping:
+  // the point for which we are trying to find the inverse mapping:
   mutable std::vector<ScalarType> y_;
 };
 

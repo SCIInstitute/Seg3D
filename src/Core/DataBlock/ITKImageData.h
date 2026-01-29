@@ -89,7 +89,7 @@ public:
   virtual Transform get_transform() const = 0;
 
   // SET_TRANSFORM:
-  /// Set the transfrom in the nrrd data
+  /// Set the transform in the nrrd data
   virtual void set_transform( Transform& transform ) = 0;
 
   // GET_NX, GET_NY, GET_NZ:
@@ -165,7 +165,7 @@ public:
   virtual Transform get_transform() const;
 
   // SET_TRANSFORM:
-  /// Set the transfrom in the nrrd data
+  /// Set the transform in the nrrd data
   virtual void set_transform( Transform& transform );
 
   // GET_NX, GET_NY, GET_NZ:

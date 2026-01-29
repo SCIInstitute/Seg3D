@@ -19,7 +19,7 @@ uniform float normalized_slice_distance;
 varying vec2 correction_factor;
 varying vec4 clip_space_pos;
 
-// Vertex postion in world coordinates
+// Vertex position in world coordinates
 varying vec4 world_coord_pos;
 // Clipping planes in world coordinates
 uniform vec4 clip_plane[ 6 ];

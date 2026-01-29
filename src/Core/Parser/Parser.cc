@@ -138,7 +138,7 @@ public:
   // returns in var_name
   bool scan_variable_name( std::string& expression, std::string& var_name );
 
-  // Scan for a string. A srting is a piece of code between quotes e.g. "foo"
+  // Scan for a string. A string is a piece of code between quotes e.g. "foo"
   // This function should recognize most escape characters in the string and
   // will translate them as well
   bool scan_constant_string( std::string& expression, std::string& str );
@@ -352,7 +352,7 @@ bool ParserPrivate::split_expression( std::string expression, std::string& varna
   return true;
 }
 
-// The main function for disecting code into a tree
+// The main function for dissecting code into a tree
 bool ParserPrivate::parse_expression_tree( std::string expression, ParserNodeHandle& handle,
   std::string& error )
 {
@@ -1493,7 +1493,7 @@ bool ParserPrivate::scan_equal_sign( std::string& expression )
   {
     if ( esize > 1 )
     {
-      // These indicate different operators adn should be
+      // These indicate different operators and should be
       // ignored, most likely this means there is a syntax error
       // in the code
       if ( expression[ 1 ] == '=' ) return false;
@@ -1512,7 +1512,7 @@ bool ParserPrivate::scan_equal_sign( std::string& expression )
 void ParserPrivate::split_function( std::string& expression, std::string& fun_name, std::vector<
                    std::string >& fun_args )
 {
-  // Get the size of the srting we need to scan
+  // Get the size of the string we need to scan
   size_t esize = expression.size();
   // First detect the function name
   // A function name starts with _A-Za-z
@@ -1565,7 +1565,7 @@ void ParserPrivate::split_function( std::string& expression, std::string& fun_na
         else if ( expression[ idx ] == ')' || expression[ idx ] == ']' )
         {
           paren_cnt--;
-          // if we encounterd end paren_cnt should be zero 
+          // if we encountered end paren_cnt should be zero 
           if ( paren_cnt == 0 )
           {
             // Get the last argument
@@ -1602,7 +1602,7 @@ void ParserPrivate::split_subs( std::string& expression, std::vector< std::strin
                  std::vector< std::string >& step_args, std::vector< std::string >& end_args,
                  std::string& varname )
 {
-  // Get the size of the srting we need to scan
+  // Get the size of the string we need to scan
   size_t esize = expression.size();
 
   int col_count = 0;
@@ -1652,7 +1652,7 @@ void ParserPrivate::split_subs( std::string& expression, std::vector< std::strin
       else if ( expression[ idx ] == ']' )
       {
         brac_cnt--;
-        // if we encounterd end paren_cnt should be zero 
+        // if we encountered end paren_cnt should be zero 
         if ( brac_cnt == 0 )
         {
           // Get the last argument
@@ -2290,7 +2290,7 @@ bool Parser::parse( ParserProgramHandle& program, std::string expressions, std::
 
     // Note we store both the raw code as well as the parsed code,
     // to improve error reporting where we can list the faulty raw expression
-    // and the error together. That way the user should be able to recongize
+    // and the error together. That way the user should be able to recognize
     // the faulty line more easily
   }
 
@@ -2575,7 +2575,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
     ++it;
   }
 
-  // Phase 2: run throught the full tree and setup intermediate variables
+  // Phase 2: run through the full tree and setup intermediate variables
   //  for each phase of the computation and translate constant strings and
   //  floats as well into variables.
 
@@ -2752,7 +2752,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
       ++fit;
     }
 
-    // Add variables to named and unamed list
+    // Add variables to named and unnamed list
     // They are added here, to prevent a loop
     named_variables[ varname ] = ohandle;
     named_order[ varname ] = order;
@@ -2861,7 +2861,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
         fhandle->set_output_var( uhandle );
         uhandle->set_parent( fhandle );
 
-        // Now search for additional occurances of whandle in the sequential list
+        // Now search for additional occurrences of whandle in the sequential list
         // and replace them with uhandle
         ParserScriptVariableHandle xhandle;
 
@@ -3021,7 +3021,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
   fit = functions.begin();
   fit_end = functions.end();
 
-  // Sort functions in three different catagories
+  // Sort functions in three different categories
   while ( fit != fit_end )
   {
 
@@ -3053,7 +3053,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
   pit = variables.begin();
   pit_end = variables.end();
 
-  // Sort variables in three different catagories
+  // Sort variables in three different categories
   while ( pit != pit_end )
   {
 
@@ -3100,7 +3100,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
   ParserScriptVariableHandle xhandle;
   ParserScriptFunctionHandle fhandle;
 
-  // Sort functions in three different catagories
+  // Sort functions in three different categories
   while ( fit != fit_end )
   {
     size_t num_input_vars = ( *fit )->num_input_vars();
@@ -3141,7 +3141,7 @@ bool Parser::optimize( ParserProgramHandle& program, std::string& error )
         if ( flags & SCRIPT_SINGLE_VAR_E ) single_function_list.push_back( fhandle );
         else const_function_list.push_back( fhandle );
 
-        // Now search for additional occurances of whandle in the sequential list
+        // Now search for additional occurrences of whandle in the sequential list
         // and replace them with uhandle
 
         fit2 = sequential_function_list.begin();

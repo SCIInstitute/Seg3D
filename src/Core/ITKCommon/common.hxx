@@ -205,7 +205,7 @@ typedef itk::Image<pixel_t, 2> image_t;
 //----------------------------------------------------------------
 // base_transform_t
 //
-// Shorthand for abstract 2D tranforms.
+// Shorthand for abstract 2D transforms.
 //
 typedef itk::Transform<double, 2, 2> base_transform_t;
 
@@ -2027,7 +2027,7 @@ my_metric(double & overlap,
 //    double area_a = calc_area(fi, fi_mask);
 //    double area_b = calc_area(mi, mi_mask);
 //#else
-    // this is fast, but approximate -- the mask is ingored,
+    // this is fast, but approximate -- the mask is ignored,
     // only the image dimensions and pixel spacing are used:
     double area_a = get_area<TImage>(fi);
     double area_b = get_area<TImage>(mi);
@@ -2724,7 +2724,7 @@ public:
                     // tile tint:
                     const std::vector<double> & tint,
 
-                    // tile trasforms:
+                    // tile transforms:
                     const std::vector<transform_pointer_t> & transform,
 
                     // tiles and tile masks
@@ -2914,7 +2914,7 @@ public:
   // tile tint:
   const std::vector<double> & tint_;
 
-  // tile trasforms:
+  // tile transforms:
   const std::vector<transform_pointer_t> & transform_;
 
   // tiles and tile masks
@@ -3534,7 +3534,7 @@ public:
                   // omitted tile flags:
                   const std::vector<bool> & omit,
 
-                  // tile trasforms:
+                  // tile transforms:
                   const std::vector<transform_pointer_t> & transform,
 
                   // tiles and tile masks
@@ -3635,7 +3635,7 @@ public:
   // omitted tile flags:
   const std::vector<bool> & omit_;
 
-  // tile trasforms:
+  // tile transforms:
   const std::vector<transform_pointer_t> & transform_;
 
   // tile masks

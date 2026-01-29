@@ -630,7 +630,7 @@ match(const unsigned int order,
           // FIXME:
           bestfit_stats(ab, bestfit);
           
-          // re-solve for affine transform in order to accomodate the new
+          // re-solve for affine transform in order to accommodate the new
           // inliers detected due to the higher order polynomial coefficients
           // of the transform, then re-solve for the higher order
           // polynomial coefficients:

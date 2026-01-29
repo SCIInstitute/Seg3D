@@ -49,7 +49,7 @@ namespace Core
 // Forward Declaration
 class ActionHistory;
 
-// Class defintion
+// Class definition
 class ActionHistory : public Lockable
 {
   CORE_SINGLETON( ActionHistory );

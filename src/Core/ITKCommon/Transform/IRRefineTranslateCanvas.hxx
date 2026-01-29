@@ -92,7 +92,7 @@ public:
                                       TheTextVector& imageIDs,
                                       TheTextVector& maskIDs);
   
-  // silly other version that uses a list because fo some reason
+  // silly other version that uses a list because for some reason
   // paul likes using lists for the list of image IDs........
   void fillTransformAndImageIDVectors(TrasformBasePointerVector& transforms,
                                       TheTextList& imageIDs,

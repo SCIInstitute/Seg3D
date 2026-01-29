@@ -71,7 +71,7 @@ public:
   
   bool overlapsTransform(const IRTransform* otherTransform) const;
   
-  // sets start and size to the area that is covered by otherTransfrom,
+  // sets start and size to the area that is covered by otherTransform,
   // the value returned by this function are with respect the the corner of
   // the transformation.
   // if they don't overlap at all this function returns an error (-1)

@@ -311,7 +311,7 @@ public:
     mask[index_b(0, 0)] = false;
   }
   
-  // Convert the j, k indeces associated with a(j, k) coefficient
+  // Convert the j, k indices associated with a(j, k) coefficient
   // into an index that can be used with the parameters array:
   inline static unsigned int index_a(const unsigned int & j,
                                      const unsigned int & k)

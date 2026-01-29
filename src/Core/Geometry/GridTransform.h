@@ -51,7 +51,7 @@ namespace Core
 
 class GridTransform : public Transform
 {
-  // -- constuctors --
+  // -- constructors --
 public:
   GridTransform();
 

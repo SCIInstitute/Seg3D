@@ -128,7 +128,7 @@ identify_clusters_cm(const double * data,
     centerofmass.push_back(cm);
   }
   
-  // sort the max points so that the best candidate is firts:
+  // sort the max points so that the best candidate is first:
   centerofmass.sort(std::greater<centerofmass_t<1> >());
   
   return !centerofmass.empty();

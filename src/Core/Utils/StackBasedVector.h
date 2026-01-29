@@ -36,7 +36,7 @@
 #include <memory>
 #include <vector>
 
-//! This vector type is similar in preformance to the StackVector, but checks
+//! This vector type is similar in performance to the StackVector, but checks
 //! for overflow. In case of overflow memory will be reserved to store data_ 
 
 namespace Core

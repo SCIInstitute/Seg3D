@@ -112,7 +112,7 @@ public:
   const std::vector<size_t>& get_bins() const;
 
   // IS_VALID:
-  /// Check whther histogram is valid
+  /// Check whether histogram is valid
   bool is_valid() const;
 
 private:

@@ -203,7 +203,7 @@ public:
       else
       {
         std::ostringstream oss;
-        oss << "Could not convert inverse tranform obtained from transform "
+        oss << "Could not convert inverse transform obtained from transform "
             << i << " from itkTransformBase to itkTransform. Skipping transform.";
         CORE_LOG_DEBUG(oss.str());
       }
@@ -364,7 +364,7 @@ private:
   // Cascaded transforms - input is first transformed by the first
   // transform, followed by the other transforms sequentially.
   // Only the top-most (last) transform in the array is accessible
-  // for modification, all preciding transforms are fixed.
+  // for modification, all preceding transforms are fixed.
   std::vector<TransformPointer> transform_;
 
   // This index controls which transform on the stack can be manipulated

@@ -61,7 +61,7 @@ public:
 /// A simple class for managing connections
 
 /// NOTE: To use this class the derived class needs to call disconnect_all()
-/// in the distructor before any of the structures are deleted.
+/// in the destructor before any of the structures are deleted.
 
 class ConnectionHandler : public boost::noncopyable
 {

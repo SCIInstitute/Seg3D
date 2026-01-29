@@ -49,7 +49,7 @@ namespace Core
 /// geometric expressions. 
 
 // NOTE: The double version of Point and Vector are defined separately. As Vector
-// and Point are dependent on each other, a templated version is limitted by the
+// and Point are dependent on each other, a templated version is limited by the
 // need to include templated member function, and templated member functions
 // current can only be defined inside the template (a limitation of the 
 // C++ language). Hence to keep code readable and organized we have two versions

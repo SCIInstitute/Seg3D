@@ -89,7 +89,7 @@ public:
   virtual Transform get_transform() const = 0;
 
   // SET_TRANSFORM:
-  /// Set the transfrom in the nrrd data
+  /// Set the transform in the nrrd data
   virtual void set_transform( Transform& transform, SliceType slice = SliceType::AXIAL_E  ) = 0;
 
   // GET_NX, GET_NY:
@@ -164,7 +164,7 @@ public:
   virtual Transform get_transform() const;
 
   // SET_TRANSFORM:
-  /// Set the transfrom in the nrrd data
+  /// Set the transform in the nrrd data
   virtual void set_transform( Transform& transform, SliceType slice = SliceType::AXIAL_E );
 
   // GET_NX, GET_NY:

@@ -54,7 +54,7 @@ public:
   /// Virtual destructor so we can do dynamic casts on this class
   virtual ~ParserFunction() {}
 
-  /// Retieve the function ID string
+  /// Retrieve the function ID string
   std::string get_function_id();
 
   /// Retrieve the function return type

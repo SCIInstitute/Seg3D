@@ -117,7 +117,7 @@ public:
   {
   }
 
-  // DESTRUCTRO
+  // DESTRUCTOR
   virtual ~StateValue()
   {
   }

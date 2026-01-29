@@ -110,7 +110,7 @@ public:
   Transform get_transform() const;
 
   // SET_TRANSFORM:
-  /// Set the transfrom in the nrrd data
+  /// Set the transform in the nrrd data
   void set_transform( GridTransform& transform, bool no_downgrade );
 
   // GET_HISTOGRAM:
